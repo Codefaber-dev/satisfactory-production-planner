@@ -12,7 +12,7 @@ class IngredientSeeder extends Seeder
         'Limestone',
         'Raw Quartz',
         'Coal',
-        'Sulphur',
+        'Sulfur',
 
         // Ores
         'Iron Ore',
@@ -104,7 +104,7 @@ class IngredientSeeder extends Seeder
         'AI Limiter',
         'Nobelisk',
         'Gas Filter',
-        'Spike Rebar'
+        'Spiked Rebar'
     ];
 
     protected $tier5 = [

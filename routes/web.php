@@ -17,7 +17,14 @@ use Inertia\Inertia;
 */
 
 Route::get('test',function() {
-   return Ingredient::all();
+   return Ingredient::where('raw',false)
+       ->whereDoesntHave('recipes')
+       ->orderBy('tier')
+       ->orderBy('name')
+       ->get()
+       ->map(function($recipe){
+           return $recipe->name;
+       });
 });
 
 Route::get('/', function () {

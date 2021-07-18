@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Ingredient;
+use App\Models\Recipe;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -61,5 +62,17 @@ class IngredientTest extends TestCase
         $in->refresh();
 
         $this->assertEquals(4, $in->tier);
+    }
+
+    /** @test */
+    public function it_can_have_multiple_recipes()
+    {
+        $in = Ingredient::factory()->create();
+
+        $recipe2 = Recipe::factory()->count(3)->create([
+            'product_id' => $in
+        ]);
+
+        $this->assertCount(3, $in->recipes);
     }
 }

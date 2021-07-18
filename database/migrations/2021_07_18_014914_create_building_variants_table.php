@@ -18,7 +18,7 @@ class CreateBuildingVariantsTable extends Migration
             $table->string('name');
             $table->foreignId('building_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('base_power');
-            $table->unsignedInteger('multiplier')->default(1);
+            $table->decimal('multiplier',8,2)->default(1);
             $table->timestamps();
 
             $table->unique(['name','building_id']);

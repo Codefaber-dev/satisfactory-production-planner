@@ -31,4 +31,14 @@ class Ingredient extends Model
     {
         return $query->whereName($name)->first();
     }
+
+    /**
+     * An ingredient has many recipes
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function recipes()
+    {
+        return $this->hasMany(Recipe::class,'product_id');
+    }
 }
