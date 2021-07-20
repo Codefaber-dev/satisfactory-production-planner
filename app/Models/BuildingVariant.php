@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use function pow;
 
 class BuildingVariant extends Model
 {
@@ -32,5 +35,21 @@ class BuildingVariant extends Model
             ->withPivot([
                 'qty'
             ]);
+    }
+
+    public function scopeOfName(Builder $query, $name)
+    {
+        return $query->firstWhere('name',$name);
+    }
+
+    public function calculatePowerUsage($clock_speed)
+    {
+        if ($clock_speed < 0.01)
+            throw new InvalidArgumentException("Clock speed must be at least 0.01");
+
+        if ($clock_speed > 2.5)
+            throw new InvalidArgumentException("Clock speed must be at most 2.5");
+
+        return pow($clock_speed,1.6) * $this->base_power;
     }
 }

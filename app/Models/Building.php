@@ -21,4 +21,9 @@ class Building extends Model
     {
         return $query->whereName($name)->first();
     }
+
+    public function variant($name)
+    {
+        return $this->variants()->ofName($name);
+    }
 }

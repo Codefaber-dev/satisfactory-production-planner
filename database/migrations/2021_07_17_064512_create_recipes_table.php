@@ -19,7 +19,7 @@ class CreateRecipesTable extends Migration
             $table->unsignedBigInteger('building_id');
             $table->unsignedBigInteger('product_id');
             $table->unsignedInteger('base_yield')->default(1);
-            $table->decimal('base_per_min',8,2);
+            $table->decimal('base_per_min',10,4);
             $table->boolean('alt_recipe')->default(false);
             $table->string('description')->nullable();
 
@@ -32,7 +32,7 @@ class CreateRecipesTable extends Migration
         Schema::create('ingredient_recipe', function(Blueprint $table) {
             $table->foreignId('recipe_id')->constrained()->cascadeOnDelete();
             $table->foreignId('ingredient_id')->constrained()->cascadeOnDelete();
-            $table->decimal('base_qty',8,2);
+            $table->decimal('base_qty',10,4);
 
             $table->primary(['recipe_id','ingredient_id']);
         });
