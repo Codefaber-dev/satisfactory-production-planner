@@ -845,7 +845,7 @@ class RecipeSeeder extends Seeder
                     "Copper Ore" => 50,
                     "Iron Ore" => 25,
                 ],
-                "alt_recipe" => true
+                "alt_recipe" => true,
             ],
             "Iron Ingot" => [
                 "description" => "Iron Alloy Ingot",
@@ -855,7 +855,7 @@ class RecipeSeeder extends Seeder
                     "Copper Ore" => 20,
                     "Iron Ore" => 20,
                 ],
-                "alt_recipe" => true
+                "alt_recipe" => true,
             ],
             "Steel Ingot" => [
                 [
@@ -874,7 +874,7 @@ class RecipeSeeder extends Seeder
                         "Iron Ore" => 75,
                         "Petroleum Coke" => 75,
                     ],
-                    "alt_recipe" => true
+                    "alt_recipe" => true,
                 ],
                 [
                     "description" => "Compacted Steel Ingot",
@@ -884,7 +884,7 @@ class RecipeSeeder extends Seeder
                         "Iron Ore" => 22.5,
                         "Compacted Coal" => 11.25,
                     ],
-                    "alt_recipe" => true
+                    "alt_recipe" => true,
                 ],
                 [
                     "description" => "Solid Steel Ingot",
@@ -894,7 +894,7 @@ class RecipeSeeder extends Seeder
                         "Iron Ingot" => 40,
                         "Coal" => 40,
                     ],
-                    "alt_recipe" => true
+                    "alt_recipe" => true,
                 ],
             ],
         ],
@@ -1244,215 +1244,510 @@ class RecipeSeeder extends Seeder
             ],
         ],
 
-        /*
         "Manufacturer" => [
             "Adaptive Control Unit" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 2,
+                "base_per_min" => 1,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Automated Wiring" => 7.5,
+                    "Circuit Board" => 5,
+                    "Heavy Modular Frame" => 1,
+                    "Computer" => 1,
                 ],
+            ],
+            "Automated Wiring" => [
+                "description" => "High-Speed Wiring",
+                "base_yield" => 4,
+                "base_per_min" => 7.5,
+                "ingredients" => [
+                    "Stator" => 3.75,
+                    "Wire" => 75,
+                    "High-Speed Connector" => 1.875,
+                ],
+                "alt_recipe" => true,
             ],
             "Beacon" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 7.5,
+                    "ingredients" => [
+                        "Iron Plate" => 22.5,
+                        "Iron Rod" => 7.5,
+                        "Wire" => 112.5,
+                        "Cable" => 15,
+                    ],
+                ],
+                [
+                    "description" => "Crystal Beacon",
+                    "base_yield" => 20,
+                    "base_per_min" => 10,
+                    "ingredients" => [
+                        "Steel Beam" => 2,
+                        "Steel Pipe" => 8,
+                        "Crystal Oscillator" => 0.5,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
-            "Computer" => [
-                "base_yield" => 1,
+            "Battery" => [
+                "description" => "Classic Battery",
+                "base_yield" => 4,
                 "base_per_min" => 30,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Sulfur" => 45,
+                    "Alclad Aluminum Sheet" => 52.5,
+                    "Plastic" => 60,
+                    "Wire" => 90,
+                ],
+                "alt_recipe" => true,
+            ],
+            "Computer" => [
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 2.5,
+                    "ingredients" => [
+                        "Circuit Board" => 25,
+                        "Cable" => 22.5,
+                        "Plastic" => 45,
+                        "Screw" => 130,
+                    ],
+                ],
+                [
+                    "description" => "Caterium Computer",
+                    "base_yield" => 1,
+                    "base_per_min" => 3.8,
+                    "ingredients" => [
+                        "Circuit Board" => 26.25,
+                        "Quickwire" => 105,
+                        "Rubber" => 45,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
             "Crystal Oscillator" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 2,
+                    "base_per_min" => 1,
+                    "ingredients" => [
+                        "Quartz Crystal" => 18,
+                        "Cable" => 14,
+                        "Reinforced Iron Plate" => 2.5,
+                    ],
                 ],
+                [
+                    "description" => "Insulated Crystal Oscillator",
+                    "base_yield" => 1,
+                    "base_per_min" => 1.9,
+                    "ingredients" => [
+                        "Quartz Crystal" => 18.75,
+                        "Rubber" => 13.125,
+                        "AI Limiter" => 1.875,
+                    ],
+                    "alt_recipe" => true,
+                ],
+            ],
+            "Encased Uranium Cell" => [
+                "description" => "Infused Uranium Cell",
+                "base_yield" => 4,
+                "base_per_min" => 20,
+                "ingredients" => [
+                    "Uranium" => 25,
+                    "Silica" => 15,
+                    "Sulfur" => 25,
+                    "Quickwire" => 75,
+                ],
+                "alt_recipe" => true,
             ],
             "Gas Filter" => [
                 "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_per_min" => 7.5,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Coal" => 37.5,
+                    "Rubber" => 15,
+                    "Fabric" => 15,
                 ],
             ],
             "Heavy Modular Frame" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 2,
+                    "ingredients" => [
+                        "Modular Frame" => 10,
+                        "Steel Pipe" => 30,
+                        "Encased Industrial Beam" => 10,
+                        "Screw" => 200,
+                    ],
+                ],
+                [
+                    "description" => "Heavy Flexible Frame",
+                    "base_yield" => 1,
+                    "base_per_min" => 3.8,
+                    "ingredients" => [
+                        "Modular Frame" => 18.75,
+                        "Encased Industrial Beam" => 11.25,
+                        "Rubber" => 75,
+                        "Screw" => 390,
+                    ],
+                    "alt_recipe" => true,
+                ],
+                [
+                    "description" => "Heavy Encased Frame",
+                    "base_yield" => 3,
+                    "base_per_min" => 2.8,
+                    "ingredients" => [
+                        "Modular Frame" => 7.5,
+                        "Encased Industrial Beam" => 9.375,
+                        "Steel Pipe" => 33.75,
+                        "Concrete" => 20.625,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
             "High-Speed Connector" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 3.8,
+                    "ingredients" => [
+                        "Quickwire" => 210,
+                        "Cable" => 37.5,
+                        "Circuit Board" => 3.75,
+                    ],
+                ],
+                [
+                    "description" => "Silicon High-Speed Connector",
+                    "base_yield" => 2,
+                    "base_per_min" => 3,
+                    "ingredients" => [
+                        "Quickwire" => 90,
+                        "Silica" => 37.5,
+                        "Circuit Board" => 3,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
             "Iodine Infused Filter" => [
                 "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_per_min" => 3.8,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Gas Filter" => 3.75,
+                    "Quickwire" => 30,
+                    "Aluminum Casing" => 3.75,
                 ],
             ],
             "Magnetic Field Generator" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 2,
+                "base_per_min" => 1,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Versatile Framework" => 2.5,
+                    "Electromagnetic Control Rod" => 1,
+                    "Battery" => 5,
                 ],
             ],
             "Modular Engine" => [
                 "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_per_min" => 1,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Motor" => 2,
+                    "Rubber" => 15,
+                    "Smart Plating" => 2,
+                ],
+            ],
+            "Motor" => [
+                "description" => "Rigour Motor",
+                "base_yield" => 6,
+                "base_per_min" => 7.5,
+                "ingredients" => [
+                    "Rotor" => 3.75,
+                    "Stator" => 3.75,
+                    "Crystal Oscillator" => 1.25,
+                ],
+                "alt_recipe" => true,
+            ],
+            "Nobelisk" => [
+                "description" => "Seismic Nobelisk",
+                "base_yield" => 4,
+                "base_per_min" => 6,
+                "ingredients" => [
+                    "Black Powder" => 12,
+                    "Steel Pipe" => 12,
+                    "Crystal Oscillator" => 1.25,
+                ],
+                "alt_recipe" => true,
+            ],
+            "Portable Miner" => [
+                "description" => "Automated Miner",
+                "base_yield" => 1,
+                "base_per_min" => 1,
+                "ingredients" => [
+                    "Motor" => 1,
+                    "Steel Pipe" => 4,
+                    "Iron Rod" => 4,
+                    "Iron Plate" => 2,
                 ],
             ],
             "Plutonium Fuel Rod" => [
                 "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_per_min" => 0.3,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Encased Plutonium Cell" => 7.5,
+                    "Steel Beam" => 4.5,
+                    "Electromagnetic Control Rod" => 1.5,
+                    "Heat Sink" => 2.5,
                 ],
             ],
             "Radio Control Unit" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 2,
+                    "base_per_min" => 2.5,
+                    "ingredients" => [
+                        "Aluminum Casing" => 40,
+                        "Crystal Oscillator" => 1.25,
+                        "Computer" => 1.25,
+                    ],
+                ],
+                [
+                    "description" => "Radio Connection Unit",
+                    "base_yield" => 1,
+                    "base_per_min" => 3.8,
+                    "ingredients" => [
+                        "Heat Sink" => 15,
+                        "High-Speed Connector" => 7.5,
+                        "Quartz Crystal" => 45,
+                    ],
+                    "alt_recipe" => true,
+                ],
+                [
+                    "description" => "Radio Control System",
+                    "base_yield" => 3,
+                    "base_per_min" => 4.5,
+                    "ingredients" => [
+                        "Crystal Oscillator" => 1.5,
+                        "Circuit Board" => 15,
+                        "Aluminum Casing" => 90,
+                        "Rubber" => 45,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
             "Rifle Cartridge" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 5,
+                "base_per_min" => 15,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Beacon" => 3,
+                    "Steel Pipe" => 30,
+                    "Black Powder" => 30,
+                    "Rubber" => 30,
                 ],
             ],
             "Supercomputer" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 1.9,
+                    "ingredients" => [
+                        "Computer" => 3.75,
+                        "AI Limiter" => 3.75,
+                        "High-Speed Connector" => 5.625,
+                        "Plastic" => 52.5,
+                    ],
+                ],
+                [
+                    "description" => "Super-State Computer",
+                    "base_yield" => 1,
+                    "base_per_min" => 2.4,
+                    "ingredients" => [
+                        "Computer" => 3.6,
+                        "Electromagnetic Control Rod" => 2.4,
+                        "Battery" => 24,
+                        "Wire" => 54,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
-            "Thermal Propulsion Rocket" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+            "Smart Plating" => [
+                "description" => "Plastic Smart Plating",
+                "base_yield" => 2,
+                "base_per_min" => 5,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Reinforced Iron Plate" => 2.5,
+                    "Rotor" => 2.5,
+                    "Plastic" => 7.5,
+                ],
+                "alt_recipe" => true,
+            ],
+            "Thermal Propulsion Rocket" => [
+                "base_yield" => 2,
+                "base_per_min" => 1,
+                "ingredients" => [
+                    "Modular Engine" => 2.5,
+                    "Turbo Motor" => 1,
+                    "Cooling System" => 3,
+                    "Fused Modular Frame" => 1,
                 ],
             ],
             "Turbo Motor" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 1.9,
+                    "ingredients" => [
+                        "Cooling System" => 7.5,
+                        "Radio Control Unit" => 3.75,
+                        "Motor" => 7.5,
+                        "Rubber" => 45,
+                    ],
+                ],
+                [
+                    "description" => "Turbo Electric Motor",
+                    "base_yield" => 3,
+                    "base_per_min" => 2.8,
+                    "ingredients" => [
+                        "Motor" => 6.5625,
+                        "Radio Control Unit" => 8.4375,
+                        "Electromagnetic Control Rod" => 4.6875,
+                        "Rotor" => 6.5625,
+                    ],
+                    "alt_recipe" => true,
+                ],
+                [
+                    "description" => "Turbo Pressure Motor",
+                    "base_yield" => 2,
+                    "base_per_min" => 3.8,
+                    "ingredients" => [
+                        "Motor" => 7.5,
+                        "Pressure Conversion Cube" => 1.875,
+                        "Packaged Nitrogen Gas" => 45,
+                        "Stator" => 15,
+                    ],
+                    "alt_recipe" => true,
                 ],
             ],
             "Quantum Server" => [
                 "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_per_min" => 1,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Supercomputer" => 10,
+                    "AI Limiter" => 50,
+                    "Heavy Modular Frame" => 25,
                 ],
             ],
             "Uranium Fuel Rod" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 0.4,
+                    "ingredients" => [
+                        "Encased Uranium Cell" => 20,
+                        "Encased Industrial Beam" => 1.2,
+                        "Electromagnetic Control Rod" => 2,
+                    ],
                 ],
+                [
+                    "description" => "Uranium Fuel Unit",
+                    "base_yield" => 3,
+                    "base_per_min" => 0.6,
+                    "ingredients" => [
+                        "Encased Uranium Cell" => 20,
+                        "Electromagnetic Control Rod" => 2,
+                        "Crystal Oscillator" => 0.6,
+                        "Beacon" => 1.2,
+                    ],
+                    "alt_recipe" => true
+                ],
+            ],
+            "Versatile Framework" => [
+                "description" => "Flexible Framework",
+                "base_yield" => 2,
+                "base_per_min" => 7.5,
+                "ingredients" => [
+                    "Modular Frame" => 3.75,
+                    "Steel Beam" => 22.5,
+                    "Rubber" => 30,
+                ],
+                "alt_recipe" => true,
             ],
         ],
 
-        "Blender" => [
-            "Battery" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-            "Cooling System" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-            "Encased Uranium Cell" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-            "Fused Modular Frame" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-            "Nitric Acid" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-            "Non-fissile Uranium" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-        ],
-
-        "Particle Accelerator" => [
-            "Plutonium Pellet" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-            "Nuclear Pasta" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                ],
-            ],
-        ],
+        // continue here
+        //
+        //"Blender" => [
+        //    "Battery" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //    "Cooling System" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //    "Encased Uranium Cell" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //    "Fused Modular Frame" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //    "Nitric Acid" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //    "Non-fissile Uranium" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //],
+        //
+        //"Particle Accelerator" => [
+        //    "Plutonium Pellet" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //    "Nuclear Pasta" => [
+        //        "base_yield" => 1,
+        //        "base_per_min" => 30,
+        //        "ingredients" => [
+        //            "Iron Ore" => 30,
+        //        ],
+        //    ],
+        //],
 
         "Nuclear Power Plant" => [
             "Uranium Waste" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 50,
+                "base_per_min" => 10,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Uranium Fuel Rod" => 0.2,
+                    "Water" => 300,
                 ],
             ],
             "Plutonium Waste" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 10,
+                "base_per_min" => 1,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Plutonium Fuel Rod" => 0.1,
+                    "Water" => 300
                 ],
             ],
         ],
-        */
+
     ];
 
     /**
@@ -1470,8 +1765,6 @@ class RecipeSeeder extends Seeder
 
                 // wrap the recipes if needed
                 $recipes = isset($recipes[0]) ? $recipes : [$recipes];
-
-
 
                 foreach ($recipes as $recipe) {
                     $atts = [
@@ -1492,8 +1785,9 @@ class RecipeSeeder extends Seeder
 
                         $ingredient = Ingredient::ofName($name);
 
-                        if ( get_class($ingredient) !== Ingredient::class )
+                        if (get_class($ingredient) !== Ingredient::class) {
                             throw new InvalidArgumentException("Could not find ingredient {$name}");
+                        }
 
                         $recipe_model->addIngredient($ingredient, $qty);
                     });

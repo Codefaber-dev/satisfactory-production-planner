@@ -466,6 +466,93 @@ class BuildingSeeder extends Seeder
             ]
         ],
 
+        // Nuclear Power Plant
+        [
+            'name' => 'Nuclear Power Plant',
+            'inputs' => 2,
+            'outputs' => 1,
+            'width' => 38,
+            'length' => 43,
+            'height' => 49,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 2500,
+                    'recipe' => [
+                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                    ],
+                ],
+                'mk2' => [
+                    'multiplier' => 1,
+                    'base_power' => 2500,
+                    'recipe' => [
+                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                    ],
+                ],
+                'mk3' => [
+                    'multiplier' => 1,
+                    'base_power' => 2500,
+                    'recipe' => [
+                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                    ],
+                ],
+                'mk4' => [
+                    'multiplier' => 1,
+                    'base_power' => 2500,
+                    'recipe' => [
+                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                    ],
+                ],
+                //'mk2' => [
+                //    'multiplier' => 1.5,
+                //    'base_power' => 375,
+                //    'recipe' => [
+                //        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 15 ],
+                //        [ 'ingredient' => 'Turbo Motor', 'qty' => 5 ],
+                //        [ 'ingredient' => 'Aluminum Casing', 'qty' => 75 ],
+                //        [ 'ingredient' => 'Radio Control Unit', 'qty' => 10 ],
+                //    ]
+                //],
+                //'mk3' => [
+                //    'multiplier' => 2,
+                //    'base_power' => 500,
+                //    'recipe' => [
+                //        [ 'ingredient' => 'Fused Modular Frame', 'qty' => 10 ],
+                //        [ 'ingredient' => 'Turbo Motor', 'qty' => 10 ],
+                //        [ 'ingredient' => 'Aluminum Casing', 'qty' => 100 ],
+                //        [ 'ingredient' => 'Radio Control Unit', 'qty' => 15 ],
+                //    ]
+                //],
+                //'mk4' => [
+                //    'multiplier' => 5,
+                //    'base_power' => 1000,
+                //    'recipe' => [
+                //        [ 'ingredient' => 'Fused Modular Frame', 'qty' => 20 ],
+                //        [ 'ingredient' => 'Turbo Motor', 'qty' => 15 ],
+                //        [ 'ingredient' => 'Aluminum Casing', 'qty' => 150 ],
+                //        [ 'ingredient' => 'Radio Control Unit', 'qty' => 15 ],
+                //        [ 'ingredient' => 'Quantum Server', 'qty' => 5 ],
+                //    ]
+                //],
+            ]
+        ],
+
 
 
 

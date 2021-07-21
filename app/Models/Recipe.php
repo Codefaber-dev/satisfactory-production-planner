@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,6 +11,11 @@ class Recipe extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function scopeOfName(Builder $query, $name)
+    {
+        return $query->firstWhere('description',$name);
+    }
 
     /**
      * A recipe yields a product

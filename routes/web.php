@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\ProductionCalculator;
 use App\Models\Ingredient;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -16,15 +17,17 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('test',function() {
-   return Ingredient::where('raw',false)
-       ->whereDoesntHave('recipes')
-       ->orderBy('tier')
-       ->orderBy('name')
-       ->get()
-       ->map(function($recipe){
-           return $recipe->name;
-       });
+Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
+    auth()->loginUsingId(1);
+
+    return ProductionCalculator::calc($ingredient, $qty, $recipe);
+});
+
+
+Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
+    auth()->loginUsingId(1);
+
+    return ProductionCalculator::calc($ingredient, $qty);
 });
 
 Route::get('/', function () {

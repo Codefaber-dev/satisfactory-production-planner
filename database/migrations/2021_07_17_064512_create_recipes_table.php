@@ -36,6 +36,15 @@ class CreateRecipesTable extends Migration
 
             $table->primary(['recipe_id','ingredient_id']);
         });
+
+        Schema::create('recipe_user', function(Blueprint $table) {
+           $table->foreignId('ingredient_id')->constrained()->cascadeOnDelete();
+           $table->foreignId('recipe_id')->constrained()->cascadeOnDelete();
+           $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+
+           $table->primary(['recipe_id','user_id']);
+           $table->unique(['ingredient_id','user_id']);
+        });
     }
 
     /**

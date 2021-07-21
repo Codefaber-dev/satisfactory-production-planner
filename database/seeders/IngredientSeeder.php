@@ -121,6 +121,7 @@ class IngredientSeeder extends Seeder
     ];
 
     protected $tier6 = [
+        'Portable Miner',
         'Crystal Oscillator',
         'Modular Frame',
         'Supercomputer',

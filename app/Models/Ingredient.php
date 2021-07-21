@@ -41,4 +41,20 @@ class Ingredient extends Model
     {
         return $this->hasMany(Recipe::class,'product_id');
     }
+
+    /**
+     * Get the default recipe
+     *
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|null
+     */
+    public function defaultRecipe()
+    {
+        if ( auth()->check() && $recipe = auth()->user()->favorite_recipes()->firstWhere('ingredient_id',$this->id) )
+            return $recipe;
+
+        if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
+            return $recipe;
+
+        return $recipe->first();
+    }
 }
