@@ -75,8 +75,7 @@ class User extends Authenticatable
 
     public function addFavorite(Recipe $recipe)
     {
-        $this->favorite_recipes()->where('ingredient_id',$recipe->product_id)->delete();
-
+        $this->favorite_recipes()->wherePivot('ingredient_id','=',$recipe->product_id)->detach();
         $this->favorite_recipes()->attach($recipe->id,['ingredient_id' => $recipe->product_id]);
     }
 

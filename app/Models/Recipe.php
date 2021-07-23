@@ -50,8 +50,37 @@ class Recipe extends Model
             ]);
     }
 
+    /**
+     * A recipe has many byproducts
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function byproducts()
+    {
+        return $this->belongsToMany(Ingredient::class,'byproduct_recipe')
+            ->withPivot([
+                'base_qty',
+            ]);
+    }
+
     public function addIngredient(Ingredient $ingredient, $base_qty)
     {
         $this->ingredients()->attach($ingredient, compact('base_qty'));
+    }
+
+    public function addByproduct(Ingredient $ingredient, $base_qty)
+    {
+        $this->byproducts()->attach($ingredient, compact('base_qty'));
+    }
+
+    public function getChoiceText()
+    {
+        $ppm = $this->base_per_min;
+        $description = $this->description ?? 'default';
+
+        $ingredients = $this->ingredients->map(fn($ingredient) => "$ingredient->name [{$ingredient->pivot->base_qty} ppm]")->join(", ");
+        $byproducts = $this->byproducts()->count() ? " [" . $this->byproducts->map(fn($ingredient) => ":bp: $ingredient->name [" . (int) $ingredient->pivot->base_qty . " ppm]")->join(", ") . "]" : "";
+
+        return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts";
     }
 }

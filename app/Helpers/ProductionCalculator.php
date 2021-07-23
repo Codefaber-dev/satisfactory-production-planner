@@ -16,6 +16,8 @@ class ProductionCalculator
 
     protected $parts = [];
 
+    protected $byproducts = [];
+
     protected $recipes = [];
 
     protected $yield = [];
@@ -58,6 +60,7 @@ class ProductionCalculator
             "yield" => $this->yield,
             "raw materials" => collect($this->parts)->filter(function($val,$key) { return Str::of($key)->startsWith("1");})->all(),
             "parts per minute" => collect($this->parts)->sortKeys()->all(),
+            "byproducts per minute" => collect($this->byproducts)->sortKeys()->all(),
             "power_usage_mw" => collect($this->power_usage),
             "build_cost" => $this->build_cost,
             "recipes" => collect($this->recipes)->sortKeys()->all(),
@@ -82,6 +85,13 @@ class ProductionCalculator
                 "building_details" => $this->getBuildingDetails($recipe,$recipe_qty)
             ];
 
+        if ( $recipe->has('byproducts') )
+            $recipe->byproducts->each(function($ingredient) use ($qty){
+                $this->byproducts[$ingredient->name] = (isset($this->byproducts[$ingredient->name]))
+                    ? $this->byproducts[$ingredient->name] + ($qty*$ingredient->pivot->base_qty)
+                    : $qty*$ingredient->pivot->base_qty;
+            });
+
         $recipe->ingredients->each(function($ingredient) use ($qty, $recipe) {
 
             // how many times per minute we need to make the recipe
@@ -91,7 +101,7 @@ class ProductionCalculator
             $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty;
 
             // if we have the ingredient in the parts list then increment it, otherwise add it
-            if (isset($this->parts[$ingredient->name]))
+            if (isset($this->parts[$this->getKeyName($ingredient)]))
                 $this->parts[$this->getKeyName($ingredient)] += $sub_qty;
             else
                 $this->parts[$this->getKeyName($ingredient)] = $sub_qty;

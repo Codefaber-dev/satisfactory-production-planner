@@ -13,6 +13,7 @@ class RecipeSeeder extends Seeder
 {
     protected $recipes = [
         // alts done
+        // no byproducts
         "Smelter" => [
             "Iron Ingot" => [
                 "base_yield" => 1,
@@ -51,6 +52,7 @@ class RecipeSeeder extends Seeder
         ],
 
         // alts done
+        // no byproducts
         "Constructor" => [
             "Aluminum Casing" => [
                 "base_yield" => 2,
@@ -325,6 +327,7 @@ class RecipeSeeder extends Seeder
         ],
 
         // alts done
+        // no byproducts
         "Assembler" => [
             "AI Limiter" => [
                 "base_yield" => 1,
@@ -828,6 +831,7 @@ class RecipeSeeder extends Seeder
         ],
 
         // alts done
+        // no byproducts
         "Foundry" => [
             "Aluminum Ingot" => [
                 "base_yield" => 4,
@@ -900,6 +904,7 @@ class RecipeSeeder extends Seeder
         ],
 
         // alts done
+        // byproducts done
         "Refinery" => [
             "Alumina Solution" => [
                 [
@@ -908,6 +913,9 @@ class RecipeSeeder extends Seeder
                     "ingredients" => [
                         "Bauxite" => 120,
                         "Water" => 180,
+                    ],
+                    "byproducts" => [
+                        "Silica" => 50,
                     ],
                 ],
                 [
@@ -924,10 +932,13 @@ class RecipeSeeder extends Seeder
             "Aluminum Scrap" => [
                 [
                     "base_yield" => 6,
-                    "base_per_min" => 30,
+                    "base_per_min" => 300,
                     "ingredients" => [
                         "Alumina Solution" => 240,
                         "Coal" => 120,
+                    ],
+                    "byproducts" => [
+                        "Water" => 120,
                     ],
                 ],
                 [
@@ -937,6 +948,9 @@ class RecipeSeeder extends Seeder
                     "ingredients" => [
                         "Alumina Solution" => 180,
                         "Petroleum Coke" => 60,
+                    ],
+                    "byproducts" => [
+                        "Water" => 105,
                     ],
                     "alt_recipe" => true,
                 ],
@@ -1008,6 +1022,9 @@ class RecipeSeeder extends Seeder
                     "ingredients" => [
                         "Crude Oil" => 60,
                     ],
+                    "byproducts" => [
+                        "Polymer Resin" => 30,
+                    ],
                 ],
                 [
                     "description" => "Residual Fuel",
@@ -1024,6 +1041,9 @@ class RecipeSeeder extends Seeder
                 "base_per_min" => 40,
                 "ingredients" => [
                     "Crude Oil" => 30,
+                ],
+                "byproducts" => [
+                    "Polymer Resin" => 20,
                 ],
                 "alt_recipe" => true,
             ],
@@ -1069,6 +1089,9 @@ class RecipeSeeder extends Seeder
                     "ingredients" => [
                         "Crude Oil" => 30,
                     ],
+                    "byproducts" => [
+                        "Heavy Oil Residue" => 10,
+                    ],
                 ],
                 [
                     "description" => "Recycled Plastic",
@@ -1097,6 +1120,9 @@ class RecipeSeeder extends Seeder
                 "ingredients" => [
                     "Crude Oil" => 60,
                 ],
+                "byproducts" => [
+                    "Heavy Oil Residue" => 20,
+                ],
                 "alt_recipe" => true,
             ],
             "Quartz Crystal" => [
@@ -1115,6 +1141,9 @@ class RecipeSeeder extends Seeder
                     "base_per_min" => 20,
                     "ingredients" => [
                         "Crude Oil" => 30,
+                    ],
+                    "byproducts" => [
+                        "Heavy Oil Residue" => 20,
                     ],
                 ],
                 [
@@ -1169,81 +1198,213 @@ class RecipeSeeder extends Seeder
             ],
         ],
 
-        // no alts
+        // alts done
+        // byproducts done
         "Packager" => [
-            "Packaged Alumina Solution" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
-                    "Iron Ore" => 30,
+            "Alumina Solution" => [
+                "description" => "Unpackage Alumina Solution",
+                "base_yield" => 2,
+                "base_per_min" => 120,
+                "byproducts" => [
+                    "Empty Canister" => 120,
                 ],
+                "ingredients" => [
+                    "Packaged Alumina Solution" => 120
+                ],
+                "alt_recipe" => true
+            ],
+            "Packaged Alumina Solution" => [
+                "base_yield" => 2,
+                "base_per_min" => 120,
+                "ingredients" => [
+                    "Alumina Solution" => 120,
+                    "Empty Canister" => 120,
+                ],
+            ],
+            "Fuel" => [
+                "description" => "Unpackage Fuel",
+                "base_yield" => 2,
+                "base_per_min" => 60,
+                "byproducts" => [
+                    "Empty Canister" => 60,
+                ],
+                "ingredients" => [
+                    "Packaged Fuel" => 60
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Fuel" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 2,
+                "base_per_min" => 40,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Fuel" => 40,
+                    "Empty Canister" => 40,
                 ],
+            ],
+            "Heavy Oil Residue" => [
+                "description" => "Unpackage Heavy Oil Residue",
+                "base_yield" => 2,
+                "base_per_min" => 20,
+                "byproducts" => [
+                    "Empty Canister" => 20,
+                ],
+                "ingredients" => [
+                    "Packaged Heavy Oil Residue" => 20
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Heavy Oil Residue" => [
-                "base_yield" => 1,
+                "base_yield" => 2,
                 "base_per_min" => 30,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Heavy Oil Residue" => 30,
+                    "Empty Canister" => 30,
                 ],
             ],
-            "Packaged Liquid Biofuel" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
-                "ingredients" => [
-                    "Iron Ore" => 30,
+            "Liquid Biofuel" => [
+                "description" => "Unpackage Liquid Biofuel",
+                "base_yield" => 2,
+                "base_per_min" => 60,
+                "byproducts" => [
+                    "Empty Canister" => 60,
                 ],
+                "ingredients" => [
+                    "Packaged Liquid Biofuel" => 60
+                ],
+                "alt_recipe" => true
+            ],
+            "Packaged Liquid Biofuel" => [
+                "base_yield" => 2,
+                "base_per_min" => 40,
+                "ingredients" => [
+                    "Liquid Biofuel" => 40,
+                    "Empty Canister" => 40,
+                ],
+            ],
+            "Nitric Acid" => [
+                "description" => "Unpackage Nitric Acid",
+                "base_yield" => 2,
+                "base_per_min" => 20,
+                "byproducts" => [
+                    "Empty Canister" => 20,
+                ],
+                "ingredients" => [
+                    "Packaged Nitric Acid" => 20
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Nitric Acid" => [
                 "base_yield" => 1,
                 "base_per_min" => 30,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Nitric Acid" => 30,
+                    "Empty Canister" => 30,
                 ],
+            ],
+            "Nitrogen Gas" => [
+                "description" => "Unpackage Nitrogen Gas",
+                "base_yield" => 2,
+                "base_per_min" => 240,
+                "byproducts" => [
+                    "Empty Fluid Tank" => 60,
+                ],
+                "ingredients" => [
+                    "Packaged Nitrogen Gas" => 60
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Nitrogen Gas" => [
                 "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_per_min" => 00,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Nitrogen Gas" => 240,
+                    "Empty Fluid Tank" => 60,
                 ],
+            ],
+            "Crude Oil" => [
+                "description" => "Unpackage Oil",
+                "base_yield" => 2,
+                "base_per_min" => 60,
+                "byproducts" => [
+                    "Empty Canister" => 60,
+                ],
+                "ingredients" => [
+                    "Packaged Oil" => 60
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Oil" => [
-                "base_yield" => 1,
+                "base_yield" => 2,
                 "base_per_min" => 30,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Crude Oil" => 30,
+                    "Empty Canister" => 30,
                 ],
+            ],
+            "Sulfuric Acid" => [
+                "description" => "Unpackage Sulfuric Acid",
+                "base_yield" => 2,
+                "base_per_min" => 60,
+                "byproducts" => [
+                    "Empty Canister" => 60,
+                ],
+                "ingredients" => [
+                    "Packaged Sulfuric Acid" => 60
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Sulfuric Acid" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 2,
+                "base_per_min" => 40,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Sulfuric Acid" => 40,
+                    "Empty Canister" => 40,
                 ],
+            ],
+            "Turbofuel" => [
+                "description" => "Unpackage Turbofuel",
+                "base_yield" => 2,
+                "base_per_min" => 20,
+                "byproducts" => [
+                    "Empty Canister" => 20,
+                ],
+                "ingredients" => [
+                    "Packaged Turbofuel" => 20
+                ],
+                "alt_recipe" => true
             ],
             "Packaged Turbofuel" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+                "base_yield" => 2,
+                "base_per_min" => 20,
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Turbofuel" => 20,
+                    "Empty Canister" => 20,
                 ],
             ],
-            "Packaged Water" => [
-                "base_yield" => 1,
-                "base_per_min" => 30,
+            "Water" => [
+                "description" => "Unpackage Water",
+                "base_yield" => 2,
+                "base_per_min" => 120,
+                "byproducts" => [
+                    "Empty Canister" => 120,
+                ],
                 "ingredients" => [
-                    "Iron Ore" => 30,
+                    "Packaged Water" => 120
+                ],
+                "alt_recipe" => true
+            ],
+            "Packaged Water" => [
+                "base_yield" => 2,
+                "base_per_min" => 60,
+                "ingredients" => [
+                    "Water" => 60,
+                    "Empty Canister" => 60,
                 ],
             ],
         ],
 
+        // alts done
+        // no byproducts
         "Manufacturer" => [
             "Adaptive Control Unit" => [
                 "base_yield" => 2,
@@ -1649,7 +1810,7 @@ class RecipeSeeder extends Seeder
                         "Crystal Oscillator" => 0.6,
                         "Beacon" => 1.2,
                     ],
-                    "alt_recipe" => true
+                    "alt_recipe" => true,
                 ],
             ],
             "Versatile Framework" => [
@@ -1665,70 +1826,177 @@ class RecipeSeeder extends Seeder
             ],
         ],
 
-        // continue here
-        //
-        //"Blender" => [
-        //    "Battery" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //    "Cooling System" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //    "Encased Uranium Cell" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //    "Fused Modular Frame" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //    "Nitric Acid" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //    "Non-fissile Uranium" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //],
-        //
-        //"Particle Accelerator" => [
-        //    "Plutonium Pellet" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //    "Nuclear Pasta" => [
-        //        "base_yield" => 1,
-        //        "base_per_min" => 30,
-        //        "ingredients" => [
-        //            "Iron Ore" => 30,
-        //        ],
-        //    ],
-        //],
+        // alts done
+        // byproducts done
+        "Blender" => [
+            "Aluminum Scrap" => [
+                "description" => "Instant Scrap",
+                "base_yield" => 30,
+                "base_per_min" => 300,
+                "ingredients" => [
+                    "Bauxite" => 150,
+                    "Coal" => 100,
+                    "Sulfuric Acid" => 50,
+                    "Water" => 60,
+                ],
+                "byproducts" => [
+                    "Water" => 50
+                ],
+                "alt_recipe" => true
+            ],
+            "Battery" => [
+                "base_yield" => 1,
+                "base_per_min" => 20,
+                "ingredients" => [
+                    "Sulfuric Acid" => 50,
+                    "Alumina Solution" => 40,
+                    "Aluminum Casing" => 20,
+                ],
+                "byproducts" => [
+                    "Water" => 30
+                ]
+            ],
+            "Cooling System" => [
+                "description" => "Cooling Device",
+                "base_yield" => 2,
+                "base_per_min" => 3.8,
+                "ingredients" => [
+                    "Heat Sink" => 9.375,
+                    "Motor" => 1.875,
+                    "Nitrogen Gas" => 45,
+                ],
+                "alt_recipe" => true,
+            ],
+            "Encased Uranium Cell" => [
+                "base_yield" => 5,
+                "base_per_min" => 25,
+                "ingredients" => [
+                    "Uranium" => 50,
+                    "Concrete" => 15,
+                    "Sulfuric Acid" => 40,
+                ],
+                "byproducts" => [
+                    "Sulfuric Acid" => 10
+                ]
+            ],
+            "Fuel" => [
+                "description" => "Diluted Fuel",
+                "base_yield" => 10,
+                "base_per_min" => 100,
+                "ingredients" => [
+                    "Heavy Oil Residue" => 50,
+                    "Water" => 100,
+                ],
+                "alt_recipe" => true,
+            ],
+            "Fused Modular Frame" => [
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 1.5,
+                    "ingredients" => [
+                        "Heavy Modular Frame" => 1.5,
+                        "Aluminum Casing" => 75,
+                        "Nitrogen Gas" => 37.5,
+                    ],
+                ],
+                [
+                    "description" => "Heat-Fused Frame",
+                    "base_yield" => 1,
+                    "base_per_min" => 3,
+                    "ingredients" => [
+                        "Heavy Modular Frame" => 3,
+                        "Aluminum Ingot" => 150,
+                        "Nitric Acid" => 24,
+                        "Fuel" => 30,
+                    ],
+                    "alt_recipe" => true
+                ],
+            ],
+            "Nitric Acid" => [
+                "base_yield" => 3,
+                "base_per_min" => 30,
+                "ingredients" => [
+                    "Nitrogen Gas" => 120,
+                    "Water" => 30,
+                    "Iron Plate" => 10,
+                ],
+            ],
+            "Non-fissile Uranium" => [
+                [
+                    "description" => "Fertile Uranium",
+                    "base_yield" => 20,
+                    "base_per_min" => 100,
+                    "ingredients" => [
+                        "Uranium" => 25,
+                        "Uranium Waste" => 25,
+                        "Nitric Acid" => 15,
+                        "Sulfuric Acid" => 25,
+                    ],
+                    "byproducts" => [
+                        "Water" => 40
+                    ],
+                    "alt_recipe" => true,
+                ],
+                [
+                    "base_yield" => 20,
+                    "base_per_min" => 50,
+                    "ingredients" => [
+                        "Uranium Waste" => 37.5,
+                        "Silica" => 25,
+                        "Nitric Acid" => 15,
+                        "Sulfuric Acid" => 15,
+                    ],
+                    "byproducts" => [
+                        "Water" => 15
+                    ],
+                ],
+            ],
+            "Turbofuel" => [
+                "description" => "Turbo Blend Fuel",
+                "base_yield" => 6,
+                "base_per_min" => 45,
+                "ingredients" => [
+                    "Fuel" => 15,
+                    "Heavy Oil Residue" => 30,
+                    "Sulfur" => 22.5,
+                    "Petroleum Coke" => 22.5,
+                ],
+                "alt_recipe" => true
+            ],
+        ],
 
+        // alts done
+        // no byproducts
+        "Particle Accelerator" => [
+            "Encased Plutonium Cell" => [
+                "description" => "Instant Plutonium Cell",
+                "base_yield" => 20,
+                "base_per_min" => 10,
+                "ingredients" => [
+                    "Non-fissile Uranium" => 75,
+                    "Aluminum Casing" => 10,
+                ],
+                "alt_recipe" => true
+            ],
+            "Plutonium Pellet" => [
+                "base_yield" => 30,
+                "base_per_min" => 30,
+                "ingredients" => [
+                    "Non-fissile Uranium" => 100,
+                    "Uranium Waste" => 25,
+                ],
+            ],
+            "Nuclear Pasta" => [
+                "base_yield" => 1,
+                "base_per_min" => 0.5,
+                "ingredients" => [
+                    "Copper Powder" => 100,
+                    "Pressure Conversion Cube" => 0.5,
+                ],
+            ],
+        ],
+
+        // no alts
         "Nuclear Power Plant" => [
             "Uranium Waste" => [
                 "base_yield" => 50,
@@ -1743,7 +2011,7 @@ class RecipeSeeder extends Seeder
                 "base_per_min" => 1,
                 "ingredients" => [
                     "Plutonium Fuel Rod" => 0.1,
-                    "Water" => 300
+                    "Water" => 300,
                 ],
             ],
         ],
@@ -1791,6 +2059,19 @@ class RecipeSeeder extends Seeder
 
                         $recipe_model->addIngredient($ingredient, $qty);
                     });
+
+                    if ( isset($recipe['byproducts']))
+                        collect($recipe['byproducts'])->each(function ($qty, $name) use ($recipe_model) {
+
+                            $ingredient = Ingredient::ofName($name);
+
+                            if (get_class($ingredient) !== Ingredient::class) {
+                                throw new InvalidArgumentException("Could not find ingredient {$name}");
+                            }
+
+                            $recipe_model->addByproduct($ingredient, $qty);
+                        });
+
                 }
             });
         });

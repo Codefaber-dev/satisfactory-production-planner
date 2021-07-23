@@ -84,4 +84,21 @@ class RecipeTest extends TestCase
         $this->assertEquals(10, $recipe->ingredients()->find(2)->pivot->base_qty);
         $this->assertEquals(20, $recipe->ingredients()->find(3)->pivot->base_qty);
     }
+
+    /** @test */
+    public function it_has_many_byproducts()
+    {
+        $byproducts = Ingredient::factory()->count(3)->create();
+
+        $recipe = Recipe::factory()->create();
+
+        $recipe->addByproduct($byproducts[0], 5);
+        $recipe->addByproduct($byproducts[1], 10);
+        $recipe->addByproduct($byproducts[2], 20);
+
+        $this->assertCount(3, $recipe->byproducts);
+        $this->assertEquals(5, $recipe->byproducts()->find(1)->pivot->base_qty);
+        $this->assertEquals(10, $recipe->byproducts()->find(2)->pivot->base_qty);
+        $this->assertEquals(20, $recipe->byproducts()->find(3)->pivot->base_qty);
+    }
 }

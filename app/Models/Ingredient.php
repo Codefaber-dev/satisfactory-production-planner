@@ -32,6 +32,44 @@ class Ingredient extends Model
         return $query->whereName($name)->first();
     }
 
+    public static function showRecipes($name)
+    {
+        return static::ofName($name)
+            ->recipes()
+            ->with(['ingredients','byproducts'])
+            ->get()
+            ->map(function($recipe) {
+                return [
+                    $recipe->description ?? "default" => [
+                        "yield" => $recipe->base_per_min,
+                        "building" => $recipe->building->name,
+                        "ingredients" => $recipe->ingredients->map(fn($ingredient) => "$ingredient->name [{$ingredient->pivot->base_qty} ppm]")->all(),
+                        "byproducts" => $recipe->byproducts->map(fn($ingredient) => "$ingredient->name [{$ingredient->pivot->base_qty} ppm]")->all(),
+                    ]
+                ];
+            })
+            ->collapse()
+            ->all();
+    }
+
+    public function getRecipeChoices()
+    {
+        $default = $this->defaultRecipe()->load(['ingredients','byproducts']);
+        $others = $this->recipes()->where('id','<>',$default->id)->get()
+            ->map(function($recipe) {
+                return [ "id:$recipe->id" => $recipe->getChoiceText()];
+            });
+
+        return $others->prepend(["id:$default->id" => $default->getChoiceText()])->collapse();
+
+
+    }
+
+    public function selectChoice($key)
+    {
+        return $this->getRecipeChoices()->flip()[$key];
+    }
+
     /**
      * An ingredient has many recipes
      *
@@ -55,6 +93,6 @@ class Ingredient extends Model
         if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
             return $recipe;
 
-        return $recipe->first();
+        return $this->recipes->first();
     }
 }
