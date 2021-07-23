@@ -79,6 +79,10 @@ class ProductionCalculator
                         ->map(function($ingredient){
                             return "{$ingredient->name} ({$ingredient->pivot->base_qty} ppm)";
                         })->implode(", "),
+                "byproducts" => $recipe->byproducts
+                        ->map(function($ingredient){
+                            return "{$ingredient->name} ({$ingredient->pivot->base_qty} ppm)";
+                        })->implode(", "),
                 "qty_required" => 1*$recipe_qty,
                 "base_per_min" => 1*$recipe->base_per_min,
                 "building_overview" => $this->getBuildingOverview($recipe,$recipe_qty),
@@ -86,10 +90,12 @@ class ProductionCalculator
             ];
 
         if ( $recipe->has('byproducts') )
-            $recipe->byproducts->each(function($ingredient) use ($qty){
-                $this->byproducts[$ingredient->name] = (isset($this->byproducts[$ingredient->name]))
-                    ? $this->byproducts[$ingredient->name] + ($qty*$ingredient->pivot->base_qty)
-                    : $qty*$ingredient->pivot->base_qty;
+            $recipe->byproducts->each(function($ingredient) use ($qty,$recipe){
+               if ( isset($this->byproducts[$ingredient->name]) )
+                    $this->byproducts[$ingredient->name]+= ($qty/$recipe->base_per_min)*$ingredient->pivot->base_qty;
+               else {
+                   $this->byproducts[$ingredient->name] = ($qty/$recipe->base_per_min)*$ingredient->pivot->base_qty;
+               }
             });
 
         $recipe->ingredients->each(function($ingredient) use ($qty, $recipe) {
