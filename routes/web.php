@@ -20,7 +20,8 @@ use Inertia\Inertia;
 |
 */
 
-auth()->loginUsingId(1);
+if (config('app.env') !== 'production')
+    auth()->loginUsingId(1);
 
 Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
     return ProductionCalculator::calc($ingredient, $qty, $recipe);
@@ -31,7 +32,8 @@ Route::middleware(['auth:sanctum', 'verified'])->post('favorites/{recipe}', [Pro
 
 
 Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
-    auth()->loginUsingId(1);
+    if (config('app.env') !== 'production')
+        auth()->loginUsingId(1);
 
     return ProductionCalculator::calc($ingredient, $qty);
 });
