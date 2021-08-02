@@ -22,7 +22,8 @@ class CreateRecipesTable extends Migration
             $table->decimal('base_per_min',10,4);
             $table->boolean('alt_recipe')->default(false);
             $table->string('description')->nullable();
-
+            $table->unsignedBigInteger('energy_cost_per_unit')->nullable();
+            $table->unsignedBigInteger('rarity_cost_per_unit')->nullable();
 
             $table->timestamps();
 

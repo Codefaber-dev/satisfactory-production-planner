@@ -12,9 +12,24 @@ class Recipe extends Model
 
     protected $guarded = [];
 
+    protected $appends = [
+        'favorite'
+    ];
+
+    public function getFavoriteAttribute()
+    {
+        if ( auth()->guest() )
+            return false;
+
+        return auth()->user()->favorite_recipes()->where('id',$this->id)->exists();
+    }
+
     public function scopeOfName(Builder $query, $name)
     {
-        return $query->firstWhere('description',$name);
+        if ($recipe = $query->firstWhere('description',$name))
+            return $recipe->load('ingredients');
+
+        return Ingredient::ofName($name)->baseRecipe()->load('ingredients');
     }
 
     /**
@@ -80,7 +95,22 @@ class Recipe extends Model
 
         $ingredients = $this->ingredients->map(fn($ingredient) => "$ingredient->name [{$ingredient->pivot->base_qty} ppm]")->join(", ");
         $byproducts = $this->byproducts()->count() ? " [" . $this->byproducts->map(fn($ingredient) => ":bp: $ingredient->name [" . (int) $ingredient->pivot->base_qty . " ppm]")->join(", ") . "]" : "";
+        $energy = energy($this,false,1) / 1e6 . " MJ";
+        $rarity = rarity($this,false,1);
 
-        return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts";
+        $energy = $this->isMostEnergyEfficient() ? "\033[32m{$energy}\033[0m" : $energy;
+        $rarity = $this->isMostResourceEfficient() ? "\033[32m{$rarity}\033[0m" : $rarity;
+
+        return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts [e:{$energy}, r:{$rarity}]";
+    }
+
+    public function isMostEnergyEfficient()
+    {
+        return $this->is($this->product->mostEnergyEfficientRecipe());
+    }
+
+    public function isMostResourceEfficient()
+    {
+        return $this->is($this->product->mostResourceEfficientRecipe());
     }
 }

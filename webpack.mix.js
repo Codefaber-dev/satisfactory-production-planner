@@ -11,13 +11,26 @@ const mix = require('laravel-mix');
  |
  */
 
+// mix.browserSync({
+//     proxy: 'satis-pp.test',
+//     host: 'satis-pp.test',
+//     open: false,
+//     https: true,
+//     socket : {
+//         domain: "https:/satis-pp.test:3000"
+//     },
+//     options : {
+//         clicks : false
+//     }
+// });
+
 mix.js('resources/js/app.js', 'public/js').vue()
     .postCss('resources/css/app.css', 'public/css', [
         require('postcss-import'),
         require('tailwindcss'),
     ])
-    .webpackConfig(require('./webpack.config'))
-    .browserSync('https://satis-pp.test');
+    .webpackConfig(require('./webpack.config'));
+    // .browserSync('https://satis-pp.test');
 
 if (mix.inProduction()) {
     mix.version();

@@ -1315,7 +1315,7 @@ class RecipeSeeder extends Seeder
             ],
             "Packaged Nitrogen Gas" => [
                 "base_yield" => 1,
-                "base_per_min" => 00,
+                "base_per_min" => 60,
                 "ingredients" => [
                     "Nitrogen Gas" => 240,
                     "Empty Fluid Tank" => 60,

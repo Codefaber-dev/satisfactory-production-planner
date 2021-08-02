@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use ErrorException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
 
 class Ingredient extends Model
 {
@@ -30,6 +33,11 @@ class Ingredient extends Model
     public function scopeOfName(Builder $query, $name)
     {
         return $query->whereName($name)->first();
+    }
+
+    public function scopeProcessed(Builder $query)
+    {
+        return $query->where('raw',false);
     }
 
     public static function showRecipes($name)
@@ -90,9 +98,57 @@ class Ingredient extends Model
         if ( auth()->check() && $recipe = auth()->user()->favorite_recipes()->firstWhere('ingredient_id',$this->id) )
             return $recipe;
 
+        return $this->baseRecipe();
+    }
+
+    /**
+     * Get the default recipe
+     *
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|null
+     * @throws \ErrorException
+     */
+    public function baseRecipe()
+    {
         if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
             return $recipe;
 
-        return $this->recipes->first();
+        if ( $recipe = $this->recipes->first() )
+            return $recipe;
+
+        throw new ErrorException("Ingredient {$this->name} has no base recipe");
+    }
+
+    public function mostEnergyEfficientRecipe()
+    {
+        return Cache::rememberForever("most_energy_efficient_recipe.{$this->id}", function() {
+           return $this->recipes->map(function($recipe){
+               try {
+                   return [
+                       'recipe' => $recipe,
+                       'energy' => energy($recipe, false, 1)
+                   ];
+               }
+               catch(InvalidArgumentException $e)
+               {}
+           })->sortBy('energy')->first()['recipe'];
+
+        });
+    }
+
+    public function mostResourceEfficientRecipe()
+    {
+        return Cache::rememberForever("most_resource_efficient_recipe.{$this->id}", function() {
+           return $this->recipes->map(function($recipe){
+               try {
+                   return [
+                       'recipe' => $recipe,
+                       'rarity' => rarity($recipe, false, 1)
+                   ];
+               }
+               catch(InvalidArgumentException $e)
+               {}
+           })->sortBy('rarity')->first()['recipe'];
+
+        });
     }
 }

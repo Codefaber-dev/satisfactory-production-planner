@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html class="dark:bg-gray-800" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +21,7 @@
         @inertia
 
         @env ('local')
-            <script src="https://localhost:3000/browser-sync/browser-sync-client.js"></script>
+            <script src="https://satis-pp.test/browser-sync/browser-sync-client.js"></script>
         @endenv
     </body>
 </html>

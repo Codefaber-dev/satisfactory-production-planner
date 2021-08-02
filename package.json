@@ -3,9 +3,9 @@
     "scripts": {
         "dev": "npm run development",
         "development": "mix",
-        "watch": "mix watch",
+        "watch": "mix watch -https",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
+        "hot": "mix watch --hot --https",
         "prod": "npm run production",
         "production": "mix --production"
     },
@@ -21,10 +21,10 @@
         "browser-sync-webpack-plugin": "^2.3.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14",
+        "postcss": "^8.3.6",
         "postcss-import": "^12.0.1",
-        "tailwindcss": "^2.0.1",
+        "tailwindcss": "^2.2.7",
         "vue": "^3.0.5",
-        "vue-loader": "^16.1.2"
+        "vue-loader": "^16.3.3"
     }
 }

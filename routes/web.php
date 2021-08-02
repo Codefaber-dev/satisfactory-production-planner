@@ -1,7 +1,10 @@
 <?php
 
 use App\Helpers\ProductionCalculator;
+use App\Http\Controllers\FavoritesController;
+use App\Http\Controllers\ProductionController;
 use App\Models\Ingredient;
+use App\Models\Recipe;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,11 +20,14 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
-    auth()->loginUsingId(1);
+auth()->loginUsingId(1);
 
+Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
     return ProductionCalculator::calc($ingredient, $qty, $recipe);
 });
+
+Route::middleware(['auth:sanctum', 'verified'])->post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);
+Route::middleware(['auth:sanctum', 'verified'])->post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
 
 
 Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
@@ -30,15 +36,8 @@ Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
     return ProductionCalculator::calc($ingredient, $qty);
 });
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::redirect('/', 'dashboard');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [ProductionController::class,'index'])->name('dashboard');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard/{ingredient}/{qty}/{recipe}/{variant}', [ProductionController::class,'show'])->name('dashboard.show');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard/{ingredient}/{qty}/{recipe}', [ProductionController::class,'show'])->name('dashboard.show');
