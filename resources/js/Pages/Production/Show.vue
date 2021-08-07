@@ -35,8 +35,9 @@
                     <option value="2000">Belts mk6 (Covered Conveyer Belt Mod)</option>
                     <option value="7500">Belts mk7 (Covered Conveyer Belt Mod)</option>
                 </select>
-                <button @click="diagrams = !diagrams" class="rounded-lg shadow bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 text-white px-4 py-2">
-                    {{ diagrams ? '❎' : '⬜' }}
+                <button @click="diagrams = !diagrams"
+                        class="rounded-lg shadow bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 text-white px-4 py-2">
+                    {{ diagrams ? '✅' : '⬜' }}
                     Toggle Diagrams
                 </button>
 
@@ -69,12 +70,16 @@
                             </div>
                             <table class="">
                                 <tr class="bg-blue-300 dark:bg-blue-900">
-                                    <th class="font-semibold text-lg" colspan="2">
+                                    <th class="font-semibold text-lg" colspan="3">
                                         Raw Materials (per min)
                                     </th>
                                 </tr>
                                 <tr v-for="material in production__rawMaterials">
-                                    <td class="p-2" v-text="material.name"></td>
+                                    <td colspan="2" class="p-2">
+                                        <img class="mr-2 inline w-8 h-8" :src="imageUrl(material.name,32)"
+                                             :alt="material.name">
+                                        {{ material.name }}
+                                    </td>
                                     <td class="p-2 text-right" v-text="material.qty"></td>
                                 </tr>
 
@@ -83,30 +88,30 @@
                                 </tr>
 
                                 <tr class="bg-blue-300 dark:bg-blue-900">
-                                    <th class="font-semibold text-lg" colspan="2">
+                                    <th class="font-semibold text-lg" colspan="3">
                                         Power Summary
                                     </th>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Energy Per Finished Product (MJ)</td>
+                                    <td colspan="2" class="p-2">Energy Per Finished Product (MJ)</td>
                                     <td class="p-2 text-right">
                                         {{ Math.round(100 * production__total_power / newYield / 60) / 2 }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Total Power Used (MW)</td>
+                                    <td colspan="2" class="p-2">Total Power Used (MW)</td>
                                     <td class="p-2 text-right">{{ production__total_power }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Coal Generator Equiv.</td>
+                                    <td colspan="2" class="p-2">Coal Generator Equiv.</td>
                                     <td class="p-2 text-right">{{ Math.ceil(production__total_power / 75) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Fuel Generator Equiv.</td>
+                                    <td colspan="2" class="p-2">Fuel Generator Equiv.</td>
                                     <td class="p-2 text-right">{{ Math.ceil(production__total_power / 150) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Nuclear Power Plant Equiv.</td>
+                                    <td colspan="2" class="p-2">Nuclear Power Plant Equiv.</td>
                                     <td class="p-2 text-right">{{ Math.ceil(production__total_power / 2500) }}</td>
                                 </tr>
 
@@ -115,12 +120,12 @@
                                 </tr>
 
                                 <tr class="bg-blue-300 dark:bg-blue-900">
-                                    <th class="font-semibold text-lg" colspan="2">
+                                    <th class="font-semibold text-lg" colspan="3">
                                         Parts List (Buildings)
                                     </th>
                                 </tr>
                                 <tr v-for="(num,mat) in production__building_summary.total_build_cost">
-                                    <td class="p-2"><input type="checkbox"> {{ mat }}</td>
+                                    <td colspan="2" class="p-2"><input type="checkbox"> {{ mat }}</td>
                                     <td class="p-2 text-right">{{ num }}</td>
                                 </tr>
                             </table>
@@ -132,157 +137,196 @@
                             </div>
                             <table>
                                 <tr>
+                                    <!--                                    <th class="font-semibold">Done</th>-->
                                     <th class="font-semibold">Inputs</th>
                                     <th class="font-semibold">Product</th>
-                                    <th class="font-semibold">Qty Per Min</th>
                                     <th class="font-semibold">Recipe</th>
                                     <th class="font-semibold">Production</th>
                                 </tr>
-                                <tbody v-for="(level,index) in production__allMaterials">
-                                <tr>
-                                    <th class="bg-blue-200 dark:bg-gray-500" colspan="100">{{ index }}</th>
+                                <tr v-show="Object.values(productionChecks).some(o=>o)">
+                                    <th class="bg-blue-200 dark:bg-gray-500 text-center p-2" colspan="100">
+                                        {{ hideCompleted ? 'Hiding' : 'Showing' }}
+                                        {{ Object.values(productionChecks).filter(o => o).length }} completed rows
+                                        <button @click="hideCompleted = ! hideCompleted"
+                                                class="text-sm bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 rounded px-4 py-2">
+                                            Toggle Completed
+                                        </button>
+                                    </th>
                                 </tr>
-                                <template v-for="material in level">
-                                <tr class="border-t border-gray-200">
-                                    <td nowrap class="p-2">
-                                        <!--                                        {{ production.recipes[material.name].inputs.split(', ')}}-->
-                                        <div v-for="(ing,name) in production.recipes[material.name].inputs">
-                                            {{ name }} ({{ Math.round(100 * ing.needed_qty) / 100 }} per min)
-                                        </div>
-                                    </td>
-                                    <td class="p-2"><input type="checkbox"> {{ material.name }}</td>
-                                    <td class="p-2" v-text="material.qty"></td>
-                                    <td class="p-2">
-                                        <!-- material is end product -->
-                                        <template v-if="material.name === newProduct.name">
-                                            <div class="flex flex-col">
-                                                <select @change="fetch" class="rounded shadow w-full text-sm"
-                                                        v-model="newRecipe">
-                                                    <option :key="option.id" v-for="option in recipes[newProduct.name]"
-                                                            :value="option">
+                                <template v-for="(level,index) in production__allMaterials">
+                                    <tr>
+                                        <th class="bg-blue-200 dark:bg-gray-500" colspan="100">{{ index }}</th>
+                                    </tr>
+
+
+                                    <tbody v-for="material in level"
+                                           v-show="!hideCompleted || ! productionChecks[material.name]"
+                                           :class="[productionChecks[material.name] ? 'opacity-25' : 'opacity-100']">
+                                    <tr class="border-t border-gray-200">
+                                        <!--                                    <td class="text-center">-->
+                                        <!--                                        <input v-model="productionChecks[material.name]" class="mr-1" type="checkbox">                                    </td>-->
+                                        <td nowrap class="p-2">
+                                            <div class="bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg">
+                                                <div class="flex items-center"
+                                                     v-for="(ing,name) in production.recipes[material.name].inputs">
+                                                    <img class="mr-2" :src="imageUrl(name,64)" :alt="name">
+                                                    {{ name }} ({{ Math.round(100 * ing.needed_qty) / 100 }} per min)
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-2">
+                                            <div @click="toggleProductionCheck(material.name)"
+                                                class="bg-teal-200 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
+                                                <img
+                                                    class="mr-2" :src="imageUrl(material.name,64)"
+                                                    :alt="material.name">
+                                                <span>{{ material.name }} ({{ material.qty }} per min)</span>
+                                            </div>
+                                        </td>
+                                        <td class="p-2">
+                                            <!-- material is end product -->
+                                            <template v-if="material.name === newProduct.name">
+                                                <div class="flex flex-col">
+                                                    <select @change="fetch" class="rounded shadow w-full text-sm"
+                                                            v-model="newRecipe">
+                                                        <option :key="option.id"
+                                                                v-for="option in recipes[newProduct.name]"
+                                                                :value="option">
+                                                            <span v-if="option.favorite">&star;</span>
+                                                            {{ option.description || 'default' }}
+                                                        </option>
+                                                    </select>
+
+                                                    <button :disabled="working" @click="setNewFavorite"
+                                                            class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"
+                                                            v-if="newRecipe && !newRecipe.favorite">Set Favorite
+                                                    </button>
+                                                </div>
+                                            </template>
+
+                                            <!-- everything else -->
+                                            <template v-else>
+                                                <select :disabled="recipes[material.name].length===1"
+                                                        @change="setNewSubFavorite(production.recipe_models[material.name])"
+                                                        class="rounded shadow w-full text-sm"
+                                                        :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"
+                                                        v-model="production.recipe_models[material.name].id">
+                                                    <option :key="option.id" v-for="option in recipes[material.name]"
+                                                            :value="option.id">
                                                         <span v-if="option.favorite">&star;</span>
                                                         {{ option.description || 'default' }}
                                                     </option>
                                                 </select>
 
-                                                <button :disabled="working" @click="setNewFavorite"
-                                                        class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"
-                                                        v-if="newRecipe && !newRecipe.favorite">Set Favorite
-                                                </button>
-                                            </div>
-                                        </template>
+                                            </template>
+                                        </td>
 
-                                        <!-- everything else -->
-                                        <template v-else>
-                                            <select :disabled="recipes[material.name].length===1"
-                                                    @change="setNewSubFavorite(recipe_models[material.name])"
-                                                    class="rounded shadow w-full text-sm"
-                                                    :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"
-                                                    v-model="recipe_models[material.name].id">
-                                                <option :key="option.id" v-for="option in recipes[material.name]"
-                                                        :value="option.id">
-                                                    <span v-if="option.favorite">&star;</span>
-                                                    {{ option.description || 'default' }}
+                                        <td class="p-2">
+                                            <select v-model="production.recipes[material.name].selected_variant"
+                                                    class="text-sm rounded shadow w-full">
+                                                <option :value="mk"
+                                                        v-for="(opt,mk) in production.recipes[material.name].building_details">
+                                                    {{ opt.num_buildings }}x {{ mk }} @{{ opt.clock_speed }}%
+                                                    [{{ Math.round(opt.power_usage) }} MW]
                                                 </option>
                                             </select>
+                                        </td>
+                                    </tr>
+                                    <tr v-show="diagrams">
+                                        <td class="text-center" colspan="100">
+                                            <div class="flex justify-end space-x-8">
 
-                                        </template>
-                                    </td>
+                                                <div class="w-48 text-left">
+                                                    <ul>
+                                                        <li class="border-b border-gray-300 flex">
+                                                            <span class="font-semibold ml-2">Foundations</span>
+                                                            <span class="flex-1 text-right">{{
+                                                                    getFootprint(material.name).foundations
+                                                                }} ({{ getFootprint(material.name).length_foundations }} x {{
+                                                                    getFootprint(material.name).width_foundations
+                                                                }})</span>
+                                                        </li>
+                                                        <li class="border-b border-gray-300 flex">
+                                                            <span class="font-semibold ml-2">Walls</span>
+                                                            <span class="flex-1 text-right">{{
+                                                                    getFootprint(material.name).walls
+                                                                }} ({{
+                                                                    getFootprint(material.name).height_walls
+                                                                }} x {{
+                                                                    getFootprint(material.name).foundations
+                                                                }})</span>
+                                                        </li>
+                                                        <li class="border-b border-gray-300 flex">
+                                                            <span class="font-semibold ml-2">Building Rows</span>
+                                                            <span class="flex-1 text-right">{{
+                                                                    getFootprint(material.name).rows
+                                                                }}
+                                                                                        </span>
+                                                        </li>
+                                                        <li class="border-b border-gray-300 flex">
+                                                            <span class="font-semibold ml-2">Buildings Per Row</span>
+                                                            <span class="flex-1 text-right">{{
+                                                                    getFootprint(material.name).buildings_per_row
+                                                                }}
+                                                                                        </span>
+                                                        </li>
+                                                        <li class="border-b border-gray-300 flex">
+                                                            <span class="font-semibold ml-2">Belt Speed</span>
+                                                            <span class="flex-1 text-right">{{
+                                                                    getFootprint(material.name).belt_speed
+                                                                }}
+                                                                                        </span>
+                                                        </li>
+                                                    </ul>
+                                                    <!--                                                <pre>{{ getFootprint(material.name) }}</pre>-->
+                                                </div>
+                                                <div class="flex justify-center p-2">
+                                                    <div style="box-sizing: content-box"
+                                                         :style="{ height: (getFootprint(material.name).length_foundations*2) + 'rem', width: (getFootprint(material.name).width_foundations*2) + 'rem'}"
+                                                         class="flex relative items-start justify-center bg-blue-300 shadow-lg text-xl">
+                                                        <!--                                            <div :key="stat" v-for="(num,stat) in getFootprint(material.name).footprint">{{ stat }} {{ num }}</div>-->
+                                                        <!--                                                <div class="text-blue-500">Foundations-->
+                                                        <!--                                                    {{ getFootprint(material.name).length_foundations }} x-->
+                                                        <!--                                                    {{ getFootprint(material.name).width_foundations }}-->
+                                                        <!--                                                </div>-->
+                                                        <div style="opacity: 0.3;box-sizing: content-box;"
+                                                             class="absolute w-full h-full flex flex-wrap items-center justify-center">
+                                                            <template
+                                                                v-for="ii in Array(getFootprint(material.name).foundations)">
+                                                                <div class="border border-blue-500"
+                                                                     style="box-sizing: border-box; height:2rem; width:2rem"
+                                                                ></div>
+                                                            </template>
+                                                        </div>
+                                                        <div style="padding:2rem;"
+                                                             class="absolute w-full h-full flex flex-wrap items-center justify-center">
+                                                            <div class="flex items-center justify-center w-full"
+                                                                 v-for="(ii,row) in Array(getFootprint(material.name).rows)">
 
-                                    <td class="p-2">
-                                        <select v-model="production.recipes[material.name].selected_variant"
-                                                class="text-sm rounded shadow w-full">
-                                            <option :value="mk"
-                                                    v-for="(opt,mk) in production.recipes[material.name].building_details">
-                                                {{ opt.num_buildings }}x {{ mk }} @{{ opt.clock_speed }}%
-                                                [{{ Math.round(opt.power_usage) }} MW]
-                                            </option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr v-show="diagrams">
-                                    <td class="text-center" colspan="100">
-                                        <div class="flex justify-end space-x-8">
+                                                                <div
+                                                                    v-for="(jj,col) in Array(getFootprint(material.name).buildings_per_row)"
+                                                                    :style="{height:(getFootprint(material.name).building_length/4) + 'rem',
+                                                                        width:(getFootprint(material.name).building_width/4)+'rem'}"
+                                                                    :class="((1+col+(row*getFootprint(material.name).buildings_per_row)) <= getFootprint(material.name).num_buildings) ?
+                                                                                                    ['border-blue-800','bg-blue-800'] : ['border-transparent','text-transparent','bg-transparent']"
+                                                                    style="box-sizing: border-box;"
+                                                                    class="border text-xs rounded flex items-center justify-center bg-opacity-25">
+                                                                    {{ getFootprint(material.name).monogram }}
+                                                                    <!--                                                            {{ 1+col+(row*getFootprint(material.name).buildings_per_row) }}-->
+                                                                    <!--                                                            {{ getFootprint(material.name).num_buildings }}-->
+                                                                </div>
 
-                                            <div class="w-48 text-left">
-                                                <ul>
-                                                    <li class="border-b border-gray-300 flex">
-                                                        <span class="font-semibold ml-2">Foundations</span>
-                                                        <span class="flex-1 text-right">{{
-                                                                getFootprint(material.name).foundations
-                                                            }} ({{ getFootprint(material.name).length_foundations }} x {{
-                                                                getFootprint(material.name).width_foundations
-                                                            }})</span>
-                                                    </li>
-                                                    <li class="border-b border-gray-300 flex">
-                                                        <span class="font-semibold ml-2">Walls</span>
-                                                        <span class="flex-1 text-right">{{
-                                                                getFootprint(material.name).walls
-                                                            }} ({{
-                                                                getFootprint(material.name).height_walls
-                                                            }} x {{ getFootprint(material.name).foundations }})</span>
-                                                    </li>
-                                                    <li class="border-b border-gray-300 flex">
-                                                        <span class="font-semibold ml-2">Building Rows</span>
-                                                        <span class="flex-1 text-right">{{
-                                                                getFootprint(material.name).rows
-                                                            }}
-                                                        </span>
-                                                    </li>
-                                                    <li class="border-b border-gray-300 flex">
-                                                        <span class="font-semibold ml-2">Buildings Per Row</span>
-                                                        <span class="flex-1 text-right">{{
-                                                                getFootprint(material.name).buildings_per_row
-                                                            }}
-                                                        </span>
-                                                    </li>
-                                                </ul>
-<!--                                                <pre>{{ getFootprint(material.name) }}</pre>-->
-                                            </div>
-                                            <div class="flex justify-center p-2">
-                                                <div style="box-sizing: content-box"
-                                                     :style="{ height: (getFootprint(material.name).length_foundations * 14) + 'px', width: (getFootprint(material.name).width_foundations * 14) + 'px'}"
-                                                     class="flex relative items-start justify-center border border-blue-500 bg-blue-300 shadow-lg text-xl">
-                                                    <!--                                            <div :key="stat" v-for="(num,stat) in getFootprint(material.name).footprint">{{ stat }} {{ num }}</div>-->
-                                                    <!--                                                <div class="text-blue-500">Foundations-->
-                                                    <!--                                                    {{ getFootprint(material.name).length_foundations }} x-->
-                                                    <!--                                                    {{ getFootprint(material.name).width_foundations }}-->
-                                                    <!--                                                </div>-->
-                                                    <div style="opacity: 0.3"
-                                                         class="absolute w-full h-full flex flex-wrap items-center justify-center">
-                                                        <template
-                                                            v-for="ii in Array(getFootprint(material.name).foundations)">
-                                                            <div :style="{height:12+'px', width:12+'px'}"
-                                                                 style="box-sizing: content-box; border-width: 1px !important;"
-                                                                 class="border border-blue-400"></div>
-                                                        </template>
-                                                    </div>
-                                                    <div style="padding:12px;"
-                                                         class="absolute w-full h-full flex flex-wrap items-center justify-center">
-                                                        <div class="flex items-center justify-center w-full"
-                                                             v-for="(ii,row) in Array(getFootprint(material.name).rows)">
-
-                                                            <div
-                                                                v-for="(jj,col) in Array(getFootprint(material.name).buildings_per_row)"
-                                                                :style="{height:(getFootprint(material.name).building_length*1.5) + 'px', width:(getFootprint(material.name).building_width*1.5)+'px'}"
-                                                                :class="((1+col+(row*getFootprint(material.name).buildings_per_row)) <= getFootprint(material.name).num_buildings) ?
-                                                                    ['border-blue-800'] : ['border-transparent','text-transparent']"
-                                                                style="box-sizing: content-box"
-                                                                class="border text-xs rounded flex items-center justify-center">
-                                                                {{ getFootprint(material.name).monogram }}
-                                                                <!--                                                            {{ 1+col+(row*getFootprint(material.name).buildings_per_row) }}-->
-                                                                <!--                                                            {{ getFootprint(material.name).num_buildings }}-->
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+
+
                                 </template>
-                                </tbody>
                             </table>
                         </div>
                         <!-- right -->
@@ -296,7 +340,7 @@
                                     <th>Num. Required</th>
                                     <th>Power Usage (MW)</th>
                                     <th>Build Cost</th>
-<!--                                    <th>Footprint</th>-->
+                                    <!--                                    <th>Footprint</th>-->
                                 </tr>
                                 <tbody class="border-b border-gray-200"
                                        v-for="(o,bldg) in production__building_summary.variants">
@@ -362,6 +406,7 @@ export default {
         'yield',
         'variant',
         'belt_speed',
+        'diagrams'
     ],
     components: {
         AppLayout,
@@ -373,16 +418,17 @@ export default {
 
     data() {
         return {
-            diagrams : true,
             done: true,
             working: false,
             newYield: this.yield,
             newProduct: this.product,
             newRecipe: this.recipe,
             newVariant: this.variant,
-            recipe_models: this.production.recipe_models,
-            newBeltSpeed: this.belt_speed || 780
-            // production_recipes : this.production.recipes
+            // recipe_models: this.production.recipe_models,
+            newBeltSpeed: this.belt_speed || 780,
+            // production_recipes : this.production.recipes,
+            productionChecks: {},
+            hideCompleted: true,
         }
     },
 
@@ -525,7 +571,15 @@ export default {
 
             this.working = true;
 
-            this.$inertia.get(`/dashboard/${this.newProduct.name}/${this.newYield}/${this.newRecipe.description || this.newProduct.name}/${this.newVariant}?belt_speed=${this.newBeltSpeed}`);
+            let parts = [
+                'dashboard',
+                this.newProduct.name,
+                this.newYield,
+                this.newRecipe.description || this.newProduct.name,
+                this.newVariant
+            ];
+
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&diagrams=${this.diagrams ? 1 : 0}`);
 
             // fetch(`/calc/${this.product.name}/${this.yield}/${this.recipe.description||this.product.name}`)
             //     .then( async response => {
@@ -565,6 +619,15 @@ export default {
         },
         getFootprint(name) {
             return this.production.recipes[name].building_details[this.production.recipes[name].selected_variant].footprint;
+        },
+        imageUrl(name, size = 64) {
+            return `https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_${size}/v1628360269/satisfactory/${name.replace(/ /ig, '')}.png`;
+        },
+        toggleProductionCheck(material) {
+            if (this.productionChecks.hasOwnProperty(material))
+                this.productionChecks[material] = !this.productionChecks[material];
+            else
+                this.productionChecks[material] = true;
         }
     }
 }

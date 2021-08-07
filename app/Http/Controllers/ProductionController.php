@@ -33,8 +33,9 @@ class ProductionController extends Controller
         $yield = $qty;
         $recipe = Recipe::ofName($recipe);
         $belt_speed = request('belt_speed',780);
+        $diagrams = (bool) request('diagrams',true);
 
-        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed') + $this->baseData());
+        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed','diagrams') + $this->baseData());
     }
 
     public function addFavorite(Recipe $recipe)

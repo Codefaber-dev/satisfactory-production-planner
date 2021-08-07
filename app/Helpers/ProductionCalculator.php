@@ -211,7 +211,7 @@ class ProductionCalculator
             })->max();
 
             // calc the number of rows needed
-            $rows = max( ceil($belt_load_in/$this->belt_speed), max(1,floor($qty/$this->belt_speed)) );
+            $rows = max( ceil($belt_load_in/$this->belt_speed), max(1,ceil($qty/$this->belt_speed)) );
 
             // calc the footprint
             //$rows = ceil($num_buildings/16); // max 16 buildings per row
@@ -225,12 +225,12 @@ class ProductionCalculator
                 'num_buildings' => $num_buildings,
                 'buildings_per_row' => $buildings_per_row,
                 'building_length' => $recipe->building->length,
-                'building_length_foundations' => 8 * (ceil($recipe->building->length/8)+2),
+                'building_length_foundations' => ceil($recipe->building->length/8),
                 'building_width' => $recipe->building->width,
-                'length_m' => $length = $rows * (8 * (ceil($recipe->building->length/8)+2) ),
-                'length_foundations' => $length_foundations = ( ceil($length/8) + 2 ),
+                'length_m' => $length = $rows * $recipe->building->length,
+                'length_foundations' => $length_foundations = ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
                 'width_m' => $width = $recipe->building->width * $buildings_per_row,
-                'width_foundations' => $width_foundations = ( ceil($width/8) + 2),
+                'width_foundations' => $width_foundations = ( ceil($width/8) + 4),
                 'height_m' => $height = $recipe->building->height,
                 'height_walls' => $height_walls = ceil($height/4) + 1,
                 'foundations' => $foundations = $length_foundations * $width_foundations,

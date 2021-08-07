@@ -16,6 +16,7 @@ module.exports = {
             fontFamily: {
                 sans: ['Ubuntu', ...defaultTheme.fontFamily.sans],
             },
+            colors : require('./colors')
         },
     },
 
