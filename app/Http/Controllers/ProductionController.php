@@ -32,8 +32,9 @@ class ProductionController extends Controller
         $product = Ingredient::ofName($ingredient);
         $yield = $qty;
         $recipe = Recipe::ofName($recipe);
+        $belt_speed = request('belt_speed',780);
 
-        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant') + $this->baseData());
+        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed') + $this->baseData());
     }
 
     public function addFavorite(Recipe $recipe)

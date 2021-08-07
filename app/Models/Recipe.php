@@ -13,8 +13,14 @@ class Recipe extends Model
     protected $guarded = [];
 
     protected $appends = [
-        'favorite'
+        'favorite',
+        'tier'
     ];
+
+    public function getTierAttribute()
+    {
+        return $this->alt_tier ?? $this->product->tier;
+    }
 
     public function getFavoriteAttribute()
     {

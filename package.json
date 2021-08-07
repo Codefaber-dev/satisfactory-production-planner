@@ -3,9 +3,9 @@
     "scripts": {
         "dev": "npm run development",
         "development": "mix",
-        "watch": "mix watch -https",
+        "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot --https",
+        "hot": "mix watch --hot",
         "prod": "npm run production",
         "production": "mix --production"
     },
