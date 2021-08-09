@@ -23,7 +23,8 @@ class Recipe extends Model
     protected $with = [
         'ingredients',
         'byproducts',
-        'building'
+        'building',
+        'product'
     ];
 
     public function getTierAttribute()

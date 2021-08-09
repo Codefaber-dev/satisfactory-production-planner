@@ -172,7 +172,10 @@
                                                 <img
                                                     class="mr-2" :src="imageUrl(material.name,64)"
                                                     :alt="material.name">
-                                                <span>{{ material.name }} ({{ material.qty }} per min)</span>
+
+                                                <span class="font-semibold">{{ material.name }} <br>
+                                                    <span class="font-light">{{ material.qty }} per min</span>
+                                                </span>
                                             </div>
                                         </td>
                                         <td nowrap class="p-2">
@@ -180,7 +183,9 @@
                                                 <div class="flex items-center"
                                                      v-for="(ing,name) in production.recipes[material.name].inputs">
                                                     <img class="mr-2" :src="imageUrl(name,64)" :alt="name">
-                                                    {{ name }} ({{ Math.round(100 * ing.needed_qty) / 100 }} per min)
+                                                    <span class="font-semibold">{{ name }} <br>
+                                                        <span class="font-light">{{ Math.round(100 * ing.needed_qty) / 100 }} per min</span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </td>
