@@ -10,7 +10,8 @@ class RawIngredientCalculator
 
     public static function calc(Recipe $recipe, $use_alts = false, $qty = 1)
     {
-        auth()->loginUsingId(1);
+        if ( auth()->guest() )
+            auth()->loginUsingId(1);
 
         $c = new static;
         $c->calculate($recipe, $use_alts, $qty);

@@ -138,8 +138,8 @@
                             <table>
                                 <tr>
                                     <!--                                    <th class="font-semibold">Done</th>-->
-                                    <th class="font-semibold">Inputs</th>
                                     <th class="font-semibold">Product</th>
+                                    <th class="font-semibold">Inputs</th>
                                     <th class="font-semibold">Recipe</th>
                                     <th class="font-semibold">Production</th>
                                 </tr>
@@ -165,6 +165,16 @@
                                     <tr class="border-t border-gray-200">
                                         <!--                                    <td class="text-center">-->
                                         <!--                                        <input v-model="productionChecks[material.name]" class="mr-1" type="checkbox">                                    </td>-->
+
+                                        <td class="p-2">
+                                            <div @click="toggleProductionCheck(material.name)"
+                                                class="bg-teal-200 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
+                                                <img
+                                                    class="mr-2" :src="imageUrl(material.name,64)"
+                                                    :alt="material.name">
+                                                <span>{{ material.name }} ({{ material.qty }} per min)</span>
+                                            </div>
+                                        </td>
                                         <td nowrap class="p-2">
                                             <div class="bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg">
                                                 <div class="flex items-center"
@@ -175,49 +185,41 @@
                                             </div>
                                         </td>
                                         <td class="p-2">
-                                            <div @click="toggleProductionCheck(material.name)"
-                                                class="bg-teal-200 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
-                                                <img
-                                                    class="mr-2" :src="imageUrl(material.name,64)"
-                                                    :alt="material.name">
-                                                <span>{{ material.name }} ({{ material.qty }} per min)</span>
-                                            </div>
-                                        </td>
-                                        <td class="p-2">
                                             <!-- material is end product -->
                                             <template v-if="material.name === newProduct.name">
                                                 <div class="flex flex-col">
-                                                    <select @change="fetch" class="rounded shadow w-full text-sm"
-                                                            v-model="newRecipe">
-                                                        <option :key="option.id"
-                                                                v-for="option in recipes[newProduct.name]"
-                                                                :value="option">
-                                                            <span v-if="option.favorite">&star;</span>
-                                                            {{ option.description || 'default' }}
-                                                        </option>
-                                                    </select>
+                                                    <recipe-picker @select="selectNewRecipe" :recipes="recipes[newProduct.name]" :selected="newRecipe"></recipe-picker>
+<!--                                                    <select @change="fetch" class="rounded shadow w-full text-sm"-->
+<!--                                                            v-model="newRecipe">-->
+<!--                                                        <option :key="option.id"-->
+<!--                                                                v-for="option in recipes[newProduct.name]"-->
+<!--                                                                :value="option">-->
+<!--                                                            <span v-if="option.favorite">&star;</span>-->
+<!--                                                            {{ option.description || 'default' }}-->
+<!--                                                        </option>-->
+<!--                                                    </select>-->
 
-                                                    <button :disabled="working" @click="setNewFavorite"
-                                                            class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"
-                                                            v-if="newRecipe && !newRecipe.favorite">Set Favorite
-                                                    </button>
+<!--                                                    <button :disabled="working" @click="setNewFavorite"-->
+<!--                                                            class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"-->
+<!--                                                            v-if="newRecipe && !newRecipe.favorite">Set Favorite-->
+<!--                                                    </button>-->
                                                 </div>
                                             </template>
 
                                             <!-- everything else -->
                                             <template v-else>
-                                                <select :disabled="recipes[material.name].length===1"
-                                                        @change="setNewSubFavorite(production.recipe_models[material.name])"
-                                                        class="rounded shadow w-full text-sm"
-                                                        :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"
-                                                        v-model="production.recipe_models[material.name].id">
-                                                    <option :key="option.id" v-for="option in recipes[material.name]"
-                                                            :value="option.id">
-                                                        <span v-if="option.favorite">&star;</span>
-                                                        {{ option.description || 'default' }}
-                                                    </option>
-                                                </select>
-
+<!--                                                <select :disabled="recipes[material.name].length===1"-->
+<!--                                                        @change="setNewSubFavorite(production.recipe_models[material.name])"-->
+<!--                                                        class="rounded shadow w-full text-sm"-->
+<!--                                                        :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"-->
+<!--                                                        v-model="production.recipe_models[material.name].id">-->
+<!--                                                    <option :key="option.id" v-for="option in recipes[material.name]"-->
+<!--                                                            :value="option.id">-->
+<!--                                                        <span v-if="option.favorite">&star;</span>-->
+<!--                                                        {{ option.description || 'default' }}-->
+<!--                                                    </option>-->
+<!--                                                </select>-->
+                                                <recipe-picker @select="selectNewSubRecipe" :recipes="recipes[material.name]" :selected="production.recipe_models[material.name]"></recipe-picker>
                                             </template>
                                         </td>
 
@@ -392,6 +394,7 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout'
+import RecipePicker from "@/Components/RecipePicker";
 import {Inertia} from '@inertiajs/inertia';
 
 
@@ -410,6 +413,7 @@ export default {
     ],
     components: {
         AppLayout,
+        RecipePicker
     },
 
     mounted() {
@@ -628,6 +632,12 @@ export default {
                 this.productionChecks[material] = !this.productionChecks[material];
             else
                 this.productionChecks[material] = true;
+        },
+        selectNewRecipe({recipe}){
+            this.setRecipe(recipe);
+        },
+        selectNewSubRecipe({recipe}){
+            this.setNewSubFavorite(recipe);
         }
     }
 }

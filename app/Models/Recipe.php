@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Recipe extends Model
 {
@@ -14,7 +15,15 @@ class Recipe extends Model
 
     protected $appends = [
         'favorite',
-        'tier'
+        'tier',
+        'energy_efficient',
+        'resource_efficient'
+    ];
+
+    protected $with = [
+        'ingredients',
+        'byproducts',
+        'building'
     ];
 
     public function getTierAttribute()
@@ -108,6 +117,16 @@ class Recipe extends Model
         $rarity = $this->isMostResourceEfficient() ? "\033[32m{$rarity}\033[0m" : $rarity;
 
         return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts [e:{$energy}, r:{$rarity}]";
+    }
+
+    public function getEnergyEfficientAttribute()
+    {
+        return Cache::rememberForever("recipe.{$this->id}.energy_efficient", fn() => $this->isMostEnergyEfficient());
+    }
+
+    public function getResourceEfficientAttribute()
+    {
+        return Cache::rememberForever("recipe.{$this->id}.resource_efficient", fn() => $this->isMostResourceEfficient());
     }
 
     public function isMostEnergyEfficient()
