@@ -1857,15 +1857,27 @@ class RecipeSeeder extends Seeder
                 ]
             ],
             "Cooling System" => [
-                "description" => "Cooling Device",
-                "base_yield" => 2,
-                "base_per_min" => 3.8,
-                "ingredients" => [
-                    "Heat Sink" => 9.375,
-                    "Motor" => 1.875,
-                    "Nitrogen Gas" => 45,
+                [
+                    "description" => "Cooling Device",
+                    "base_yield" => 2,
+                    "base_per_min" => 3.8,
+                    "ingredients" => [
+                        "Heat Sink" => 9.375,
+                        "Motor" => 1.875,
+                        "Nitrogen Gas" => 45,
+                    ],
+                    "alt_recipe" => true,
                 ],
-                "alt_recipe" => true,
+                [
+                    "base_yield" => 1,
+                    "base_per_min" => 6,
+                    "ingredients" => [
+                        "Heat Sink" => 12,
+                        "Rubber" => 12,
+                        "Water" => 30,
+                        "Nitrogen Gas" => 150,
+                    ],
+                ]
             ],
             "Encased Uranium Cell" => [
                 "base_yield" => 5,

@@ -5,7 +5,7 @@
             <div class="font-semibold text-xl flex space-x-2 items-center">
                 <span>New Production Line :</span>
                 <span>
-                    [<input autofocus @input="fetch" type="number" step="0.5" min="0" v-model="newYield"
+                    [<input ref="yield" autofocus="autofocus" @change="fetch" type="number" step="0.5" min="0" v-model="newYield"
                             class="rounded shadow w-24"> per min]
                 </span>
                 <select @change="setDefaultRecipe" class="rounded shadow" v-model="newProduct">
@@ -124,8 +124,9 @@
                                         Parts List (Buildings)
                                     </th>
                                 </tr>
-                                <tr v-for="(num,mat) in production__building_summary.total_build_cost">
-                                    <td colspan="2" class="p-2"><input type="checkbox"> {{ mat }}</td>
+                                <tr @click="buildingChecks[mat] = ! buildingChecks[mat]" class="cursor-pointer" v-for="(num,mat) in production__building_summary.total_build_cost">
+                                    <td colspan="2" class="p-2"> <img class="mr-2 inline w-6 h-6" :src="imageUrl(mat,24)"
+                                             :alt="mat"> <input v-model="buildingChecks[mat]" type="checkbox"> {{ mat }}</td>
                                     <td class="p-2 text-right">{{ num }}</td>
                                 </tr>
                             </table>
@@ -423,6 +424,8 @@ export default {
 
     mounted() {
         window.Page = this;
+
+        this.$refs.yield.focus();
     },
 
     data() {
@@ -437,6 +440,7 @@ export default {
             newBeltSpeed: this.belt_speed || 780,
             // production_recipes : this.production.recipes,
             productionChecks: {},
+            buildingChecks: {},
             hideCompleted: true,
         }
     },
