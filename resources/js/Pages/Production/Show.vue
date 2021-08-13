@@ -261,7 +261,7 @@
                                                                 }} ({{
                                                                     getFootprint(material.name).height_walls
                                                                 }} x {{
-                                                                    getFootprint(material.name).foundations
+                                                                    2*(getFootprint(material.name).length_foundations + getFootprint(material.name).width_foundations)
                                                                 }})</span>
                                                         </li>
                                                         <li class="border-b border-gray-300 flex">

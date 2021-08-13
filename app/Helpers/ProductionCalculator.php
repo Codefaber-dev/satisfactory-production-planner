@@ -236,7 +236,7 @@ class ProductionCalculator
                 'height_m' => $height = $recipe->building->height,
                 'height_walls' => $height_walls = ceil($height/4) + 1,
                 'foundations' => $foundations = $length_foundations * $width_foundations,
-                'walls' => $height_walls * $foundations
+                'walls' => $height_walls * (2*($length_foundations + $width_foundations))
             ];
 
             return [
