@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use function get_class;
@@ -29,6 +30,8 @@ class ProductionCalculator
 
     protected $build_cost = [];
 
+    protected $raw = [];
+
     protected $recipe;
 
     protected $selected_variant;
@@ -44,9 +47,32 @@ class ProductionCalculator
         return (new static($ingredient, $qty, $recipe, $variant))->calculate();
     }
 
-    public function __construct(Ingredient $ingredient, $qty = null, $recipe = null, $variant = "mk1")
+    public static function newYield($ingredient, $qty = null, $recipe = null, $variant = "mk1")
+    {
+        if (is_string($ingredient)) {
+            $ingredient = i($ingredient);
+        }
+
+        return (new static($ingredient, $qty, $recipe, $variant))->calculate()['adjusted qty'];
+    }
+
+    public static function parseRaw($raw)
+    {
+        return collect(explode(",",$raw))
+            ->map(function($pair) {
+                [$key,$value] = explode(":",$pair);
+                return [$key => (int) $value];
+            })
+            ->collapse()
+            ->all();
+
+    }
+
+    public function __construct(Ingredient $ingredient, $qty = null, $recipe = null, $variant = "mk1", $raw = [])
     {
         $this->belt_speed = request('belt_speed',780);
+
+        $this->raw = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
         $this->product = $ingredient;
 
@@ -75,6 +101,7 @@ class ProductionCalculator
             "product" => $this->product->name,
             "recipe" => $this->recipe->description ?? "default",
             "yield" => $this->qty,
+            "adjusted qty" => $this->getAdjustedQty(),
             "raw materials" => collect($this->parts)->filter(function ($val, $key) {
                 return Str::of($key)->startsWith("1");
             })->all(),
@@ -278,5 +305,24 @@ class ProductionCalculator
                     return $group->sum('qty');
                 });
             });
+    }
+
+    protected function ratioOfAvailableRawMaterials()
+    {
+        return collect($this->parts)
+            // get required raw materials
+            ->filter(function ($val, $key) {
+                return Str::of($key)->startsWith("1");
+            })->map(function($required, $key) {
+               if (isset($this->raw[str_replace("1 - ","",$key)]) && $available = $this->raw[str_replace("1 - ","",$key)]) {
+                   return $available/$required;
+               }
+               return 1;
+            })->min();
+    }
+
+    public function getAdjustedQty()
+    {
+        return floor($this->qty * $this->ratioOfAvailableRawMaterials());
     }
 }

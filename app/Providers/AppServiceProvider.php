@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Favorites\FavoritesRepository;
+use App\Favorites\Implementations\GuestFavorites;
+use App\Favorites\Implementations\UserFavorites;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 
     /**

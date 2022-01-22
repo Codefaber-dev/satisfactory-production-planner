@@ -20,26 +20,26 @@ use Inertia\Inertia;
 |
 */
 
-if (config('app.env') !== 'production')
-    auth()->loginUsingId(1);
+//if (config('app.env') !== 'production')
+//    auth()->loginUsingId(1);
 
 Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
     return ProductionCalculator::calc($ingredient, $qty, $recipe);
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);
-Route::middleware(['auth:sanctum', 'verified'])->post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
+Route::post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);
+Route::post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
 
 
 Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
-    if (config('app.env') !== 'production')
-        auth()->loginUsingId(1);
-
     return ProductionCalculator::calc($ingredient, $qty);
 });
 
 Route::redirect('/', 'dashboard');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [ProductionController::class,'index'])->name('dashboard');
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard/{ingredient}/{qty}/{recipe}/{variant}', [ProductionController::class,'show'])->name('dashboard.show');
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard/{ingredient}/{qty}/{recipe}', [ProductionController::class,'show'])->name('dashboard.show');
+Route::get('/dashboard', [ProductionController::class,'index'])->name('dashboard');
+Route::get('/dashboard/{ingredient}/{qty}/{recipe}/{variant}', [ProductionController::class,'show'])->name('dashboard.show');
+Route::get('/dashboard/{ingredient}/{qty}/{recipe}', [ProductionController::class,'show'])->name('dashboard.show');
+
+Route::get('/newyield/{ingredient}/{qty}/{recipe}/{variant}', [ProductionController::class,'newYield'])->name('dashboard.newYield');
+Route::get('/newyield/{ingredient}/{qty}/{recipe}', [ProductionController::class,'newYield'])->name('dashboard.newYield');

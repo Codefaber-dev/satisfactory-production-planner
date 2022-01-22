@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Favorites\Facades\Favorites;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,12 +33,9 @@ class Recipe extends Model
         return $this->alt_tier ?? $this->product->tier;
     }
 
-    public function getFavoriteAttribute()
+    public function getFavoriteAttribute(): bool
     {
-        if ( auth()->guest() )
-            return false;
-
-        return auth()->user()->favorite_recipes()->where('id',$this->id)->exists();
+        return Favorites::isFavorite($this);
     }
 
     public function scopeOfName(Builder $query, $name)

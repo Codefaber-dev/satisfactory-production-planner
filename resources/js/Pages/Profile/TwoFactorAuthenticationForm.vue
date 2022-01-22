@@ -159,7 +159,7 @@
 
         computed: {
             twoFactorEnabled() {
-                return ! this.enabling && this.$page.props.user.two_factor_enabled
+                return ! this.enabling && this.$page.props?.user.two_factor_enabled
             }
         }
     }

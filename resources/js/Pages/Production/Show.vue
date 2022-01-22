@@ -80,7 +80,16 @@
                                              :alt="material.name">
                                         {{ material.name }}
                                     </td>
-                                    <td class="p-2 text-right" v-text="material.qty"></td>
+                                    <td class="p-2 text-right">
+                                        <input @input="rawUnchanged=false" class="w-24 text-right text-sm" v-model="rawMaterials[material.name]" :rel="material.name" type="text" >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        <button @click="fetchNewYield" :disabled="rawUnchanged" class="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 hover:disabled:bg-blue-900 disabled:bg-blue-900 disabled:cursor-not-allowed rounded px-4 py-2">
+                                            Update Yield
+                                        </button>
+                                    </td>
                                 </tr>
 
                                 <tr>
@@ -415,7 +424,8 @@ export default {
         'yield',
         'variant',
         'belt_speed',
-        'diagrams'
+        'diagrams',
+        'constraints'
     ],
     components: {
         AppLayout,
@@ -426,6 +436,8 @@ export default {
         window.Page = this;
 
         this.$refs.yield.focus();
+
+        this.newYield = this.production.yield;
     },
 
     data() {
@@ -442,6 +454,9 @@ export default {
             productionChecks: {},
             buildingChecks: {},
             hideCompleted: true,
+            rawMaterials : {},
+            newConstraints : [],
+            rawUnchanged: true,
         }
     },
 
@@ -457,7 +472,11 @@ export default {
                     ret.push({name: prop.replace('1 - ', ''), qty: Math.round(this.production['raw materials'][prop])});
             }
 
-            return ret.sort((a, b) => (a.qty > b.qty) ? 1 : -1);
+            ret = ret.sort((a, b) => (a.qty > b.qty) ? 1 : -1);
+
+            ret.forEach(mat => {this.rawMaterials[mat.name] = mat.qty});
+
+            return ret;
         },
 
         production__allMaterials() {
@@ -590,17 +609,32 @@ export default {
                 this.newYield,
                 this.newRecipe.description || this.newProduct.name,
                 this.newVariant
-            ];
+            ]
 
             this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&diagrams=${this.diagrams ? 1 : 0}`);
-
-            // fetch(`/calc/${this.product.name}/${this.yield}/${this.recipe.description||this.product.name}`)
-            //     .then( async response => {
-            //         this.production = await response.json();
-            //         this.working = false;
-            //         this.done = true;
-            //     });
         },
+
+        async fetchNewYield() {
+            if (this.yield < 1)
+                return false;
+
+            this.working = true;
+
+            let parts = [
+                'newyield',
+                this.newProduct.name,
+                this.newYield,
+                this.newRecipe.description || this.newProduct.name,
+                this.newVariant
+            ], raw = [];
+
+            for (let prop in this.rawMaterials) {
+                raw.push(`${prop}:${this.rawMaterials[prop]}`);
+            }
+
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&diagrams=${this.diagrams ? 1 : 0}&raw=${raw.join(',')}`);
+        },
+
         setNewSubFavorite(recipe) {
             if (recipe.product_id === this.recipe.product_id)
                 this.$inertia.post(`/favorites/${recipe.id}`);
@@ -624,7 +658,7 @@ export default {
         },
         setRecipe(recipe) {
             this.newRecipe = recipe;
-            this.newYield = 10;
+            //this.newYield = 10;
             this.fetch();
         },
         reset() {

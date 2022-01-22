@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Favorites\Facades\Favorites;
 use Illuminate\Http\Request;
 
 class FavoritesController extends Controller
 {
     public function store($recipe)
     {
-        request()->user()->addFavorite($recipe);
+        Favorites::set($recipe->product, $recipe);
 
-        return auth()->user()->favorite_recipes;
+        return Favorites::all();
     }
 }

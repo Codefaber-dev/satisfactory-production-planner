@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Favorites\Facades\Favorites;
 use ErrorException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -91,14 +92,11 @@ class Ingredient extends Model
     /**
      * Get the default recipe
      *
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|null
+     * @return \App\Models\Recipe
      */
     public function defaultRecipe()
     {
-        if ( auth()->check() && $recipe = auth()->user()->favorite_recipes()->firstWhere('ingredient_id',$this->id) )
-            return $recipe;
-
-        return $this->baseRecipe();
+        return Favorites::get($this);
     }
 
     /**
@@ -107,7 +105,7 @@ class Ingredient extends Model
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|null
      * @throws \ErrorException
      */
-    public function baseRecipe()
+    public function baseRecipe() : Recipe
     {
         if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
             return $recipe;
