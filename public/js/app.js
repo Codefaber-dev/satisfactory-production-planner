@@ -19802,7 +19802,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     imageUrl: function imageUrl(name) {
       var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 64;
-      return "https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_".concat(size, "/v1628360269/satisfactory/").concat(name.replace(/ /ig, ''), ".png");
+      return "https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_".concat(size, "/v1642885193/satisfactory/").concat(name.replace(/ /ig, ''), ".png");
     },
     toggleProductionCheck: function toggleProductionCheck(material) {
       if (this.productionChecks.hasOwnProperty(material)) this.productionChecks[material] = !this.productionChecks[material];else this.productionChecks[material] = true;
@@ -20609,7 +20609,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  src: "https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_64/v1628360269/satisfactory/IronIngot.png",
+  src: "https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_64/v1642885193/satisfactory/IronIngot.png",
   alt: ""
 };
 function render(_ctx, _cache) {
@@ -20632,7 +20632,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  src: "https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_64/v1628360269/satisfactory/IronIngot.png",
+  src: "https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_64/v1642885193/satisfactory/IronIngot.png",
   alt: ""
 };
 function render(_ctx, _cache) {

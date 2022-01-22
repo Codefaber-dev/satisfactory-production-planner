@@ -668,7 +668,7 @@ export default {
             return this.production.recipes[name].building_details[this.production.recipes[name].selected_variant].footprint;
         },
         imageUrl(name, size = 64) {
-            return `https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_${size}/v1628360269/satisfactory/${name.replace(/ /ig, '')}.png`;
+            return `https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_${size}/v1642885193/satisfactory/${name.replace(/ /ig, '')}.png`;
         },
         toggleProductionCheck(material) {
             if (this.productionChecks.hasOwnProperty(material))
