@@ -88,8 +88,7 @@
                                 </tr>
                                 <tr v-for="material in production__rawMaterials">
                                     <td colspan="2" class="p-2">
-                                        <img class="mr-2 inline w-8 h-8" :src="imageUrl(material.name,32)"
-                                             :alt="material.name">
+                                        <cloud-image class="inline-flex" :public-id="`${material.name}.png`" crop="scale" quality="100" width="32" :alt="material.name"/>
                                         {{ material.name }}
                                     </td>
                                     <td class="p-2 text-right">
@@ -164,9 +163,9 @@
                                 </tr>
                                 <tr @click="buildingChecks[mat] = ! buildingChecks[mat]" class="cursor-pointer"
                                     v-for="(num,mat) in production__building_summary.total_build_cost">
-                                    <td colspan="2" class="p-2"><img class="mr-2 inline w-6 h-6" :src="imageUrl(mat,24)"
-                                                                     :alt="mat"> <input v-model="buildingChecks[mat]"
-                                                                                        type="checkbox"> {{ mat }}
+                                    <td colspan="2" class="p-2">
+                                        <cloud-image class="inline-flex mr-2" :public-id="mat" crop="scale" quality="100" width="24" :alt="mat"/>
+                                        <input v-model="buildingChecks[mat]" type="checkbox"> {{ mat }}
                                     </td>
                                     <td class="p-2 text-right">{{ num }}</td>
                                 </tr>
@@ -213,9 +212,7 @@
                                         <td class="p-2">
                                             <div @click="toggleProductionCheck(material.name)"
                                                  class="bg-teal-200 dark:text-slate-800 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
-                                                <img
-                                                    class="mr-2" :src="imageUrl(material.name,64)"
-                                                    :alt="material.name">
+                                                <cloud-image class="mr-2" :public-id="material.name" width="48" crop="scale" :alt="material.name"/>
 
                                                 <span class="font-semibold">{{ material.name }} <br>
                                                     <span class="font-light">{{ material.qty }} per min</span>
@@ -227,7 +224,7 @@
                                                 class="dark:text-slate-800 bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg">
                                                 <div class="flex items-center"
                                                      v-for="(ing,name) in production.recipes[material.name].inputs">
-                                                    <img class="mr-2" :src="imageUrl(name,64)" :alt="name">
+                                                    <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name"/>
                                                     <span class="font-semibold">{{ name }} <br>
                                                         <span class="font-light">{{
                                                                 Math.round(100 * ing.needed_qty) / 100
@@ -243,36 +240,13 @@
                                                     <recipe-picker @select="selectNewRecipe"
                                                                    :recipes="recipes[newProduct.name]"
                                                                    :selected="newRecipe"></recipe-picker>
-                                                    <!--                                                    <select @change="fetch" class="rounded shadow w-full text-sm"-->
-                                                    <!--                                                            v-model="newRecipe">-->
-                                                    <!--                                                        <option :key="option.id"-->
-                                                    <!--                                                                v-for="option in recipes[newProduct.name]"-->
-                                                    <!--                                                                :value="option">-->
-                                                    <!--                                                            <span v-if="option.favorite">&star;</span>-->
-                                                    <!--                                                            {{ option.description || 'default' }}-->
-                                                    <!--                                                        </option>-->
-                                                    <!--                                                    </select>-->
 
-                                                    <!--                                                    <button :disabled="working" @click="setNewFavorite"-->
-                                                    <!--                                                            class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"-->
-                                                    <!--                                                            v-if="newRecipe && !newRecipe.favorite">Set Favorite-->
-                                                    <!--                                                    </button>-->
                                                 </div>
                                             </template>
 
                                             <!-- everything else -->
                                             <template v-else>
-                                                <!--                                                <select :disabled="recipes[material.name].length===1"-->
-                                                <!--                                                        @change="setNewSubFavorite(production.recipe_models[material.name])"-->
-                                                <!--                                                        class="rounded shadow w-full text-sm"-->
-                                                <!--                                                        :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"-->
-                                                <!--                                                        v-model="production.recipe_models[material.name].id">-->
-                                                <!--                                                    <option :key="option.id" v-for="option in recipes[material.name]"-->
-                                                <!--                                                            :value="option.id">-->
-                                                <!--                                                        <span v-if="option.favorite">&star;</span>-->
-                                                <!--                                                        {{ option.description || 'default' }}-->
-                                                <!--                                                    </option>-->
-                                                <!--                                                </select>-->
+
                                                 <recipe-picker @select="selectNewSubRecipe"
                                                                :recipes="recipes[material.name]"
                                                                :selected="production.recipe_models[material.name]"></recipe-picker>
@@ -541,7 +515,7 @@ export default {
 
                     ret[level].push({
                         name: prop.replace(/\d - /, ''),
-                        qty: Math.round(100 * this.production['parts per minute'][prop]) / 100
+                        qty: Math.round(10000 * this.production['parts per minute'][prop]) / 10000
                     })
                 }
 
@@ -659,7 +633,7 @@ export default {
                 this.newVariant
             ]
 
-            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&factory=${this.factory ? (this.factory.id || this.factory.name) : ''}`);
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&factory=${this.factory ? this.factory.id : ''}`);
         },
 
         async fetchNewYield() {
@@ -681,7 +655,7 @@ export default {
                     raw.push(`${prop}:${this.rawMaterials[prop]}`);
             }
 
-            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&raw=${raw.join(',')}&factory=${this.factory ? (this.factory.id || this.factory.name) : ''}`);
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&raw=${raw.join(',')}&factory=${this.factory ? this.factory.id : ''}`);
         },
 
         saveMyFactory() {
@@ -741,9 +715,6 @@ export default {
         },
         getFootprint(name) {
             return this.production.recipes[name].building_details[this.production.recipes[name].selected_variant].footprint;
-        },
-        imageUrl(name, size = 64) {
-            return `https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_${size}/v1642885193/satisfactory/${name.replace(/ /ig, '')}.png`;
         },
         toggleProductionCheck(material) {
             if (this.productionChecks.hasOwnProperty(material))

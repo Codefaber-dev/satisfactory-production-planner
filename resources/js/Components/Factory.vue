@@ -35,7 +35,7 @@
             class="flex relative w-full rounded-r-xl shadow bg-white dark:bg-slate-900 items-center border-4 border-sky-300 dark:border-sky-900">
 
             <div class="flex flex-1 mx-8 space-x-4 items-center py-2">
-                <img :src="imageUrl(product.name)" alt="">
+                <cloud-image :public-id="product.name" crop="scale" quality="100" width="64" alt="logo"/>
 
                 <div class="flex flex-col flex-1">
                     <div v-show="! editing" class="font-bold text-2xl flex">
@@ -100,10 +100,6 @@ export default {
             if (this.editing) {
                 this.$refs.newName.focus();
             }
-        },
-
-        imageUrl(name, size = 64) {
-            return `https://res.cloudinary.com/codefaber/image/upload/c_scale,q_100,w_${size}/v1642885193/satisfactory/${name.replace(/ /ig, '')}.png`;
         },
 
         deletePrompt() {
