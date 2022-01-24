@@ -9,8 +9,8 @@
         <recipe-detail :slim="true" :recipe="selected"></recipe-detail>
         <!-- dropdown arrow -->
         <div class="font-bold text-lg group-hover:text-blue-300 transition-all"
-             :style="{transform: `rotate(${showMenu ? 0 : 180}deg)`}">
-            ^
+             :style="{transform: `rotate(${showMenu ? 180 : 0}deg)`}">
+            🔽
         </div>
 
         <!-- menu -->
@@ -35,12 +35,25 @@ export default {
         RecipeDetail
     },
 
+    mounted() {
+        if (this.recipes?.length === 1 && this.selected.dummy)
+            this.selected = this.recipes[0];
+    },
+
     props: {
         recipes: {
             required: true,
         },
         selected: {
-            required: true
+            default() {
+                return {
+                    favorite: false,
+                    product: {
+                        name: 'dummy'
+                    },
+                    dummy: true
+                }
+            }
         }
     },
 

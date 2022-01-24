@@ -28,6 +28,10 @@ Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe)
     return ProductionCalculator::calc($ingredient, $qty, $recipe);
 });
 
+Route::get('/favorites', [FavoritesController::class,'index'])->name('favorites');
+Route::post('/favorites/preset', [FavoritesController::class,'storePreset'])->name('favorites.storePreset');
+Route::post('/favorites', [FavoritesController::class,'store'])->name('favorites.store');
+
 Route::post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);
 Route::post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
 
@@ -50,3 +54,5 @@ Route::get('/factories', [ProductionLineController::class,'index'])->name('facto
 Route::post('/factories', [ProductionLineController::class,'store']);
 Route::patch('/factories/{id}', [ProductionLineController::class,'update']);
 Route::delete('/factories/{id}', [ProductionLineController::class,'destroy']);
+
+

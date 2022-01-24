@@ -21,7 +21,8 @@ export default {
 
     computed: {
         url() {
-            let opts = {};
+            let opts = {},
+                publicId = this.publicId.replace(/ /gi,'').replace(/Packaged/gi,'').replace(/\-/gi,'').replace(/.png/,'');
             if (this.crop) {
                 opts.crop = this.crop;
             }
@@ -35,7 +36,7 @@ export default {
                 opts.quality = this.quality;
             }
 
-            return cl.url('satisfactory/' + this.publicId.replace(/ /gi,''), opts);
+            return cl.url('satisfactory/' + publicId + ".png", opts);
         }
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark:bg-gray-800" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html class="bg-gray-100 dark:bg-slate-900" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +17,7 @@
         @routes
         <script src="{{ mix('js/app.js') }}" defer></script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased bg-gray-100 dark:bg-slate-900" style="background-attachment: fixed">
         @inertia
 
         @env ('local')

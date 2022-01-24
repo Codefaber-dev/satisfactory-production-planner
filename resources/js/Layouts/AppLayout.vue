@@ -23,6 +23,9 @@
                                 <jet-nav-link :href="route('factories')" :active="route().current('factories')">
                                     My Factories
                                 </jet-nav-link>
+                                <jet-nav-link :href="route('favorites')" :active="route().current('favorites')">
+                                    My Favorite Recipes
+                                </jet-nav-link>
                             </div>
                         </div>
 
@@ -44,11 +47,13 @@
                                         <!-- toggle -->
                                         <div class="relative">
                                             <!-- input -->
-                                            <input id="darkToggle" @change="savePrefs" v-model="dark" type="checkbox" class="sr-only">
+                                            <input id="darkToggle" @change="savePrefs" v-model="dark" type="checkbox"
+                                                   class="sr-only">
                                             <!-- line -->
                                             <div class="block bg-gray-600 dark:bg-gray-200 w-14 h-8 rounded-full"></div>
                                             <!-- dot -->
-                                            <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                                            <div
+                                                class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
                                         </div>
                                         <!-- dark mode -->
                                         <div class="ml-2 font-medium">
@@ -224,6 +229,10 @@ export default {
         JetResponsiveNavLink,
     },
 
+    mounted() {
+        this.setDarkMode();
+    },
+
     data() {
         return {
             showingNavigationDropdown: false,
@@ -245,7 +254,19 @@ export default {
         },
 
         savePrefs() {
-            store.setItem('dark',this.dark);
+            store.setItem('dark', this.dark);
+
+            this.setDarkMode();
+        },
+
+        setDarkMode() {
+            if (this.dark) {
+                document.querySelector('html').classList.add('dark','bg-slate-800');
+                document.querySelector('html').classList.remove('bg-gray-100');
+            } else {
+                document.querySelector('html').classList.remove('dark','bg-slate-800');
+                document.querySelector('html').classList.add('bg-gray-100');
+            }
         }
     }
 }
