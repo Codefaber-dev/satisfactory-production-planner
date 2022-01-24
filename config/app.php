@@ -178,6 +178,7 @@ return [
         App\Providers\JetstreamServiceProvider::class,
 
         App\Favorites\Providers\FavoritesProvider::class,
+        App\Factories\Providers\FactoriesProvider::class,
 
     ],
 
@@ -235,6 +236,7 @@ return [
 
 
         'Favorites' => App\Favorites\Facades\Favorites::class,
+        'Factories' => App\Factories\Facades\Factories::class,
     ],
 
 ];

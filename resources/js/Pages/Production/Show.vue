@@ -2,45 +2,55 @@
     <app-layout>
         <template #header>
 
-            <div class="font-semibold text-xl flex space-x-2 items-center">
-                <span>New Production Line :</span>
-                <span>
-                    [<input ref="yield" autofocus="autofocus" @change="fetch" type="number" step="0.5" min="0" v-model="newYield"
-                            class="rounded shadow w-24"> per min]
-                </span>
-                <select @change="setDefaultRecipe" class="rounded shadow" v-model="newProduct">
-                    <option :key="option.id" v-for="option in products" :value="option">{{
-                            option.name
-                        }}
-                    </option>
-                </select>
-                <select @change="fetch" class="rounded shadow" v-model="newRecipe">
-                    <option :key="option.id" v-for="option in recipes[newProduct.name]" :value="option">
-                        <span v-if="option.favorite">&star;</span>
-                        {{ option.description || 'default' }}
-                    </option>
-                </select>
-                <select @change="fetch" v-model="newVariant" class="rounded shadow">
-                    <option value="mk1">Production mk1 (base)</option>
-                    <option value="mk2">Production mk2 (mk++ mod)</option>
-                    <option value="mk3">Production mk3 (mk++ mod)</option>
-                    <option value="mk4">Production mk4 (mk++ mod)</option>
-                </select>
-                <select @change="fetch" v-model="newBeltSpeed" class="rounded shadow">
-                    <option value="60">Belts mk1 (base)</option>
-                    <option value="120">Belts mk2 (base)</option>
-                    <option value="270">Belts mk3 (base)</option>
-                    <option value="480">Belts mk4 (base)</option>
-                    <option value="780">Belts mk5 (base)</option>
-                    <option value="2000">Belts mk6 (Covered Conveyer Belt Mod)</option>
-                    <option value="7500">Belts mk7 (Covered Conveyer Belt Mod)</option>
-                </select>
-                <button @click="diagrams = !diagrams"
-                        class="rounded-lg shadow bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 text-white px-4 py-2">
+            <div class="font-semibold text-xl flex flex-col space-y-4 justify-center">
+                <span>{{ factory ? factory.name : 'New Production Line' }}</span>
+
+                <div class="flex space-x-2">
+                    <span>
+                        <input ref="yield" autofocus="autofocus" @change="fetch" type="number" step="0.5" min="0"
+                               v-model="newYield"
+                               class="rounded shadow w-24 py-2 px-1 dark:bg-sky-800 appearance-none"> per min
+                    </span>
+                    <select @change="setDefaultRecipe" class="rounded shadow py-2 dark:bg-sky-800" v-model="newProduct">
+                        <option :key="option.id" v-for="option in products" :value="option">{{
+                                option.name
+                            }}
+                        </option>
+                    </select>
+                    <select @change="fetch" class="rounded shadow py-2 px-1 dark:bg-sky-800" v-model="newRecipe">
+                        <option :key="option.id" v-for="option in recipes[newProduct.name]" :value="option">
+                            <span v-if="option.favorite">&star;</span>
+                            {{ option.description || 'default' }}
+                        </option>
+                    </select>
+                    <select @change="fetch" v-model="newVariant" class="rounded shadow py-2 px-1 dark:bg-sky-800">
+                        <option value="mk1">Production mk1 (base)</option>
+                        <option value="mk2">Production mk2 (mk++ mod)</option>
+                        <option value="mk3">Production mk3 (mk++ mod)</option>
+                        <option value="mk4">Production mk4 (mk++ mod)</option>
+                    </select>
+                    <select @change="fetch" v-model="newBeltSpeed" class="rounded shadow py-2 px-1 dark:bg-sky-800">
+                        <option value="60">Belts mk1 (base)</option>
+                        <option value="120">Belts mk2 (base)</option>
+                        <option value="270">Belts mk3 (base)</option>
+                        <option value="480">Belts mk4 (base)</option>
+                        <option value="780">Belts mk5 (base)</option>
+                        <option value="2000">Belts mk6 (Covered Conveyer Belt Mod)</option>
+                        <option value="7500">Belts mk7 (Covered Conveyer Belt Mod)</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="my-4 space-x-4">
+                <button :disabled="working" @click="saveMyFactory"
+                        class="btn btn-emerald">
+                    {{ factory ? 'Save Changes To Factory' : 'Save To My Factories' }}
+                </button>
+                <button @click="diagrams = !diagrams;savePrefs()"
+                        class="btn btn-emerald">
                     {{ diagrams ? '✅' : '⬜' }}
                     Toggle Diagrams
                 </button>
-
             </div>
             <div class="mt-4 flex flex-col">
                 <hr class="mb-4">
@@ -64,12 +74,14 @@
                      class="dark:text-gray-100 p-4 flex flex-col space-y-2 flex-1">
                     <div class="flex flex-1 space-x-8 py-4">
                         <!-- Left Side -->
-                        <div class="w-96 flex flex-col text-sm bg-white shadow-lg border border-gray-500 rounded-lg">
-                            <div class="p-4 font-semibold text-xl bg-gray-900 text-white rounded-t-lg text-center">
+                        <div
+                            class="w-96 flex flex-col text-sm bg-white dark:bg-slate-900 shadow-lg border border-gray-500 dark:border-sky-700 rounded-lg">
+                            <div
+                                class="p-4 font-semibold text-xl bg-gray-900 dark:bg-sky-700 text-white rounded-t-lg text-center">
                                 Production Summary
                             </div>
                             <table class="">
-                                <tr class="bg-blue-300 dark:bg-blue-900">
+                                <tr class="bg-sky-300 dark:bg-sky-800">
                                     <th class="font-semibold text-lg" colspan="3">
                                         Raw Materials (per min)
                                     </th>
@@ -81,12 +93,29 @@
                                         {{ material.name }}
                                     </td>
                                     <td class="p-2 text-right">
-                                        <input @input="rawUnchanged=false" class="w-24 text-right text-sm" v-model="rawMaterials[material.name]" :rel="material.name" type="text" >
+                                        <div class="flex space-x-2">
+                                            <button
+                                                @click="disabledRawMaterials[material.name] = !!!disabledRawMaterials[material.name]"
+                                                class="btn-sm btn-emerald">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                     viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          stroke-width="2"
+                                                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                </svg>
+                                            </button>
+                                            <input :disabled="disabledRawMaterials[material.name]"
+                                                   @input="rawUnchanged=false"
+                                                   class="w-24 text-right text-sm rounded bg-gray-200 dark:bg-sky-200 dark:text-slate-900 p-2 dark:disabled:bg-gray-600 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                                                   v-model="rawMaterials[material.name]" :rel="material.name"
+                                                   type="text">
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="3" class="text-center">
-                                        <button @click="fetchNewYield" :disabled="rawUnchanged" class="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 hover:disabled:bg-blue-900 disabled:bg-blue-900 disabled:cursor-not-allowed rounded px-4 py-2">
+                                        <button @click="fetchNewYield" :disabled="rawUnchanged"
+                                                class="btn btn-emerald">
                                             Update Yield
                                         </button>
                                     </td>
@@ -96,7 +125,7 @@
                                     <td>&nbsp;</td>
                                 </tr>
 
-                                <tr class="bg-blue-300 dark:bg-blue-900">
+                                <tr class="bg-sky-300 dark:bg-sky-700">
                                     <th class="font-semibold text-lg" colspan="3">
                                         Power Summary
                                     </th>
@@ -128,21 +157,26 @@
                                     <td>&nbsp;</td>
                                 </tr>
 
-                                <tr class="bg-blue-300 dark:bg-blue-900">
+                                <tr class="bg-sky-300 dark:bg-sky-700">
                                     <th class="font-semibold text-lg" colspan="3">
                                         Parts List (Buildings)
                                     </th>
                                 </tr>
-                                <tr @click="buildingChecks[mat] = ! buildingChecks[mat]" class="cursor-pointer" v-for="(num,mat) in production__building_summary.total_build_cost">
-                                    <td colspan="2" class="p-2"> <img class="mr-2 inline w-6 h-6" :src="imageUrl(mat,24)"
-                                             :alt="mat"> <input v-model="buildingChecks[mat]" type="checkbox"> {{ mat }}</td>
+                                <tr @click="buildingChecks[mat] = ! buildingChecks[mat]" class="cursor-pointer"
+                                    v-for="(num,mat) in production__building_summary.total_build_cost">
+                                    <td colspan="2" class="p-2"><img class="mr-2 inline w-6 h-6" :src="imageUrl(mat,24)"
+                                                                     :alt="mat"> <input v-model="buildingChecks[mat]"
+                                                                                        type="checkbox"> {{ mat }}
+                                    </td>
                                     <td class="p-2 text-right">{{ num }}</td>
                                 </tr>
                             </table>
                         </div>
                         <!-- middle -->
-                        <div class="flex-1 flex flex-col text-sm bg-white shadow-lg rounded-lg border border-gray-500">
-                            <div class="p-4 font-semibold text-xl bg-gray-900 text-white rounded-t-lg text-center">
+                        <div
+                            class="flex-1 flex flex-col text-sm bg-white dark:bg-slate-900 shadow-lg rounded-lg border border-gray-500 dark:border-sky-700">
+                            <div
+                                class="p-4 font-semibold text-xl bg-gray-900 dark:bg-sky-700 text-white rounded-t-lg text-center">
                                 Intermediate Products
                             </div>
                             <table>
@@ -154,31 +188,31 @@
                                     <th class="font-semibold">Production</th>
                                 </tr>
                                 <tr v-show="Object.values(productionChecks).some(o=>o)">
-                                    <th class="bg-blue-200 dark:bg-gray-500 text-center p-2" colspan="100">
+                                    <th class="bg-blue-200 dark:bg-sky-600 text-center p-2" colspan="100">
                                         {{ hideCompleted ? 'Hiding' : 'Showing' }}
                                         {{ Object.values(productionChecks).filter(o => o).length }} completed rows
                                         <button @click="hideCompleted = ! hideCompleted"
-                                                class="text-sm bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 rounded px-4 py-2">
+                                                class="text-sm bg-emerald-500 hover:bg-emerald-600 focus:bg-emerald-700 rounded px-4 py-2">
                                             Toggle Completed
                                         </button>
                                     </th>
                                 </tr>
                                 <template v-for="(level,index) in production__allMaterials">
                                     <tr>
-                                        <th class="bg-blue-200 dark:bg-gray-500" colspan="100">{{ index }}</th>
+                                        <th class="bg-blue-200 dark:bg-slate-800 py-2" colspan="100">{{ index }}</th>
                                     </tr>
 
 
                                     <tbody v-for="material in level"
                                            v-show="!hideCompleted || ! productionChecks[material.name]"
                                            :class="[productionChecks[material.name] ? 'opacity-25' : 'opacity-100']">
-                                    <tr class="border-t border-gray-200">
+                                    <tr class="border-t border-gray-200 dark:border-slate-700">
                                         <!--                                    <td class="text-center">-->
                                         <!--                                        <input v-model="productionChecks[material.name]" class="mr-1" type="checkbox">                                    </td>-->
 
                                         <td class="p-2">
                                             <div @click="toggleProductionCheck(material.name)"
-                                                class="bg-teal-200 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
+                                                 class="bg-teal-200 dark:text-slate-800 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
                                                 <img
                                                     class="mr-2" :src="imageUrl(material.name,64)"
                                                     :alt="material.name">
@@ -189,12 +223,15 @@
                                             </div>
                                         </td>
                                         <td nowrap class="p-2">
-                                            <div class="bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg">
+                                            <div
+                                                class="dark:text-slate-800 bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg">
                                                 <div class="flex items-center"
                                                      v-for="(ing,name) in production.recipes[material.name].inputs">
                                                     <img class="mr-2" :src="imageUrl(name,64)" :alt="name">
                                                     <span class="font-semibold">{{ name }} <br>
-                                                        <span class="font-light">{{ Math.round(100 * ing.needed_qty) / 100 }} per min</span>
+                                                        <span class="font-light">{{
+                                                                Math.round(100 * ing.needed_qty) / 100
+                                                            }} per min</span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -203,45 +240,49 @@
                                             <!-- material is end product -->
                                             <template v-if="material.name === newProduct.name">
                                                 <div class="flex flex-col">
-                                                    <recipe-picker @select="selectNewRecipe" :recipes="recipes[newProduct.name]" :selected="newRecipe"></recipe-picker>
-<!--                                                    <select @change="fetch" class="rounded shadow w-full text-sm"-->
-<!--                                                            v-model="newRecipe">-->
-<!--                                                        <option :key="option.id"-->
-<!--                                                                v-for="option in recipes[newProduct.name]"-->
-<!--                                                                :value="option">-->
-<!--                                                            <span v-if="option.favorite">&star;</span>-->
-<!--                                                            {{ option.description || 'default' }}-->
-<!--                                                        </option>-->
-<!--                                                    </select>-->
+                                                    <recipe-picker @select="selectNewRecipe"
+                                                                   :recipes="recipes[newProduct.name]"
+                                                                   :selected="newRecipe"></recipe-picker>
+                                                    <!--                                                    <select @change="fetch" class="rounded shadow w-full text-sm"-->
+                                                    <!--                                                            v-model="newRecipe">-->
+                                                    <!--                                                        <option :key="option.id"-->
+                                                    <!--                                                                v-for="option in recipes[newProduct.name]"-->
+                                                    <!--                                                                :value="option">-->
+                                                    <!--                                                            <span v-if="option.favorite">&star;</span>-->
+                                                    <!--                                                            {{ option.description || 'default' }}-->
+                                                    <!--                                                        </option>-->
+                                                    <!--                                                    </select>-->
 
-<!--                                                    <button :disabled="working" @click="setNewFavorite"-->
-<!--                                                            class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"-->
-<!--                                                            v-if="newRecipe && !newRecipe.favorite">Set Favorite-->
-<!--                                                    </button>-->
+                                                    <!--                                                    <button :disabled="working" @click="setNewFavorite"-->
+                                                    <!--                                                            class="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 inline rounded-xl mt-2"-->
+                                                    <!--                                                            v-if="newRecipe && !newRecipe.favorite">Set Favorite-->
+                                                    <!--                                                    </button>-->
                                                 </div>
                                             </template>
 
                                             <!-- everything else -->
                                             <template v-else>
-<!--                                                <select :disabled="recipes[material.name].length===1"-->
-<!--                                                        @change="setNewSubFavorite(production.recipe_models[material.name])"-->
-<!--                                                        class="rounded shadow w-full text-sm"-->
-<!--                                                        :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"-->
-<!--                                                        v-model="production.recipe_models[material.name].id">-->
-<!--                                                    <option :key="option.id" v-for="option in recipes[material.name]"-->
-<!--                                                            :value="option.id">-->
-<!--                                                        <span v-if="option.favorite">&star;</span>-->
-<!--                                                        {{ option.description || 'default' }}-->
-<!--                                                    </option>-->
-<!--                                                </select>-->
-                                                <recipe-picker @select="selectNewSubRecipe" :recipes="recipes[material.name]" :selected="production.recipe_models[material.name]"></recipe-picker>
+                                                <!--                                                <select :disabled="recipes[material.name].length===1"-->
+                                                <!--                                                        @change="setNewSubFavorite(production.recipe_models[material.name])"-->
+                                                <!--                                                        class="rounded shadow w-full text-sm"-->
+                                                <!--                                                        :class="{'bg-gray-300' : recipes[material.name].length===1, 'dark:bg-black' : recipes[material.name].length===1}"-->
+                                                <!--                                                        v-model="production.recipe_models[material.name].id">-->
+                                                <!--                                                    <option :key="option.id" v-for="option in recipes[material.name]"-->
+                                                <!--                                                            :value="option.id">-->
+                                                <!--                                                        <span v-if="option.favorite">&star;</span>-->
+                                                <!--                                                        {{ option.description || 'default' }}-->
+                                                <!--                                                    </option>-->
+                                                <!--                                                </select>-->
+                                                <recipe-picker @select="selectNewSubRecipe"
+                                                               :recipes="recipes[material.name]"
+                                                               :selected="production.recipe_models[material.name]"></recipe-picker>
                                             </template>
                                         </td>
 
                                         <td class="p-2">
                                             <select v-model="production.recipes[material.name].selected_variant"
-                                                    class="text-sm rounded shadow w-full">
-                                                <option :value="mk"
+                                                    class="rounded shadow py-2 dark:bg-sky-800 w-full text-right">
+                                                <option class="text-right" :value="mk"
                                                         v-for="(opt,mk) in production.recipes[material.name].building_details">
                                                     {{ opt.num_buildings }}x {{ mk }} @{{ opt.clock_speed }}%
                                                     [{{ Math.round(opt.power_usage) }} MW]
@@ -270,7 +311,7 @@
                                                                 }} ({{
                                                                     getFootprint(material.name).height_walls
                                                                 }} x {{
-                                                                    2*(getFootprint(material.name).length_foundations + getFootprint(material.name).width_foundations)
+                                                                    2 * (getFootprint(material.name).length_foundations + getFootprint(material.name).width_foundations)
                                                                 }})</span>
                                                         </li>
                                                         <li class="border-b border-gray-300 flex">
@@ -347,19 +388,21 @@
                             </table>
                         </div>
                         <!-- right -->
-                        <div class="flex-col text-sm bg-white shadow-lg rounded-lg border border-gray-500">
-                            <div class="p-4 font-semibold text-xl bg-gray-900 text-white rounded-t-lg text-center">
+                        <div
+                            class="flex-col text-sm bg-white dark:bg-slate-900 shadow-lg rounded-lg border border-gray-500 dark:border-sky-700">
+                            <div
+                                class="p-4 font-semibold text-xl bg-gray-900 dark:bg-sky-700 text-white rounded-t-lg text-center">
                                 Building Summary
                             </div>
                             <table>
                                 <tr>
                                     <th>Building</th>
-                                    <th>Num. Required</th>
+                                    <th>Num</th>
                                     <th>Power Usage (MW)</th>
                                     <th>Build Cost</th>
                                     <!--                                    <th>Footprint</th>-->
                                 </tr>
-                                <tbody class="border-b border-gray-200"
+                                <tbody class="border-b border-gray-200 dark:border-slate-800"
                                        v-for="(o,bldg) in production__building_summary.variants">
                                 <tr>
                                     <td class="p-2">{{ bldg }}</td>
@@ -411,6 +454,7 @@
 import AppLayout from '@/Layouts/AppLayout'
 import RecipePicker from "@/Components/RecipePicker";
 import {Inertia} from '@inertiajs/inertia';
+import store from '@/store';
 
 
 export default {
@@ -424,8 +468,8 @@ export default {
         'yield',
         'variant',
         'belt_speed',
-        'diagrams',
-        'constraints'
+        'constraints',
+        'factory'
     ],
     components: {
         AppLayout,
@@ -454,9 +498,11 @@ export default {
             productionChecks: {},
             buildingChecks: {},
             hideCompleted: true,
-            rawMaterials : {},
-            newConstraints : [],
+            rawMaterials: {},
+            disabledRawMaterials: {},
+            newConstraints: [],
             rawUnchanged: true,
+            diagrams: store.getItem('diagrams', true)
         }
     },
 
@@ -474,7 +520,9 @@ export default {
 
             ret = ret.sort((a, b) => (a.qty > b.qty) ? 1 : -1);
 
-            ret.forEach(mat => {this.rawMaterials[mat.name] = mat.qty});
+            ret.forEach(mat => {
+                this.rawMaterials[mat.name] = mat.qty
+            });
 
             return ret;
         },
@@ -611,7 +659,7 @@ export default {
                 this.newVariant
             ]
 
-            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&diagrams=${this.diagrams ? 1 : 0}`);
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&factory=${this.factory ? (this.factory.id || this.factory.name) : ''}`);
         },
 
         async fetchNewYield() {
@@ -629,10 +677,37 @@ export default {
             ], raw = [];
 
             for (let prop in this.rawMaterials) {
-                raw.push(`${prop}:${this.rawMaterials[prop]}`);
+                if (!this.disabledRawMaterials[prop])
+                    raw.push(`${prop}:${this.rawMaterials[prop]}`);
             }
 
-            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&diagrams=${this.diagrams ? 1 : 0}&raw=${raw.join(',')}`);
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&raw=${raw.join(',')}&factory=${this.factory ? (this.factory.id || this.factory.name) : ''}`);
+        },
+
+        saveMyFactory() {
+            let name;
+
+            if (this.factory) {
+                this.$inertia.patch(`/factories/${this.factory.id}`, {
+                    name: this.factory.name,
+                    ingredient_id: this.product.id,
+                    recipe_id: this.recipe.id,
+                    yield: this.yield
+                });
+
+            } else {
+                name = prompt('Provide a name for your factory');
+            }
+
+            if (!name)
+                return;
+
+            this.$inertia.post('/factories', {
+                name,
+                ingredient_id: this.product.id,
+                recipe_id: this.recipe.id,
+                yield: this.yield
+            })
         },
 
         setNewSubFavorite(recipe) {
@@ -676,11 +751,14 @@ export default {
             else
                 this.productionChecks[material] = true;
         },
-        selectNewRecipe({recipe}){
+        selectNewRecipe({recipe}) {
             this.setRecipe(recipe);
         },
-        selectNewSubRecipe({recipe}){
+        selectNewSubRecipe({recipe}) {
             this.setNewSubFavorite(recipe);
+        },
+        savePrefs() {
+            store.setItem('diagrams', this.diagrams);
         }
     }
 }

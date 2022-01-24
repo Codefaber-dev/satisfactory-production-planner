@@ -65,6 +65,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Recipe::class)->withPivot(['ingredient_id']);
     }
 
+    public function factories()
+    {
+        return $this->hasMany(ProductionLine::class);
+    }
+
     public function addFavoriteByName($name)
     {
         if ( ! $recipe = Recipe::ofName($name) )

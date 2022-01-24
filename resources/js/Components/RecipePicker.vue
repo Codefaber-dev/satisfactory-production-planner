@@ -1,6 +1,6 @@
 <template>
     <div @click="showMenu = !showMenu"
-         class="relative transition-all flex shadow-lg border border-gray-400 group hover:border-blue-300 rounded px-4 py-2 items-center justify-between cursor-pointer">
+         class="relative transition-all flex shadow-lg border border-gray-400 dark:border-slate-700 group hover:border-blue-300 rounded px-4 py-2 items-center justify-between cursor-pointer">
         <!-- favorite indicator -->
         <div class="pr-4">
             <span v-if="selected.favorite">⭐</span>
@@ -15,8 +15,8 @@
 
         <!-- menu -->
         <div v-show="showMenu" style="top:100%"
-             class="absolute bg-white border border-blue-300 shadow-lg w-100 flex flex-col z-50">
-            <recipe-detail @select="select" class="border-b border-gray-300 hover:bg-blue-100 rounded p-4"
+             class="absolute bg-white dark:bg-slate-900 border border-sky-300 shadow-lg w-100 flex flex-col z-50">
+            <recipe-detail @select="select" class="border-b border-gray-300 hover:bg-sky-100 dark:hover:bg-sky-900 rounded p-4"
                            :key="recipe.id" v-for="recipe in recipes" v-bind="{recipe}"></recipe-detail>
         </div>
 

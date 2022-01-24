@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div :class="{dark}">
         <jet-banner/>
 
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-gray-100">
-            <nav class="bg-white dark:bg-gray-800 border-b border-gray-100">
+        <div class="min-h-screen bg-gray-100 dark:bg-slate-800 dark:text-gray-100">
+            <nav class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-sky-500">
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
@@ -20,12 +20,47 @@
                                 <jet-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                                     Production Planner
                                 </jet-nav-link>
+                                <jet-nav-link :href="route('factories')" :active="route().current('factories')">
+                                    My Factories
+                                </jet-nav-link>
                             </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
-                            <div class="ml-3 relative">
+                            <div class="mr-3 h-16 flex items-center justify-center">
 
+                                <!-- dark mode toggle -->
+                                <div class="flex items-center justify-center w-full dark:text-gray-200">
+
+                                    <label for="darkToggle" class="flex items-center cursor-pointer">
+                                        <!-- light mode -->
+                                        <div class="mr-2 font-medium">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                            </svg>
+                                        </div>
+                                        <!-- toggle -->
+                                        <div class="relative">
+                                            <!-- input -->
+                                            <input id="darkToggle" @change="savePrefs" v-model="dark" type="checkbox" class="sr-only">
+                                            <!-- line -->
+                                            <div class="block bg-gray-600 dark:bg-gray-200 w-14 h-8 rounded-full"></div>
+                                            <!-- dot -->
+                                            <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                                        </div>
+                                        <!-- dark mode -->
+                                        <div class="ml-2 font-medium">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                                            </svg>
+                                        </div>
+                                    </label>
+
+                                </div>
                             </div>
 
                             <!-- Settings Dropdown -->
@@ -156,7 +191,7 @@
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-white dark:bg-gray-900 shadow" v-if="$slots.header">
+            <header class="bg-white dark:bg-sky-900 shadow" v-if="$slots.header">
                 <div class=" mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <slot name="header"></slot>
                 </div>
@@ -177,6 +212,7 @@ import JetDropdown from '@/Jetstream/Dropdown'
 import JetDropdownLink from '@/Jetstream/DropdownLink'
 import JetNavLink from '@/Jetstream/NavLink'
 import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink'
+import store from '@/store';
 
 export default {
     components: {
@@ -191,6 +227,7 @@ export default {
     data() {
         return {
             showingNavigationDropdown: false,
+            dark: store.getItem('dark')
         }
     },
 
@@ -206,6 +243,18 @@ export default {
         logout() {
             this.$inertia.post(route('logout'));
         },
+
+        savePrefs() {
+            store.setItem('dark',this.dark);
+        }
     }
 }
 </script>
+
+<style>
+/* Toggle B */
+input:checked ~ .dot {
+    transform: translateX(100%);
+    background-color: #48bb78;
+}
+</style>

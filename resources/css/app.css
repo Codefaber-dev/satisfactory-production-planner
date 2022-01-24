@@ -6,3 +6,27 @@
 /*input, select, [type="number"] {*/
 /*    @apply dark:bg-gray-800 dark:text-gray-100;*/
 /*}*/
+
+.btn-sm {
+    @apply p-1 text-sm rounded-lg shadow text-white disabled:cursor-not-allowed
+}
+
+.btn {
+    @apply px-4 py-2 rounded-lg shadow text-white disabled:cursor-not-allowed;
+}
+
+.btn-emerald {
+    @apply bg-emerald-600 hover:bg-emerald-700 focus:bg-emerald-800 disabled:hover:bg-emerald-600 disabled:focus:bg-emerald-600;
+}
+
+.btn-orange {
+    @apply bg-orange-600 hover:bg-orange-700 focus:bg-orange-800 disabled:hover:bg-orange-600 disabled:focus:bg-orange-600;
+}
+
+.btn-rose {
+    @apply bg-rose-600 hover:bg-rose-700 focus:bg-rose-800 disabled:hover:bg-rose-600 disabled:focus:bg-rose-600;
+}
+
+.btn-gray {
+    @apply bg-gray-600 hover:bg-gray-700 focus:bg-gray-800 disabled:hover:bg-gray-600 disabled:focus:bg-gray-600;
+}

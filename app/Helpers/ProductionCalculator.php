@@ -317,8 +317,10 @@ class ProductionCalculator
                if (isset($this->raw[str_replace("1 - ","",$key)]) && $available = $this->raw[str_replace("1 - ","",$key)]) {
                    return $available/$required;
                }
-               return 1;
-            })->min();
+               return null;
+            })
+            ->filter()
+            ->min();
     }
 
     public function getAdjustedQty()

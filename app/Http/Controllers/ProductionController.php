@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\Facades\Factories;
 use App\Favorites\Facades\Favorites;
 use App\Helpers\ProductionCalculator;
 use App\Models\Ingredient;
@@ -18,8 +19,9 @@ class ProductionController extends Controller
             return [$product->name => $product->recipes()->with('ingredients')->get()];
         })->collapse();
         $favorites = Favorites::all();
+        $factory = Factories::find(request('factory'));
 
-        return compact('products','recipes','favorites');
+        return compact('products','recipes','favorites','factory');
     }
 
     public function index()
@@ -34,18 +36,17 @@ class ProductionController extends Controller
         $yield = $qty;
         $recipe = Recipe::ofName($recipe);
         $belt_speed = request('belt_speed',780);
-        $diagrams = (bool) request('diagrams',true);
 
-        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed','diagrams') + $this->baseData());
+        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant="mk1")
     {
         $newQty = ProductionCalculator::newYield($ingredient,$qty,$recipe,$variant);
         $belt_speed = request('belt_speed',780);
-        $diagrams = (int) request('diagrams',1);
+        $factory = request('factory');
 
-        return redirect()->to("/dashboard/$ingredient/$newQty/$recipe/$variant?belt_speed={$belt_speed}&diagrams={$diagrams}");
+        return redirect()->to("/dashboard/$ingredient/$newQty/$recipe/$variant?belt_speed={$belt_speed}&factory={$factory}");
     }
 
     public function addFavorite(Recipe $recipe)
