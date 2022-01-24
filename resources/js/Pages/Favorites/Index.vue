@@ -47,7 +47,7 @@
                             <recipe-picker
                                 class="dark:border-sky-800 dark:bg-sky-600"
                                 :recipes="product.recipes"
-                                :selected="product.recipes.length > 1 ? product.recipes.filter(o=>o.favorite)[0] : product.recipes[0]"
+                                :selected="product.recipes.length > 1 ? product.recipes.filter(o=>o.favorite)[0] || product.recipes[0] : product.recipes[0]"
                                 @select="update"
                             />
                         </div>

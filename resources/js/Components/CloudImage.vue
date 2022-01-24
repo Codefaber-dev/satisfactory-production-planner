@@ -22,7 +22,7 @@ export default {
     computed: {
         url() {
             let opts = {},
-                publicId = this.publicId.replace(/ /gi,'').replace(/Packaged/gi,'').replace(/\-/gi,'').replace(/.png/,'');
+                publicId = this.publicId.replace(/ /gi,'').replace(/Packaged/gi,'').replace(/-/gi,'').replace(/.png/,'');
             if (this.crop) {
                 opts.crop = this.crop;
             }

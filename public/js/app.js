@@ -21477,7 +21477,7 @@ var cl = cloudinary_core__WEBPACK_IMPORTED_MODULE_0__.Cloudinary["new"]({
   computed: {
     url: function url() {
       var opts = {},
-          publicId = this.publicId.replace(/ /gi, '').replace(/Packaged/gi, '').replace(/\-/gi, '').replace(/.png/, '');
+          publicId = this.publicId.replace(/ /gi, '').replace(/Packaged/gi, '').replace(/-/gi, '').replace(/.png/, '');
 
       if (this.crop) {
         opts.crop = this.crop;
@@ -27758,7 +27758,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           recipes: product.recipes,
           selected: product.recipes.length > 1 ? product.recipes.filter(function (o) {
             return o.favorite;
-          })[0] : product.recipes[0],
+          })[0] || product.recipes[0] : product.recipes[0],
           onSelect: $options.update
         }, null, 8
         /* PROPS */
