@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use function get_class;
+use function in_array;
 use function round;
 
 class ProductionCalculator
@@ -74,6 +75,8 @@ class ProductionCalculator
 
         $this->raw = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
+        $this->imports = explode(",",request("imports"));
+
         $this->product = $ingredient;
 
         $this->recipe = $recipe ? r($recipe) : $this->getRecipe($this->product);
@@ -105,7 +108,13 @@ class ProductionCalculator
             "raw materials" => collect($this->parts)->filter(function ($val, $key) {
                 return Str::of($key)->startsWith("1");
             })->all(),
+            "intermediate materials" => collect($this->parts)->reject(function ($val, $key) {
+                return Str::of($key)->startsWith("1") || Str::of($key)->contains($this->product->name);
+            })->all(),
             "parts per minute" => collect($this->parts)->sortKeys()->all(),
+            "partsPerMinuteAll" => collect($this->parts)->sortKeys()->map(function($value, $key) {
+                return [preg_replace("/\d - /", "", $key) => 1*$value];
+            })->collapse()->all(),
             "byproducts per minute" => collect($this->byproducts)->sortKeys()->all(),
             "power_usage_mw" => collect($this->power_usage),
             "build_cost" => $this->build_cost,
@@ -116,6 +125,11 @@ class ProductionCalculator
 
     protected function calculateSubRecipe(Recipe $recipe, $qty)
     {
+        // if product is being imported, then ignore this recipe
+        if (in_array($recipe->product->name, $this->imports, true)) {
+            return;
+        }
+
         $recipe_qty = isset($this->recipes[$recipe->product->name]) ?
             $this->recipes[$recipe->product->name]['qty_required'] + $qty : $qty;
 

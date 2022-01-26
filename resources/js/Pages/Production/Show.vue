@@ -81,44 +81,108 @@
                                 Production Summary
                             </div>
                             <table class="">
-                                <tr class="bg-sky-300 dark:bg-sky-800">
-                                    <th class="font-semibold text-lg" colspan="3">
-                                        Raw Materials (per min)
-                                    </th>
-                                </tr>
-                                <tr v-for="material in production__rawMaterials">
-                                    <td colspan="2" class="p-2">
-                                        <cloud-image class="inline-flex" :public-id="`${material.name}.png`" crop="scale" quality="100" width="32" :alt="material.name"/>
-                                        {{ material.name }}
-                                    </td>
-                                    <td class="p-2 text-right">
-                                        <div class="flex space-x-2">
-                                            <button
-                                                @click="disabledRawMaterials[material.name] = !!!disabledRawMaterials[material.name]"
-                                                class="btn-sm btn-emerald">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                                     viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2"
-                                                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                                                </svg>
+                                <template v-if="production__rawMaterials.length">
+                                    <tr class="bg-sky-300 dark:bg-sky-800">
+                                        <th class="font-semibold text-lg" colspan="3">
+                                            Raw Materials (per min)
+                                        </th>
+                                    </tr>
+                                    <tr v-for="material in production__rawMaterials">
+                                        <td colspan="2" class="p-2">
+                                            <cloud-image class="inline-flex" :public-id="`${material.name}.png`"
+                                                         crop="scale" quality="100" width="32" :alt="material.name"/>
+                                            {{ material.name }}
+                                        </td>
+                                        <td class="p-2 text-right">
+                                            <div class="flex space-x-2 justify-end">
+                                                <button
+                                                    @click="disabledRawMaterials[material.name] = !!!disabledRawMaterials[material.name]"
+                                                    class="btn-sm btn-emerald">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                                         viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              stroke-width="2"
+                                                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                    </svg>
+                                                </button>
+                                                <input :disabled="disabledRawMaterials[material.name]"
+                                                       @input="rawUnchanged=false"
+                                                       class="w-24 text-right text-sm rounded bg-gray-200 dark:bg-sky-200 dark:text-slate-900 p-2 dark:disabled:bg-gray-600 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                                                       v-model="rawMaterials[material.name]" :rel="material.name"
+                                                       type="text">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-center">
+                                            <button @click="helpRawMaterials" class="btn btn-gray mb-4 mr-2">
+                                                Help
                                             </button>
-                                            <input :disabled="disabledRawMaterials[material.name]"
-                                                   @input="rawUnchanged=false"
-                                                   class="w-24 text-right text-sm rounded bg-gray-200 dark:bg-sky-200 dark:text-slate-900 p-2 dark:disabled:bg-gray-600 disabled:bg-gray-600 disabled:cursor-not-allowed"
-                                                   v-model="rawMaterials[material.name]" :rel="material.name"
-                                                   type="text">
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <button @click="fetchNewYield" :disabled="rawUnchanged"
-                                                class="btn btn-emerald">
-                                            Update Yield
-                                        </button>
-                                    </td>
-                                </tr>
+                                            <button @click="fetchNewYield" :disabled="rawUnchanged"
+                                                    class="btn btn-emerald mb-4">
+                                                Update Yield
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+
+                                <template v-if="production__intermediateMaterials.length">
+                                    <tr class="bg-sky-300 dark:bg-sky-800">
+                                        <th class="font-semibold text-lg" colspan="3">
+                                            Intermediate Products
+                                        </th>
+                                    </tr>
+                                    <tr v-for="material in production__intermediateMaterials">
+                                        <td colspan="2" class="p-2">
+                                            <div class="flex">
+                                                <cloud-image class="inline-flex mr-2" :public-id="`${material.name}.png`"
+                                                             crop="scale" quality="100" width="32" :alt="material.name"/>
+                                                <div>
+                                                    <span>{{ material.name }}</span> <br>
+                                                    <span class="italic">{{ material.qty }} per min</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-2 text-right">
+                                            <div class="flex space-x-2">
+                                                <label :for="`importToggle${material.name.replace(/ /gi,'')}`" class="flex items-center cursor-pointer">
+                                                    <!-- Produce -->
+                                                    <div class="mr-2 font-medium">
+                                                        Produce
+                                                    </div>
+                                                    <!-- toggle -->
+                                                    <div class="relative">
+                                                        <!-- input -->
+                                                        <input :id="`importToggle${material.name.replace(/ /gi,'')}`" v-model="newImports[material.name]"
+                                                               type="checkbox"
+                                                               class="sr-only">
+                                                        <!-- line -->
+                                                        <div
+                                                            class="block bg-gray-600 dark:bg-gray-200 w-14 h-8 rounded-full"></div>
+                                                        <!-- dot -->
+                                                        <div
+                                                            class="dot absolute left-1 top-1 bg-white dark:bg-gray-800 w-6 h-6 rounded-full transition"></div>
+                                                    </div>
+                                                    <!-- import -->
+                                                    <div class="ml-2 font-medium">
+                                                        Import
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-center">
+                                            <button @click="helpImport" class="btn btn-gray mr-2">
+                                                Help
+                                            </button>
+                                            <button @click="fetch"
+                                                    class="btn btn-emerald">
+                                                Recalculate
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
 
                                 <tr>
                                     <td>&nbsp;</td>
@@ -130,7 +194,7 @@
                                     </th>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" class="p-2">Energy Per Finished Product (MJ)</td>
+                                    <td colspan="2" class="p-2 whitespace-nowrap">Energy Per Product (MJ)</td>
                                     <td class="p-2 text-right">
                                         {{ Math.round(100 * production__total_power / newYield / 60) / 2 }}
                                     </td>
@@ -163,8 +227,9 @@
                                 </tr>
                                 <tr @click="buildingChecks[mat] = ! buildingChecks[mat]" class="cursor-pointer"
                                     v-for="(num,mat) in production__building_summary.total_build_cost">
-                                    <td colspan="2" class="p-2">
-                                        <cloud-image class="inline-flex mr-2" :public-id="mat" crop="scale" quality="100" width="24" :alt="mat"/>
+                                    <td colspan="2" class="p-2 whitespace-nowrap">
+                                        <cloud-image class="inline-flex mr-2" :public-id="mat" crop="scale"
+                                                     quality="100" width="24" :alt="mat"/>
                                         <input v-model="buildingChecks[mat]" type="checkbox"> {{ mat }}
                                     </td>
                                     <td class="p-2 text-right">{{ num }}</td>
@@ -212,23 +277,47 @@
                                         <td class="p-2">
                                             <div @click="toggleProductionCheck(material.name)"
                                                  class="bg-teal-200 dark:text-slate-800 border border-teal-500 rounded-lg p-2 flex items-center shadow-lg cursor-pointer">
-                                                <cloud-image class="mr-2" :public-id="material.name" width="48" crop="scale" :alt="material.name"/>
+                                                <cloud-image class="mr-2" :public-id="material.name" width="48"
+                                                             crop="scale" :alt="material.name"/>
 
-                                                <span class="font-semibold">{{ material.name }} <br>
-                                                    <span class="font-light">{{ material.qty }} per min</span>
-                                                </span>
+                                                <div class="flex flex-col space-y-2 w-full">
+                                                    <span class="font-semibold">
+                                                        {{ material.name }}
+                                                    </span>
+                                                    <span class="font-light">
+                                                       {{ material.qty }} per min
+                                                    </span>
+                                                    <div v-if="Object.keys(material.outputs || {}).length" class="flex flex-col bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg w-full">
+                                                        <span class="font-semibold">
+                                                            Destination
+                                                        </span>
+                                                        <span v-for="(qty,mat) in material.outputs">
+                                                            <cloud-image class="inline-flex mr-2" :public-id="mat" width="32" crop="scale"
+                                                                 :alt="mat"/>
+<!--                                                            {{ mat }} -->
+                                                            {{ Math.round( 100 * 100 * qty / material.qty) / 100 }}%
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </td>
                                         <td nowrap class="p-2">
                                             <div
                                                 class="dark:text-slate-800 bg-yellow-200 border border-yellow-500 p-2 rounded-lg shadow-lg">
-                                                <div class="flex items-center"
+                                                <div v-if="production.recipes[material.name]" class="flex items-center my-2"
                                                      v-for="(ing,name) in production.recipes[material.name].inputs">
-                                                    <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name"/>
-                                                    <span class="font-semibold">{{ name }} <br>
+                                                    <cloud-image class="mr-2" :public-id="name" width="48" crop="scale"
+                                                                 :alt="name"/>
+                                                    <span class="font-semibold">{{ name }}
+                                                        <span v-if="imports[name]" class="px-2 py-1 rounded-lg bg-green-300 text-xs">Imported</span>
+                                                        <br>
                                                         <span class="font-light">{{
-                                                                Math.round(100 * ing.needed_qty) / 100
-                                                            }} per min</span>
+                                                                Math.round(10000 * ing.needed_qty) / 10000
+                                                            }} per min
+                                                        </span> <br>
+                                                        <span class="font-light italic">
+                                                            {{ Math.round(100 * 100 * ing.needed_qty / production.partsPerMinuteAll[name]) / 100 }}%
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -253,7 +342,7 @@
                                             </template>
                                         </td>
 
-                                        <td class="p-2">
+                                        <td v-if="production.recipes[material.name]" class="p-2">
                                             <select v-model="production.recipes[material.name].selected_variant"
                                                     class="rounded shadow py-2 dark:bg-sky-800 w-full text-right">
                                                 <option class="text-right" :value="mk"
@@ -443,7 +532,8 @@ export default {
         'variant',
         'belt_speed',
         'constraints',
-        'factory'
+        'factory',
+        'imports'
     ],
     components: {
         AppLayout,
@@ -473,10 +563,12 @@ export default {
             buildingChecks: {},
             hideCompleted: true,
             rawMaterials: {},
+            intermediateMaterials: {},
             disabledRawMaterials: {},
             newConstraints: [],
             rawUnchanged: true,
-            diagrams: store.getItem('diagrams', true)
+            diagrams: store.getItem('diagrams', true),
+            newImports: this.imports
         }
     },
 
@@ -501,6 +593,29 @@ export default {
             return ret;
         },
 
+        production__intermediateMaterials() {
+            if (!this.production)
+                return [];
+
+            let ret = [];
+
+            for (let prop in this.production['intermediate materials']) {
+                if (this.production['intermediate materials'].hasOwnProperty(prop))
+                    ret.push({
+                        name: prop.replace(/\d - /ig, ''),
+                        qty: Math.round(this.production['intermediate materials'][prop])
+                    });
+            }
+
+            ret = ret.sort((a, b) => (a.qty > b.qty) ? 1 : -1);
+
+            ret.forEach(mat => {
+                this.intermediateMaterials[mat.name] = mat.qty
+            });
+
+            return ret;
+        },
+
         production__allMaterials() {
             if (!this.production)
                 return [];
@@ -508,14 +623,22 @@ export default {
             let ret = {};
 
             for (let prop in this.production['parts per minute']) {
+                if ( ! this.production.recipes[prop.replace(/\d - /, '')] )
+                    continue;
+
                 if (this.production['parts per minute'].hasOwnProperty(prop) && prop.charAt(0) > 1) {
-                    let level = 'Level ' + (+prop.charAt(0) - 1).toString();
+                    let level = 'Level ' + (+prop.charAt(0) - 1).toString(),
+                        qty = Math.round(10000 * this.production['parts per minute'][prop]) / 10000,
+                        name = prop.replace(/\d - /, ''),
+                        outputs = this.getOutputs(name);
+
                     if (ret[level] == null)
                         ret[level] = [];
 
                     ret[level].push({
-                        name: prop.replace(/\d - /, ''),
-                        qty: Math.round(10000 * this.production['parts per minute'][prop]) / 10000
+                        name,
+                        qty,
+                        outputs
                     })
                 }
 
@@ -631,9 +754,9 @@ export default {
                 this.newYield,
                 this.newRecipe.description || this.newProduct.name,
                 this.newVariant
-            ]
+            ], imports = Object.keys(this.newImports).filter(o => this.newImports[o]).join(',')
 
-            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&factory=${this.factory ? this.factory.id : ''}`);
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&factory=${this.factory ? this.factory.id : ''}&imports=${imports}`);
         },
 
         async fetchNewYield() {
@@ -648,14 +771,17 @@ export default {
                 this.newYield,
                 this.newRecipe.description || this.newProduct.name,
                 this.newVariant
-            ], raw = [];
+            ], raw = [], imports = Object.keys(this.newImports).filter(o => this.newImports[o]).join(',');
 
             for (let prop in this.rawMaterials) {
                 if (!this.disabledRawMaterials[prop])
                     raw.push(`${prop}:${this.rawMaterials[prop]}`);
             }
 
-            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&raw=${raw.join(',')}&factory=${this.factory ? this.factory.id : ''}`);
+            if (! raw.length)
+                return false;
+
+            this.$inertia.get(`/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&raw=${raw.join(',')}&factory=${this.factory ? this.factory.id : ''}&imports=${imports}`);
         },
 
         saveMyFactory() {
@@ -730,6 +856,28 @@ export default {
         },
         savePrefs() {
             store.setItem('diagrams', this.diagrams);
+        },
+        getOutputs(name) {
+
+            let ret = {};
+
+            Object.keys(this.production.recipes)
+                .filter(product => {
+                    return !! this.production.recipes[product];
+                })
+                .filter(product => {
+                    return this.production.recipes[product].inputs[name]?.needed_qty > 0;
+                }).forEach(product => {
+                    ret[product] = Math.round(10000 * this.production.recipes[product].inputs[name].needed_qty) / 10000;
+                });
+
+            return ret;
+        },
+        helpRawMaterials() {
+            alert('Constrained by something? Enter your actual available raw materials then click Update Yield. Click the green button next to the input to ignore that material for the recalculation.');
+        },
+        helpImport() {
+            alert('Choose whether to produce each intermediate product in this factory (default) or to import select products from elsewhere.');
         }
     }
 }
