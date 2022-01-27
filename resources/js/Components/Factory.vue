@@ -42,6 +42,15 @@
                         {{ product.name }}
                     </div>
                     <span v-show="! editing" class="italic">{{ recipe.description || 'default' }}</span>
+                    <div v-html="renderedNotes"  v-if="!! notes && ! editing"
+                       class="p-4 m-4 font-mono dark:bg-slate-900 bg-gray-100 rounded-lg border dark:border-slate-800 prose dark:prose-invert">
+                    </div>
+                    <textarea v-show="editing" v-model="form.notes" placeholder="Notes" rows="4" class="p-2 rounded-lg border shadow dark:bg-slate-800 dark:border-slate-700 font-mono my-2 w-full">
+
+                    </textarea>
+                    <p v-if="!! imports && ! editing">
+                       Imports <cloud-image v-for="name in imports.split(',')" :public-id="name" crop="scale" quality="100" width="24" class="inline-flex px-2" alt="logo"/>
+                    </p>
                     <recipe-picker v-show="editing" @select="updateRecipe"
                                    :recipes="product.recipes"
                                    :selected="selectedRecipe"></recipe-picker>
@@ -65,6 +74,7 @@
 
 <script>
 import RecipePicker from '@/Components/RecipePicker';
+const Markdown = require('markdown-it')();
 
 export default {
     name: "Factory",
@@ -79,6 +89,8 @@ export default {
         product: Object,
         recipe: Object,
         yield: Number,
+        imports: String,
+        notes: String,
     },
 
     data() {
@@ -88,12 +100,18 @@ export default {
             form: {
                 name: this.name,
                 yield: +this.yield,
-                recipe_id: this.recipe.id
+                recipe_id: this.recipe.id,
+                imports: this.imports,
+                notes: this.notes
             }
         }
     },
 
     methods: {
+        parse(el) {
+            return Markdown.renderInline(el);
+        },
+
         toggleEditing() {
             this.editing = !this.editing;
 
@@ -131,7 +149,10 @@ export default {
 
     computed: {
         planUrl() {
-            return `/dashboard/${this.product.name}/${(+this.yield).toFixed(2)}/${this.recipe.description || this.product.name}?factory=${this.id}`;
+            return `/dashboard/${this.product.name}/${(+this.yield).toFixed(2)}/${this.recipe.description || this.product.name}?factory=${this.id}&imports=${this.imports || ''}`;
+        },
+        renderedNotes() {
+            return Markdown.render(this.form.notes);
         }
     }
 }

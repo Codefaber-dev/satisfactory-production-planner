@@ -785,14 +785,15 @@ export default {
         },
 
         saveMyFactory() {
-            let name;
+            let name, imports = Object.keys(this.newImports).filter(o => this.newImports[o]).join(',');
 
             if (this.factory) {
                 this.$inertia.patch(`/factories/${this.factory.id}`, {
                     name: this.factory.name,
                     ingredient_id: this.product.id,
                     recipe_id: this.recipe.id,
-                    yield: this.yield
+                    yield: this.yield,
+                    imports
                 });
 
             } else {
@@ -806,7 +807,8 @@ export default {
                 name,
                 ingredient_id: this.product.id,
                 recipe_id: this.recipe.id,
-                yield: this.yield
+                yield: this.yield,
+                imports
             })
         },
 

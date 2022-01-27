@@ -26,7 +26,9 @@ class ProductionLineController extends Controller
             'name' => request('name'),
             'ingredient_id' => request('ingredient_id'),
             'recipe_id' => request('recipe_id'),
-            'yield' => request('yield')
+            'yield' => request('yield'),
+            'notes' => request()->has('notes') ? request('notes',"") : null,
+            'imports' => request()->has('imports') ? request('imports',"") : null,
         ];
 
         Factories::create($attributes);
@@ -39,7 +41,9 @@ class ProductionLineController extends Controller
         $attributes = [
             'name' => request('name'),
             'recipe_id' => request('recipe_id'),
-            'yield' => request('yield')
+            'yield' => request('yield'),
+            'notes' => request()->has('notes') ? request('notes',"") : null,
+            'imports' => request()->has('imports') ? request('imports',"") : null,
         ];
 
         Factories::update($id, $attributes);

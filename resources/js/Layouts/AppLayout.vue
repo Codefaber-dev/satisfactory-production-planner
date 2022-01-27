@@ -26,6 +26,9 @@
                                 <jet-nav-link :href="route('favorites')" :active="route().current('favorites')">
                                     My Favorite Recipes
                                 </jet-nav-link>
+                                <jet-nav-link href="https://discord.gg/dqGQECppCy" target="_blank">
+                                    Join the Discussion on Discord
+                                </jet-nav-link>
                             </div>
                         </div>
 
