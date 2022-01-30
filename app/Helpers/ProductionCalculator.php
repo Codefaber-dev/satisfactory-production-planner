@@ -140,24 +140,24 @@ class ProductionCalculator
     {
         // if product is being imported, then ignore this recipe
         if ($this->isBeingImported($recipe)) {
-            Log::debug("Importing {$recipe->product->name}");
+            //Log::debug("Importing {$recipe->product->name}");
             return;
         }
 
         // if product is byproduct of a previous step, then ignore this recipe
         if ($this->isProducedAsByproduct($recipe, $qty)) {
-            Log::debug("Using byproduct {$recipe->product->name}");
+            //Log::debug("Using byproduct {$recipe->product->name}");
             return;
         }
 
         // if product is already logged, then skip
         if ($this->isLogged($qty, $recipe, $parent)) {
-            Log::debug("already logged");
+            //Log::debug("already logged");
             return;
         }
 
         if ( $qty < 0.001 ) {
-            Log::debug("Qty too small, skipping");
+            //Log::debug("Qty too small, skipping");
             return;
         }
 
@@ -403,7 +403,7 @@ class ProductionCalculator
      */
     protected function log($qty, Recipe $recipe, ?Recipe $parent = null): void
     {
-        Log::debug("Producing {$qty} {$recipe->product->name} using ".$recipe->description ?? 'default');
+        //Log::debug("Producing {$qty} {$recipe->product->name} using ".$recipe->description ?? 'default');
 
         $this->production_log[$recipe->product->name] = [
             "qty" => $qty,
