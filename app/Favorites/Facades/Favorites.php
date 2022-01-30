@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static Recipe get(Ingredient $ingredient)
  * @method static void set(Ingredient $ingredient, Recipe $recipe)
  * @method static void setByName(Ingredient $ingredient, string $name)
+ * @method static void setDefault(Ingredient $ingredient)
  * @method static bool isFavorite(Recipe $recipe)
 */
 class Favorites extends Facade

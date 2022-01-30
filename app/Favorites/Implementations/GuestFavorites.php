@@ -30,6 +30,11 @@ class GuestFavorites implements FavoritesContract
         Redis::hSet($this->getCacheTag(), $this->getCacheKey($ingredient), $recipe->id);
     }
 
+    public function setDefault(Ingredient $ingredient): void
+    {
+        Redis::hDel($this->getCacheTag(), $this->getCacheKey($ingredient));
+    }
+
     public function setByName(Ingredient $ingredient, string $name): void
     {
         if ( ! $recipe = Recipe::ofName($name) ) {
@@ -46,14 +51,16 @@ class GuestFavorites implements FavoritesContract
 
     protected function getCacheKey(Ingredient $ingredient) : string
     {
-        return "favorites.ingredient.{$ingredient->id}";
+        $guestToken = request()->header('guest-token',session_id());
+
+        return "favorites.{$guestToken}.ingredient.{$ingredient->id}";
     }
 
-    protected function getCacheTag() : string
+    public function getCacheTag() : string
     {
-        $session_id = session()->getId();
+        $guestToken = request()->header('guest-token',session_id());
 
-        return "favorites.{$session_id}";
+        return "favorites.{$guestToken}";
     }
 
     public function all(): Collection
@@ -62,4 +69,6 @@ class GuestFavorites implements FavoritesContract
 
         return Recipe::find($ids);
     }
+
+
 }

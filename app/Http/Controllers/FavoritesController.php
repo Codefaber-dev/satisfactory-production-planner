@@ -29,6 +29,14 @@ class FavoritesController extends Controller
         return redirect()->to('/favorites');
     }
 
+    public function destroy($id)
+    {
+        $product = Ingredient::find($id);
+        Favorites::setDefault($product);
+
+        return redirect()->to('/favorites');
+    }
+
     public function storePreset()
     {
         $preset = request('preset');

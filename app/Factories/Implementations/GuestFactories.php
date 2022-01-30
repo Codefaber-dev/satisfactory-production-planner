@@ -77,9 +77,9 @@ class GuestFactories implements FactoriesContract
 
     protected function getCacheTag() : string
     {
-        $session_id = session()->getId();
+        $guestToken = request()->header('guest-token');
 
-        return "factories.{$session_id}";
+        return "factories.{$guestToken}";
     }
 
     public function destroy($id): void

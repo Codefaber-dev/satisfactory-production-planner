@@ -8,25 +8,25 @@
 /*}*/
 
 .btn-sm {
-    @apply p-1 text-sm rounded-lg shadow text-white disabled:cursor-not-allowed
+    @apply py-1 px-2 text-sm rounded-lg shadow text-white disabled:cursor-not-allowed disabled:bg-opacity-30 disabled:hover:bg-opacity-30 disabled:focus:bg-opacity-30;
 }
 
 .btn {
-    @apply px-4 py-2 rounded-lg shadow text-white disabled:cursor-not-allowed;
+    @apply px-4 py-2 rounded-lg shadow text-white disabled:cursor-not-allowed disabled:bg-opacity-30 disabled:hover:bg-opacity-30 disabled:focus:bg-opacity-30;
 }
 
 .btn-emerald {
-    @apply bg-emerald-600 hover:bg-emerald-700 focus:bg-emerald-800 disabled:hover:bg-emerald-600 disabled:focus:bg-emerald-600;
+    @apply bg-emerald-600 hover:bg-emerald-700 focus:bg-emerald-800 disabled:bg-emerald-900 disabled:hover:bg-emerald-900 disabled:focus:bg-emerald-900;
 }
 
 .btn-orange {
-    @apply bg-orange-600 hover:bg-orange-700 focus:bg-orange-800 disabled:hover:bg-orange-600 disabled:focus:bg-orange-600;
+    @apply bg-orange-600 hover:bg-orange-700 focus:bg-orange-800 disabled:bg-orange-900 disabled:hover:bg-orange-900 disabled:focus:bg-orange-900;
 }
 
 .btn-rose {
-    @apply bg-rose-600 hover:bg-rose-700 focus:bg-rose-800 disabled:hover:bg-rose-600 disabled:focus:bg-rose-600;
+    @apply bg-rose-600 hover:bg-rose-700 focus:bg-rose-800 disabled:bg-rose-900 disabled:hover:bg-rose-900 disabled:focus:bg-rose-900;
 }
 
 .btn-gray {
-    @apply bg-gray-600 hover:bg-gray-700 focus:bg-gray-800 disabled:hover:bg-gray-600 disabled:focus:bg-gray-600;
+    @apply bg-gray-600 hover:bg-gray-700 focus:bg-gray-800 disabled:bg-gray-900 disabled:hover:bg-gray-900 disabled:focus:bg-gray-900;
 }

@@ -24,21 +24,22 @@ use Inertia\Inertia;
 //if (config('app.env') !== 'production')
 //    auth()->loginUsingId(1);
 
-Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
-    return ProductionCalculator::calc($ingredient, $qty, $recipe);
-});
+//Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
+//    return ProductionCalculator::calc($ingredient, $qty, $recipe);
+//});
 
 Route::get('/favorites', [FavoritesController::class,'index'])->name('favorites');
 Route::post('/favorites/preset', [FavoritesController::class,'storePreset'])->name('favorites.storePreset');
 Route::post('/favorites', [FavoritesController::class,'store'])->name('favorites.store');
+Route::delete('/favorites/{id}', [FavoritesController::class,'destroy'])->name('favorites.destroy');
 
 Route::post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);
 Route::post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
 
 
-Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
-    return ProductionCalculator::calc($ingredient, $qty);
-});
+//Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
+//    return ProductionCalculator::calc($ingredient, $qty);
+//});
 
 Route::redirect('/', 'dashboard');
 

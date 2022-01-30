@@ -16,6 +16,8 @@ class RawIngredientCalculator
         $c = new static;
         $c->calculate($recipe, $use_alts, $qty);
 
+        auth()->logout();
+
         return $c->raw;
     }
 

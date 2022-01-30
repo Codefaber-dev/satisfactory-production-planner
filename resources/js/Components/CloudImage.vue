@@ -1,14 +1,14 @@
 <template>
-    <img :src="url" :alt="alt">
+    <img :src="url" :alt="alt" />
 </template>
 
 <script>
-import {Cloudinary} from 'cloudinary-core';
+import { Cloudinary } from 'cloudinary-core';
 
-const cl = Cloudinary.new({cloud_name : 'codefaber'});
+const cl = Cloudinary.new({ cloud_name: 'codefaber' });
 
 export default {
-    name: "CloudImage",
+    name: 'CloudImage',
 
     props: {
         alt: String,
@@ -22,22 +22,26 @@ export default {
     computed: {
         url() {
             let opts = {},
-                publicId = this.publicId.replace(/ /gi,'').replace(/Packaged/gi,'').replace(/-/gi,'').replace(/.png/,'');
+                publicId = this.publicId
+                    .replace(/ /gi, '')
+                    .replace(/Packaged/gi, '')
+                    .replace(/-/gi, '')
+                    .replace(/.png/, '');
             if (this.crop) {
                 opts.crop = this.crop;
             }
             if (this.width) {
                 opts.width = this.width;
             }
-            if(this.height) {
+            if (this.height) {
                 opts.height = this.height;
             }
-            if(this.quality) {
+            if (this.quality) {
                 opts.quality = this.quality;
             }
 
-            return cl.url('satisfactory/' + publicId + ".png", opts);
-        }
-    }
-}
+            return cl.url('satisfactory/' + publicId + '.png', opts);
+        },
+    },
+};
 </script>

@@ -12,5 +12,6 @@ interface FavoritesContract
     public function get(Ingredient $ingredient): Recipe;
     public function set(Ingredient $ingredient, Recipe $recipe): void;
     public function setByName(Ingredient $ingredient, string $name): void;
+    public function setDefault(Ingredient $ingredient): void;
     public function isFavorite(Recipe $recipe): bool;
 }

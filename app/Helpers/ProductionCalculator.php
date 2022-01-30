@@ -39,6 +39,10 @@ class ProductionCalculator
 
     protected $belt_speed;
 
+    public $production_log = [];
+
+    protected $warnings = [];
+
     public static function calc($ingredient, $qty = null, $recipe = null, $variant = "mk1")
     {
         if (is_string($ingredient)) {
@@ -54,7 +58,7 @@ class ProductionCalculator
             $ingredient = i($ingredient);
         }
 
-        return (new static($ingredient, $qty, $recipe, $variant))->calculate()['adjusted qty'];
+        return (new static($ingredient, $qty, $recipe, $variant))->calculate();
     }
 
     public static function parseRaw($raw)
@@ -75,13 +79,20 @@ class ProductionCalculator
 
         $this->raw = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
-        $this->imports = explode(",",request("imports"));
+        $this->imports = collect(explode(",",request("imports")));
 
         $this->product = $ingredient;
 
         $this->recipe = $recipe ? r($recipe) : $this->getRecipe($this->product);
 
         $this->qty = $qty ?? $this->recipe->base_per_min;
+
+
+        $productionTree = ProductionTree::make($this->product, $this->recipe, $this->qty, [], $this->imports);
+
+        $this->imports = $this->imports->merge($productionTree->getImports());
+
+        $this->warnings = $productionTree->circularWarning;
 
         $description = $this->recipe->description ?? "default";
 
@@ -120,15 +131,38 @@ class ProductionCalculator
             "build_cost" => $this->build_cost,
             "recipes" => collect($this->recipes)->sortKeys()->all(),
             "recipe_models" => $this->recipe_models,
+            "imports" => $this->imports->all(),
+            "warnings" => $this->warnings
         ]);
     }
 
-    protected function calculateSubRecipe(Recipe $recipe, $qty)
+    protected function calculateSubRecipe(Recipe $recipe, $qty, ?Recipe $parent = null)
     {
         // if product is being imported, then ignore this recipe
-        if (in_array($recipe->product->name, $this->imports, true)) {
+        if ($this->isBeingImported($recipe)) {
+            Log::debug("Importing {$recipe->product->name}");
             return;
         }
+
+        // if product is byproduct of a previous step, then ignore this recipe
+        if ($this->isProducedAsByproduct($recipe, $qty)) {
+            Log::debug("Using byproduct {$recipe->product->name}");
+            return;
+        }
+
+        // if product is already logged, then skip
+        if ($this->isLogged($qty, $recipe, $parent)) {
+            Log::debug("already logged");
+            return;
+        }
+
+        if ( $qty < 0.001 ) {
+            Log::debug("Qty too small, skipping");
+            return;
+        }
+
+        // not imported or a byproduct, so calculate the production
+        $this->log($qty, $recipe, $parent);
 
         $recipe_qty = isset($this->recipes[$recipe->product->name]) ?
             $this->recipes[$recipe->product->name]['qty_required'] + $qty : $qty;
@@ -196,7 +230,7 @@ class ProductionCalculator
 
             // continue calculating until we get to all raw ingredients
             if (! $ingredient->isRaw()) {
-                $this->calculateSubRecipe($this->getRecipe($ingredient), $sub_qty);
+                $this->calculateSubRecipe($this->getRecipe($ingredient), $sub_qty, $recipe);
             }
         });
     }
@@ -340,5 +374,50 @@ class ProductionCalculator
     public function getAdjustedQty()
     {
         return floor($this->qty * $this->ratioOfAvailableRawMaterials());
+    }
+
+    /**
+     * @param \App\Models\Recipe $recipe
+     * @return bool
+     */
+    protected function isBeingImported(Recipe $recipe): bool
+    {
+        return $this->imports->contains($recipe->product->name);
+    }
+
+    /**
+     * @param \App\Models\Recipe $recipe
+     * @param $qty
+     * @return bool
+     */
+    protected function isProducedAsByproduct(Recipe $recipe, $qty): bool
+    {
+        return ($this->byproducts[$recipe->product->name] ?? 0) >= $qty;
+    }
+
+    /**
+     * @param $qty
+     * @param \App\Models\Recipe $recipe
+     * @param \App\Models\Recipe|null $parent
+     * @return void
+     */
+    protected function log($qty, Recipe $recipe, ?Recipe $parent = null): void
+    {
+        Log::debug("Producing {$qty} {$recipe->product->name} using ".$recipe->description ?? 'default');
+
+        $this->production_log[$recipe->product->name] = [
+            "qty" => $qty,
+            "parent" => $parent->product->name ?? 'none'
+        ];
+    }
+
+    protected function isLogged($qty, Recipe $recipe, ?Recipe $parent = null): bool
+    {
+        if ( ! isset($this->production_log[$recipe->product->name]) ) {
+            return false;
+        }
+
+        return ($this->production_log[$recipe->product->name]["qty"] === $qty) &&
+            ($this->production_log[$recipe->product->name]["parent"] === ($parent->product->name ?? 'none'));
     }
 }

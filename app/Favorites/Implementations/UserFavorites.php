@@ -31,6 +31,11 @@ class UserFavorites implements FavoritesContract
         $this->user->favorite_recipes()->attach($recipe->id,['ingredient_id' => $ingredient->id]);
     }
 
+    public function setDefault(Ingredient $ingredient): void
+    {
+        $this->user->favorite_recipes()->wherePivot('ingredient_id','=',$ingredient->id)->detach();
+    }
+
     public function setByName(Ingredient $ingredient, string $name): void
     {
          if ( ! $recipe = Recipe::ofName($name) ) {

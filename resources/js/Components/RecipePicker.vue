@@ -1,6 +1,8 @@
 <template>
-    <div @click="showMenu = !showMenu"
-         class="relative transition-all flex shadow-lg border border-gray-400 dark:border-slate-700 group hover:border-blue-300 rounded px-4 py-2 items-center justify-between cursor-pointer">
+    <div
+        @click="showMenu = !showMenu"
+        class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2 shadow-lg transition-all hover:border-blue-300 dark:border-slate-700"
+    >
         <!-- favorite indicator -->
         <div class="pr-4">
             <span v-if="selected.favorite">⭐</span>
@@ -8,31 +10,44 @@
         <!-- selected recipe -->
         <recipe-detail :slim="true" :recipe="selected"></recipe-detail>
         <!-- dropdown arrow -->
-        <div class="font-bold text-lg group-hover:text-blue-300 transition-all"
-             :style="{transform: `rotate(${showMenu ? 180 : 0}deg)`}">
+        <div
+            class="text-lg font-bold transition-all group-hover:text-blue-300"
+            :style="{ transform: `rotate(${showMenu ? 180 : 0}deg)` }"
+        >
             🔽
         </div>
 
         <!-- menu -->
-        <div v-show="showMenu" style="top:100%"
-             class="absolute bg-white dark:bg-slate-900 border border-sky-300 shadow-lg w-100 flex flex-col z-50">
-            <recipe-detail @select="select" class="border-b border-gray-300 hover:bg-sky-100 dark:hover:bg-sky-900 rounded p-4"
-                           :key="recipe.id" v-for="recipe in recipes" v-bind="{recipe}"></recipe-detail>
+        <div
+            v-show="showMenu"
+            style="top: 100%"
+            class="w-100 absolute z-50 flex flex-col border border-sky-300 bg-white shadow-lg dark:bg-slate-900"
+        >
+            <recipe-detail
+                @select="select"
+                class="rounded border-b border-gray-300 p-4 hover:bg-sky-100 dark:hover:bg-sky-900"
+                :key="recipe.id"
+                v-for="recipe in recipes"
+                v-bind="{ recipe }"
+            ></recipe-detail>
         </div>
 
         <!-- modal bg -->
-        <div v-show="showMenu" class="modal-bg fixed z-40 bg-black inset-0 opacity-5"></div>
+        <div
+            v-show="showMenu"
+            class="modal-bg fixed inset-0 z-40 bg-black opacity-5"
+        ></div>
     </div>
 </template>
 
 <script>
-import RecipeDetail from "@/Components/RecipeDetail";
+import RecipeDetail from '@/Components/RecipeDetail';
 
 export default {
-    name: "RecipePicker",
+    name: 'RecipePicker',
 
     components: {
-        RecipeDetail
+        RecipeDetail,
     },
 
     mounted() {
@@ -49,12 +64,12 @@ export default {
                 return {
                     favorite: false,
                     product: {
-                        name: 'dummy'
+                        name: 'dummy',
                     },
-                    dummy: true
-                }
-            }
-        }
+                    dummy: true,
+                };
+            },
+        },
     },
 
     data() {
@@ -72,9 +87,9 @@ export default {
                 detectIFrame: true,
                 // Note: The default value is false. Sets the capture option for EventTarget addEventListener method.
                 //       Could be useful if some event's handler calls stopPropagation method preventing event bubbling.
-                capture: false
-            }
-        }
+                capture: false,
+            },
+        };
     },
 
     methods: {
@@ -82,27 +97,27 @@ export default {
             this.showMenu = false;
         },
 
-        select({recipe}) {
-            this.$emit('select', {recipe});
+        select({ recipe }) {
+            this.$emit('select', { recipe });
         },
 
         outside() {
-            console.log('clicked')
+            console.log('clicked');
         },
 
         handler(event) {
-            console.log('Clicked outside (Using config), middleware returned true :)')
+            console.log(
+                'Clicked outside (Using config), middleware returned true :)'
+            );
         },
         // Note: The middleware will be executed if the event was fired outside the element.
         //       It should have only sync functionality and it should return a boolean to
         //       define if the handler should be fire or not
         middleware(event) {
-            return event.target.className !== 'modal'
-        }
-    }
-}
+            return event.target.className !== 'modal';
+        },
+    },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

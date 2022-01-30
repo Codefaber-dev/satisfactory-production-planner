@@ -37,7 +37,7 @@ class ProductionController extends Controller
         $yield = $qty;
         $recipe = Recipe::ofName($recipe);
         $belt_speed = request('belt_speed',780);
-        $imports = collect(explode(",",request('imports','')))->map(function($key) { return $key ? [$key => true] : null;})->filter()->collapse();
+        $imports = collect($production->imports)->map(function($key) { return $key ? [$key => true] : null;})->filter()->collapse();
 
         return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
     }
@@ -47,9 +47,9 @@ class ProductionController extends Controller
         $newQty = ProductionCalculator::newYield($ingredient,$qty,$recipe,$variant);
         $belt_speed = request('belt_speed',780);
         $factory = request('factory');
-        $imports = request('imports');
+        $imports = collect($newQty->imports)->map(function($key) { return $key ? [$key => true] : null;})->filter()->collapse();
 
-        return redirect()->to("/dashboard/$ingredient/$newQty/$recipe/$variant?belt_speed={$belt_speed}&factory={$factory}&imports={$imports}");
+        return redirect()->to("/dashboard/$ingredient/{$newQty['adjusted qty']}/$recipe/$variant?belt_speed={$belt_speed}&factory={$factory}&imports={$imports}");
     }
 
     public function addFavorite(Recipe $recipe)

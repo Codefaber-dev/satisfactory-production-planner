@@ -583,6 +583,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   left: 0.25rem;
 }.top-1{
   top: 0.25rem;
+}.bottom-4{
+  bottom: 1rem;
+}.right-4{
+  right: 1rem;
 }.z-0{
   z-index: 0;
 }.z-50{
@@ -672,6 +676,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: 0.25rem;
 }.block{
   display: block;
+}.inline{
+  display: inline;
 }.flex{
   display: flex;
 }.inline-flex{
@@ -1046,6 +1052,12 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.bg-sky-200{
   --tw-bg-opacity: 1;
   background-color: rgb(186 230 253 / var(--tw-bg-opacity));
+}.bg-slate-100{
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}.bg-rose-300{
+  --tw-bg-opacity: 1;
+  background-color: rgb(253 164 175 / var(--tw-bg-opacity));
 }.bg-gray-900{
   --tw-bg-opacity: 1;
   background-color: rgb(17 24 39 / var(--tw-bg-opacity));
@@ -1146,6 +1158,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-bottom: 0.25rem;
 }.pt-8{
   padding-top: 2rem;
+}.pb-2{
+  padding-bottom: 0.5rem;
 }.text-left{
   text-align: left;
 }.text-center{
@@ -1334,7 +1348,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }/*input, select, [type="number"] {*//*    @apply dark:bg-gray-800 dark:text-gray-100;*//*}*/.btn-sm{
   border-radius: 0.5rem;
-  padding: 0.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   --tw-text-opacity: 1;
@@ -1344,6 +1361,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }.btn-sm:disabled{
   cursor: not-allowed;
+  --tw-bg-opacity: 0.3;
+}.btn-sm:hover:disabled{
+  --tw-bg-opacity: 0.3;
+}.btn-sm:focus:disabled{
+  --tw-bg-opacity: 0.3;
 }.btn{
   border-radius: 0.5rem;
   padding-left: 1rem;
@@ -1357,6 +1379,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }.btn:disabled{
   cursor: not-allowed;
+  --tw-bg-opacity: 0.3;
+}.btn:hover:disabled{
+  --tw-bg-opacity: 0.3;
+}.btn:focus:disabled{
+  --tw-bg-opacity: 0.3;
 }.btn-emerald{
   --tw-bg-opacity: 1;
   background-color: rgb(5 150 105 / var(--tw-bg-opacity));
@@ -1366,12 +1393,15 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.btn-emerald:focus{
   --tw-bg-opacity: 1;
   background-color: rgb(6 95 70 / var(--tw-bg-opacity));
+}.btn-emerald:disabled{
+  --tw-bg-opacity: 1;
+  background-color: rgb(6 78 59 / var(--tw-bg-opacity));
 }.btn-emerald:hover:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(5 150 105 / var(--tw-bg-opacity));
+  background-color: rgb(6 78 59 / var(--tw-bg-opacity));
 }.btn-emerald:focus:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(5 150 105 / var(--tw-bg-opacity));
+  background-color: rgb(6 78 59 / var(--tw-bg-opacity));
 }.btn-orange{
   --tw-bg-opacity: 1;
   background-color: rgb(234 88 12 / var(--tw-bg-opacity));
@@ -1381,12 +1411,15 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.btn-orange:focus{
   --tw-bg-opacity: 1;
   background-color: rgb(154 52 18 / var(--tw-bg-opacity));
+}.btn-orange:disabled{
+  --tw-bg-opacity: 1;
+  background-color: rgb(124 45 18 / var(--tw-bg-opacity));
 }.btn-orange:hover:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(234 88 12 / var(--tw-bg-opacity));
+  background-color: rgb(124 45 18 / var(--tw-bg-opacity));
 }.btn-orange:focus:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(234 88 12 / var(--tw-bg-opacity));
+  background-color: rgb(124 45 18 / var(--tw-bg-opacity));
 }.btn-rose{
   --tw-bg-opacity: 1;
   background-color: rgb(225 29 72 / var(--tw-bg-opacity));
@@ -1396,12 +1429,15 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.btn-rose:focus{
   --tw-bg-opacity: 1;
   background-color: rgb(159 18 57 / var(--tw-bg-opacity));
+}.btn-rose:disabled{
+  --tw-bg-opacity: 1;
+  background-color: rgb(136 19 55 / var(--tw-bg-opacity));
 }.btn-rose:hover:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(225 29 72 / var(--tw-bg-opacity));
+  background-color: rgb(136 19 55 / var(--tw-bg-opacity));
 }.btn-rose:focus:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(225 29 72 / var(--tw-bg-opacity));
+  background-color: rgb(136 19 55 / var(--tw-bg-opacity));
 }.btn-gray{
   --tw-bg-opacity: 1;
   background-color: rgb(75 85 99 / var(--tw-bg-opacity));
@@ -1411,12 +1447,15 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.btn-gray:focus{
   --tw-bg-opacity: 1;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}.btn-gray:disabled{
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
 }.btn-gray:hover:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
 }.btn-gray:focus:disabled{
   --tw-bg-opacity: 1;
-  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
 }.hover\:border-gray-300:hover{
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
@@ -1640,6 +1679,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.dark .dark\:bg-slate-700{
   --tw-bg-opacity: 1;
   background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+}.dark .dark\:bg-rose-800{
+  --tw-bg-opacity: 1;
+  background-color: rgb(159 18 57 / var(--tw-bg-opacity));
 }.dark .dark\:bg-sky-700{
   --tw-bg-opacity: 1;
   background-color: rgb(3 105 161 / var(--tw-bg-opacity));
@@ -1664,6 +1706,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.dark .dark\:text-slate-900{
   --tw-text-opacity: 1;
   color: rgb(15 23 42 / var(--tw-text-opacity));
+}.dark .dark\:shadow-rose-500{
+  --tw-shadow-color: #f43f5e;
+  --tw-shadow: var(--tw-shadow-colored);
 }.dark .dark\:hover\:border-blue-300:hover{
   --tw-border-opacity: 1;
   border-color: rgb(147 197 253 / var(--tw-border-opacity));
