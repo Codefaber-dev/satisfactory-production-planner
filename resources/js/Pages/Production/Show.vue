@@ -5,8 +5,8 @@
                 class="flex flex-col justify-center space-y-4 text-xl font-semibold"
             >
                 <span>{{
-                    factory ? factory.name : 'New Production Line'
-                }}</span>
+                        factory ? factory.name : "New Production Line"
+                    }}</span>
 
                 <div class="flex space-x-2">
                     <span>
@@ -46,7 +46,7 @@
                             :value="option"
                         >
                             <span v-if="option.favorite">&star;</span>
-                            {{ option.description || 'default' }}
+                            {{ option.description || "default" }}
                         </option>
                     </select>
                     <select
@@ -86,8 +86,8 @@
                 >
                     {{
                         factory
-                            ? 'Save Changes To Factory'
-                            : 'Save To My Factories'
+                            ? "Save Changes To Factory"
+                            : "Save To My Factories"
                     }}
                 </button>
                 <button
@@ -97,7 +97,7 @@
                     "
                     class="btn btn-emerald"
                 >
-                    {{ diagrams ? '✅' : '⬜' }}
+                    {{ diagrams ? "✅" : "⬜" }}
                     Toggle Diagrams
                 </button>
             </div>
@@ -126,48 +126,7 @@
                     v-if="done && production"
                     class="relative flex flex-1 flex-col space-y-2 p-4 dark:text-gray-100"
                 >
-                    <div
-                        v-if="
-                            production__warnings && production__warnings.length
-                        "
-                        v-show="showWarnings"
-                        class="fixed bottom-4 right-4 my-4 cursor-pointer space-y-4 rounded-lg bg-slate-100 p-4 shadow dark:bg-slate-800 dark:shadow-rose-500"
-                        @click="showWarnings = false"
-                    >
-                        <span class="flex pb-2 font-semibold">
-                            <span class="flex-1"
-                                >Circular Dependencies Found - Imports
-                                Adjusted</span
-                            >
-                            <button
-                                @click="showWarnings = false"
-                                class="btn btn-rose"
-                            >
-                                X
-                            </button>
-                        </span>
-                        <div
-                            class="flex flex-col"
-                            v-for="warning in production__warnings"
-                        >
-                            <span
-                                class="inline rounded-lg bg-rose-300 p-2 dark:bg-rose-800"
-                            >
-                                {{
-                                    warning.replace(
-                                        'Circular dependency found: ',
-                                        'Problem: '
-                                    )
-                                }}
-                            </span>
-                            <span
-                                class="line rounded-lg bg-gray-200 p-2 dark:bg-gray-800"
-                            >
-                                Resolution: Import
-                                {{ warning.split('->').pop() }}
-                            </span>
-                        </div>
-                    </div>
+<!--                    <production-warning :production__warnings="production__warnings" :show-warnings="showWarnings" />-->
 
                     <div class="flex flex-1 space-x-8 py-4">
                         <!-- Left Side -->
@@ -181,7 +140,7 @@
                             </div>
                             <table class="">
                                 <template
-                                    v-if="production__rawMaterials.length"
+                                    v-if="production.raw.length"
                                 >
                                     <tr class="bg-sky-300 dark:bg-sky-800">
                                         <th
@@ -192,7 +151,7 @@
                                         </th>
                                     </tr>
                                     <tr
-                                        v-for="material in production__rawMaterials"
+                                        v-for="material in production.raw"
                                     >
                                         <td colspan="2" class="p-2">
                                             <cloud-image
@@ -277,7 +236,7 @@
 
                                 <template
                                     v-if="
-                                        production__intermediateMaterials.length
+                                        production.intermediate.length
                                     "
                                 >
                                     <tr class="bg-sky-300 dark:bg-sky-800">
@@ -289,7 +248,7 @@
                                         </th>
                                     </tr>
                                     <tr
-                                        v-for="material in production__intermediateMaterials"
+                                        v-for="material in production.intermediate"
                                     >
                                         <td colspan="2" class="p-2">
                                             <div class="flex">
@@ -303,11 +262,11 @@
                                                 />
                                                 <div>
                                                     <span>{{
-                                                        material.name
-                                                    }}</span>
+                                                            material.name
+                                                        }}</span>
                                                     <br />
                                                     <span class="italic"
-                                                        >{{ material.qty }} per
+                                                    >{{ material.qty }} per
                                                         min</span
                                                     >
                                                 </div>
@@ -316,10 +275,7 @@
                                         <td class="p-2 text-right">
                                             <div class="flex space-x-2">
                                                 <label
-                                                    :for="`importToggle${material.name.replace(
-                                                        / /gi,
-                                                        ''
-                                                    )}`"
+                                                    :for="`importToggle${material.name.replace(/ /gi,'')}`"
                                                     class="flex cursor-pointer items-center"
                                                 >
                                                     <!-- Produce -->
@@ -332,16 +288,8 @@
                                                     <div class="relative">
                                                         <!-- input -->
                                                         <input
-                                                            :id="`importToggle${material.name.replace(
-                                                                / /gi,
-                                                                ''
-                                                            )}`"
-                                                            v-model="
-                                                                newImports[
-                                                                    material
-                                                                        .name
-                                                                ]
-                                                            "
+                                                            :id="`importToggle${material.name.replace(/ /gi,'')}`"
+                                                            v-model="newImports[material.name]"
                                                             type="checkbox"
                                                             class="sr-only"
                                                         />
@@ -402,14 +350,7 @@
                                         Energy Per Product (MJ)
                                     </td>
                                     <td class="p-2 text-right">
-                                        {{
-                                            Math.round(
-                                                (100 *
-                                                    production__total_power) /
-                                                    newYield /
-                                                    60
-                                            ) / 2
-                                        }}
+                                        {{ Math.round((100 * production__total_power) / newYield / 60) / 2 }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -425,11 +366,7 @@
                                         Coal Generator Equiv.
                                     </td>
                                     <td class="p-2 text-right">
-                                        {{
-                                            Math.ceil(
-                                                production__total_power / 75
-                                            )
-                                        }}
+                                        {{ Math.ceil(production__total_power / 75) }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -437,11 +374,7 @@
                                         Fuel Generator Equiv.
                                     </td>
                                     <td class="p-2 text-right">
-                                        {{
-                                            Math.ceil(
-                                                production__total_power / 150
-                                            )
-                                        }}
+                                        {{ Math.ceil( production__total_power / 150 ) }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -449,11 +382,7 @@
                                         Nuclear Power Plant Equiv.
                                     </td>
                                     <td class="p-2 text-right">
-                                        {{
-                                            Math.ceil(
-                                                production__total_power / 2500
-                                            )
-                                        }}
+                                        {{ Math.ceil( production__total_power / 2500 ) }}
                                     </td>
                                 </tr>
 
@@ -471,13 +400,10 @@
                                 </tr>
                                 <tr
                                     @click="
-                                        buildingChecks[mat] =
-                                            !buildingChecks[mat]
+                                        buildingChecks[mat] = !buildingChecks[mat]
                                     "
                                     class="cursor-pointer"
-                                    v-for="(
-                                        num, mat
-                                    ) in production__building_summary.total_build_cost"
+                                    v-for="( num, mat ) in production__building_summary.total_build_cost"
                                 >
                                     <td
                                         colspan="2"
@@ -518,40 +444,22 @@
                                     <th class="font-semibold">Recipe</th>
                                     <th class="font-semibold">Production</th>
                                 </tr>
-                                <tr
-                                    v-show="
-                                        Object.values(productionChecks).some(
-                                            (o) => o
-                                        )
-                                    "
-                                >
+                                <tr v-show="Object.values(productionChecks).some( (o) => o )">
                                     <th
                                         class="bg-blue-200 p-2 text-center dark:bg-sky-600"
                                         colspan="100"
-                                    >
-                                        {{
-                                            hideCompleted ? 'Hiding' : 'Showing'
-                                        }}
-                                        {{
-                                            Object.values(
-                                                productionChecks
-                                            ).filter((o) => o).length
-                                        }}
+                                    > {{ hideCompleted ? "Hiding" : "Showing"  }}
+                                        {{ Object.values( productionChecks ).filter((o) => o).length  }}
                                         completed rows
-                                        <button
-                                            @click="
-                                                hideCompleted = !hideCompleted
-                                            "
-                                            class="rounded bg-emerald-500 px-4 py-2 text-sm hover:bg-emerald-600 focus:bg-emerald-700"
+                                        <button @click="hideCompleted = !hideCompleted"
+                                                class="rounded bg-emerald-500 px-4 py-2 text-sm hover:bg-emerald-600 focus:bg-emerald-700"
                                         >
                                             Toggle Completed
                                         </button>
                                     </th>
                                 </tr>
                                 <template
-                                    v-for="(
-                                        level, index
-                                    ) in production__allMaterials"
+                                    v-for="(level, index) in production.parsed"
                                 >
                                     <tr>
                                         <th
@@ -562,18 +470,15 @@
                                         </th>
                                     </tr>
 
-                                    <tbody
-                                        v-for="material in level"
-                                        v-show="
-                                            !hideCompleted ||
-                                            !productionChecks[material.name]
-                                        "
-                                        :class="[
-                                            productionChecks[material.name]
-                                                ? 'opacity-25'
-                                                : 'opacity-100',
-                                        ]"
-                                    >
+                                    <template v-for="material in level">
+                                        <tbody
+                                            v-for="recipe in material"
+                                            v-show="
+                                                !hideCompleted ||
+                                                !productionChecks[material.name + '-' + recipe.description]
+                                            "
+                                            :class="[productionChecks[recipe.name + '-' + recipe.description] ? 'opacity-25' : 'opacity-100']"
+                                        >
                                         <tr
                                             class="border-t border-gray-200 dark:border-slate-700"
                                         >
@@ -582,75 +487,75 @@
 
                                             <td class="p-2">
                                                 <div
-                                                    @click="
-                                                        toggleProductionCheck(
-                                                            material.name
-                                                        )
-                                                    "
+                                                    @click="toggleProductionCheck(recipe.name + '-' + recipe.description)"
                                                     class="flex cursor-pointer items-center rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg dark:text-slate-800"
                                                 >
                                                     <cloud-image
                                                         class="mr-2"
-                                                        :public-id="
-                                                            material.name
-                                                        "
+                                                        :public-id="recipe.name"
                                                         width="48"
                                                         crop="scale"
-                                                        :alt="material.name"
+                                                        :alt="recipe.name"
                                                     />
 
                                                     <div
                                                         class="flex w-full flex-col space-y-2"
                                                     >
-                                                        <span
-                                                            class="font-semibold"
-                                                        >
-                                                            {{ material.name }}
-                                                        </span>
-                                                        <span
-                                                            class="font-light"
-                                                        >
-                                                            {{ material.qty }}
-                                                            per min
-                                                        </span>
-                                                        <div
-                                                            v-if="
-                                                                Object.keys(
-                                                                    material.outputs ||
-                                                                        {}
-                                                                ).length
-                                                            "
-                                                            class="flex w-full flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
-                                                        >
                                                             <span
                                                                 class="font-semibold"
                                                             >
-                                                                Destination
+                                                                {{
+                                                                    recipe.name
+                                                                }}
                                                             </span>
+                                                        <span
+                                                            class="font-light"
+                                                        >
+                                                                {{
+                                                                recipe.qty
+                                                            }}
+                                                                per min
+                                                            </span>
+                                                        <div
+                                                            v-if="
+                                                                    Object.keys(
+                                                                        recipe.outputs ||
+                                                                            {}
+                                                                    ).length
+                                                                "
+                                                            class="flex w-full flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                                                        >
+                                                                <span
+                                                                    class="font-semibold"
+                                                                >
+                                                                    Destination
+                                                                </span>
                                                             <span
                                                                 v-for="(
-                                                                    qty, mat
-                                                                ) in material.outputs"
+                                                                        qty, mat
+                                                                    ) in recipe.outputs"
                                                             >
-                                                                <cloud-image
-                                                                    class="mr-2 inline-flex"
-                                                                    :public-id="
-                                                                        mat
-                                                                    "
-                                                                    width="32"
-                                                                    crop="scale"
-                                                                    :alt="mat"
-                                                                />
+                                                                    <cloud-image
+                                                                        class="mr-2 inline-flex"
+                                                                        :public-id="
+                                                                            mat
+                                                                        "
+                                                                        width="32"
+                                                                        crop="scale"
+                                                                        :alt="
+                                                                            mat
+                                                                        "
+                                                                    />
                                                                 <!--                                                            {{ mat }} -->
-                                                                {{
+                                                                    {{
                                                                     Math.round(
                                                                         (100 *
                                                                             100 *
                                                                             qty) /
-                                                                            material.qty
+                                                                        recipe.qty
                                                                     ) / 100
                                                                 }}%
-                                                            </span>
+                                                                </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -661,64 +566,70 @@
                                                 >
                                                     <div
                                                         v-if="
-                                                            production.recipes[
-                                                                material.name
-                                                            ]
-                                                        "
+                                                                production
+                                                                    .recipes[
+                                                                    material
+                                                                        .name
+                                                                ]
+                                                            "
                                                         class="my-2 flex items-center"
                                                         v-for="(
-                                                            ing, name
-                                                        ) in production.recipes[
-                                                            material.name
-                                                        ].inputs"
+                                                                ing, name
+                                                            ) in production
+                                                                .recipes[
+                                                                material.name
+                                                            ].inputs"
                                                     >
                                                         <cloud-image
                                                             class="mr-2"
-                                                            :public-id="name"
+                                                            :public-id="
+                                                                    name
+                                                                "
                                                             width="48"
                                                             crop="scale"
                                                             :alt="name"
                                                         />
                                                         <span
                                                             class="font-semibold"
-                                                            >{{ name }}
-                                                            <span
-                                                                v-if="
-                                                                    imports[
-                                                                        name
-                                                                    ]
-                                                                "
-                                                                class="rounded-lg bg-green-300 px-2 py-1 text-xs"
+                                                        >{{ name }}
+                                                                <span
+                                                                    v-if="
+                                                                        imports[
+                                                                            name
+                                                                        ]
+                                                                    "
+                                                                    class="rounded-lg bg-green-300 px-2 py-1 text-xs"
                                                                 >Imported</span
-                                                            >
-                                                            <br />
-                                                            <span
-                                                                class="font-light"
+                                                                >
+                                                                <br />
+                                                                <span
+                                                                    class="font-light"
                                                                 >{{
-                                                                    Math.round(
-                                                                        10000 *
+                                                                        Math.round(
+                                                                            10000 *
                                                                             ing.needed_qty
-                                                                    ) / 10000
-                                                                }}
-                                                                per min
-                                                            </span>
-                                                            <br />
-                                                            <span
-                                                                class="font-light italic"
-                                                            >
-                                                                {{
-                                                                    Math.round(
-                                                                        (100 *
-                                                                            100 *
-                                                                            ing.needed_qty) /
+                                                                        ) /
+                                                                        10000
+                                                                    }}
+                                                                    per min
+                                                                </span>
+                                                                <br />
+                                                                <span
+                                                                    class="font-light italic"
+                                                                >
+                                                                    {{
+                                                                        Math.round(
+                                                                            (100 *
+                                                                                100 *
+                                                                                ing.needed_qty) /
                                                                             production
                                                                                 .partsPerMinuteAll[
                                                                                 name
-                                                                            ]
-                                                                    ) / 100
-                                                                }}%
+                                                                                ]
+                                                                        ) / 100
+                                                                    }}%
+                                                                </span>
                                                             </span>
-                                                        </span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -726,24 +637,26 @@
                                                 <!-- material is end product -->
                                                 <template
                                                     v-if="
-                                                        material.name ===
-                                                        newProduct.name
-                                                    "
+                                                            material.name ===
+                                                            newProduct.name
+                                                        "
                                                 >
-                                                    <div class="flex flex-col">
+                                                    <div
+                                                        class="flex flex-col"
+                                                    >
                                                         <recipe-picker
                                                             @select="
-                                                                selectNewRecipe
-                                                            "
+                                                                    selectNewRecipe
+                                                                "
                                                             :recipes="
-                                                                recipes[
-                                                                    newProduct
-                                                                        .name
-                                                                ]
-                                                            "
+                                                                    recipes[
+                                                                        newProduct
+                                                                            .name
+                                                                    ]
+                                                                "
                                                             :selected="
-                                                                newRecipe
-                                                            "
+                                                                    newRecipe
+                                                                "
                                                         ></recipe-picker>
                                                     </div>
                                                 </template>
@@ -752,50 +665,54 @@
                                                 <template v-else>
                                                     <recipe-picker
                                                         @select="
-                                                            selectNewSubRecipe
-                                                        "
+                                                                selectNewSubRecipe
+                                                            "
                                                         :recipes="
-                                                            recipes[
-                                                                material.name
-                                                            ]
-                                                        "
+                                                                recipes[
+                                                                    material
+                                                                        .name
+                                                                ]
+                                                            "
                                                         :selected="
-                                                            production
-                                                                .recipe_models[
-                                                                material.name
-                                                            ]
-                                                        "
+                                                                production
+                                                                    .recipe_models[
+                                                                    material
+                                                                        .name
+                                                                ]
+                                                            "
                                                     ></recipe-picker>
                                                 </template>
                                             </td>
 
                                             <td
                                                 v-if="
-                                                    production.recipes[
-                                                        material.name
-                                                    ]
-                                                "
+                                                        production.recipes[
+                                                            material.name
+                                                        ]
+                                                    "
                                                 class="p-2"
                                             >
                                                 <select
                                                     v-model="
-                                                        production.recipes[
-                                                            material.name
-                                                        ].selected_variant
-                                                    "
+                                                            production.recipes[
+                                                                material.name
+                                                            ].selected_variant
+                                                        "
                                                     class="w-full rounded py-2 text-right shadow dark:bg-sky-800"
                                                 >
                                                     <option
                                                         class="text-right"
                                                         :value="mk"
                                                         v-for="(
-                                                            opt, mk
-                                                        ) in production.recipes[
-                                                            material.name
-                                                        ].building_details"
+                                                                opt, mk
+                                                            ) in production
+                                                                .recipes[
+                                                                material.name
+                                                            ].building_details"
                                                     >
-                                                        {{ opt.num_buildings }}x
-                                                        {{ mk }} @{{
+                                                        {{
+                                                            opt.num_buildings
+                                                        }}x {{ mk }} @{{
                                                             opt.clock_speed
                                                         }}% [{{
                                                             Math.round(
@@ -815,31 +732,33 @@
                                                 <div
                                                     class="flex justify-end space-x-8"
                                                 >
-                                                    <div class="w-48 text-left">
+                                                    <div
+                                                        class="w-48 text-left"
+                                                    >
                                                         <ul>
                                                             <li
                                                                 class="flex border-b border-gray-300"
                                                             >
-                                                                <span
-                                                                    class="ml-2 font-semibold"
+                                                                    <span
+                                                                        class="ml-2 font-semibold"
                                                                     >Foundations</span
-                                                                >
+                                                                    >
                                                                 <span
                                                                     class="flex-1 text-right"
-                                                                    >{{
+                                                                >{{
                                                                         getFootprint(
                                                                             material.name
                                                                         )
                                                                             .foundations
                                                                     }}
-                                                                    ({{
+                                                                        ({{
                                                                         getFootprint(
                                                                             material.name
                                                                         )
                                                                             .length_foundations
                                                                     }}
-                                                                    x
-                                                                    {{
+                                                                        x
+                                                                        {{
                                                                         getFootprint(
                                                                             material.name
                                                                         )
@@ -850,30 +769,31 @@
                                                             <li
                                                                 class="flex border-b border-gray-300"
                                                             >
-                                                                <span
-                                                                    class="ml-2 font-semibold"
+                                                                    <span
+                                                                        class="ml-2 font-semibold"
                                                                     >Walls</span
-                                                                >
+                                                                    >
                                                                 <span
                                                                     class="flex-1 text-right"
-                                                                    >{{
+                                                                >{{
                                                                         getFootprint(
                                                                             material.name
-                                                                        ).walls
+                                                                        )
+                                                                            .walls
                                                                     }}
-                                                                    ({{
+                                                                        ({{
                                                                         getFootprint(
                                                                             material.name
                                                                         )
                                                                             .height_walls
                                                                     }}
-                                                                    x
-                                                                    {{
+                                                                        x
+                                                                        {{
                                                                         2 *
                                                                         (getFootprint(
-                                                                            material.name
-                                                                        )
-                                                                            .length_foundations +
+                                                                                material.name
+                                                                            )
+                                                                                .length_foundations +
                                                                             getFootprint(
                                                                                 material.name
                                                                             )
@@ -884,56 +804,57 @@
                                                             <li
                                                                 class="flex border-b border-gray-300"
                                                             >
-                                                                <span
-                                                                    class="ml-2 font-semibold"
+                                                                    <span
+                                                                        class="ml-2 font-semibold"
                                                                     >Building
-                                                                    Rows</span
-                                                                >
+                                                                        Rows</span
+                                                                    >
                                                                 <span
                                                                     class="flex-1 text-right"
-                                                                    >{{
+                                                                >{{
                                                                         getFootprint(
                                                                             material.name
-                                                                        ).rows
+                                                                        )
+                                                                            .rows
                                                                     }}
-                                                                </span>
+                                                                    </span>
                                                             </li>
                                                             <li
                                                                 class="flex border-b border-gray-300"
                                                             >
-                                                                <span
-                                                                    class="ml-2 font-semibold"
+                                                                    <span
+                                                                        class="ml-2 font-semibold"
                                                                     >Buildings
-                                                                    Per
-                                                                    Row</span
-                                                                >
+                                                                        Per
+                                                                        Row</span
+                                                                    >
                                                                 <span
                                                                     class="flex-1 text-right"
-                                                                    >{{
+                                                                >{{
                                                                         getFootprint(
                                                                             material.name
                                                                         )
                                                                             .buildings_per_row
                                                                     }}
-                                                                </span>
+                                                                    </span>
                                                             </li>
                                                             <li
                                                                 class="flex border-b border-gray-300"
                                                             >
-                                                                <span
-                                                                    class="ml-2 font-semibold"
+                                                                    <span
+                                                                        class="ml-2 font-semibold"
                                                                     >Belt
-                                                                    Speed</span
-                                                                >
+                                                                        Speed</span
+                                                                    >
                                                                 <span
                                                                     class="flex-1 text-right"
-                                                                    >{{
+                                                                >{{
                                                                         getFootprint(
                                                                             material.name
                                                                         )
                                                                             .belt_speed
                                                                     }}
-                                                                </span>
+                                                                    </span>
                                                             </li>
                                                         </ul>
                                                         <!--                                                <pre>{{ getFootprint(material.name) }}</pre>-->
@@ -943,24 +864,24 @@
                                                     >
                                                         <div
                                                             style="
-                                                                box-sizing: content-box;
-                                                            "
+                                                                    box-sizing: content-box;
+                                                                "
                                                             :style="{
-                                                                height:
-                                                                    getFootprint(
-                                                                        material.name
-                                                                    )
-                                                                        .length_foundations *
-                                                                        2 +
-                                                                    'rem',
-                                                                width:
-                                                                    getFootprint(
-                                                                        material.name
-                                                                    )
-                                                                        .width_foundations *
-                                                                        2 +
-                                                                    'rem',
-                                                            }"
+                                                                    height:
+                                                                        getFootprint(
+                                                                            material.name
+                                                                        )
+                                                                            .length_foundations *
+                                                                            2 +
+                                                                        'rem',
+                                                                    width:
+                                                                        getFootprint(
+                                                                            material.name
+                                                                        )
+                                                                            .width_foundations *
+                                                                            2 +
+                                                                        'rem',
+                                                                }"
                                                             class="relative flex items-start justify-center bg-blue-300 text-xl shadow-lg"
                                                         >
                                                             <!--                                            <div :key="stat" v-for="(num,stat) in getFootprint(material.name).footprint">{{ stat }} {{ num }}</div>-->
@@ -970,96 +891,98 @@
                                                             <!--                                                </div>-->
                                                             <div
                                                                 style="
-                                                                    opacity: 0.3;
-                                                                    box-sizing: content-box;
-                                                                "
+                                                                        opacity: 0.3;
+                                                                        box-sizing: content-box;
+                                                                    "
                                                                 class="absolute flex h-full w-full flex-wrap items-center justify-center"
                                                             >
                                                                 <template
                                                                     v-for="ii in Array(
-                                                                        getFootprint(
-                                                                            material.name
-                                                                        )
-                                                                            .foundations
-                                                                    )"
+                                                                            getFootprint(
+                                                                                material.name
+                                                                            )
+                                                                                .foundations
+                                                                        )"
                                                                 >
                                                                     <div
                                                                         class="border border-blue-500"
                                                                         style="
-                                                                            box-sizing: border-box;
-                                                                            height: 2rem;
-                                                                            width: 2rem;
-                                                                        "
+                                                                                box-sizing: border-box;
+                                                                                height: 2rem;
+                                                                                width: 2rem;
+                                                                            "
                                                                     ></div>
                                                                 </template>
                                                             </div>
                                                             <div
                                                                 style="
-                                                                    padding: 2rem;
-                                                                "
+                                                                        padding: 2rem;
+                                                                    "
                                                                 class="absolute flex h-full w-full flex-wrap items-center justify-center"
                                                             >
                                                                 <div
                                                                     class="flex w-full items-center justify-center"
                                                                     v-for="(
-                                                                        ii, row
-                                                                    ) in Array(
-                                                                        getFootprint(
-                                                                            material.name
-                                                                        ).rows
-                                                                    )"
-                                                                >
-                                                                    <div
-                                                                        v-for="(
-                                                                            jj,
-                                                                            col
+                                                                            ii,
+                                                                            row
                                                                         ) in Array(
                                                                             getFootprint(
                                                                                 material.name
                                                                             )
-                                                                                .buildings_per_row
+                                                                                .rows
                                                                         )"
+                                                                >
+                                                                    <div
+                                                                        v-for="(
+                                                                                jj,
+                                                                                col
+                                                                            ) in Array(
+                                                                                getFootprint(
+                                                                                    material.name
+                                                                                )
+                                                                                    .buildings_per_row
+                                                                            )"
                                                                         :style="{
-                                                                            height:
-                                                                                getFootprint(
-                                                                                    material.name
-                                                                                )
-                                                                                    .building_length /
-                                                                                    4 +
-                                                                                'rem',
-                                                                            width:
-                                                                                getFootprint(
-                                                                                    material.name
-                                                                                )
-                                                                                    .building_width /
-                                                                                    4 +
-                                                                                'rem',
-                                                                        }"
-                                                                        :class="
-                                                                            1 +
-                                                                                col +
-                                                                                row *
+                                                                                height:
                                                                                     getFootprint(
                                                                                         material.name
                                                                                     )
-                                                                                        .buildings_per_row <=
-                                                                            getFootprint(
-                                                                                material.name
-                                                                            )
-                                                                                .num_buildings
-                                                                                ? [
-                                                                                      'border-blue-800',
-                                                                                      'bg-blue-800',
-                                                                                  ]
-                                                                                : [
-                                                                                      'border-transparent',
-                                                                                      'text-transparent',
-                                                                                      'bg-transparent',
-                                                                                  ]
-                                                                        "
+                                                                                        .building_length /
+                                                                                        4 +
+                                                                                    'rem',
+                                                                                width:
+                                                                                    getFootprint(
+                                                                                        material.name
+                                                                                    )
+                                                                                        .building_width /
+                                                                                        4 +
+                                                                                    'rem',
+                                                                            }"
+                                                                        :class="
+                                                                                1 +
+                                                                                    col +
+                                                                                    row *
+                                                                                        getFootprint(
+                                                                                            material.name
+                                                                                        )
+                                                                                            .buildings_per_row <=
+                                                                                getFootprint(
+                                                                                    material.name
+                                                                                )
+                                                                                    .num_buildings
+                                                                                    ? [
+                                                                                          'border-blue-800',
+                                                                                          'bg-blue-800',
+                                                                                      ]
+                                                                                    : [
+                                                                                          'border-transparent',
+                                                                                          'text-transparent',
+                                                                                          'bg-transparent',
+                                                                                      ]
+                                                                            "
                                                                         style="
-                                                                            box-sizing: border-box;
-                                                                        "
+                                                                                box-sizing: border-box;
+                                                                            "
                                                                         class="flex items-center justify-center rounded border bg-opacity-25 text-xs"
                                                                     >
                                                                         {{
@@ -1078,7 +1001,8 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    </tbody>
+                                        </tbody>
+                                    </template>
                                 </template>
                             </table>
                         </div>
@@ -1105,52 +1029,52 @@
                                         o, bldg
                                     ) in production__building_summary.variants"
                                 >
-                                    <tr>
-                                        <td class="p-2">{{ bldg }}</td>
-                                        <td class="p-2">
-                                            {{ o.num_buildings }}
-                                        </td>
-                                        <td class="p-2 text-right">
-                                            {{ Math.round(o.power_usage) }}
-                                        </td>
-                                        <td nowrap="" class="p-2 text-right">
-                                            <div class="flex flex-col">
-                                                <div
-                                                    :key="mat"
-                                                    v-for="(
+                                <tr>
+                                    <td class="p-2">{{ bldg }}</td>
+                                    <td class="p-2">
+                                        {{ o.num_buildings }}
+                                    </td>
+                                    <td class="p-2 text-right">
+                                        {{ Math.round(o.power_usage) }}
+                                    </td>
+                                    <td nowrap="" class="p-2 text-right">
+                                        <div class="flex flex-col">
+                                            <div
+                                                :key="mat"
+                                                v-for="(
                                                         num, mat
                                                     ) in o.build_cost"
-                                                >
-                                                    {{ mat }} {{ num }}
-                                                </div>
+                                            >
+                                                {{ mat }} {{ num }}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </td>
+                                </tr>
                                 </tbody>
                                 <tbody
                                     class="rounded-b-lg bg-blue-200 font-bold dark:bg-gray-900"
                                 >
-                                    <tr>
-                                        <td class="p-2">Total</td>
-                                        <td class="p-2">
-                                            {{ production__total_buildings }}
-                                        </td>
-                                        <td class="p-2 text-right">
-                                            {{ production__total_power }}
-                                        </td>
-                                        <td nowrap="" class="p-2 text-right">
-                                            <div class="flex flex-col">
-                                                <div
-                                                    :key="mat"
-                                                    v-for="(
+                                <tr>
+                                    <td class="p-2">Total</td>
+                                    <td class="p-2">
+                                        {{ production__total_buildings }}
+                                    </td>
+                                    <td class="p-2 text-right">
+                                        {{ production__total_power }}
+                                    </td>
+                                    <td nowrap="" class="p-2 text-right">
+                                        <div class="flex flex-col">
+                                            <div
+                                                :key="mat"
+                                                v-for="(
                                                         num, mat
                                                     ) in production__building_summary.total_build_cost"
-                                                >
-                                                    {{ mat }} {{ num }}
-                                                </div>
+                                            >
+                                                {{ mat }} {{ num }}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1173,29 +1097,30 @@
 </template>
 
 <script>
-import AppLayout from '@/Layouts/AppLayout';
-import RecipePicker from '@/Components/RecipePicker';
-import { Inertia } from '@inertiajs/inertia';
-import store from '@/store';
+import AppLayout from "@/Layouts/AppLayout";
+import RecipePicker from "@/Components/RecipePicker";
+import store from "@/store";
+import ProductionWarning from "@/Pages/Production/ProductionWarning";
 
 export default {
     props: [
-        'products',
-        'recipes',
-        'favorites',
-        'production',
-        'product',
-        'recipe',
-        'yield',
-        'variant',
-        'belt_speed',
-        'constraints',
-        'factory',
-        'imports',
+        "products",
+        "recipes",
+        "favorites",
+        "production",
+        "product",
+        "recipe",
+        "yield",
+        "variant",
+        "belt_speed",
+        "constraints",
+        "factory",
+        "imports"
     ],
     components: {
+        ProductionWarning,
         AppLayout,
-        RecipePicker,
+        RecipePicker
     },
 
     mounted() {
@@ -1225,97 +1150,13 @@ export default {
             disabledRawMaterials: {},
             newConstraints: [],
             rawUnchanged: true,
-            diagrams: store.getItem('diagrams', true),
+            diagrams: store.getItem("diagrams", true),
             newImports: this.imports,
-            showWarnings: true,
+            showWarnings: true
         };
     },
 
     computed: {
-        production__rawMaterials() {
-            if (!this.production) return [];
-
-            let ret = [];
-
-            for (let prop in this.production['raw materials']) {
-                if (this.production['raw materials'].hasOwnProperty(prop))
-                    ret.push({
-                        name: prop.replace('1 - ', ''),
-                        qty: Math.round(this.production['raw materials'][prop]),
-                    });
-            }
-
-            ret = ret.sort((a, b) => (a.qty > b.qty ? 1 : -1));
-
-            ret.forEach((mat) => {
-                this.rawMaterials[mat.name] = mat.qty;
-            });
-
-            return ret;
-        },
-
-        production__intermediateMaterials() {
-            if (!this.production) return [];
-
-            let ret = [];
-
-            for (let prop in this.production['intermediate materials']) {
-                if (
-                    this.production['intermediate materials'].hasOwnProperty(
-                        prop
-                    )
-                )
-                    ret.push({
-                        name: prop.replace(/\d - /gi, ''),
-                        qty: Math.round(
-                            this.production['intermediate materials'][prop]
-                        ),
-                    });
-            }
-
-            ret = ret.sort((a, b) => (a.qty > b.qty ? 1 : -1));
-
-            ret.forEach((mat) => {
-                this.intermediateMaterials[mat.name] = mat.qty;
-            });
-
-            return ret;
-        },
-
-        production__allMaterials() {
-            if (!this.production) return [];
-
-            let ret = {};
-
-            for (let prop in this.production['parts per minute']) {
-                if (!this.production.recipes[prop.replace(/\d - /, '')])
-                    continue;
-
-                if (
-                    this.production['parts per minute'].hasOwnProperty(prop) &&
-                    prop.charAt(0) > 1
-                ) {
-                    let level = 'Level ' + (+prop.charAt(0) - 1).toString(),
-                        qty =
-                            Math.round(
-                                10000 *
-                                    this.production['parts per minute'][prop]
-                            ) / 10000,
-                        name = prop.replace(/\d - /, ''),
-                        outputs = this.getOutputs(name);
-
-                    if (ret[level] == null) ret[level] = [];
-
-                    ret[level].push({
-                        name,
-                        qty,
-                        outputs,
-                    });
-                }
-            }
-
-            return ret;
-        },
 
         production__warnings() {
             if (!this.production) return [];
@@ -1346,17 +1187,17 @@ export default {
         production__productByproducts() {
             if (!this.production) return false;
 
-            let b = this.production['byproducts per minute'],
+            let b = this.production["byproducts per minute"],
                 r = [];
 
-            if (b.hasOwnProperty('length') && !b.length) return 'n/a';
+            if (b.hasOwnProperty("length") && !b.length) return "n/a";
 
             for (let prop in b) {
                 if (b.hasOwnProperty(prop))
                     r.push(`${prop} - ${b[prop]} per min`);
             }
 
-            return r.join(', ');
+            return r.join(", ");
         },
 
         production__building_details() {
@@ -1369,7 +1210,7 @@ export default {
 
             return ret.map((o) =>
                 Object.assign(o.building_details[o.selected_variant], {
-                    variant: o.selected_variant,
+                    variant: o.selected_variant
                 })
             );
         },
@@ -1419,7 +1260,7 @@ export default {
             });
 
             return ret;
-        },
+        }
     },
 
     methods: {
@@ -1429,19 +1270,19 @@ export default {
             this.working = true;
 
             let parts = [
-                    'dashboard',
+                    "dashboard",
                     this.newProduct.name,
                     this.newYield,
                     this.newRecipe.description || this.newProduct.name,
-                    this.newVariant,
+                    this.newVariant
                 ],
                 imports = Object.keys(this.newImports)
                     .filter((o) => this.newImports[o])
-                    .join(',');
+                    .join(",");
 
             this.$inertia.get(
-                `/${parts.join('/')}?belt_speed=${this.newBeltSpeed}&factory=${
-                    this.factory ? this.factory.id : ''
+                `/${parts.join("/")}?belt_speed=${this.newBeltSpeed}&factory=${
+                    this.factory ? this.factory.id : ""
                 }&imports=${imports}`
             );
         },
@@ -1452,16 +1293,16 @@ export default {
             this.working = true;
 
             let parts = [
-                    'newyield',
+                    "newyield",
                     this.newProduct.name,
                     this.newYield,
                     this.newRecipe.description || this.newProduct.name,
-                    this.newVariant,
+                    this.newVariant
                 ],
                 raw = [],
                 imports = Object.keys(this.newImports)
                     .filter((o) => this.newImports[o])
-                    .join(',');
+                    .join(",");
 
             for (let prop in this.rawMaterials) {
                 if (!this.disabledRawMaterials[prop])
@@ -1471,10 +1312,10 @@ export default {
             if (!raw.length) return false;
 
             this.$inertia.get(
-                `/${parts.join('/')}?belt_speed=${
+                `/${parts.join("/")}?belt_speed=${
                     this.newBeltSpeed
-                }&raw=${raw.join(',')}&factory=${
-                    this.factory ? this.factory.id : ''
+                }&raw=${raw.join(",")}&factory=${
+                    this.factory ? this.factory.id : ""
                 }&imports=${imports}`
             );
         },
@@ -1483,7 +1324,7 @@ export default {
             let name,
                 imports = Object.keys(this.newImports)
                     .filter((o) => this.newImports[o])
-                    .join(',');
+                    .join(",");
 
             if (this.factory) {
                 this.$inertia.patch(`/factories/${this.factory.id}`, {
@@ -1491,20 +1332,20 @@ export default {
                     ingredient_id: this.product.id,
                     recipe_id: this.recipe.id,
                     yield: this.yield,
-                    imports,
+                    imports
                 });
             } else {
-                name = prompt('Provide a name for your factory');
+                name = prompt("Provide a name for your factory");
             }
 
             if (!name) return;
 
-            this.$inertia.post('/factories', {
+            this.$inertia.post("/factories", {
                 name,
                 ingredient_id: this.product.id,
                 recipe_id: this.recipe.id,
                 yield: this.yield,
-                imports,
+                imports
             });
         },
 
@@ -1540,13 +1381,13 @@ export default {
         },
 
         reset() {
-            this.$inertia.get('dashboard');
+            this.$inertia.get("dashboard");
         },
 
         getFootprint(name) {
             return this.production.recipes[name].building_details[
                 this.production.recipes[name].selected_variant
-            ].footprint;
+                ].footprint;
         },
 
         toggleProductionCheck(material) {
@@ -1565,7 +1406,7 @@ export default {
         },
 
         savePrefs() {
-            store.setItem('diagrams', this.diagrams);
+            store.setItem("diagrams", this.diagrams);
         },
 
         getOutputs(name) {
@@ -1585,8 +1426,8 @@ export default {
                     ret[product] =
                         Math.round(
                             10000 *
-                                this.production.recipes[product].inputs[name]
-                                    .needed_qty
+                            this.production.recipes[product].inputs[name]
+                                .needed_qty
                         ) / 10000;
                 });
 
@@ -1595,15 +1436,15 @@ export default {
 
         helpRawMaterials() {
             alert(
-                'Constrained by something? Enter your actual available raw materials then click Update Yield. Click the green button next to the input to ignore that material for the recalculation.'
+                "Constrained by something? Enter your actual available raw materials then click Update Yield. Click the green button next to the input to ignore that material for the recalculation."
             );
         },
 
         helpImport() {
             alert(
-                'Choose whether to produce each intermediate product in this factory (default) or to import select products from elsewhere.'
+                "Choose whether to produce each intermediate product in this factory (default) or to import select products from elsewhere."
             );
-        },
-    },
+        }
+    }
 };
 </script>

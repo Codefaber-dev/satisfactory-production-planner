@@ -43,7 +43,12 @@ class FavoritesController extends Controller
 
         if ($preset) {
             foreach ($preset as $item) {
-                $recipe = Recipe::ofName($item['recipe']);
+                if ( $item['recipe'] === 'default' ) {
+                    $recipe = i($item['product'])->baseRecipe();
+                }
+                else {
+                    $recipe = r($item['recipe']);
+                }
 
                 if ($recipe) {
                     Favorites::set($recipe->product, $recipe);

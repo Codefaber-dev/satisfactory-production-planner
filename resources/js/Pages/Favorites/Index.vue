@@ -160,6 +160,32 @@ export default {
                         recipe: 'Pure Quartz Crystal',
                     },
                 ],
+                'Test Circular Dependency Resolution': [
+                    {
+                        product: 'Computer',
+                        recipe: 'Caterium Computer',
+                    },
+                    {
+                        product: 'Circuit Board',
+                        recipe: 'Caterium Circuit Board',
+                    },
+                    {
+                        product: 'Fuel',
+                        recipe: 'Unpackage Fuel',
+                    },
+                    {
+                        product: 'Packaged Fuel',
+                        recipe: 'default',
+                    },
+                    {
+                        product: 'Rubber',
+                        recipe: 'Recycled Rubber',
+                    },
+                    {
+                        product: 'Plastic',
+                        recipe: 'Recycled Plastic',
+                    },
+                ],
             },
         };
     },

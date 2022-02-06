@@ -57,13 +57,13 @@ class RecipeEnergyTest extends TestCase
         $this->assertEquals((int)$total, energy('Wire'));
     }
 
-    /** @test */
-    public function it_calculates_the_most_efficient_recipe_per_ingredient()
-    {
-        Ingredient::processed()->get()->map(function($ingredient) {
-           echo $ingredient->name . "\n";
-
-           return $ingredient->mostEnergyEfficientRecipe();
-        });
-    }
+    ///** @test */
+    //public function it_calculates_the_most_efficient_recipe_per_ingredient()
+    //{
+    //    Ingredient::processed()->get()->map(function($ingredient) {
+    //       echo $ingredient->name . "\n";
+    //
+    //       return $ingredient->mostEnergyEfficientRecipe();
+    //    });
+    //}
 }

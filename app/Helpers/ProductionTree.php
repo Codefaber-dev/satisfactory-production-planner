@@ -79,15 +79,6 @@ class ProductionTree
             }
         }
 
-        //$this->sorter->setCircularInterceptor(function($products){
-        //    $offender = $products[0];
-        //    if ( ! $this->imports->contains($offender)) {
-        //        $this->imports->add($offender);
-        //    }
-        //    $this->sorter->add($offender,[]);
-        //});
-
-
     }
 
     public static function make(Ingredient $product, Recipe $recipe, $qty, $overrides = [], $imports = []): static

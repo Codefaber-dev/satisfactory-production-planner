@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\ProductionBak\BuildingOverview;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -169,6 +170,8 @@ class ProductionCalculator
 
         $this->recipe_models[$recipe->product->name] = $recipe;
 
+        $overview = BuildingOverview::make($recipe, $qty, $this->belt_speed);
+
         $this->recipes[$recipe->product->name] = [
             "recipe" => $recipe->description ?? "default",
             "inputs" => $recipe->ingredients->map(function ($ingredient) use ($recipe) {
@@ -188,11 +191,11 @@ class ProductionCalculator
             })->implode(", "),
             "qty_required" => 1 * $recipe_qty,
             "base_per_min" => 1 * $recipe->base_per_min,
-            "building_overview" => $this->getBuildingOverview($recipe, $recipe_qty),
-            "building_details" => $details = $this->getBuildingDetails($recipe, $recipe_qty),
+            "building_overview" => $overview->overview,
+            "building_details" => $overview->details,
             "selected_variant" => $this->selected_variant ?
-                $details->keys()->filter(fn($key) => Str::of($key)->contains($this->selected_variant))->first() :
-                $details->keys()->first(),
+                $overview->details->keys()->filter(fn($key) => Str::of($key)->contains($this->selected_variant))->first() :
+                $overview->details->keys()->first(),
         ];
 
         if ($recipe->has('byproducts')) {
@@ -258,68 +261,68 @@ class ProductionCalculator
         return "{$recipe->tier} - {$recipe->product->name}";
     }
 
-    public function getBuildingOverview($recipe, $qty)
-    {
-        return $this->getBuildingDetails($recipe, $qty)->map(function ($details, $building) {
-            return [$building => "[x{$details['num_buildings']} {$details['clock_speed']}%] [{$details['power_usage']} MW]"];
-        })->collapse();
-    }
-
-    public function getBuildingDetails($recipe, $qty)
-    {
-        return $recipe->building->variants->map(function ($variant) use ($qty, $recipe) {
-            // calc number of buildings needed
-            $num_buildings = 1 * ceil($qty / $recipe->base_per_min / $variant->multiplier);
-
-            // calc the clock speed for the buildings
-            $clock_speed = 1 * round(100 * $qty / $num_buildings / $recipe->base_per_min / $variant->multiplier, 4);
-
-            // calc the power_usage for the buildings
-            $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
-
-            // calc the build cost
-            $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
-                return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
-            })->collapse();
-
-            // calculate the max belt load
-            $belt_load_in = $recipe->ingredients->map(function ($ingredient) use ($num_buildings,$clock_speed,$variant) {
-                return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
-            })->max();
-
-            // calc the number of rows needed
-            $rows = max( ceil($belt_load_in/$this->belt_speed), max(1,ceil($qty/$this->belt_speed)) );
-
-            // calc the footprint
-            //$rows = ceil($num_buildings/16); // max 16 buildings per row
-            $buildings_per_row = min($num_buildings, ceil($num_buildings/$rows) );
-
-            $footprint = [
-                'monogram' => $recipe->building->name[0],
-                'belt_speed' => $this->belt_speed,
-                'belt_load' => $belt_load_in,
-                'rows' => $rows,
-                'num_buildings' => $num_buildings,
-                'buildings_per_row' => $buildings_per_row,
-                'building_length' => $recipe->building->length,
-                'building_length_foundations' => ceil($recipe->building->length/8),
-                'building_width' => $recipe->building->width,
-                'length_m' => $length = $rows * $recipe->building->length,
-                'length_foundations' => $length_foundations = ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
-                'width_m' => $width = $recipe->building->width * $buildings_per_row,
-                'width_foundations' => $width_foundations = ( ceil($width/8) + 4),
-                'height_m' => $height = $recipe->building->height,
-                'height_walls' => $height_walls = ceil($height/4) + 1,
-                'foundations' => $foundations = $length_foundations * $width_foundations,
-                'walls' => $height_walls * (2*($length_foundations + $width_foundations))
-            ];
-
-            return [
-                "{$recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'build_cost','footprint'),
-            ];
-        })->collapse();
-    }
+    //public function getBuildingOverview($recipe, $qty)
+    //{
+    //    return $this->getBuildingDetails($recipe, $qty)->map(function ($details, $building) {
+    //        return [$building => "[x{$details['num_buildings']} {$details['clock_speed']}%] [{$details['power_usage']} MW]"];
+    //    })->collapse();
+    //}
+    //
+    //public function getBuildingDetails($recipe, $qty)
+    //{
+    //    return $recipe->building->variants->map(function ($variant) use ($qty, $recipe) {
+    //        // calc number of buildings needed
+    //        $num_buildings = 1 * ceil($qty / $recipe->base_per_min / $variant->multiplier);
+    //
+    //        // calc the clock speed for the buildings
+    //        $clock_speed = 1 * round(100 * $qty / $num_buildings / $recipe->base_per_min / $variant->multiplier, 4);
+    //
+    //        // calc the power_usage for the buildings
+    //        $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
+    //
+    //        // calc the build cost
+    //        $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
+    //            return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
+    //        })->collapse();
+    //
+    //        // calculate the max belt load
+    //        $belt_load_in = $recipe->ingredients->map(function ($ingredient) use ($num_buildings,$clock_speed,$variant) {
+    //            return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
+    //        })->max();
+    //
+    //        // calc the number of rows needed
+    //        $rows = max( ceil($belt_load_in/$this->belt_speed), max(1,ceil($qty/$this->belt_speed)) );
+    //
+    //        // calc the footprint
+    //        //$rows = ceil($num_buildings/16); // max 16 buildings per row
+    //        $buildings_per_row = min($num_buildings, ceil($num_buildings/$rows) );
+    //
+    //        $footprint = [
+    //            'monogram' => $recipe->building->name[0],
+    //            'belt_speed' => $this->belt_speed,
+    //            'belt_load' => $belt_load_in,
+    //            'rows' => $rows,
+    //            'num_buildings' => $num_buildings,
+    //            'buildings_per_row' => $buildings_per_row,
+    //            'building_length' => $recipe->building->length,
+    //            'building_length_foundations' => ceil($recipe->building->length/8),
+    //            'building_width' => $recipe->building->width,
+    //            'length_m' => $length = $rows * $recipe->building->length,
+    //            'length_foundations' => $length_foundations = ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
+    //            'width_m' => $width = $recipe->building->width * $buildings_per_row,
+    //            'width_foundations' => $width_foundations = ( ceil($width/8) + 4),
+    //            'height_m' => $height = $recipe->building->height,
+    //            'height_walls' => $height_walls = ceil($height/4) + 1,
+    //            'foundations' => $foundations = $length_foundations * $width_foundations,
+    //            'walls' => $height_walls * (2*($length_foundations + $width_foundations))
+    //        ];
+    //
+    //        return [
+    //            "{$recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
+    //                compact('num_buildings', 'clock_speed', 'power_usage', 'build_cost','footprint'),
+    //        ];
+    //    })->collapse();
+    //}
 
     protected function calculateTotalPowerUsage()
     {

@@ -357,7 +357,7 @@ class RecipeSeeder extends Seeder
             ],
             "Assembly Director System" => [
                 "base_yield" => 1,
-                "base_per_min" => 0.8,
+                "base_per_min" => 0.75,
                 "ingredients" => [
                     "Adaptive Control Unit" => 1.5,
                     "Supercomputer" => 0.75,
@@ -425,7 +425,7 @@ class RecipeSeeder extends Seeder
                 [
                     "description" => "Caterium Circuit Board",
                     "base_yield" => 7,
-                    "base_per_min" => 8.8,
+                    "base_per_min" => 8.75,
                     "ingredients" => [
                         "Quickwire" => 37.5,
                         "Plastic" => 12.5,
@@ -1476,7 +1476,7 @@ class RecipeSeeder extends Seeder
                 [
                     "description" => "Caterium Computer",
                     "base_yield" => 1,
-                    "base_per_min" => 3.8,
+                    "base_per_min" => 3.75,
                     "ingredients" => [
                         "Circuit Board" => 26.25,
                         "Quickwire" => 105,
