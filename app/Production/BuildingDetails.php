@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ProductionBak;
+namespace App\Production;
 
 use App\Models\Recipe;
 use Illuminate\Support\Collection;

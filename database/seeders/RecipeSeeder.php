@@ -651,7 +651,7 @@ class RecipeSeeder extends Seeder
                     "base_per_min" => 7.5,
                     "ingredients" => [
                         "Rotor" => 7.5,
-                        "Electromagnetic Control Rod" => 7.5,
+                        "Electromagnetic Control Rod" => 3.75,
                     ],
                     "alt_recipe" => true,
                 ],
@@ -932,7 +932,7 @@ class RecipeSeeder extends Seeder
             "Aluminum Scrap" => [
                 [
                     "base_yield" => 6,
-                    "base_per_min" => 300,
+                    "base_per_min" => 360,
                     "ingredients" => [
                         "Alumina Solution" => 240,
                         "Coal" => 120,
@@ -1631,7 +1631,7 @@ class RecipeSeeder extends Seeder
                 "ingredients" => [
                     "Black Powder" => 12,
                     "Steel Pipe" => 12,
-                    "Crystal Oscillator" => 1.25,
+                    "Crystal Oscillator" => 1.5,
                 ],
                 "alt_recipe" => true,
             ],

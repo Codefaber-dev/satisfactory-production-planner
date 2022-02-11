@@ -6,20 +6,33 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
-function r($name) {
-    if (is_string($name))
-        return Recipe::ofName($name);
+function r($name, $force=false) {
+    $key = is_string($name) ? $name : ($name->description ?? $name->product->name);
 
-    return $name;
+    if($force) {
+        Cache::forget("recipes.$key");
+    }
 
+    return Cache::rememberForever("recipes.$key", function() use ($name) {
+        if (is_string($name)) {
+            return Recipe::ofName($name);
+        }
+        return $name;
+    });
 }
 
 function i($name) {
-    if (is_string($name))
-        return Ingredient::ofName($name);
+    $key = is_string($name) ? $name : $name->name;
 
-    return $name;
+    return Cache::rememberForever("ingredients.$key", function() use ($name) {
+        if (is_string($name)) {
+            return Ingredient::ofName($name);
+        }
+
+        return $name;
+    });
 }
 
 function raw($recipe, $use_alts = false, $qty = 1) {
@@ -30,7 +43,7 @@ function raw($recipe, $use_alts = false, $qty = 1) {
 }
 
 // lower is better
-function energy($recipe, $use_alts = false, $qty = 1)
+function energy($recipe, $use_alts = false, $qty = 100)
 {
     try {
         $raw = raw($recipe, $use_alts, $qty);
@@ -40,13 +53,13 @@ function energy($recipe, $use_alts = false, $qty = 1)
             ->reduce(function($carry, $qty, $ingredient) {
                 //print_r(compact('carry','qty','ingredient'));
                 return $carry + config("raw_materials.energy cost.{$ingredient}")*$qty;
-            }, 0);
+            }, 0) / $qty;
 
         if (is_string($recipe))
             $recipe = r($recipe);
 
         // calc energy of production
-        $production = ProductionCalculator::calc($recipe->product,null,$recipe)->energy();
+        $production = ProductionCalculator::calc($recipe->product,$qty,$recipe)->energy();
 
         return $raw_extraction + $production;
     }
@@ -63,7 +76,7 @@ function energy($recipe, $use_alts = false, $qty = 1)
 }
 
 // lower is better
-function rarity($recipe, $use_alts = false, $qty = 1)
+function rarity($recipe, $use_alts = false, $qty = 100)
 {
     $raw = raw($recipe, $use_alts, $qty);
 
@@ -71,5 +84,5 @@ function rarity($recipe, $use_alts = false, $qty = 1)
         ->reduce(function($carry, $qty, $ingredient) {
             //print_r(compact('carry','qty','ingredient'));
             return $carry + config("raw_materials.rarity.{$ingredient}")*$qty;
-        }, 0));
+        }, 0)) / $qty;
 }

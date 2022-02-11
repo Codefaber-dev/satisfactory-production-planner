@@ -2,6 +2,7 @@
 
 namespace App\Production;
 
+use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
@@ -16,17 +17,23 @@ class ProductionCalculator
     protected ?Recipe $recipe;
     protected $qty;
     protected $overrides;
+    protected Collection $favorites;
+    protected $imports;
+    protected $variant;
 
     // derived params
     protected Step $steps;
 
-    public static function make($product, $qty, $recipe = null, $overrides = []): static
+    public static function make($product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1"): static
     {
         $production = (new static)
             ->setProduct($product)
             ->setQty($qty)
             ->setRecipe($recipe)
-            ->setOverrides($overrides);
+            ->setOverrides($overrides)
+            ->setFavorites($favorites)
+            ->setImports($imports)
+            ->setVariant($variant);
 
         $production->calculate();
 
@@ -71,6 +78,13 @@ class ProductionCalculator
         return $this;
     }
 
+    public function setImports($imports): static
+    {
+        $this->imports = $imports;
+
+        return $this;
+    }
+
     public function get($key)
     {
         return data_get($this->results,$key);
@@ -82,7 +96,12 @@ class ProductionCalculator
             product: $this->product,
             qty: $this->qty,
             recipe: $this->recipe,
-            overrides: $this->overrides
+            globals: ProductionGlobals::make(
+                overrides: $this->overrides,
+                favorites: $this->favorites,
+                imports: $this->imports,
+                variant: $this->variant
+            )
         );
     }
 
@@ -96,5 +115,24 @@ class ProductionCalculator
         return $this->results->toArray();
     }
 
+    public function getSlimResults()
+    {
+        return $this->slim_results->toArray();
+    }
 
+    public function setFavorites($favorites): static
+    {
+        $this->favorites = $favorites ?
+            collect($favorites) :
+            Favorites::all();
+
+        return $this;
+    }
+
+    public function setVariant($variant): static
+    {
+        $this->variant = $variant;
+
+        return $this;
+    }
 }

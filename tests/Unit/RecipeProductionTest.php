@@ -51,7 +51,111 @@ class RecipeProductionTest extends TestCase
     {
         $production = ProductionCalculator::make($product, $qty);
 
+
         $this->assertEquals($expectedQty, $production->get($key));
+    }
+
+    /** @test */
+    public function it_can_handle_circular_dependencies()
+    {
+        $production = ProductionCalculator::make(
+            product: "Rubber",
+            qty:100,
+            recipe: "Recycled Rubber",
+            overrides: [],
+            favorites: [
+                'Plastic' => r('Recycled Plastic')
+            ]
+        );
+
+        $this->assertEquals(100, $production->get('3.Rubber.total'));
+        $this->assertEquals(50, $production->get('2.Plastic.total'));
+        $this->assertEquals(50, $production->get('2.Fuel.total'));
+        $this->assertEquals(150, $production->get('1.Crude Oil.total'));
+    }
+
+    /** @test */
+    public function it_can_calculate_fused_quickwire()
+    {
+        $production = ProductionCalculator::make(
+            product: "Quickwire",
+            qty: 1740,
+            recipe: "Fused Quickwire",
+            overrides: [],
+            favorites: [
+                //'Circuit Board' => r('Caterium Circuit Board'),
+                //'Plastic' => r('Recycled Plastic'),
+                //'Rubber' => r('Recycled Rubber'),
+                //'Fuel' => r('Unpackage Fuel'),
+                //'Packaged Fuel' => r('Packaged Fuel'),
+                //'Quickwire' => r('Fused Quickwire')
+            ],
+            imports: [
+                //'Caterium Ingot',
+                //'Copper Ingot'
+            ]
+        );
+
+        dd($production->getSlimResults());
+
+        $this->assertEquals(145, $production->get('2.Caterium Ingot.total'));
+        $this->assertEquals(725, $production->get('2.Copper Ingot.total'));
+        $this->assertEquals(1740, $production->get('3.Quickwire.total'));
+    }
+
+    /** @test */
+    public function it_can_handle_the_caterium_computer_issue()
+    {
+        $production = ProductionCalculator::make(
+            product: "Computer",
+            qty: 30,
+            recipe: "Caterium Computer",
+            overrides: [],
+            favorites: [
+                'Circuit Board' => r('Caterium Circuit Board'),
+                'Plastic' => r('Recycled Plastic'),
+                'Rubber' => r('Recycled Rubber'),
+                'Fuel' => r('Unpackage Fuel'),
+                'Packaged Fuel' => r('Packaged Fuel'),
+                'Quickwire' => r('Fused Quickwire')
+            ],
+            imports: [
+                'Caterium Ingot',
+                'Copper Ingot'
+            ]
+
+        );
+
+        $steps = $production->getSteps();
+
+        $steps->assertImported('Caterium Ingot');
+        $steps->assertImported('Copper Ingot');
+        $steps->assertOverride('Rubber','Rubber');
+        $steps->assertOverride('Packaged Fuel','Diluted Packaged Fuel');
+        $steps->assertIntermediateRecipe('Plastic','Recycled Plastic');
+        $steps->assertIntermediateRecipe('Quickwire','Fused Quickwire');
+
+
+        //dd($production->getSlimResults());
+
+        $this->assertNull($production->get('1.Caterium Ore.total'));
+        $this->assertNull($production->get('1.Copper Ore.total'));
+
+        $this->assertEquals(933.75, $production->get('1.Crude Oil.total'));
+        $this->assertEquals(150, $production->get('1.Water.total'));
+        $this->assertEquals(145, $production->get('2.Caterium Ingot.total'));
+        $this->assertEquals(725, $production->get('2.Copper Ingot.total'));
+        $this->assertEquals(75, $production->get('2.Heavy Oil Residue.total'));
+        $this->assertEquals(510, $production->get('2.Rubber.total'));
+        $this->assertEquals(75, $production->get('2.Plastic.total'));
+        $this->assertEquals(1740, $production->get('3.Quickwire.total'));
+        $this->assertEquals(300, $production->get('3.Plastic.total'));
+        $this->assertEquals(150, $production->get('3.Empty Canister.total'));
+        $this->assertEquals(150, $production->get('4.Packaged Water.total'));
+        $this->assertEquals(210, $production->get('4.Circuit Board.total'));
+        $this->assertEquals(150, $production->get('5.Fuel.total'));
+        $this->assertEquals(150, $production->get('5.Packaged Fuel.total'));
+        $this->assertEquals(30, $production->get('5.Computer.total'));
     }
 
     public function rawIngredientsData()

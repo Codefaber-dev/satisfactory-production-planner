@@ -95,11 +95,13 @@ class Recipe extends Model
 
     public function addIngredient(Ingredient $ingredient, $base_qty)
     {
+        $this->ingredients()->detach($ingredient);
         $this->ingredients()->attach($ingredient, compact('base_qty'));
     }
 
     public function addByproduct(Ingredient $ingredient, $base_qty)
     {
+        $this->byproducts()->detach($ingredient);
         $this->byproducts()->attach($ingredient, compact('base_qty'));
     }
 
@@ -119,23 +121,27 @@ class Recipe extends Model
         return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts [e:{$energy}, r:{$rarity}]";
     }
 
+    //public function getEnergyEfficientAttribute()
+    //{
+    //    return Cache::rememberForever("recipe.{$this->id}.energy_efficient", fn() => $this->isMostEnergyEfficient());
+    //}
+    //
+    //public function getResourceEfficientAttribute()
+    //{
+    //    return Cache::rememberForever("recipe.{$this->id}.resource_efficient", fn() => $this->isMostResourceEfficient());
+    //}
+
     public function getEnergyEfficientAttribute()
     {
-        return Cache::rememberForever("recipe.{$this->id}.energy_efficient", fn() => $this->isMostEnergyEfficient());
+        return Cache::rememberForever("recipe.{$this->id}.energy", function() {
+            return energy($this, false, 100);
+        });
     }
 
     public function getResourceEfficientAttribute()
     {
-        return Cache::rememberForever("recipe.{$this->id}.resource_efficient", fn() => $this->isMostResourceEfficient());
-    }
-
-    public function isMostEnergyEfficient()
-    {
-        return $this->is($this->product->mostEnergyEfficientRecipe());
-    }
-
-    public function isMostResourceEfficient()
-    {
-        return $this->is($this->product->mostResourceEfficientRecipe());
+        return Cache::rememberForever("recipe.{$this->id}.rarity", function() {
+            return rarity($this, false, 100);
+        });
     }
 }

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Factories\Facades\Factories;
 use App\Favorites\Facades\Favorites;
-use App\Helpers\ProductionCalculator;
+//use App\Helpers\ProductionCalculator;
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\ProductionCalculator;
 use App\ProductionBak\Production;
 use App\ProductionBak\ProductionStep;
 use Illuminate\Http\Request;
@@ -34,20 +35,33 @@ class ProductionController extends Controller
 
     public function show($ingredient, $qty, $recipe, $variant="mk1")
     {
-        $production = Production::make(
+        //$production = Production::make(
+        //    product: $product = i($ingredient),
+        //    qty: $yield = $qty,
+        //    recipe: $recipe = r($recipe),
+        //    variant: $variant,
+        //);
+
+        $calc = ProductionCalculator::make(
             product: $product = i($ingredient),
             qty: $yield = $qty,
-            recipe: $recipe = r($recipe),
-            variant: $variant,
+            recipe: $recipe,
+            imports: $imports = request()->has('imports') ? explode(",",request("imports")) : [],
+            favorites: Favorites::all(),
+            variant: $variant
         );
 
+        $production = [
+            'results' => $calc->getResults(),
+            'raw_materials' => $calc->getRawMaterials(),
+            'intermediate_materials' => $calc->getIntermediateMaterials()
+        ];
+
+        //dd($production);
+
         $belt_speed = request('belt_speed',780);
-        $imports = $production->getMappedImports();
 
-
-        //$production = ProductionCalculator::calc($ingredient,$qty,$recipe,$variant);
-
-        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
+        return Inertia::render('Production/ShowNew',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant="mk1")

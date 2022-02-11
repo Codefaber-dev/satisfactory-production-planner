@@ -19,8 +19,12 @@ trait CastsToArray
             'overrides' => $this->getOverrides()->toArray(),
             'children' => optional($this->getChildren())->toArray(),
             'outputs' => [
-                ($this->getParent() ?? 'final') => $this->getQty()
-            ]
+                'dest' => ($this->getParent() ?? 'final'),
+                'qty' => $this->getQty()
+            ],
+            'imported' => $this->isImported($this->getName()),
+            'overridden' => $this->isOverride($this->getName()),
+            'overview' => optional($this->getOverview())->toArray() ?? []
         ];
     }
 }

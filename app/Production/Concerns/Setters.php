@@ -4,13 +4,19 @@ namespace App\Production\Concerns;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\BuildingOverview;
+use App\Production\ProductionGlobals;
+use Illuminate\Support\Collection;
 
 trait Setters
 {
     protected Ingredient $product;
     protected ?Recipe $recipe = null;
     protected $qty;
-    protected $overrides;
+    //protected $overrides;
+    //protected $favorites;
+    //protected $imports;
+    protected ProductionGlobals $globals;
 
     // derived parameters
     protected $name;
@@ -18,6 +24,10 @@ trait Setters
     protected $chain;
     protected $ingredients;
     protected $byproducts;
+    protected $warning;
+    protected $imported = false;
+    protected ?BuildingOverview $overview = null;
+
 
     public function setProduct($product): static
     {
@@ -49,13 +59,6 @@ trait Setters
         return $this;
     }
 
-    public function setOverrides($overrides): static
-    {
-        $this->overrides = $overrides;
-
-        return $this;
-    }
-
     public function setParent($parent): static
     {
         $this->parent = $parent;
@@ -69,5 +72,65 @@ trait Setters
         $this->chain->push($this->name);
 
         return $this;
+    }
+
+    public function setImports(Collection|array $imports): static
+    {
+        $this->imports = collect($imports);
+
+        return $this;
+    }
+
+    public function setFavorites(Collection|array $favorites): static
+    {
+        $this->favorites = collect($favorites);
+
+        $this->overrideFavoritesIfNecessary();
+
+        return $this;
+    }
+
+    public function setWarning(string $message): static
+    {
+        $this->warning = $message;
+
+        return $this;
+    }
+
+    public function setGlobals(ProductionGlobals $globals): static
+    {
+        $this->globals = $globals;
+
+        return $this;
+    }
+
+    public function setOverview(BuildingOverview $overview): static
+    {
+        $this->overview = $overview;
+
+        return $this;
+    }
+
+    protected function overrideFavoritesIfNecessary(): void
+    {
+        $favorites = $this->getFavorites()->values()->pluck('description');
+
+        // scenario 1, recycled rubber and recycled plastic
+        if ($favorites->contains("Recycled Rubber") && $favorites->contains("Recycled Plastic")) {
+            $this->addOverride("Rubber", r("Rubber"));
+        }
+
+        if ($favorites->contains("Recycled Rubber") && $this->getRecipe()->is(r("Recycled Plastic"))) {
+            $this->addOverride("Rubber", r("Rubber"));
+        }
+
+        if ($favorites->contains("Recycled Plastic") && $this->getRecipe()->is(r("Recycled Rubber"))) {
+            $this->addOverride("Plastic", r("Plastic"));
+        }
+
+        // scenario 2, packaged fuel
+        if ($this->getIntermediateRecipe(i("Fuel"))->is(r("Unpackage Fuel")) && $this->getIntermediateRecipe(i("Packaged Fuel"))->is(r("Packaged Fuel"))) {
+            $this->addOverride("Packaged Fuel",r("Diluted Packaged Fuel"));
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Production\Concerns;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\BuildingOverview;
 use App\Production\Step;
 
 trait CalculatesSteps
@@ -18,6 +19,18 @@ trait CalculatesSteps
             return;
         }
 
+        if($this->isImported($this->getName())) {
+            $this->imported = true;
+            return;
+        }
+
+        $this->setOverview(BuildingOverview::make(
+            recipe: $this->getRecipe(),
+            qty: $this->getQty(),
+            belt_speed: $this->getBeltSpeed(),
+            variant: $this->getVariant()
+        ));
+
         $this->ingredients = $this->getRecipe()->ingredients;
 
         $this->byproducts = $this->getRecipe()->byproducts;
@@ -29,28 +42,38 @@ trait CalculatesSteps
             // how much of the ingredient we need to make per minute
             $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty;
 
+
             // return a new production step
             return static::make(
                 product: $ingredient,
                 qty: $sub_qty,
-                recipe: $this->getSubRecipe($ingredient),
+                globals: $this->globals,
+                recipe: $this->getIntermediateRecipe($ingredient),
                 parent: $this->name,
-                chain: $this->chain,
-                overrides: $this->overrides
+                chain: $this->chain
             );
         });
     }
 
-    protected function getSubRecipe(Ingredient $ingredient): ?Recipe
+    protected function check(): bool
     {
-        if ($ingredient->isRaw()) {
-            return null;
-        }
+        // check the dependencies
+        return $this->getChain()->filter(fn($val) => $val === $this->getName())->count() === 1;
+    }
 
-        if ($recipe = $this->getOverride($ingredient)) {
-            return $recipe;
-        }
+    protected function useCompatibleRecipe(): void
+    {
+        $recipe = $this->getProduct()->recipes->filter(function(Recipe $recipe) {
+            return $recipe->ingredients
+                ->map(fn($ingredient)=>$ingredient->name)
+                ->intersect($this->getChain())
+                ->isEmpty();
+        })->first();
 
-        return $ingredient->defaultRecipe();
+        $description = $recipe->description ?? "default";
+
+        $this->setWarning("Using {$description} recipe for {$this->getName()} to avoid circular dependency.");
+
+        $this->setRecipe($recipe);
     }
 }
