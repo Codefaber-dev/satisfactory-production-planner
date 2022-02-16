@@ -172,6 +172,6 @@ trait Getters
         if($this->getProduct()->isRaw()) {
             return collect();
         }
-        return $this->getBuildingDetails()->map(fn($variant) => $variant['power_usage']);
+        return $this->getBuildingDetails()->pluck('power_usage');
     }
 }

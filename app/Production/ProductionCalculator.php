@@ -170,7 +170,7 @@ class ProductionCalculator
             ->collapse()
             ->collapse()
             ->pluck('power_usage')
-            ->map(fn($details) => $details->values()->all())
+            ->map(fn($details) => collect($details)->values()->all())
             ->crossSum()[$variant];
     }
 

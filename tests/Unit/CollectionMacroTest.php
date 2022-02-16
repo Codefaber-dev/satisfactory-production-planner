@@ -41,4 +41,16 @@ class CollectionMacroTest extends TestCase
 
        $this->assertEquals([6,8,10,12], $a->crossSumByKey('val'));
     }
+
+    /** @test */
+    public function it_can_cross_sum_by_key2()
+    {
+        $a = collect([
+            [
+                "val" => [1,2,3,4]
+            ],
+        ]);
+
+       $this->assertEquals([1,2,3,4], $a->crossSumByKey('val'));
+    }
 }

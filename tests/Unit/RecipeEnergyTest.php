@@ -47,7 +47,7 @@ class RecipeEnergyTest extends TestCase
         // energy cost of a recipe is the energy cost of the extraction of the raw materials,
         // plus the energy cost of production
 
-        $extraction = 0.5*energy('Copper Ore');
+        $extraction = 0.5*energy(i('Copper Ore'));
         $smelter = 1e6 * Building::ofName("Smelter")->variant("mk1")->calculatePowerUsage(1);
         $constructor = 1e6 * Building::ofName("Constructor")->variant("mk1")->calculatePowerUsage(0.5);
         $yield = r("Wire")->base_per_min;
