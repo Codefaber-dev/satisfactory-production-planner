@@ -15,9 +15,7 @@
                         (60 * +recipe.base_yield) / +recipe.base_per_min
                     )
                 }}s
-                <span class="whitespace-nowrap text-xs"
-                    >per {{ +recipe.base_yield }}</span
-                >
+                <span class="whitespace-nowrap text-xs">per {{ +recipe.base_yield }}</span>
             </div>
         </div>
 

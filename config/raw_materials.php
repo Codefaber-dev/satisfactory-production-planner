@@ -6,18 +6,18 @@ return [
         // assumptions:
         // - normal node
         // - mk.2 miner @ 100% (12MW)
-        'Iron Ore' => 12e6 / 120,
-        'Copper Ore' => 12e6 / 120,
-        'Limestone' => 12e6 / 120,
-        'Coal' => 12e6 / 120,
-        'Caterium Ore' => 12e6 / 120,
-        'Raw Quartz' => 12e6 / 120,
-        'Sulfur' => 12e6 / 120,
-        'Bauxite' => 12e6 / 120,
-        'Uranium' => 12e6 / 120,
-        'Water' => 20e6 / 120, // - water extractor @ 100% (20MW)
-        'Crude Oil' => 40e6 / 120, // - normal node - oil extractor @ 100% (40MW)
-        'Nitrogen Gas' => 150e6 / 60 , // - normal node - resource well pressurizer @ 100% (150MW)
+        'Iron Ore' => 12 / 120,
+        'Copper Ore' => 12 / 120,
+        'Limestone' => 12 / 120,
+        'Coal' => 12 / 120,
+        'Caterium Ore' => 12 / 120,
+        'Raw Quartz' => 12 / 120,
+        'Sulfur' => 12 / 120,
+        'Bauxite' => 12 / 120,
+        'Uranium' => 12 / 120,
+        'Water' => 20 / 120, // - water extractor @ 100% (20MW)
+        'Crude Oil' => 40 / 120, // - normal node - oil extractor @ 100% (40MW)
+        'Nitrogen Gas' => 150 / 60 , // - normal node - resource well pressurizer @ 100% (150MW)
     ],
 
     // rarity of raw materials derived from standard yield per min / max yield per min with mk.3 miners @100%

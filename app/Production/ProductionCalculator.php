@@ -14,26 +14,36 @@ class ProductionCalculator
 
     // supplied params
     protected Ingredient $product;
-    protected ?Recipe $recipe;
+
+    protected ?Recipe $recipe = null;
+
     protected $qty;
+
     protected $overrides;
-    protected Collection $favorites;
+
+    protected ?Collection $favorites;
+
     protected $imports;
+
     protected $variant;
 
     // derived params
     protected Step $steps;
 
-    public static function make($product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1"): static
-    {
-        $production = (new static)
-            ->setProduct($product)
+    protected $raw_available;
+
+    public static function make(
+        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1"
+    ): static {
+        $production = (new static)->setProduct($product)
             ->setQty($qty)
             ->setRecipe($recipe)
             ->setOverrides($overrides)
             ->setFavorites($favorites)
             ->setImports($imports)
             ->setVariant($variant);
+
+        $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
         $production->calculate();
 
@@ -49,7 +59,7 @@ class ProductionCalculator
         return $this;
     }
 
-    public function setRecipe($recipe=null): static
+    public function setRecipe($recipe = null): static
     {
         if ($this->product->isRaw()) {
             return $this;
@@ -57,14 +67,19 @@ class ProductionCalculator
 
         if ($recipe) {
             $this->recipe = r($recipe);
-        } else {
+        }
+        else {
             $this->recipe = $this->product->baseRecipe();
+        }
+
+        if (! $this->recipe) {
+            throw new Exception("No base recipe found for {$this->product->name}");
         }
 
         return $this;
     }
 
-    public function setQty($qty=100): static
+    public function setQty($qty = 100): static
     {
         $this->qty = $qty;
 
@@ -85,9 +100,14 @@ class ProductionCalculator
         return $this;
     }
 
+    public function getQty()
+    {
+        return $this->qty;
+    }
+
     public function get($key)
     {
-        return data_get($this->results,$key);
+        return data_get($this->results, $key);
     }
 
     public function calculate(): void
@@ -100,8 +120,7 @@ class ProductionCalculator
                 overrides: $this->overrides,
                 favorites: $this->favorites,
                 imports: $this->imports,
-                variant: $this->variant
-            )
+                variant: $this->variant)
         );
     }
 
@@ -110,9 +129,9 @@ class ProductionCalculator
         return $this->steps;
     }
 
-    public function getResults(): array
+    public function getResults(): Collection
     {
-        return $this->results->toArray();
+        return $this->results;
     }
 
     public function getSlimResults()
@@ -120,11 +139,9 @@ class ProductionCalculator
         return $this->slim_results->toArray();
     }
 
-    public function setFavorites($favorites): static
+    public function setFavorites(Collection|array|null $favorites): static
     {
-        $this->favorites = $favorites ?
-            collect($favorites) :
-            Favorites::all();
+        $this->favorites = $favorites;
 
         return $this;
     }
@@ -134,5 +151,60 @@ class ProductionCalculator
         $this->variant = $variant;
 
         return $this;
+    }
+
+    public function getPowerUsage($variant = 0): float
+    {
+        /**
+         * variants
+         * 0 mk1
+         * 1 mk2
+         * 2 mk3
+         * 3 mk4
+         */
+
+        return $this->getResults()
+            ->skip(1)
+            ->map(fn($tier) => $tier->map(fn($product) => collect($product->production)->values())->values())
+            ->values()
+            ->collapse()
+            ->collapse()
+            ->pluck('power_usage')
+            ->map(fn($details) => $details->values()->all())
+            ->crossSum()[$variant];
+    }
+
+    public function getEnergy($variant = 0): int
+    {
+        return (int) ( 60 * $this->getPowerUsage($variant) / $this->qty );
+    }
+
+    public static function parseRaw($raw): array
+    {
+        return collect(explode(",",$raw))
+            ->map(function($pair) {
+                [$key,$value] = explode(":",$pair);
+                return [$key => (int) $value];
+            })
+            ->collapse()
+            ->all();
+    }
+
+    public function getAdjustedQty()
+    {
+        return floor(1000 * $this->qty * $this->ratioOfAvailableRawMaterials()) / 1000;
+    }
+
+    protected function ratioOfAvailableRawMaterials(): float
+    {
+        return $this->getRawMaterials()
+            ->map(function($required, $key) {
+               if (isset($this->raw_available[$key]) && $available = $this->raw_available[$key]) {
+                   return $available/$required;
+               }
+               return null;
+            })
+            ->filter()
+            ->min() ?? 1;
     }
 }

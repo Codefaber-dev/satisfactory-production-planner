@@ -57,6 +57,12 @@
                             />
                         </div>
 
+                        <div>
+                            <button @click='resetAll' class='btn btn-emerald'>
+                                Reset All To Default...
+                            </button>
+                        </div>
+
                         <div
                             :key="product.id"
                             v-for="product in filtered"
@@ -232,6 +238,14 @@ export default {
                     preserveScroll: true,
                 }
             );
+        },
+        resetAll() {
+            const conf = confirm("Are you sure you want to remove all favorite recipes?");
+            if (!conf) {
+                return;
+            }
+
+            this.$inertia.delete('/favorites-all');
         },
         reset(product) {
             this.$inertia.delete(`/favorites/${product.id}`);

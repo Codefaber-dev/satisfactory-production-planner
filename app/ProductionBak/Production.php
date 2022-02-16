@@ -169,7 +169,7 @@ class Production
 
     public function getAdjustedQty()
     {
-        return floor($this->qty * $this->ratioOfAvailableRawMaterials());
+        return floor(1000 * $this->qty * $this->ratioOfAvailableRawMaterials()) / 1000;
     }
 
     protected function ratioOfAvailableRawMaterials(): float

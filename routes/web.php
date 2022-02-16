@@ -37,12 +37,16 @@ Route::get('/fix-recipes', function() {
 
     r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
     r('Seismic Nobelisk', force: true);
+});
 
+Route::get('testing', function() {
+    return energy('Unpackage Fuel');
 });
 
 Route::get('/favorites', [FavoritesController::class,'index'])->name('favorites');
 Route::post('/favorites/preset', [FavoritesController::class,'storePreset'])->name('favorites.storePreset');
 Route::post('/favorites', [FavoritesController::class,'store'])->name('favorites.store');
+Route::delete('/favorites-all', [FavoritesController::class,'destroyAll'])->name('favorites.destroyAll');
 Route::delete('/favorites/{id}', [FavoritesController::class,'destroy'])->name('favorites.destroy');
 
 Route::post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);

@@ -37,6 +37,14 @@ class FavoritesController extends Controller
         return redirect()->to('/favorites');
     }
 
+    public function destroyAll()
+    {
+        $favorites = Favorites::all();
+        $favorites->each(fn(Recipe $favorite) => Favorites::setDefault($favorite->product));
+
+        return redirect()->to('/favorites');
+    }
+
     public function storePreset()
     {
         $preset = request('preset');

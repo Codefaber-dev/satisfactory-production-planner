@@ -2,13 +2,15 @@
 
 namespace App\Production\Concerns;
 
+use App\Production\BuildingOverview;
 use App\Production\Step;
+use Illuminate\Support\Collection;
 
 trait ParsesSteps
 {
     protected $raw_results;
 
-    protected $results;
+    protected Collection $results;
 
     protected $slim_results;
 
@@ -33,12 +35,30 @@ trait ParsesSteps
         $this->results = $this->raw_results->sortBy(['tier', 'name'])->groupBy(['tier', 'name'])
             ->map(function($products, $tier){
                 return $products->map(function($recipes, $product) {
+                    $recipes = collect($recipes);
                     return [$product => (object) [
-                        "imported" => collect($recipes)->max('imported'),
-                        "overridden" => collect($recipes)->max('overridden'),
-                        "total" => collect($recipes)->sum('qty'),
-                        "outputs" => collect($recipes)->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
-                        "production" => $recipes->toArray(),
+                        "imported" => $recipes->max('imported'),
+                        "overridden" => $recipes->max('overridden'),
+                        "total" => $recipes->sum('qty'),
+                        "outputs" => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
+                        "production" => $recipes
+                            ->groupBy(fn($row) => $row['name'].".".$row['description'])
+                            ->map(fn($group) => [
+                                "byproducts" => $group->crossSumByKey("byproducts"),
+                                "description" => $group->dataGet("0.description"),
+                                "imported" => $group->dataGet("0.imported"),
+                                "ingredients" => $group->crossSumByKey("ingredients"),
+                                "name" => $group->dataGet("0.name"),
+                                "outputs" => $group->pluck("outputs"),
+                                "overridden" => $group->dataGet("0.overridden"),
+                                "overrides" => $group->dataGet("0.overrides"),
+                                "qty" => $qty = round($group->sum('qty'),4),
+                                "recipe" => $recipe = $group->dataGet("0.recipe"),
+                                "overview" => $recipe ? BuildingOverview::make($recipe, $qty, $this->getSteps()->getBeltSpeed(), $this->variant)->toArray() : null,
+                                "power_usage" => $group->crossSumByKey("power_usage"),
+                                "tier" => $group->dataGet("0.tier"),
+                                "variant" => $group->dataGet("0.variant"),
+                            ])->values(),
                     ]];
                 })->collapse();
             });
@@ -62,7 +82,7 @@ trait ParsesSteps
     public function getRawMaterials()
     {
         return $this->results[1]->map(function($val, $name) {
-            return $val->total;
+            return round($val->total,4);
         });
     }
 
@@ -71,7 +91,19 @@ trait ParsesSteps
         return $this->results->skip(1)->map(function($tier) {
             return $tier->map(function($val, $name) {
                 if($name !== $this->product->name) {
-                    return $val->total;
+                    return round($val->total,4);
+                }
+                return null;
+            })->filter();
+        })->collapse();
+    }
+
+    public function getAllMaterials()
+    {
+        return $this->results->map(function($tier) {
+            return $tier->map(function($val, $name) {
+                if($name !== $this->product->name) {
+                    return round($val->total,4);
                 }
                 return null;
             })->filter();

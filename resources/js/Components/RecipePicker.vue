@@ -1,7 +1,8 @@
 <template>
     <div
         @click="showMenu = !showMenu"
-        class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2 shadow-lg transition-all hover:border-blue-300 dark:border-slate-700"
+        class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2
+        shadow transition-all hover:border-blue-300 dark:border-slate-800 dark:shadow-slate-800 dark:hover:border-sky-800 dark:hover:shadow-sky-800"
     >
         <!-- favorite indicator -->
         <div class="pr-4">

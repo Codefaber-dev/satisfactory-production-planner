@@ -12,6 +12,8 @@ class Building extends Model
 
     protected $guarded = [];
 
+    protected $with = ['variants'];
+
     public function variants()
     {
         return $this->hasMany(BuildingVariant::class);

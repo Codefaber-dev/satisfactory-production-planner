@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 
+use App\Favorites\Facades\Favorites;
 use App\Production\ProductionCalculator;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,6 +54,21 @@ class RecipeProductionTest extends TestCase
 
 
         $this->assertEquals($expectedQty, $production->get($key));
+    }
+
+    /** @test */
+    public function it_can_set_favorites()
+    {
+        Favorites::set(i('Screw'),r('Steel Screw'));
+
+        $production = ProductionCalculator::make(
+            product: "Computer",
+            qty: 10
+        );
+
+        //dd($production->getSteps()->getFavorites());
+
+        $production->getSteps()->assertIntermediateRecipe('Screw','Steel Screw');
     }
 
     /** @test */

@@ -162,8 +162,16 @@ trait Getters
         return $this->overview;
     }
 
-    public function getBuildingDetails(): BuildingDetails
+    public function getBuildingDetails(): Collection
     {
-        return $this->getOverview()->details;
+        return optional($this->getOverview())->details ?? collect();
+    }
+
+    public function getPowerUsage(): Collection
+    {
+        if($this->getProduct()->isRaw()) {
+            return collect();
+        }
+        return $this->getBuildingDetails()->map(fn($variant) => $variant['power_usage']);
     }
 }

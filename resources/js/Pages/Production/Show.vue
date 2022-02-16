@@ -126,7 +126,7 @@
                     v-if="done && production"
                     class="relative flex flex-1 flex-col space-y-2 p-4 dark:text-gray-100"
                 >
-<!--                    <production-warning :production__warnings="production__warnings" :show-warnings="showWarnings" />-->
+                    <production-warning :production__warnings="production__warnings" :show-warnings="showWarnings" />
 
                     <div class="flex flex-1 space-x-8 py-4">
                         <!-- Left Side -->

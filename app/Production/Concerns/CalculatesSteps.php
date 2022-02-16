@@ -24,12 +24,12 @@ trait CalculatesSteps
             return;
         }
 
-        $this->setOverview(BuildingOverview::make(
-            recipe: $this->getRecipe(),
-            qty: $this->getQty(),
-            belt_speed: $this->getBeltSpeed(),
-            variant: $this->getVariant()
-        ));
+        //$this->setOverview(BuildingOverview::make(
+        //    recipe: $this->getRecipe(),
+        //    qty: $this->getQty(),
+        //    belt_speed: $this->getBeltSpeed(),
+        //    variant: $this->getVariant()
+        //));
 
         $this->ingredients = $this->getRecipe()->ingredients;
 

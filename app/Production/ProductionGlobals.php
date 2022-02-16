@@ -3,6 +3,7 @@
 namespace App\Production;
 
 
+use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Support\Collection;
@@ -15,16 +16,18 @@ class ProductionGlobals
     protected string $variant;
     protected int $belt_speed;
 
-    public function __construct(Collection|array $overrides, Collection|array $favorites, Collection|array $imports, string $variant)
+    public function __construct(Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant)
     {
         $this->overrides = collect($overrides);
-        $this->favorites = collect($favorites);
+        $this->favorites = ! is_null($favorites) ?
+            collect($favorites) :
+            Favorites::all()->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse();
         $this->imports = collect($imports);
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed',780);
     }
 
-    public static function make(Collection|array $overrides, Collection|array $favorites, Collection|array $imports, string $variant): static
+    public static function make(Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant): static
     {
         return new static($overrides, $favorites, $imports, $variant);
     }
@@ -33,7 +36,7 @@ class ProductionGlobals
     {
         return static::make(
             overrides: $globals['overrides'] ?? [],
-            favorites: $globals['favorites'] ?? [],
+            favorites: $globals['favorites'] ?? null,
             imports: $globals['imports'] ?? [],
             variant: $globals['variant'] ?? 'mk1'
         );
@@ -71,7 +74,7 @@ class ProductionGlobals
 
     public function getFavorite(Ingredient $ingredient): ?Recipe
     {
-        return $this->favorites[$ingredient->name] ?? null;
+        return $this->favorites->get($ingredient->name);
     }
 
     public function getOverrides(): ?Collection

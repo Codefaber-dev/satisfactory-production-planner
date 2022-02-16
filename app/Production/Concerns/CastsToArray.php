@@ -24,7 +24,9 @@ trait CastsToArray
             ],
             'imported' => $this->isImported($this->getName()),
             'overridden' => $this->isOverride($this->getName()),
-            'overview' => optional($this->getOverview())->toArray() ?? []
+            'overview' => optional($this->getOverview())->toArray() ?? [],
+            'power_usage' => $this->getPowerUsage(),
+            'variant' => $this->getVariant()
         ];
     }
 }

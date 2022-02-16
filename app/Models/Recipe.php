@@ -29,6 +29,11 @@ class Recipe extends Model
         'product'
     ];
 
+    protected $casts = [
+        'energy' => 'float',
+        'resource' => 'float'
+    ];
+
     public function getTierAttribute()
     {
         return $this->alt_tier ?? $this->product->tier;
@@ -105,43 +110,39 @@ class Recipe extends Model
         $this->byproducts()->attach($ingredient, compact('base_qty'));
     }
 
-    public function getChoiceText()
-    {
-        $ppm = $this->base_per_min;
-        $description = $this->description ?? 'default';
-
-        $ingredients = $this->ingredients->map(fn($ingredient) => "$ingredient->name [{$ingredient->pivot->base_qty} ppm]")->join(", ");
-        $byproducts = $this->byproducts()->count() ? " [" . $this->byproducts->map(fn($ingredient) => ":bp: $ingredient->name [" . (int) $ingredient->pivot->base_qty . " ppm]")->join(", ") . "]" : "";
-        $energy = energy($this,false,1) / 1e6 . " MJ";
-        $rarity = rarity($this,false,1);
-
-        $energy = $this->isMostEnergyEfficient() ? "\033[32m{$energy}\033[0m" : $energy;
-        $rarity = $this->isMostResourceEfficient() ? "\033[32m{$rarity}\033[0m" : $rarity;
-
-        return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts [e:{$energy}, r:{$rarity}]";
-    }
-
-    //public function getEnergyEfficientAttribute()
+    //public function getChoiceText()
     //{
-    //    return Cache::rememberForever("recipe.{$this->id}.energy_efficient", fn() => $this->isMostEnergyEfficient());
-    //}
+    //    $ppm = $this->base_per_min;
+    //    $description = $this->description ?? 'default';
     //
-    //public function getResourceEfficientAttribute()
-    //{
-    //    return Cache::rememberForever("recipe.{$this->id}.resource_efficient", fn() => $this->isMostResourceEfficient());
+    //    $ingredients = $this->ingredients->map(fn($ingredient) => "$ingredient->name [{$ingredient->pivot->base_qty} ppm]")->join(", ");
+    //    $byproducts = $this->byproducts()->count() ? " [" . $this->byproducts->map(fn($ingredient) => ":bp: $ingredient->name [" . (int) $ingredient->pivot->base_qty . " ppm]")->join(", ") . "]" : "";
+    //    $energy = energy($this,false,1) / 1e6 . " MJ";
+    //    $rarity = rarity($this,false,1);
+    //
+    //    $energy = $this->isMostEnergyEfficient() ? "\033[32m{$energy}\033[0m" : $energy;
+    //    $rarity = $this->isMostResourceEfficient() ? "\033[32m{$rarity}\033[0m" : $rarity;
+    //
+    //    return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts [e:{$energy}, r:{$rarity}]";
     //}
 
     public function getEnergyEfficientAttribute()
     {
-        return Cache::rememberForever("recipe.{$this->id}.energy", function() {
-            return energy($this, false, 100);
-        });
+        return Cache::rememberForever("recipe.{$this->id}.energy_efficient", fn() => $this->is($this->product->recipes()->orderBy('energy')->first()));
     }
 
     public function getResourceEfficientAttribute()
     {
-        return Cache::rememberForever("recipe.{$this->id}.rarity", function() {
-            return rarity($this, false, 100);
-        });
+        return Cache::rememberForever("recipe.{$this->id}.resource_efficient", fn() => $this->is($this->product->recipes()->orderBy('resource')->first()));
+    }
+
+    public function getEnergyUsage()
+    {
+        return energy($this);
+    }
+
+    public function getRarity()
+    {
+        return rarity($this);
     }
 }

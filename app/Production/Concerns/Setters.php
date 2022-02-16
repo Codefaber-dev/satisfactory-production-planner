@@ -16,7 +16,7 @@ trait Setters
     //protected $overrides;
     //protected $favorites;
     //protected $imports;
-    protected ProductionGlobals $globals;
+    public ProductionGlobals $globals;
 
     // derived parameters
     protected $name;
@@ -81,14 +81,14 @@ trait Setters
         return $this;
     }
 
-    public function setFavorites(Collection|array $favorites): static
-    {
-        $this->favorites = collect($favorites);
-
-        $this->overrideFavoritesIfNecessary();
-
-        return $this;
-    }
+    //public function setFavorites(Collection|array $favorites): static
+    //{
+    //    $this->favorites = collect($favorites);
+    //
+    //    $this->overrideFavoritesIfNecessary();
+    //
+    //    return $this;
+    //}
 
     public function setWarning(string $message): static
     {

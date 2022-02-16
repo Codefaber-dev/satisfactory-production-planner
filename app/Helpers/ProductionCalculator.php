@@ -175,7 +175,9 @@ class ProductionCalculator
         $this->recipes[$recipe->product->name] = [
             "recipe" => $recipe->description ?? "default",
             "inputs" => $recipe->ingredients->map(function ($ingredient) use ($recipe) {
-                $needed = isset($this->recipes[$recipe->product->name]) ? $this->recipes[$recipe->product->name]['inputs'][$ingredient->name]['needed_qty'] : 0;
+                $needed = isset($this->recipes[$recipe->product->name]) ?
+                    $this->recipes[$recipe->product->name]['inputs'][$ingredient->name]['needed_qty'] :
+                    0;
 
                 return [
                     $ingredient->name => [

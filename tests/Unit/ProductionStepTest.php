@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Favorites\Facades\Favorites;
 use App\Production\Step;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -79,6 +80,26 @@ class ProductionStepTest extends TestCase
                 "favorites" => [
                     'Screw' => r('Steel Screw')
                 ]
+            ]
+        );
+
+        $step->assertIntermediateRecipe('Screw','Steel Screw');
+
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_use_recipe_favorites()
+    {
+        Favorites::set(i('Screw'),r('Steel Screw'));
+
+        $step = Step::make(
+            product: "Heavy Modular Frame",
+            qty: 5,
+            recipe: "Heavy Encased Frame",
+            globals: [
+                "overrides" => [],
             ]
         );
 

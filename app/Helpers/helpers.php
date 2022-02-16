@@ -1,6 +1,6 @@
 <?php
 
-use App\Helpers\ProductionCalculator;
+use App\Production\ProductionCalculator;
 use App\Helpers\RawIngredientCalculator;
 use App\Models\Ingredient;
 use App\Models\Recipe;
@@ -43,23 +43,22 @@ function raw($recipe, $use_alts = false, $qty = 1) {
 }
 
 // lower is better
-function energy($recipe, $use_alts = false, $qty = 100)
+function energy(Recipe $recipe, $use_alts = false)
 {
     try {
+        $qty = $recipe->base_per_min;
+
         $raw = raw($recipe, $use_alts, $qty);
 
         // calc the energy of raw extraction
-        $raw_extraction = (int) collect($raw)
+        $raw_extraction = collect($raw)
             ->reduce(function($carry, $qty, $ingredient) {
                 //print_r(compact('carry','qty','ingredient'));
-                return $carry + config("raw_materials.energy cost.{$ingredient}")*$qty;
-            }, 0) / $qty;
-
-        if (is_string($recipe))
-            $recipe = r($recipe);
+                return $carry + config("raw_materials.energy cost.{$ingredient}");
+            }, 0);
 
         // calc energy of production
-        $production = ProductionCalculator::calc($recipe->product,$qty,$recipe)->energy();
+        $production = ProductionCalculator::make($recipe->product,$qty,$recipe)->getEnergy();
 
         return $raw_extraction + $production;
     }

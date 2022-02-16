@@ -49,7 +49,10 @@ class BuildingOverview
             "qty" => $this->qty,
             "details" => $this->details->all(),
             "overview" => $this->overview->all(),
-            "selected_variant" => $this->selected_variant
+            "selected_variant" => $this->details[$this->selected_variant],
+            "selected_variant_name" => $this->selected_variant,
         ];
     }
+
+
 }

@@ -2,6 +2,8 @@
     <div :class="{ dark }">
         <jet-banner />
 
+        <release-notes ref='releaseNotes' v-bind='{version: $page.props.version,releaseNotes: $page.props.releaseNotes}'/>
+
         <div
             class="min-h-screen bg-gray-100 dark:bg-slate-800 dark:text-gray-100"
         >
@@ -43,12 +45,6 @@
                                 >
                                     My Favorite Recipes
                                 </jet-nav-link>
-                                <jet-nav-link
-                                    href="https://discord.gg/dqGQECppCy"
-                                    target="_blank"
-                                >
-                                    Join the Discussion on Discord
-                                </jet-nav-link>
                             </div>
                         </div>
 
@@ -56,6 +52,19 @@
                             <div
                                 class="mr-3 flex h-16 items-center justify-center"
                             >
+
+                                <button @click='showReleaseNotes' class='btn btn-gray whitespace-nowrap mr-4'>
+                                    Release Notes
+                                </button>
+
+                                <a
+                                    href="https://discord.gg/dqGQECppCy"
+                                    target="_blank"
+                                    class='btn btn-emerald whitespace-nowrap mr-4'
+                                >
+                                    Join the Discussion on Discord
+                                </a>
+
                                 <!-- dark mode toggle -->
                                 <div
                                     class="flex w-full items-center justify-center dark:text-gray-200"
@@ -345,6 +354,7 @@ import JetDropdownLink from '@/Jetstream/DropdownLink';
 import JetNavLink from '@/Jetstream/NavLink';
 import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink';
 import store from '@/store';
+import ReleaseNotes from '@/Components/ReleaseNotes';
 
 export default {
     components: {
@@ -354,6 +364,12 @@ export default {
         JetDropdownLink,
         JetNavLink,
         JetResponsiveNavLink,
+        ReleaseNotes,
+    },
+
+    props: {
+        version: String,
+        releaseNotes: String,
     },
 
     mounted() {
@@ -378,6 +394,10 @@ export default {
                     preserveState: false,
                 }
             );
+        },
+
+        showReleaseNotes() {
+            this.$refs.releaseNotes.toggle();
         },
 
         logout() {

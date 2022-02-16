@@ -11,21 +11,26 @@ use App\Production\ProductionCalculator;
 use App\ProductionBak\Production;
 use App\ProductionBak\ProductionStep;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Jetstream\Jetstream;
 
 class ProductionController extends Controller
 {
     protected function baseData()
     {
+        $releaseNotesFile = Jetstream::localizedMarkdownPath('release-notes.md');
+        $releaseNotes = Str::markdown(file_get_contents($releaseNotesFile));
+        $version = config('app.version');
+
+
         $products = Ingredient::processed()->orderBy('name')->get();
-        $recipes = $products->map(function($product) {
-            return [$product->name => $product->recipes()->with('ingredients')->get()];
-        })->collapse();
+        $recipes = Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
         $favorites = Favorites::all();
         $factory = Factories::find(request('factory'));
 
 
-        return compact('products','recipes','favorites','factory');
+        return compact('products','recipes','favorites','factory','releaseNotes','version');
     }
 
     public function index()
@@ -35,13 +40,34 @@ class ProductionController extends Controller
 
     public function show($ingredient, $qty, $recipe, $variant="mk1")
     {
-        //$production = Production::make(
-        //    product: $product = i($ingredient),
-        //    qty: $yield = $qty,
-        //    recipe: $recipe = r($recipe),
-        //    variant: $variant,
-        //);
+        $calc = ProductionCalculator::make(
+            product: $product = i($ingredient),
+            qty: $yield = $qty,
+            recipe: $recipe,
+            imports: request()->has('imports') ? explode(",",request("imports")) : [],
+            variant: $variant
+        );
 
+        $production = [
+            'results' => $calc->getResults(),
+            'raw_materials' => $calc->getRawMaterials(),
+            'intermediate_materials' => $calc->getIntermediateMaterials(),
+            'all_materials' => $calc->getAllMaterials(),
+            'final' => $calc->getSteps()->toArray(),
+            'recipe' => $calc->getSteps()->getRecipe(),
+            'overrides' => $calc->getSteps()->getOverrides(),
+        ];
+
+        $imports = request('imports');
+
+
+        $belt_speed = request('belt_speed',780);
+
+        return Inertia::render('Production/ShowNew',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
+    }
+
+    public function newYield($ingredient, $qty, $recipe, $variant="mk1")
+    {
         $calc = ProductionCalculator::make(
             product: $product = i($ingredient),
             qty: $yield = $qty,
@@ -51,32 +77,10 @@ class ProductionController extends Controller
             variant: $variant
         );
 
-        $production = [
-            'results' => $calc->getResults(),
-            'raw_materials' => $calc->getRawMaterials(),
-            'intermediate_materials' => $calc->getIntermediateMaterials()
-        ];
-
-        //dd($production);
-
-        $belt_speed = request('belt_speed',780);
-
-        return Inertia::render('Production/ShowNew',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
-    }
-
-    public function newYield($ingredient, $qty, $recipe, $variant="mk1")
-    {
-        $production = Production::make(
-            product: i($ingredient),
-            qty: $qty,
-            recipe: r($recipe),
-            variant: $variant,
-        );
-
-        $newQty = $production->getAdjustedQty();
+        $newQty = $calc->getAdjustedQty();
         $belt_speed = request('belt_speed',780);
         $factory = request('factory');
-        $imports = $production->getMappedImports();
+        $imports = request('imports');
 
         return redirect()->to("/dashboard/$ingredient/{$newQty}/$recipe/$variant?belt_speed={$belt_speed}&factory={$factory}&imports={$imports}");
     }
