@@ -1,5 +1,5 @@
 <template>
-<div v-show='show' class='fixed inset-0 flex flex-col bg-slate-800 bg-opacity-20'>
+<div v-show='show && !!releaseNotes' class='fixed z-50 inset-0 flex flex-col bg-slate-800 bg-opacity-20'>
     <div class='max-w-[90vw] lg:max-w-screen-lg mx-auto my-[10vh] z-100 rounded-lg bg-gray-200 dark:bg-slate-900 shadow dark:shadow-emerald-500 prose dark:prose-invert'>
         <div v-html='releaseNotes' class='max-h-[70vh] overflow-y-auto p-6'>
         </div>
