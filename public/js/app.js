@@ -23947,7 +23947,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       done: true,
       working: false,
       newYield: this["yield"],
-      newProduct: this.product,
+      newProduct: this.products.filter(function (o) {
+        return o.id === _this.product.id;
+      })[0],
       newRecipe: this.recipes[this.product.name].filter(function (o) {
         return o.id === _this.production.recipe.id;
       })[0],
@@ -23964,9 +23966,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       newConstraints: [],
       rawUnchanged: true,
       diagrams: _store__WEBPACK_IMPORTED_MODULE_2__["default"].getItem('diagrams', true),
-      newImports: Object.fromEntries(this.imports.split(",").map(function (o) {
+      newImports: this.imports ? Object.fromEntries((this.imports || "").split(",").map(function (o) {
         return [o, true];
-      })) || {},
+      })) : {},
       showWarnings: true
     };
   },

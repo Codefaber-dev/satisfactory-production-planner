@@ -156,7 +156,7 @@ export default {
             done: true,
             working: false,
             newYield: this.yield,
-            newProduct: this.product,
+            newProduct: this.products.filter(o => o.id === this.product.id)[0],
             newRecipe: this.recipes[this.product.name].filter(o => o.id === this.production.recipe.id)[0],
             newVariant: this.variant,
             // recipe_models: this.production.recipe_models,
@@ -171,7 +171,7 @@ export default {
             newConstraints: [],
             rawUnchanged: true,
             diagrams: store.getItem('diagrams', true),
-            newImports: Object.fromEntries(this.imports.split(",").map(o=>[o,true])) || {},
+            newImports: this.imports ? Object.fromEntries((this.imports || "").split(",").map(o=>[o,true])) : {},
             showWarnings: true,
         };
     },
