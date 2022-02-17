@@ -2,6 +2,7 @@
 
 use App\Helpers\ProductionCalculator;
 use App\Http\Controllers\FavoritesController;
+use App\Http\Controllers\PowerPlanController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionLineController;
 use App\Models\Ingredient;
@@ -28,20 +29,20 @@ use Inertia\Inertia;
 //    return ProductionCalculator::calc($ingredient, $qty, $recipe);
 //});
 
-Route::get('/fix-recipes', function() {
-    r('Aluminum Scrap')->update(['base_per_min' => 360]);
-    r('Aluminum Scrap', force: true);
-
-    r('Electric Motor')->addIngredient(i('Electromagnetic Control Rod'), 3.75);
-    r('Electric Motor', force: true);
-
-    r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
-    r('Seismic Nobelisk', force: true);
-});
-
-Route::get('testing', function() {
-    return energy('Unpackage Fuel');
-});
+//Route::get('/fix-recipes', function() {
+//    r('Aluminum Scrap')->update(['base_per_min' => 360]);
+//    r('Aluminum Scrap', force: true);
+//
+//    r('Electric Motor')->addIngredient(i('Electromagnetic Control Rod'), 3.75);
+//    r('Electric Motor', force: true);
+//
+//    r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
+//    r('Seismic Nobelisk', force: true);
+//});
+//
+//Route::get('testing', function() {
+//    return energy('Unpackage Fuel');
+//});
 
 Route::get('/favorites', [FavoritesController::class,'index'])->name('favorites');
 Route::post('/favorites/preset', [FavoritesController::class,'storePreset'])->name('favorites.storePreset');
@@ -52,6 +53,8 @@ Route::delete('/favorites/{id}', [FavoritesController::class,'destroy'])->name('
 Route::post('favorites/sub/{recipe}', [ProductionController::class, 'addSubFavorite']);
 Route::post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
 
+Route::get('/power',[PowerPlanController::class,'index'])->name('power.index');
+Route::get('/power/{output}',[PowerPlanController::class,'show'])->name('power.show');
 
 //Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
 //    return ProductionCalculator::calc($ingredient, $qty);

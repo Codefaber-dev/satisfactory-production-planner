@@ -63,7 +63,7 @@ class ProductionController extends Controller
 
         $belt_speed = request('belt_speed',780);
 
-        return Inertia::render('Production/ShowNew',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
+        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant="mk1")

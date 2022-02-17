@@ -1,5 +1,5 @@
 <template>
-    <img :src="url" :alt="alt" />
+    <img :src="url" :alt="alt" :height='height' :width='width' />
 </template>
 
 <script>
@@ -14,8 +14,8 @@ export default {
         alt: String,
         publicId: String,
         crop: String,
-        width: Number,
-        height: Number,
+        width: String,
+        height: String,
         quality: String,
     },
 

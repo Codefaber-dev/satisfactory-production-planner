@@ -34,6 +34,12 @@
                                     Production Planner
                                 </jet-nav-link>
                                 <jet-nav-link
+                                    :href="route('power.index')"
+                                    :active="route().current('power')"
+                                >
+                                    Power Planner
+                                </jet-nav-link>
+                                <jet-nav-link
                                     :href="route('factories')"
                                     :active="route().current('factories')"
                                 >
