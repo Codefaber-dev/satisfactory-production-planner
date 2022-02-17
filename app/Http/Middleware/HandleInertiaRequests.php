@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
+use Laravel\Jetstream\Jetstream;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -37,8 +39,14 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
+        $releaseNotesFile = Jetstream::localizedMarkdownPath('release-notes.md');
+        $releaseNotes = Str::markdown(file_get_contents($releaseNotesFile));
+        $version = config('app.version');
+
         return array_merge(parent::share($request), [
-            'user' => auth()->check() ? $request->user()->toArray() : new User()
+            'user' => auth()->check() ? $request->user()->toArray() : new User(),
+            'releaseNotes' => $releaseNotes,
+            'version' => $version
         ]);
     }
 }

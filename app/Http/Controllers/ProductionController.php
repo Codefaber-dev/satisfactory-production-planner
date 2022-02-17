@@ -19,18 +19,13 @@ class ProductionController extends Controller
 {
     protected function baseData()
     {
-        $releaseNotesFile = Jetstream::localizedMarkdownPath('release-notes.md');
-        $releaseNotes = Str::markdown(file_get_contents($releaseNotesFile));
-        $version = config('app.version');
-
-
         $products = Ingredient::processed()->orderBy('name')->get();
         $recipes = Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
         $favorites = Favorites::all();
         $factory = Factories::find(request('factory'));
 
 
-        return compact('products','recipes','favorites','factory','releaseNotes','version');
+        return compact('products','recipes','favorites','factory');
     }
 
     public function index()
