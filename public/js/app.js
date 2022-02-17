@@ -21472,7 +21472,7 @@ var cl = cloudinary_core__WEBPACK_IMPORTED_MODULE_0__.Cloudinary["new"]({
     crop: String,
     width: Number,
     height: Number,
-    quality: Number
+    quality: String
   },
   computed: {
     url: function url() {

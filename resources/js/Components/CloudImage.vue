@@ -16,7 +16,7 @@ export default {
         crop: String,
         width: Number,
         height: Number,
-        quality: Number,
+        quality: String,
     },
 
     computed: {
