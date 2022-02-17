@@ -7,6 +7,11 @@ By CodeFaber
 Greetings pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
+### v0.0.5
+
+- New Feature - [Power Planner](https://satisfactory.codefaber.dev/power) Enter your desired power output and get a detailed breakdown by generator type
+
+
 ### v0.0.4
 
 - Huge improvements to calculations. Rewrote calculation engine... twice.
