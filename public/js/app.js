@@ -21530,13 +21530,15 @@ var Markdown = __webpack_require__(/*! markdown-it */ "./node_modules/markdown-i
     notes: String
   },
   data: function data() {
+    var _this$recipe;
+
     return {
       editing: false,
       selectedRecipe: this.recipe,
       form: {
         name: this.name,
         "yield": +this["yield"],
-        recipe_id: this.recipe.id,
+        recipe_id: (_this$recipe = this.recipe) === null || _this$recipe === void 0 ? void 0 : _this$recipe.id,
         imports: this.imports,
         notes: this.notes
       }

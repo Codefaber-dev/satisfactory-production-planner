@@ -159,7 +159,7 @@ export default {
             form: {
                 name: this.name,
                 yield: +this.yield,
-                recipe_id: this.recipe.id,
+                recipe_id: this.recipe?.id,
                 imports: this.imports,
                 notes: this.notes,
             },
