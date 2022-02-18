@@ -12,14 +12,6 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-let guestToken = store.getItem(
-    'guest-token',
-    null
-) || document.querySelector('meta[name="guest-token"]').content;
-
-store.setItem('guest-token', guestToken);
-
-window.axios.defaults.headers.common['guest-token'] = guestToken;
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

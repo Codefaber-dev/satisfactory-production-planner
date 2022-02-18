@@ -7,6 +7,7 @@ use App\Models\ProductionLine;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use function guest_token;
 
 class GuestFactories implements FactoriesContract
 {
@@ -77,7 +78,7 @@ class GuestFactories implements FactoriesContract
 
     protected function getCacheTag() : string
     {
-        $guestToken = request()->header('guest-token');
+        $guestToken = guest_token();
 
         return "factories.{$guestToken}";
     }

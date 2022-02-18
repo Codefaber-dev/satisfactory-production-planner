@@ -8,6 +8,7 @@ use App\Models\Recipe;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use function guest_token;
 
 class GuestFavorites implements FavoritesContract
 {
@@ -51,14 +52,14 @@ class GuestFavorites implements FavoritesContract
 
     protected function getCacheKey(Ingredient $ingredient) : string
     {
-        $guestToken = request()->header('guest-token',session_id());
+        $guestToken = guest_token();
 
         return "favorites.{$guestToken}.ingredient.{$ingredient->id}";
     }
 
     public function getCacheTag() : string
     {
-        $guestToken = request()->header('guest-token',session_id());
+        $guestToken = guest_token();
 
         return "favorites.{$guestToken}";
     }
