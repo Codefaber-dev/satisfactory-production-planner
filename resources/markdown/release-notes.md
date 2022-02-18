@@ -1,16 +1,25 @@
 # Satisfactory Production Planner
 By CodeFaber
 
+### 🗣️ Discord
+Eager to share feedback or have suggestions for improvements?
+
 [Join The Discussion On Discord](https://discord.gg/dqGQECppCy)
 
-## Release Notes
-Greetings pioneers! Here are the latest changes to the Satisfactory Production Planner.
+### 👤 User Registration
+Your factories and favorites will persist across sessions if you [register](https://satisfactory.codefaber.dev), but it's entirely optional. 
+
+### ⚠️ Privacy
+I hate spam as much as the next guy. I will never send you spam or give your information out to anyone. 
+
+## 📔 Release Notes
+Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
 ### v0.0.6
 
 Fixed bugs
-- Fixed an issue with guest sessions not being uniquely identified - should resolve a lot of issues around incorrect default recipes.
+- Fixed an issue with guest sessions not being uniquely identified - should resolve a lot of issues around incorrect default recipes. 
 - Fixed missing Uranium Icon
 
 Planned features
