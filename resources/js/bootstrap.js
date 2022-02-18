@@ -14,8 +14,8 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 let guestToken = store.getItem(
     'guest-token',
-    document.querySelector('meta[name="guest-token"]').content
-);
+    null
+) || document.querySelector('meta[name="guest-token"]').content;
 
 store.setItem('guest-token', guestToken);
 

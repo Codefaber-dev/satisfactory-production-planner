@@ -5,8 +5,14 @@ use App\Helpers\RawIngredientCalculator;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
+
+function guest_token(): string
+{
+    return Session::getId();
+}
 
 function r($name, $force=false) {
     $key = is_string($name) ? $name : ($name->description ?? $name->product->name);

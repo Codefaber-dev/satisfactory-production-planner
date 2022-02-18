@@ -36,9 +36,9 @@ export default {
             if (this.height) {
                 opts.height = this.height;
             }
-            if (this.quality) {
-                opts.quality = this.quality;
-            }
+
+            opts.quality = this.quality || 80;
+
 
             return cl.url('satisfactory/' + publicId + '.png', opts);
         },

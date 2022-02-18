@@ -7,6 +7,19 @@ By CodeFaber
 Greetings pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
+### v0.0.6
+
+Fixed bugs
+- Fixed an issue with guest sessions not being uniquely identified - should resolve a lot of issues around incorrect default recipes.
+- Fixed missing Uranium Icon
+
+Planned features
+- Power Planner - Display required alt recipes and buildings for fuel types
+- Power Planner - Specify input and quantity and build plan automatically
+- Power Planner - Calculate net power including cost of producing fuel
+- Production Planner - Calculate multiple outputs
+
+
 ### v0.0.5
 
 - New Feature - [Power Planner](https://satisfactory.codefaber.dev/power) Enter your desired power output and get a detailed breakdown by generator type

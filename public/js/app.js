@@ -21491,10 +21491,7 @@ var cl = cloudinary_core__WEBPACK_IMPORTED_MODULE_0__.Cloudinary["new"]({
         opts.height = this.height;
       }
 
-      if (this.quality) {
-        opts.quality = this.quality;
-      }
-
+      opts.quality = this.quality || 80;
       return cl.url('satisfactory/' + publicId + '.png', opts);
     }
   }
@@ -29496,7 +29493,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "flex w-96 flex-col rounded-lg border border-gray-500 bg-white text-sm shadow-lg dark:border-sky-700 dark:bg-slate-900"
+  "class": "flex flex-col rounded-lg border border-gray-500 bg-white text-sm shadow-lg dark:border-sky-700 dark:bg-slate-900"
 };
 
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -31495,7 +31492,7 @@ window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-var guestToken = _store__WEBPACK_IMPORTED_MODULE_0__["default"].getItem('guest-token', document.querySelector('meta[name="guest-token"]').content);
+var guestToken = _store__WEBPACK_IMPORTED_MODULE_0__["default"].getItem('guest-token', null) || document.querySelector('meta[name="guest-token"]').content;
 _store__WEBPACK_IMPORTED_MODULE_0__["default"].setItem('guest-token', guestToken);
 window.axios.defaults.headers.common['guest-token'] = guestToken;
 /**
