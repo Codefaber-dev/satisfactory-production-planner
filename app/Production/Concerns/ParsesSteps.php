@@ -37,6 +37,7 @@ trait ParsesSteps
                 return $products->map(function($recipes, $product) {
                     $recipes = collect($recipes);
                     return [$product => (object) [
+                        "raw" => i($product)->isRaw(),
                         "imported" => $recipes->max('imported'),
                         "overridden" => $recipes->max('overridden'),
                         "total" => $recipes->sum('qty'),
@@ -89,6 +90,11 @@ trait ParsesSteps
 
     public function getRawMaterials()
     {
+        // confirm we have raw materials
+        if (! isset($this->results[1])) {
+            return collect();
+        }
+
         return $this->results[1]->map(function($val, $name) {
             return round($val->total,4);
         });
@@ -96,7 +102,12 @@ trait ParsesSteps
 
     public function getIntermediateMaterials()
     {
-        return $this->results->skip(1)->map(function($tier) {
+        // skip raw if needed
+        $intermediate = isset($this->results[1]) ?
+            $this->results->skip(1) :
+            $this->results;
+
+        return $intermediate->map(function($tier) {
             return $tier->map(function($val, $name) {
                 if($name !== $this->product->name) {
                     return round($val->total,4);

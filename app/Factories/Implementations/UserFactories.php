@@ -3,6 +3,7 @@
 namespace App\Factories\Implementations;
 
 use App\Factories\Contracts\FactoriesContract;
+use App\Models\Ingredient;
 use App\Models\ProductionLine;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -23,6 +24,8 @@ class UserFactories implements FactoriesContract
 
     public function create(array $attributes): ProductionLine
     {
+        $attributes['recipe_id'] ??= Ingredient::find($attributes['ingredient_id'])->baseRecipe()->id;
+
         return $this->user->factories()->create($attributes);
     }
 
@@ -40,6 +43,8 @@ class UserFactories implements FactoriesContract
         $line->yield = (isset($attributes['yield']) && !! $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
+
+        $line->recipe_id ??= Ingredient::find($line->ingredient_id)->baseRecipe()->id;
 
         $line->save();
 

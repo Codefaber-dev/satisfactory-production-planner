@@ -16,6 +16,13 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
+### v0.0.7
+
+Fixed Bugs
+- Fixed issues with saving factories and viewing saved factories. Error happened with guests and logged in users when saving factories using default recipe.
+- Fixed error when importing all intermediate products.
+
+
 ### v0.0.6
 
 Fixed bugs

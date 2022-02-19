@@ -3,6 +3,7 @@
 namespace App\Factories\Implementations;
 
 use App\Factories\Contracts\FactoriesContract;
+use App\Models\Ingredient;
 use App\Models\ProductionLine;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
@@ -17,12 +18,22 @@ class GuestFactories implements FactoriesContract
         return collect(Redis::hGetAll($this->getCacheTag()))
             ->values()
             ->map(function($json){
-                return json_decode($json,true);
+                $atts = json_decode($json,true);
+                $product = Ingredient::find($atts['ingredient_id']);
+                if (! isset($atts['recipe'])) {
+                    $atts['recipe'] = $product->baseRecipe();
+                }
+                if (! isset($atts['recipe_id'])) {
+                    $atts['recipe_id'] = $product->baseRecipe()->id;
+                }
+                return $atts;
             });
     }
 
     public function create(array $attributes): ProductionLine
     {
+        $attributes['recipe_id'] ??= Ingredient::find($attributes['ingredient_id'])->baseRecipe()->id;
+
         $line = new ProductionLine($attributes);
 
         $id = Str::random(16);
@@ -42,6 +53,8 @@ class GuestFactories implements FactoriesContract
         $line->yield = (isset($attributes['yield']) && !! $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
+
+        $line->recipe_id ??= Ingredient::find($line->ingredient_id)->baseRecipe()->id;
 
         $this->set($id, $line);
 
