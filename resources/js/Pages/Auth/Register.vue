@@ -1,5 +1,6 @@
 <template>
-    <jet-authentication-card>
+    <div :class='{ dark }'>
+        <jet-authentication-card>
         <template #logo>
             <jet-authentication-card-logo />
         </template>
@@ -40,7 +41,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <inertia-link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                <inertia-link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900 dark:text-gray-100 dark:hover:text-sky-300">
                     Already registered?
                 </inertia-link>
 
@@ -50,6 +51,7 @@
             </div>
         </form>
     </jet-authentication-card>
+    </div>
 </template>
 
 <script>
@@ -60,6 +62,7 @@
     import JetCheckbox from "@/Jetstream/Checkbox";
     import JetLabel from '@/Jetstream/Label'
     import JetValidationErrors from '@/Jetstream/ValidationErrors'
+    import store from '@/store';
 
     export default {
         components: {
@@ -80,7 +83,8 @@
                     password: '',
                     password_confirmation: '',
                     terms: false,
-                })
+                }),
+                dark: store.getItem('dark'),
             }
         },
 
