@@ -25,6 +25,8 @@
                 </div>
 
                 <factory v-for="factory in factories" v-bind="factory" />
+
+                <multi-factory v-for='factory in multiFactories' v-bind='factory'/>
             </div>
         </div>
     </app-layout>
@@ -33,6 +35,7 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout';
 import Factory from '@/Components/Factory';
+import MultiFactory from '@/Components/MultiFactory';
 
 export default {
     name: 'Index',
@@ -40,10 +43,12 @@ export default {
     components: {
         AppLayout,
         Factory,
+        MultiFactory
     },
 
     props: {
         factories: Array,
+        multiFactories: Array,
     },
 };
 </script>

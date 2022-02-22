@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use function guest_token;
+use function http_build_query;
 
 class GuestFactories implements FactoriesContract
 {
@@ -26,6 +27,13 @@ class GuestFactories implements FactoriesContract
                 if (! isset($atts['recipe_id'])) {
                     $atts['recipe_id'] = $product->baseRecipe()->id;
                 }
+                $description = $atts['recipe']->description ?? $product->name;
+                $params = http_build_query([
+                    "factory" => $atts["id"],
+                    "imports" => $atts["imports"],
+                    "choices" => $atts["choices"] ?? []
+                ]);
+                $atts['url'] = "/dashboard/{$product->name}/{$atts['yield']}/{$description}/?{$params}";
                 return $atts;
             });
     }

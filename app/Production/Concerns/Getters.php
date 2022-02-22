@@ -130,6 +130,8 @@ trait Getters
             case $ingredient->is($this->getProduct());
                 return $this->getRecipe();
 
+            // use a chosen recipe if there is one
+            case $recipe = $this->getChoice($ingredient) :
             // use an override if there is one
             case $recipe = $this->getOverride($ingredient) :
             // use a favorite recipe if there is one

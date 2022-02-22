@@ -19,7 +19,18 @@ class UserFactories implements FactoriesContract
 
     public function all(): Collection
     {
-        return $this->user->factories;
+        return $this->user->factories->map(function ($factory) {
+            $atts = $factory->toArray();
+            $description = $atts['recipe']->description ?? $factory->product->name;
+            $params = http_build_query([
+                "factory" => $atts["id"],
+                "imports" => $atts["imports"],
+                "choices" => $atts["choices"] ?? [],
+            ]);
+            $atts['url'] = "/dashboard/{$factory->product->name}/{$atts['yield']}/{$description}/?{$params}";
+
+            return $atts;
+        });
     }
 
     public function create(array $attributes): ProductionLine
@@ -37,12 +48,15 @@ class UserFactories implements FactoriesContract
             return new ProductionLine;
         }
 
-        $line->name = (isset($attributes['name']) && !! $attributes['name']) ? $attributes['name'] : $line->name;
-        $line->ingredient_id = (isset($attributes['ingredient_id']) && !! $attributes['ingredient_id']) ? $attributes['ingredient_id'] : $line->ingredient_id;
-        $line->recipe_id = (isset($attributes['recipe_id']) && !! $attributes['recipe_id']) ? $attributes['recipe_id'] : $line->recipe_id;
-        $line->yield = (isset($attributes['yield']) && !! $attributes['yield']) ? $attributes['yield'] : $line->yield;
+        $line->name = (isset($attributes['name']) && ! ! $attributes['name']) ? $attributes['name'] : $line->name;
+        $line->ingredient_id = (isset($attributes['ingredient_id']) && ! ! $attributes['ingredient_id']) ?
+            $attributes['ingredient_id'] : $line->ingredient_id;
+        $line->recipe_id = (isset($attributes['recipe_id']) && ! ! $attributes['recipe_id']) ?
+            $attributes['recipe_id'] : $line->recipe_id;
+        $line->yield = (isset($attributes['yield']) && ! ! $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
+        $line->choices = (isset($attributes['choices'])) ? $attributes['choices'] : $line->choices;
 
         $line->recipe_id ??= Ingredient::find($line->ingredient_id)->baseRecipe()->id;
 
@@ -60,6 +74,4 @@ class UserFactories implements FactoriesContract
     {
         optional($this->user->factories()->find($id))->delete();
     }
-
-
 }

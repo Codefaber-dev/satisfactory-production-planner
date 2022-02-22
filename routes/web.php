@@ -2,6 +2,7 @@
 
 use App\Helpers\ProductionCalculator;
 use App\Http\Controllers\FavoritesController;
+use App\Http\Controllers\MultiProductionLineController;
 use App\Http\Controllers\PowerPlanController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionLineController;
@@ -64,11 +65,17 @@ Route::redirect('/', 'dashboard');
 
 
 Route::get('/dashboard', [ProductionController::class,'index'])->name('dashboard');
+Route::get('/dashboard/multi', [ProductionController::class,'multi'])->name('dashboard.multi');
 Route::get('/dashboard/{ingredient}/{qty}/{recipe}/{variant}', [ProductionController::class,'show'])->name('dashboard.show');
 Route::get('/dashboard/{ingredient}/{qty}/{recipe}', [ProductionController::class,'show'])->name('dashboard.show');
 
+Route::get('/newyield/multi', [ProductionController::class,'newYieldMulti'])->name('dashboard.newYield.multi');
 Route::get('/newyield/{ingredient}/{qty}/{recipe}/{variant}', [ProductionController::class,'newYield'])->name('dashboard.newYield');
 Route::get('/newyield/{ingredient}/{qty}/{recipe}', [ProductionController::class,'newYield'])->name('dashboard.newYield');
+
+Route::post('/factories/multi',[MultiProductionLineController::class,'store']);
+Route::patch('/factories/multi/{id}', [MultiProductionLineController::class,'update']);
+Route::delete('/factories/multi/{id}', [MultiProductionLineController::class,'destroy']);
 
 Route::get('/factories', [ProductionLineController::class,'index'])->name('factories');
 Route::post('/factories', [ProductionLineController::class,'store']);

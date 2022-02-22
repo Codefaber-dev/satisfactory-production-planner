@@ -6,6 +6,13 @@
             class='rounded-t-lg bg-gray-900 p-4 text-center text-xl font-semibold text-white dark:bg-sky-700'
         >
             Production Steps
+            <button
+                @click="$emit('toggleDiagrams')"
+                class="btn btn-emerald"
+            >
+                {{ diagrams ? "✅" : "⬜" }}
+                Toggle Diagrams
+            </button>
         </div>
         <table>
             <tr>
@@ -37,9 +44,9 @@
 
                 <template v-for='(material,name) in level'>
                     <tbody
-                        v-for='{recipe,qty,ingredients,variant,overview,overridden} in material.production'
+                        v-for='{recipe,qty,ingredients,variant,overview,overridden,imported} in material.production'
                         v-show="
-                            (
+                            !imported && (
                                 !hideCompleted ||
                                 !productionChecks[name + '-' + (recipe?.description || 'base')] )
                         "
@@ -70,21 +77,29 @@
                                     <span class='font-light'>
                                         {{ qty }} per min
                                     </span>
-                                    <div v-if='name !== newProduct.name'
+                                    <div
                                          class='flex w-full flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg'
                                     >
                                         <span class='font-semibold'>
                                             Destination
                                         </span>
                                         <span v-for='(out_qty, mat) in material.outputs'>
-                                            <cloud-image class='mr-2 inline-flex'
-                                                         :public-id='mat'
-                                                         width='32' crop='scale'
-                                                         :alt='mat' />
-                                            <span class='text-xs'>
-                                                {{ mat }}
-                                                ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
-                                            </span>
+                                            <template v-if='mat !== "final"'>
+                                                <cloud-image class='mr-2 inline-flex'
+                                                             :public-id='mat'
+                                                             width='32' crop='scale'
+                                                             :alt='mat' />
+                                                <span class='text-xs'>
+                                                    {{ mat }} {{ +out_qty.toFixed(4) }} per min
+                                                    ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
+                                                </span>
+                                            </template>
+                                            <template v-else>
+                                                <div class='text-xs font-bold p-2 my-2 rounded bg-lime-300'>
+                                                    Output {{ out_qty }} per min
+                                                    ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
+                                                </div>
+                                            </template>
                                         </span>
                                     </div>
                                 </div>
@@ -120,29 +135,13 @@
                             </div>
                         </td>
                         <td class='p-2'>
-                            <template v-if='recipe'>
-                                <template v-if='recipes[name]'>
-                                    <!-- material is end product -->
-                                    <template v-if='name === newProduct.name'>
-                                        <div
-                                            class='flex flex-col'
-                                        >
-                                            <recipe-picker @select='selectNewRecipe'
-                                                           :recipes='recipes[newProduct.name]'
-                                                           :selected='newRecipe'
-                                            ></recipe-picker>
-                                        </div>
-                                    </template>
-
-                                    <!-- everything else -->
-                                    <template v-else>
-                                        <recipe-picker
-                                            @select='selectNewSubRecipe'
-                                            :recipes='recipes[name]'
-                                            :selected='recipes[name].filter(o => o.id === recipe.id)[0]'
-                                        ></recipe-picker>
-                                    </template>
-                                </template>
+                            <template v-if='recipe && recipes[name]'>
+                                    <recipe-picker
+                                        @select='setNewSubFavorite'
+                                        :recipes='recipes[name]'
+                                        :selected='recipes[name].filter(o => o.id === recipe.id)[0]'
+                                        :choices='choices'
+                                    ></recipe-picker>
                             </template>
                         </td>
 
@@ -191,6 +190,7 @@ export default {
         productionChecks: {},
         recipes: {},
         toggleProductionCheck: {},
+        choices: {}
     },
 
     methods: {
@@ -198,12 +198,8 @@ export default {
             alert('Your chosen recipe was overridden to avoid a circular dependency.');
         },
 
-        selectNewRecipe(recipe) {
-            this.$emit('SelectNewRecipe',recipe);
-        },
-
-        selectNewSubRecipe(recipe) {
-            this.$emit('SelectNewSubRecipe',recipe)
+        setNewSubFavorite({ recipe }) {
+            this.$emit('setNewSubFavorite',recipe)
         }
     },
 

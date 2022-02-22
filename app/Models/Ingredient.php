@@ -94,18 +94,18 @@ class Ingredient extends Model
      *
      * @return \App\Models\Recipe
      */
-    public function defaultRecipe()
+    public function defaultRecipe(): Recipe
     {
         return Favorites::get($this);
     }
 
     /**
-     * Get the default recipe
+     * Get the base recipe
      *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|null
      * @throws \ErrorException
      */
-    public function baseRecipe() : Recipe
+    public function baseRecipe(): Recipe
     {
         if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
             return $recipe;

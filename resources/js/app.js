@@ -21,4 +21,4 @@ createApp({
     .component('InertiaLink',InertiaLink)
     .mount(el);
 
-InertiaProgress.init({ color: '#4B5563' });
+InertiaProgress.init({ color: '#6ee7b7', showSpinner: true });

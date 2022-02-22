@@ -13,6 +13,10 @@ class ProductionLine extends Model
 
     protected $with = ['product.recipes.product','recipe.product'];
 
+    protected $casts = [
+        "choices" => "array"
+    ];
+
 
     public function product()
     {

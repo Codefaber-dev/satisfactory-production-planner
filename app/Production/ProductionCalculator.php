@@ -23,6 +23,8 @@ class ProductionCalculator
 
     protected ?Collection $favorites;
 
+    protected ?Collection $choices;
+
     protected $imports;
 
     protected $variant;
@@ -33,7 +35,7 @@ class ProductionCalculator
     protected $raw_available;
 
     public static function make(
-        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1"
+        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1", $choices = []
     ): static {
         $production = (new static)->setProduct($product)
             ->setQty($qty)
@@ -41,7 +43,8 @@ class ProductionCalculator
             ->setOverrides($overrides)
             ->setFavorites($favorites)
             ->setImports($imports)
-            ->setVariant($variant);
+            ->setVariant($variant)
+            ->setChoices($choices);
 
         $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
@@ -73,7 +76,7 @@ class ProductionCalculator
         }
 
         if (! $this->recipe) {
-            throw new Exception("No base recipe found for {$this->product->name}");
+            throw new \Exception("No base recipe found for {$this->product->name}");
         }
 
         return $this;
@@ -117,6 +120,7 @@ class ProductionCalculator
             qty: $this->qty,
             recipe: $this->recipe,
             globals: ProductionGlobals::make(
+                choices: $this->choices,
                 overrides: $this->overrides,
                 favorites: $this->favorites,
                 imports: $this->imports,
@@ -134,6 +138,11 @@ class ProductionCalculator
         return $this->results;
     }
 
+    public function getRawResults(): Collection
+    {
+        return $this->raw_results;
+    }
+
     public function getSlimResults()
     {
         return $this->slim_results->toArray();
@@ -142,6 +151,13 @@ class ProductionCalculator
     public function setFavorites(Collection|array|null $favorites): static
     {
         $this->favorites = $favorites;
+
+        return $this;
+    }
+
+    public function setChoices(Collection|array|null $choices): static
+    {
+        $this->choices = $choices;
 
         return $this;
     }

@@ -34,6 +34,11 @@ class Recipe extends Model
         'resource' => 'float'
     ];
 
+    public function isDefault(): bool
+    {
+        return $this->is($this->product->defaultRecipe());
+    }
+
     public function getTierAttribute()
     {
         return $this->alt_tier ?? $this->product->tier;

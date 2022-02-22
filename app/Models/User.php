@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->hasMany(ProductionLine::class);
     }
 
+    public function multiFactories()
+    {
+        return $this->hasMany(MultiProductionLine::class);
+    }
+
     public function addFavoriteByName($name)
     {
         if ( ! $recipe = Recipe::ofName($name) )

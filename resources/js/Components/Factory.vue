@@ -31,102 +31,111 @@
             </span>
         </div>
 
-        <div
-            class="relative flex flex-col items-start justify-center text-center text-2xl font-semibold"
-        >
-            <div
-                class="flex w-24 flex-col items-center justify-center divide-y divide-black rounded-l-xl bg-sky-300 p-4 dark:divide-white dark:bg-sky-900"
-            >
-                <div class="py-2">
-                    <span v-show="!editing">{{ (+yield).toFixed(0) }}</span>
-                    <input
-                        @keyup.enter="saveEdits"
-                        class="w-16 rounded px-2 py-1 shadow dark:bg-sky-600"
-                        v-show="editing"
-                        v-model="form.yield"
-                        type="text"
-                    />
-                </div>
-                <div class="py-2">min</div>
+        <div class='absolute flex' style='top: -48px; right: 2rem'>
+            <div v-show="!editing" class="mx-4 flex space-x-2">
+                <inertia-link
+                    as="button"
+                    :href="url"
+                    class="btn btn-emerald"
+                >
+                    Plan
+                </inertia-link>
+                <button @click="toggleEditing" class="btn btn-orange">
+                    Edit
+                </button>
+                <button @click="deletePrompt" class="btn btn-rose">
+                    Delete
+                </button>
+            </div>
+
+            <div v-show="editing" class="mx-4 flex space-x-2">
+                <button @click="saveEdits" class="btn btn-emerald">
+                    Save
+                </button>
+                <button @click="cancelEditing" class="btn btn-rose">
+                    Cancel
+                </button>
             </div>
         </div>
-        <div
-            class="relative flex w-full items-center rounded-r-xl border-4 border-sky-300 bg-white shadow dark:border-sky-900 dark:bg-slate-900"
-        >
-            <div class="mx-8 flex flex-1 items-center space-x-4 py-2">
-                <cloud-image
-                    :public-id="product.name"
-                    crop="scale"
-                    quality="100"
-                    width="64"
-                    alt="logo"
-                />
 
-                <div class="flex flex-1 flex-col">
-                    <div v-show="!editing" class="flex text-2xl font-bold">
-                        {{ product.name }}
-                    </div>
-                    <span v-show="!editing" class="italic">{{
-                        recipe.description || 'default'
-                    }}</span>
+        <div class='flex flex-col w-full'>
+            <div class='flex w-full'>
+                <div
+                    class="relative flex flex-col items-start justify-center text-center text-2xl font-semibold"
+                >
                     <div
-                        v-html="renderedNotes"
-                        v-if="!!notes && !editing"
-                        class="prose m-4 rounded-lg border bg-gray-100 p-4 font-mono dark:prose-invert dark:border-slate-800 dark:bg-slate-900"
-                    ></div>
-                    <textarea
-                        v-show="editing"
-                        v-model="form.notes"
-                        placeholder="Notes"
-                        rows="4"
-                        class="my-2 w-full rounded-lg border p-2 font-mono shadow dark:border-slate-700 dark:bg-slate-800"
+                        class="flex w-24 flex-col items-center justify-center divide-y divide-black rounded-l-xl bg-sky-300 p-4 dark:divide-white dark:bg-sky-900"
                     >
-                    </textarea>
-                    <p v-if="!!imports && !editing">
-                        Imports
+                        <div class="py-2">
+                            <span v-show="!editing">{{ (+yield).toFixed(0) }}</span>
+                            <input
+                                @keyup.enter="saveEdits"
+                                class="w-16 rounded px-2 py-1 shadow dark:bg-sky-600"
+                                v-show="editing"
+                                v-model="form.yield"
+                                type="text"
+                            />
+                        </div>
+                        <div class="py-2">min</div>
+                    </div>
+                </div>
+                <div
+                    class="relative flex w-full items-center rounded-r-xl border-4 border-sky-300 bg-white shadow dark:border-sky-900 dark:bg-slate-900"
+                >
+                    <div class="mx-8 flex flex-1 items-center space-x-4 py-2">
                         <cloud-image
-                            v-for="name in imports.split(',')"
-                            :public-id="name"
+                            :public-id="product.name"
                             crop="scale"
                             quality="100"
-                            width="24"
-                            class="inline-flex px-2"
+                            width="64"
                             alt="logo"
                         />
-                    </p>
-                    <recipe-picker
-                        v-show="editing"
-                        @select="updateRecipe"
-                        :recipes="product.recipes"
-                        :selected="selectedRecipe"
-                    ></recipe-picker>
-                </div>
 
-                <div v-show="!editing" class="mx-4 flex space-x-2">
-                    <inertia-link
-                        as="button"
-                        :href="planUrl"
-                        class="btn btn-emerald"
-                        >Plan</inertia-link
-                    >
-                    <button @click="toggleEditing" class="btn btn-orange">
-                        Edit
-                    </button>
-                    <button @click="deletePrompt" class="btn btn-rose">
-                        Delete
-                    </button>
-                </div>
+                        <div class="flex flex-1 flex-col">
+                            <div v-show="!editing" class="flex text-2xl font-bold">
+                                {{ product.name }}
+                            </div>
+                            <span v-show="!editing" class="italic">{{
+                                recipe.description || 'default'
+                            }}</span>
+                            <div
+                                v-html="renderedNotes"
+                                v-if="!!notes && !editing"
+                                class="prose m-4 rounded-lg border bg-gray-100 p-4 font-mono dark:prose-invert dark:border-slate-800 dark:bg-slate-900"
+                            ></div>
+                            <textarea
+                                v-show="editing"
+                                v-model="form.notes"
+                                placeholder="Notes"
+                                rows="4"
+                                class="my-2 w-full rounded-lg border p-2 font-mono shadow dark:border-slate-700 dark:bg-slate-800"
+                            >
+                            </textarea>
+                            <recipe-picker
+                                v-show="editing"
+                                @select="updateRecipe"
+                                :recipes="product.recipes"
+                                :selected="selectedRecipe"
+                            ></recipe-picker>
+                        </div>
 
-                <div v-show="editing" class="mx-4 flex space-x-2">
-                    <button @click="saveEdits" class="btn btn-emerald">
-                        Save
-                    </button>
-                    <button @click="cancelEditing" class="btn btn-rose">
-                        Cancel
-                    </button>
+                    </div>
                 </div>
             </div>
+            <p class='ml-4 py-2' v-if="!!imports && !editing">
+                Imports
+                <cloud-image
+                    v-for="name in imports.split(',')"
+                    :public-id="name"
+                    crop="scale"
+                    quality="100"
+                    width="36"
+                    class="inline-flex px-2"
+                    alt="logo"
+                />
+            </p>
         </div>
+
     </div>
 </template>
 
@@ -150,6 +159,8 @@ export default {
         yield: Number,
         imports: String,
         notes: String,
+        choices: Object,
+        url: String
     },
 
     data() {
@@ -206,13 +217,6 @@ export default {
     },
 
     computed: {
-        planUrl() {
-            return `/dashboard/${this.product.name}/${(+this.yield).toFixed(
-                2
-            )}/${this.recipe.description || this.product.name}?factory=${
-                this.id
-            }&imports=${this.imports || ''}`;
-        },
         renderedNotes() {
             return Markdown.render(this.form.notes);
         },

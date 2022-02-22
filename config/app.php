@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
-    'version' => '0.7',
+    'version' => '0.8',
 
     /*
     |--------------------------------------------------------------------------
@@ -181,6 +181,7 @@ return [
 
         App\Favorites\Providers\FavoritesProvider::class,
         App\Factories\Providers\FactoriesProvider::class,
+        App\MultiFactories\Providers\MultiFactoriesProvider::class,
 
     ],
 
@@ -239,6 +240,7 @@ return [
 
         'Favorites' => App\Favorites\Facades\Favorites::class,
         'Factories' => App\Factories\Facades\Factories::class,
+        'MultiFactories' => App\MultiFactories\Facades\MultiFactories::class,
     ],
 
 ];

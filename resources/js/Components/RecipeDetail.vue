@@ -22,7 +22,10 @@
         <div class="flex flex-col">
             <!-- recipe name -->
             <div class="flex text-lg font-semibold">
-                <span class="whitespace-nowrap">{{ description }}</span>
+                <span class="whitespace-nowrap">
+                    <span v-if="recipe.favorite && !slim">⭐</span>
+                    {{ description }}
+                </span>
                 <div
                     :class="slim ? ['p-1'] : ['px-4', 'py-2']"
                     v-if="recipe.alt_recipe"

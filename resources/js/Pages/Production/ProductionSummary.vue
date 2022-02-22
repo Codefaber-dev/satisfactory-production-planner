@@ -65,7 +65,7 @@
                             Help
                         </button>
                         <button
-                            @click='fetchNewYield'
+                            @click='$emit("fetchNewYield")'
                             :disabled='rawUnchanged'
                             class='btn btn-emerald mb-4'
                         >
@@ -76,9 +76,7 @@
             </template>
 
             <template
-                v-if='
-                                        Object.keys(production.intermediate_materials).length
-                                    '
+                v-if='Object.keys(production.intermediate_materials).length'
             >
                 <tr class='bg-sky-300 dark:bg-sky-800'>
                     <th
@@ -155,7 +153,7 @@
                             Help
                         </button>
                         <button
-                            @click='fetch'
+                            @click='$emit("fetch")'
                             class='btn btn-emerald'
                         >
                             Recalculate
@@ -176,17 +174,17 @@
                     Power Summary
                 </th>
             </tr>
-            <tr>
-                <td
-                    colspan='2'
-                    class='whitespace-nowrap p-2'
-                >
-                    Energy Per Product (MJ)
-                </td>
-                <td class='p-2 text-right'>
-                    {{ Math.round(60 * production__total_power / newYield) }}
-                </td>
-            </tr>
+<!--            <tr>-->
+<!--                <td-->
+<!--                    colspan='2'-->
+<!--                    class='whitespace-nowrap p-2'-->
+<!--                >-->
+<!--                    Energy Per Product (MJ)-->
+<!--                </td>-->
+<!--                <td class='p-2 text-right'>-->
+<!--                    {{ //Math.round(60 * production__total_power / newYield) }}-->
+<!--                </td>-->
+<!--            </tr>-->
             <tr>
                 <td colspan='2' class='p-2'>
                     Total Power Used (MW)

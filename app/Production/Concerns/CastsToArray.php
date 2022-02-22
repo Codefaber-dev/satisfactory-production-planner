@@ -26,7 +26,8 @@ trait CastsToArray
             'overridden' => $this->isOverride($this->getName()),
             'overview' => optional($this->getOverview())->toArray() ?? [],
             'power_usage' => $this->getPowerUsage(),
-            'variant' => $this->getVariant()
+            'variant' => $this->getVariant(),
+            'belt_speed' => $this->getBeltSpeed(),
         ];
     }
 }

@@ -10,14 +10,16 @@ use Illuminate\Support\Collection;
 
 class ProductionGlobals
 {
+    protected Collection $choices;
     protected Collection $overrides;
     protected Collection $favorites;
     protected Collection $imports;
     protected string $variant;
     protected int $belt_speed;
 
-    public function __construct(Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant)
+    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant)
     {
+        $this->choices = collect($choices);
         $this->overrides = collect($overrides);
         $this->favorites = ! is_null($favorites) ?
             collect($favorites) :
@@ -27,14 +29,15 @@ class ProductionGlobals
         $this->belt_speed = request('belt_speed',780);
     }
 
-    public static function make(Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant): static
+    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant): static
     {
-        return new static($overrides, $favorites, $imports, $variant);
+        return new static($choices, $overrides, $favorites, $imports, $variant);
     }
 
     public static function fromArray(array $globals): static
     {
         return static::make(
+            choices: $globals['choices'] ?? [],
             overrides: $globals['overrides'] ?? [],
             favorites: $globals['favorites'] ?? null,
             imports: $globals['imports'] ?? [],
@@ -65,6 +68,16 @@ class ProductionGlobals
     public function isOverride(string $ingredient): bool
     {
         return isset($this->overrides[$ingredient]);
+    }
+
+    public function getChoices(): ?Collection
+    {
+        return $this->choices;
+    }
+
+    public function getChoice(Ingredient $ingredient): ?Recipe
+    {
+        return $this->choices->get($ingredient->name);
     }
 
     public function getFavorites(): ?Collection

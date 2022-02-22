@@ -4,9 +4,11 @@
         class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2
         shadow transition-all hover:border-blue-300 dark:border-slate-800 dark:shadow-slate-800 dark:hover:border-sky-800 dark:hover:shadow-sky-800"
     >
-        <!-- favorite indicator -->
+        <!-- favorite/choice indicator -->
         <div class="pr-4">
             <span v-if="selected.favorite">⭐</span>
+            <span v-else-if="selectedChosen">⏺️</span>
+            <span v-else>⬜</span>
         </div>
         <!-- selected recipe -->
         <recipe-detail :slim="true" :recipe="selected"></recipe-detail>
@@ -24,6 +26,11 @@
             style="top: 100%"
             class="w-100 absolute z-50 flex flex-col border border-sky-300 bg-white shadow-lg dark:bg-slate-900"
         >
+            <div class='p-4 border-b'>
+                <button @click='select({recipe:defaultRecipe})' class='btn btn-emerald'>
+                    Use Default
+                </button>
+            </div>
             <recipe-detail
                 @select="select"
                 class="rounded border-b border-gray-300 p-4 hover:bg-sky-100 dark:hover:bg-sky-900"
@@ -71,6 +78,12 @@ export default {
                 };
             },
         },
+        choices: {
+            type: Object,
+            default() {
+                return {};
+            }
+        }
     },
 
     data() {
@@ -91,6 +104,20 @@ export default {
                 capture: false,
             },
         };
+    },
+
+    computed: {
+        selectedChosen() {
+            return Object.values(this.choices).some(o => (o === this.selected.description || o === this.selected.product.name));
+        },
+
+        defaultRecipe() {
+            if (this.recipes.some(o => o.favorite)) {
+                return this.recipes.find(o => o.favorite);
+            }
+
+            return this.recipes.filter(o => !o.description)[0];
+        }
     },
 
     methods: {

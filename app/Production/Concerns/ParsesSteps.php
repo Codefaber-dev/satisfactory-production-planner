@@ -32,45 +32,7 @@ trait ParsesSteps
 
         $this->parse($this->steps);
 
-        $this->results = $this->raw_results->sortBy(['tier', 'name'])->groupBy(['tier', 'name'])
-            ->map(function($products, $tier){
-                return $products->map(function($recipes, $product) {
-                    $recipes = collect($recipes);
-                    return [$product => (object) [
-                        "raw" => i($product)->isRaw(),
-                        "imported" => $recipes->max('imported'),
-                        "overridden" => $recipes->max('overridden'),
-                        "total" => $recipes->sum('qty'),
-                        "outputs" => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
-                        "production" => $recipes
-                            ->groupBy(fn($row) => $row['name'].".".$row['description'])
-                            ->map(function($group) {
-                                $qty = round($group->sum('qty'),4);
-                                $recipe = $group->dataGet("0.recipe");
-                                $overview = $recipe ? BuildingOverview::make($recipe, $qty, $this->getSteps()->getBeltSpeed(), $this->variant) : null;
-
-                                $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
-
-                                return [
-                                    "byproducts" => $group->crossSumByKey("byproducts"),
-                                    "description" => $group->dataGet("0.description"),
-                                    "imported" => $group->dataGet("0.imported"),
-                                    "ingredients" => $group->crossSumByKey("ingredients"),
-                                    "name" => $group->dataGet("0.name"),
-                                    "outputs" => $group->pluck("outputs"),
-                                    "overridden" => $group->dataGet("0.overridden"),
-                                    "overrides" => $group->dataGet("0.overrides"),
-                                    "qty" => $qty,
-                                    "recipe" => $recipe,
-                                    "overview" => $overview ? $overview->toArray() : null,
-                                    "power_usage" => $power_usage,
-                                    "tier" => $group->dataGet("0.tier"),
-                                    "variant" => $group->dataGet("0.variant"),
-                                ];
-                            })->values(),
-                    ]];
-                })->collapse();
-            });
+        $this->results = static::groupAndSortResults($this->raw_results);
 
         //$this->slim_results = $this->raw_results->sortBy(['tier', 'name'])->groupBy(['tier', 'name'])
         //    ->map(function($products, $tier){
@@ -127,5 +89,50 @@ trait ParsesSteps
                 return null;
             })->filter();
         })->collapse();
+    }
+
+    public static function groupAndSortResults(Collection $results): Collection
+    {
+        return $results->sortBy(['tier', 'name'])->groupBy(['tier', 'name'])
+            ->map(function($products, $tier){
+                return $products->map(function($recipes, $product) {
+                    $recipes = collect($recipes);
+                    return [$product => (object) [
+                        "raw" => i($product)->isRaw(),
+                        "imported" => $recipes->max('imported'),
+                        "overridden" => $recipes->max('overridden'),
+                        "total" => $recipes->sum('qty'),
+                        "outputs" => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
+                        "production" => $recipes
+                            ->groupBy(fn($row) => $row['name'].".".$row['description'])
+                            ->map(function($group) {
+                                $qty = round($group->sum('qty'),4);
+                                $recipe = $group->dataGet("0.recipe");
+                                $variant = $group->dataGet("0.variant");
+                                $belt_speed = $group->dataGet("0.belt_speed");
+                                $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant) : null;
+
+                                $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
+
+                                return [
+                                    "byproducts" => $group->crossSumByKey("byproducts"),
+                                    "description" => $group->dataGet("0.description"),
+                                    "imported" => $group->dataGet("0.imported"),
+                                    "ingredients" => $group->crossSumByKey("ingredients"),
+                                    "name" => $group->dataGet("0.name"),
+                                    "outputs" => $group->pluck("outputs"),
+                                    "overridden" => $group->dataGet("0.overridden"),
+                                    "overrides" => $group->dataGet("0.overrides"),
+                                    "qty" => $qty,
+                                    "recipe" => $recipe,
+                                    "overview" => $overview ? $overview->toArray() : null,
+                                    "power_usage" => $power_usage,
+                                    "tier" => $group->dataGet("0.tier"),
+                                    "variant" => $group->dataGet("0.variant"),
+                                ];
+                            })->values(),
+                    ]];
+                })->collapse();
+            });
     }
 }
