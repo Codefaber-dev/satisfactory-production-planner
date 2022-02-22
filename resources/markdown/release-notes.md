@@ -9,8 +9,13 @@ Eager to share feedback or have suggestions for improvements?
 ### 👤 User Registration
 Your factories and favorites will persist across sessions if you [register](https://satisfactory.codefaber.dev), but it's entirely optional. 
 
-### ⚠️ Privacy
-I hate spam as much as the next guy. I will never send you spam or give your information out to anyone. 
+### 🔏️ Privacy
+I hate spam as much as the next guy. I will never send you spam or give your information out to anyone.
+
+### 💲 Support
+Servers don't grow on trees. If you feel like chipping in that would be toit, but no pressure. 
+
+[Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y)
 
 ## 📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
