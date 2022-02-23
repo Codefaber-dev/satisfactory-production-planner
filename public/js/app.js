@@ -23896,7 +23896,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   computed: {
     allChosenRecipes: function allChosenRecipes() {
-      return Object.assign({}, this.newChoices, Object.fromEntries(this.form.outputs.map(function (o) {
+      return Object.assign({}, this.newChoices, Object.fromEntries(this.form.outputs.filter(function (o) {
+        return o.product && o.recipe;
+      }).map(function (o) {
         return [o.product.name, o.recipe.description || o.product.name];
       })));
     },

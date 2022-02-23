@@ -222,7 +222,7 @@ export default {
 
     computed: {
         allChosenRecipes() {
-            return Object.assign({}, this.newChoices, Object.fromEntries(this.form.outputs.map(o => [o.product.name,(o.recipe.description || o.product.name) ])));
+            return Object.assign({}, this.newChoices, Object.fromEntries(this.form.outputs.filter(o => o.product && o.recipe).map(o => [o.product.name,(o.recipe.description || o.product.name) ])));
         },
 
         production__building_details() {
