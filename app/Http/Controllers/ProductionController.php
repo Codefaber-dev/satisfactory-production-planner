@@ -153,7 +153,7 @@ class ProductionController extends Controller
                 recipe: $recipe,
                 imports: request()->has('imports') ? explode(",",request("imports")) : [],
                 variant: $variant,
-                choices: collect($choices)->map(fn($name) => r($name))
+                choices: collect($choices)->map(fn($name) => r($name))->merge($recipes->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse())
             );
             $m->add($calc);
         }
@@ -161,7 +161,7 @@ class ProductionController extends Controller
         $ratio = $m->ratioOfAvailableRawMaterials();
 
         foreach($yields as $key => $value) {
-            $yields[$key] = floor(1000 * $value * $ratio) / 1000;
+            $yields[$key] = floor(10000 * $value * $ratio) / 10000;
         }
 
         $belt_speed = request('belt_speed',780);

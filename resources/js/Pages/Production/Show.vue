@@ -308,9 +308,9 @@ export default {
             }
 
             if (this.form.outputs.length > 1) {
-                params.product = this.form.outputs.map(o => o.product.name);
-                params.yield = this.form.outputs.map(o => o.yield);
-                params.recipe = this.form.outputs.map(o => o.recipe.description || o.product.name);
+                params.product = this.form.outputs.filter(o => o.product && o.recipe).map(o => o.product.name);
+                params.yield = this.form.outputs.filter(o => o.product && o.recipe).map(o => o.yield);
+                params.recipe = this.form.outputs.filter(o => o.product && o.recipe).map(o => o.recipe.description || o.product.name);
                 delete(params.factory);
                 params.multiFactory = this.newFactory ? this.newFactory.id : '';
             }

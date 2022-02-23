@@ -23982,13 +23982,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
 
       if (this.form.outputs.length > 1) {
-        params.product = this.form.outputs.map(function (o) {
+        params.product = this.form.outputs.filter(function (o) {
+          return o.product && o.recipe;
+        }).map(function (o) {
           return o.product.name;
         });
-        params["yield"] = this.form.outputs.map(function (o) {
+        params["yield"] = this.form.outputs.filter(function (o) {
+          return o.product && o.recipe;
+        }).map(function (o) {
           return o["yield"];
         });
-        params.recipe = this.form.outputs.map(function (o) {
+        params.recipe = this.form.outputs.filter(function (o) {
+          return o.product && o.recipe;
+        }).map(function (o) {
           return o.recipe.description || o.product.name;
         });
         delete params.factory;
