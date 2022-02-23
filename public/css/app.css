@@ -1694,6 +1694,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.dark .dark\:border-sky-700{
   --tw-border-opacity: 1;
   border-color: rgb(3 105 161 / var(--tw-border-opacity));
+}.dark .dark\:border-sky-300{
+  --tw-border-opacity: 1;
+  border-color: rgb(125 211 252 / var(--tw-border-opacity));
 }.dark .dark\:bg-slate-900{
   --tw-bg-opacity: 1;
   background-color: rgb(15 23 42 / var(--tw-bg-opacity));
@@ -1751,6 +1754,12 @@ Ensure the default browser behavior of the `hidden` attribute.
 }.dark .dark\:text-gray-800{
   --tw-text-opacity: 1;
   color: rgb(31 41 55 / var(--tw-text-opacity));
+}.dark .dark\:text-sky-300{
+  --tw-text-opacity: 1;
+  color: rgb(125 211 252 / var(--tw-text-opacity));
+}.dark .dark\:text-sky-400{
+  --tw-text-opacity: 1;
+  color: rgb(56 189 248 / var(--tw-text-opacity));
 }.dark .dark\:shadow-slate-800{
   --tw-shadow-color: #1e293b;
   --tw-shadow: var(--tw-shadow-colored);

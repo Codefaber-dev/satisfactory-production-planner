@@ -25538,7 +25538,7 @@ var _hoisted_2 = {
   "class": "mt-5 md:mt-0 md:col-span-2"
 };
 var _hoisted_3 = {
-  "class": "px-4 py-5 sm:p-6 bg-white shadow sm:rounded-lg"
+  "class": "px-4 py-5 sm:p-6 bg-white dark:bg-slate-700 shadow sm:rounded-lg"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_jet_section_title = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("jet-section-title");
@@ -26226,7 +26226,7 @@ var _hoisted_3 = {
 };
 var _hoisted_4 = {
   key: 0,
-  "class": "flex items-center justify-end px-4 py-3 bg-gray-50 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md"
+  "class": "flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-slate-900 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_jet_section_title = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("jet-section-title");
@@ -26246,7 +26246,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return _ctx.$emit('submitted');
     }, ["prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["px-4 py-5 bg-white sm:p-6 shadow", $options.hasActions ? 'sm:rounded-tl-md sm:rounded-tr-md' : 'sm:rounded-md'])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["px-4 py-5 bg-white dark:bg-slate-700 sm:p-6 shadow", $options.hasActions ? 'sm:rounded-tl-md sm:rounded-tr-md' : 'sm:rounded-md'])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "form")])], 2
   /* CLASS */
   ), $options.hasActions ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "actions")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 32
@@ -26543,7 +26543,7 @@ var _hoisted_1 = {
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "py-8"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "border-t border-gray-200"
+  "class": "border-t border-gray-200 dark:border-sky-300"
 })], -1
 /* HOISTED */
 );
@@ -26575,10 +26575,10 @@ var _hoisted_2 = {
   "class": "px-4 sm:px-0"
 };
 var _hoisted_3 = {
-  "class": "text-lg font-medium text-gray-900"
+  "class": "text-lg font-medium text-gray-900 dark:text-sky-300"
 };
 var _hoisted_4 = {
-  "class": "mt-1 text-sm text-gray-600"
+  "class": "mt-1 text-sm text-gray-600 dark:text-gray-100"
 };
 var _hoisted_5 = {
   "class": "px-4 sm:px-0"
@@ -30860,7 +30860,7 @@ var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNod
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Permanently delete your account. ");
 
 var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "max-w-xl text-sm text-gray-600"
+  "class": "max-w-xl text-sm text-gray-600 dark:text-gray-100"
 }, " Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain. ", -1
 /* HOISTED */
 );
@@ -31005,7 +31005,7 @@ var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNod
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Manage and log out your active sessions on other browsers and devices. ");
 
 var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "max-w-xl text-sm text-gray-600"
+  "class": "max-w-xl text-sm text-gray-600 dark:text-gray-100"
 }, " If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password. ", -1
 /* HOISTED */
 );
@@ -31022,7 +31022,7 @@ var _hoisted_5 = {
   "stroke-width": "2",
   viewBox: "0 0 24 24",
   stroke: "currentColor",
-  "class": "w-8 h-8 text-gray-500"
+  "class": "w-8 h-8 text-gray-500 dark:text-gray-100"
 };
 
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
@@ -31072,10 +31072,10 @@ var _hoisted_13 = {
   "class": "ml-3"
 };
 var _hoisted_14 = {
-  "class": "text-sm text-gray-600"
+  "class": "text-sm text-gray-600 dark:text-gray-100"
 };
 var _hoisted_15 = {
-  "class": "text-xs text-gray-500"
+  "class": "text-xs text-gray-500 dark:text-gray-100"
 };
 var _hoisted_16 = {
   key: 0,
@@ -31249,7 +31249,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
-  "class": "font-semibold text-xl text-gray-800 leading-tight"
+  "class": "font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight"
 }, " Profile ", -1
 /* HOISTED */
 );
@@ -31337,15 +31337,15 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNod
 
 var _hoisted_3 = {
   key: 0,
-  "class": "text-lg font-medium text-gray-900"
+  "class": "text-lg font-medium text-gray-900 dark:text-sky-400"
 };
 var _hoisted_4 = {
   key: 1,
-  "class": "text-lg font-medium text-gray-900"
+  "class": "text-lg font-medium text-gray-900 dark:text-sky-400"
 };
 
 var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "mt-3 max-w-xl text-sm text-gray-600"
+  "class": "mt-3 max-w-xl text-sm text-gray-600 dark:text-gray-100"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, " When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application. ")], -1
 /* HOISTED */
 );
@@ -31358,7 +31358,7 @@ var _hoisted_7 = {
 };
 
 var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "mt-4 max-w-xl text-sm text-gray-600"
+  "class": "mt-4 max-w-xl text-sm text-gray-600 dark:text-gray-100"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "font-semibold"
 }, " Two factor authentication is now enabled. Scan the following QR code using your phone's authenticator application. ")], -1
@@ -31371,7 +31371,7 @@ var _hoisted_10 = {
 };
 
 var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "mt-4 max-w-xl text-sm text-gray-600"
+  "class": "mt-4 max-w-xl text-sm text-gray-600 dark:text-gray-100"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "font-semibold"
 }, " Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost. ")], -1
