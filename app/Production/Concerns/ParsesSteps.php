@@ -79,6 +79,11 @@ trait ParsesSteps
         })->collapse();
     }
 
+    public function getByproducts()
+    {
+        return $this->raw_results->pluck('byproducts')->filter()->sumByKey();
+    }
+
     public function getAllMaterials()
     {
         return $this->results->map(function($tier) {

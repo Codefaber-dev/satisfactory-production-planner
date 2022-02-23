@@ -85,6 +85,11 @@ class Multiplexer
         return $this->calcs->map(fn($calc) => $calc->getSteps()->getOverrides()->filter())->collapse();
     }
 
+    public function getByproducts()
+    {
+        return $this->calcs->map(fn($calc) => $calc->getByproducts())->sumByKey();
+    }
+
     public function ratioOfAvailableRawMaterials(): float
     {
         $raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];

@@ -56,6 +56,7 @@ class ProductionController extends Controller
             'final' => $calc->getSteps()->toArray(),
             'recipe' => $calc->getSteps()->getRecipe(),
             'overrides' => $calc->getSteps()->getOverrides(),
+            'byproducts' => $calc->getByproducts(),
         ];
 
         $imports = request('imports');
@@ -99,6 +100,7 @@ class ProductionController extends Controller
             'final' => $m->getFinals(),
             'recipe' => $m->getRecipes(),
             'overrides' => $m->getOverrides(),
+            'byproducts' => $m->getByproducts()
         ];
 
         $imports = request('imports');

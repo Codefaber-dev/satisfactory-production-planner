@@ -83,30 +83,32 @@
                                         <span class='font-semibold'>
                                             Destination
                                         </span>
-                                        <span v-for='(out_qty, mat) in material.outputs'>
-                                            <template v-if='mat !== "final"'>
+                                        <div class='flex flex-col' v-for='(out_qty, mat) in material.outputs'>
+                                            <div class='flex' v-if='mat !== "final"'>
                                                 <cloud-image class='mr-2 inline-flex'
                                                              :public-id='mat'
                                                              width='32' crop='scale'
                                                              :alt='mat' />
                                                 <span class='text-xs'>
-                                                    {{ mat }} {{ +out_qty.toFixed(4) }} per min
+                                                    {{ mat }}
+                                                    <br>
+                                                    {{ +out_qty.toFixed(4) }} per min
                                                     ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
                                                 </span>
-                                            </template>
+                                            </div>
                                             <template v-else>
                                                 <div class='text-xs font-bold p-2 my-2 rounded bg-lime-300'>
                                                     Output {{ out_qty }} per min
                                                     ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
                                                 </div>
                                             </template>
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </td>
                         <td nowrap class='p-2'>
-                            <div v-if='recipe && Object.keys(ingredients).length'
+                            <div v-if='recipe  && Object.keys(ingredients).length'
                                  class='rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg dark:text-slate-800'>
                                 <div
                                     class='my-2 flex items-center'

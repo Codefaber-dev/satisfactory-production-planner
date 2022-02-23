@@ -75,6 +75,7 @@
                 </tr>
             </template>
 
+
             <template
                 v-if='Object.keys(production.intermediate_materials).length'
             >
@@ -158,6 +159,43 @@
                         >
                             Recalculate
                         </button>
+                    </td>
+                </tr>
+            </template>
+
+            <template
+                v-if='Object.keys(production.byproducts).length'
+            >
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr class='bg-sky-300 dark:bg-sky-800'>
+                    <th
+                        class='text-lg font-semibold'
+                        colspan='3'
+                    >
+                        Byproducts
+                    </th>
+                </tr>
+                <tr
+                    v-for='(qty,name) in production.byproducts'
+                >
+                    <td colspan='2' class='p-2'>
+                        <div class='flex'>
+                            <cloud-image
+                                class='mr-2 inline-flex'
+                                :public-id='`${name}.png`'
+                                crop='scale'
+                                quality='100'
+                                width='32'
+                                :alt='name'
+                            />
+                            <div>
+                                <span>{{ name }}</span>
+                                <br />
+                                <span class='italic'>{{ +qty.toFixed(4) }} per min</span>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             </template>
