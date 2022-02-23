@@ -343,7 +343,10 @@ export default {
 
             if (!raw.length) return false;
 
-            this.$inertia.get(`/newyield/${this.endpoint}&raw=${raw.join(',')}`);
+            this.$inertia.get(`/newyield/${this.endpoint}`,{
+                ...this.params,
+                raw: raw.join(',')
+            });
         },
 
         toggleDiagrams() {

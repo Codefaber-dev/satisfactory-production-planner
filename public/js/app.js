@@ -24065,7 +24065,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 return _context2.abrupt("return", false);
 
               case 7:
-                _this5.$inertia.get("/newyield/".concat(_this5.endpoint, "&raw=").concat(raw.join(',')));
+                _this5.$inertia.get("/newyield/".concat(_this5.endpoint), _objectSpread(_objectSpread({}, _this5.params), {}, {
+                  raw: raw.join(',')
+                }));
 
               case 8:
               case "end":
