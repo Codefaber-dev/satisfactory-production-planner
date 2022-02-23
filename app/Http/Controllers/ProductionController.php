@@ -25,9 +25,10 @@ class ProductionController extends Controller
         $factory = Factories::find(request('factory'));
         $multiFactory = MultiFactories::find(request('multiFactory'));
         $choices = !empty(request('choices',[])) ? collect(request('choices',(object) []))->reject(fn($name) => r($name)->isDefault())->all() : null;
+        $even = request('even') ? 1 : 0;
 
 
-        return compact('products','recipes','favorites','factory','multiFactory','choices');
+        return compact('products','recipes','favorites','factory','multiFactory','choices','even');
     }
 
     public function index()

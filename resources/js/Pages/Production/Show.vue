@@ -138,8 +138,8 @@
                         <production-steps :diagrams='diagrams' :hide-completed='hideCompleted' :new-imports='newImports'
                                       :production='production'
                                       :production-checks='productionChecks' :recipes='recipes' :choices='allChosenRecipes'
-                                      @setNewSubFavorite='setNewSubFavorite'
-                                      @toggle='toggleProductionCheck' @toggleDiagrams='toggleDiagrams' />
+                                      @setNewSubFavorite='setNewSubFavorite' :even='newEven'
+                                      @toggle='toggleProductionCheck' @toggleDiagrams='toggleDiagrams' @toggleEvenRows='toggleEvenRows' />
 
                         <!-- right -->
                         <building-summary :production__building_summary='production__building_summary'
@@ -172,7 +172,24 @@ export default {
         ProductionWarning
     },
 
-    props: ['products', 'recipes', 'favorites', 'production', 'product', 'recipe', 'yield', 'variant', 'belt_speed', 'constraints', 'factory', 'multiFactory', 'imports', 'multi','choices'],
+    props: [
+        'products',
+        'recipes',
+        'favorites',
+        'production',
+        'product',
+        'recipe',
+        'yield',
+        'variant',
+        'belt_speed',
+        'constraints',
+        'factory',
+        'multiFactory',
+        'imports',
+        'multi',
+        'choices',
+        'even'
+    ],
 
     data() {
         let outputs = this.multi ? this.multi.products.map((o,i) => {
@@ -216,7 +233,8 @@ export default {
             diagrams: store.getItem('diagrams', true),
             newImports: this.imports ? Object.fromEntries((this.imports || "").split(",").map(o=>[o,true])) : {},
             showWarnings: true,
-            newChoices: this.choices || {}
+            newChoices: this.choices || {},
+            newEven: !!this.even
         };
     },
 
@@ -305,6 +323,7 @@ export default {
                 factory: this.newFactory ? this.newFactory.id : '',
                 variant: this.form.variant,
                 choices: this.newChoices,
+                even: this.newEven ? 1 : 0,
             }
 
             if (this.form.outputs.length > 1) {
@@ -347,6 +366,11 @@ export default {
                 ...this.params,
                 raw: raw.join(',')
             });
+        },
+
+        toggleEvenRows() {
+            this.newEven = ! this.newEven;
+            this.fetch({preserveScroll: true});
         },
 
         toggleDiagrams() {

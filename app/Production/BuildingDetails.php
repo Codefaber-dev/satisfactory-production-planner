@@ -16,12 +16,16 @@ class BuildingDetails extends Collection
 
     protected $belt_speed;
 
+    // even rows
+    protected $even = false;
+
     public static function calc(Recipe $recipe, $qty, $belt_speed = 720): static
     {
         return (new static)
             ->setRecipe($recipe)
             ->setQty($qty)
             ->setBeltSpeed($belt_speed)
+            ->setEven(request('even',false))
             ->getBuildingDetails();
     }
 
@@ -42,6 +46,13 @@ class BuildingDetails extends Collection
     protected function setBeltSpeed($belt_speed): static
     {
         $this->belt_speed = $belt_speed;
+
+        return $this;
+    }
+
+    public function setEven($even): static
+    {
+        $this->even = $even;
 
         return $this;
     }
@@ -74,6 +85,16 @@ class BuildingDetails extends Collection
             // calc the footprint
             //$rows = ceil($num_buildings/16); // max 16 buildings per row
             $buildings_per_row = min($num_buildings, ceil($num_buildings/$rows) );
+
+            // force even rows
+            if($this->even) {
+                $num_buildings = $rows * $buildings_per_row;
+                $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
+                $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
+                $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
+                    return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
+                })->collapse();
+            }
 
             $footprint = [
                 'monogram' => $this->recipe->building->name[0],

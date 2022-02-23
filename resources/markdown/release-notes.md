@@ -22,8 +22,9 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 
 ___
 ### v0.0.8
-New Feature
+New Features
 - Multiple Outputs 🎉 Production Planner now supports up to 6 products from the same production line. [Check It Out](/dashboard/multi?imports=Iron+Ingot,Caterium+Ingot,Screw,Copper+Ingot&variant=mk1&product[0]=Motor&product[1]=Rotor&product[2]=Stator&yield[0]=10&yield[1]=10&yield[2]=10&recipe[0]=Motor&recipe[1]=Rotor&recipe[2]=Quickwire+Stator&choices[Steel+Ingot]=Solid+Steel+Ingot&choices[Iron+Rod]=Steel+Rod)
+- Force even rows in build diagrams. You can optionally force symmetrical rows of buildings in the production planner. Build costs and power calculations will update to reflect the selected configuration.
 
 Fixes
 - Recipe Picker improvements. Icons now indicate information about the selected recipe

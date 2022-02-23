@@ -3,15 +3,22 @@
         class='flex flex-1 flex-col rounded-lg border border-gray-500 bg-white text-sm shadow-lg dark:border-sky-700 dark:bg-slate-900'
     >
         <div
-            class='rounded-t-lg bg-gray-900 p-4 text-center text-xl font-semibold text-white dark:bg-sky-700'
+            class='flex space-x-4 items-center justify-center rounded-t-lg bg-gray-900 p-4 text-xl font-semibold text-white dark:bg-sky-700'
         >
-            Production Steps
+            <span>Production Steps</span>
             <button
                 @click="$emit('toggleDiagrams')"
                 class="btn btn-emerald"
             >
                 {{ diagrams ? "✅" : "⬜" }}
                 Toggle Diagrams
+            </button>
+            <button
+                @click="$emit('toggleEvenRows')"
+                class="btn btn-emerald"
+            >
+                {{ even ? "✅" : "⬜" }}
+                Force Even Rows
             </button>
         </div>
         <table>
@@ -192,7 +199,8 @@ export default {
         productionChecks: {},
         recipes: {},
         toggleProductionCheck: {},
-        choices: {}
+        choices: {},
+        even: {}
     },
 
     methods: {

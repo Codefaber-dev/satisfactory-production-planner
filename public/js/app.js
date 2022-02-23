@@ -23716,7 +23716,8 @@ __webpack_require__.r(__webpack_exports__);
     productionChecks: {},
     recipes: {},
     toggleProductionCheck: {},
-    choices: {}
+    choices: {},
+    even: {}
   },
   methods: {
     helpOverride: function helpOverride() {
@@ -23839,7 +23840,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     AppLayout: _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_1__["default"],
     ProductionWarning: _Pages_Production_ProductionWarning__WEBPACK_IMPORTED_MODULE_6__["default"]
   },
-  props: ['products', 'recipes', 'favorites', 'production', 'product', 'recipe', 'yield', 'variant', 'belt_speed', 'constraints', 'factory', 'multiFactory', 'imports', 'multi', 'choices'],
+  props: ['products', 'recipes', 'favorites', 'production', 'product', 'recipe', 'yield', 'variant', 'belt_speed', 'constraints', 'factory', 'multiFactory', 'imports', 'multi', 'choices', 'even'],
   data: function data() {
     var _this = this;
 
@@ -23891,7 +23892,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return [o, true];
       })) : {},
       showWarnings: true,
-      newChoices: this.choices || {}
+      newChoices: this.choices || {},
+      newEven: !!this.even
     };
   },
   computed: {
@@ -23978,7 +23980,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         belt_speed: this.form.belt_speed,
         factory: this.newFactory ? this.newFactory.id : '',
         variant: this.form.variant,
-        choices: this.newChoices
+        choices: this.newChoices,
+        even: this.newEven ? 1 : 0
       };
 
       if (this.form.outputs.length > 1) {
@@ -24082,6 +24085,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           }
         }, _callee2);
       }))();
+    },
+    toggleEvenRows: function toggleEvenRows() {
+      this.newEven = !this.newEven;
+      this.fetch({
+        preserveScroll: true
+      });
     },
     toggleDiagrams: function toggleDiagrams() {
       this.diagrams = !this.diagrams;
@@ -29736,10 +29745,12 @@ var _hoisted_1 = {
   "class": "flex flex-1 flex-col rounded-lg border border-gray-500 bg-white text-sm shadow-lg dark:border-sky-700 dark:bg-slate-900"
 };
 var _hoisted_2 = {
-  "class": "rounded-t-lg bg-gray-900 p-4 text-center text-xl font-semibold text-white dark:bg-sky-700"
+  "class": "flex space-x-4 items-center justify-center rounded-t-lg bg-gray-900 p-4 text-xl font-semibold text-white dark:bg-sky-700"
 };
 
-var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Production Steps ");
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Production Steps", -1
+/* HOISTED */
+);
 
 var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
   "class": "font-semibold"
@@ -29873,12 +29884,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn btn-emerald"
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.diagrams ? "✅" : "⬜") + " Toggle Diagrams ", 1
   /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[1] || (_cache[1] = function ($event) {
+      return _ctx.$emit('toggleEvenRows');
+    }),
+    "class": "btn btn-emerald"
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.even ? "✅" : "⬜") + " Force Even Rows ", 1
+  /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", null, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.hideCompleted ? 'Hiding' : 'Showing') + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Object.values($props.productionChecks).filter(function (o) {
     return o;
   }).length) + " completed rows ", 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[1] || (_cache[1] = function ($event) {
+    onClick: _cache[2] || (_cache[2] = function ($event) {
       return $props.hideCompleted = !$props.hideCompleted;
     }),
     "class": "rounded bg-emerald-500 px-4 py-2 text-sm hover:bg-emerald-600 focus:bg-emerald-700"
@@ -30802,11 +30820,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         recipes: $props.recipes,
         choices: $options.allChosenRecipes,
         onSetNewSubFavorite: $options.setNewSubFavorite,
+        even: $data.newEven,
         onToggle: $options.toggleProductionCheck,
-        onToggleDiagrams: $options.toggleDiagrams
+        onToggleDiagrams: $options.toggleDiagrams,
+        onToggleEvenRows: $options.toggleEvenRows
       }, null, 8
       /* PROPS */
-      , ["diagrams", "hide-completed", "new-imports", "production", "production-checks", "recipes", "choices", "onSetNewSubFavorite", "onToggle", "onToggleDiagrams"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" right "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_building_summary, {
+      , ["diagrams", "hide-completed", "new-imports", "production", "production-checks", "recipes", "choices", "onSetNewSubFavorite", "even", "onToggle", "onToggleDiagrams", "onToggleEvenRows"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" right "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_building_summary, {
         production__building_summary: $options.production__building_summary,
         production__total_power: $options.production__total_power
       }, null, 8
