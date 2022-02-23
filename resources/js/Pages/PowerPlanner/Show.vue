@@ -60,6 +60,16 @@
                                             Build
                                         </inertia-link>
                                     </div>
+                                    <div v-if='plan.waste && plan.waste[fuel]' class='pt-2 flex flex-col'>
+                                        <span class='font-semibold'>Waste</span>
+                                        <ul>
+                                            <li class='flex items-center my-2' v-for='(num, ing) in plan.waste[fuel]'>
+                                                <cloud-image :public-id='ing' height='20' width='20' class='mr-2' />
+                                                {{ ing }} <br>
+                                                {{ +num.toFixed(2) }} per min
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -68,16 +78,6 @@
                         <span class='font-semibold'>Other Inputs</span>
                         <ul>
                             <li  class='flex items-center my-2' v-for='(num, ing) in plan.other'>
-                                <cloud-image :public-id='ing' height='48' width='48' class='mr-2' />
-                                {{ ing }} <br>
-                                {{ +num.toFixed(2) }} per min
-                            </li>
-                        </ul>
-                    </div>
-                    <div v-if='plan.waste && Object.keys(plan.waste).length' class='flex flex-col w-full border border-sky-500 rounded p-4'>
-                        <span class='font-semibold'>Byproducts</span>
-                        <ul>
-                            <li class='flex items-center my-2' v-for='(num, ing) in plan.waste'>
                                 <cloud-image :public-id='ing' height='48' width='48' class='mr-2' />
                                 {{ ing }} <br>
                                 {{ +num.toFixed(2) }} per min

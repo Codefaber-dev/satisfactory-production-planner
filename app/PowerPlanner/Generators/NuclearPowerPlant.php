@@ -19,8 +19,8 @@ class NuclearPowerPlant extends Base
     ];
 
     protected $waste = [
-        "Uranium Waste" => 10,
-        "Plutonium Waste" => 1
+        "Uranium Fuel Rod" => ["Uranium Waste" => 10],
+        "Plutonium Fuel Rod" => ["Plutonium Waste" => 1]
     ];
 
     protected $build_cost = [

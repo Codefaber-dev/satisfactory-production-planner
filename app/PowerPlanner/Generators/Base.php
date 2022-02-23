@@ -72,7 +72,7 @@ abstract class Base implements GeneratorContract
     {
         $numRequired = $this->getNumRequired();
 
-        return collect($this->waste)->map(fn($qty) => $qty * $numRequired);
+        return collect($this->waste)->map(fn($waste) => collect($waste)->map(fn($qty) => $qty * $numRequired));
     }
 
     public function getBuildCost(): Collection
