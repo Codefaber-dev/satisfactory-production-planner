@@ -23755,6 +23755,12 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    setNewSubFavorite: function setNewSubFavorite(_ref) {
+      var recipe = _ref.recipe;
+      this.$emit('setNewSubFavorite', {
+        recipe: recipe
+      });
+    },
     updateClock: function updateClock(clock) {
       this.selectedOverview = clock;
       _store__WEBPACK_IMPORTED_MODULE_2__["default"].setItem("".concat(this.key, ".clock"), this.selectedOverview);
@@ -23820,7 +23826,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     setNewSubFavorite: function setNewSubFavorite(_ref) {
       var recipe = _ref.recipe;
-      this.$emit('setNewSubFavorite', recipe);
+      this.$emit('setNewSubFavorite', {
+        recipe: recipe
+      });
     }
   },
   computed: {
@@ -24317,7 +24325,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         imports: imports
       });
     },
-    setNewSubFavorite: function setNewSubFavorite(recipe) {
+    setNewSubFavorite: function setNewSubFavorite(_ref2) {
+      var recipe = _ref2.recipe;
+
       if (this.form.outputs.some(function (o) {
         return o.recipe.product_id === recipe.product_id;
       })) {
@@ -24353,12 +24363,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     toggleProductionCheck: function toggleProductionCheck(material) {
       if (this.productionChecks.hasOwnProperty(material)) this.productionChecks[material] = !this.productionChecks[material];else this.productionChecks[material] = true;
     },
-    selectNewRecipe: function selectNewRecipe(_ref2) {
-      var recipe = _ref2.recipe;
+    selectNewRecipe: function selectNewRecipe(_ref3) {
+      var recipe = _ref3.recipe;
       this.setRecipe(recipe);
     },
-    selectNewSubRecipe: function selectNewSubRecipe(_ref3) {
-      var recipe = _ref3.recipe;
+    selectNewSubRecipe: function selectNewSubRecipe(_ref4) {
+      var recipe = _ref4.recipe;
       this.setNewSubFavorite(recipe);
     },
     savePrefs: function savePrefs() {
@@ -30105,9 +30115,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* UNKEYED_FRAGMENT */
   ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_23, [$data.recipe && $props.recipes[$props.name] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_recipe_picker, {
     key: 0,
-    onSelect: _cache[1] || (_cache[1] = function ($event) {
-      return _ctx.$emit("setNewSubFavorite");
-    }),
+    onSelect: $options.setNewSubFavorite,
     recipes: $props.recipes[$props.name],
     selected: $props.recipes[$props.name].filter(function (o) {
       return o.id === $data.recipe.id;
@@ -30115,13 +30123,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     choices: $props.choices
   }, null, 8
   /* PROPS */
-  , ["recipes", "selected", "choices"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_24, [$data.recipe && $props.recipes[$props.name] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  , ["onSelect", "recipes", "selected", "choices"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_24, [$data.recipe && $props.recipes[$props.name] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    onChange: _cache[2] || (_cache[2] = function () {
+    onChange: _cache[1] || (_cache[1] = function () {
       return $options.updateVariant && $options.updateVariant.apply($options, arguments);
     }),
-    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return $data.selectedVariantName = $event;
     }),
     "class": "w-full rounded py-2 text-right shadow dark:bg-sky-800"
@@ -30148,28 +30156,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }), 256
   /* UNKEYED_FRAGMENT */
   ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[4] || (_cache[4] = function ($event) {
+    onClick: _cache[3] || (_cache[3] = function ($event) {
       return $options.updateClock("c100");
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([[$data.selectedOverview === "c100" ? "btn-gray" : "btn-emerald"], "btn-sm"])
   }, "100%", 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[5] || (_cache[5] = function ($event) {
+    onClick: _cache[4] || (_cache[4] = function ($event) {
       return $options.updateClock("c150");
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([[$data.selectedOverview === "c150" ? "btn-gray" : "btn-emerald"], "btn-sm"])
   }, "150%", 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[6] || (_cache[6] = function ($event) {
+    onClick: _cache[5] || (_cache[5] = function ($event) {
       return $options.updateClock("c200");
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([[$data.selectedOverview === "c200" ? "btn-gray" : "btn-emerald"], "btn-sm"])
   }, "200%", 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[7] || (_cache[7] = function ($event) {
+    onClick: _cache[6] || (_cache[6] = function ($event) {
       return $options.updateClock("c250");
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([[$data.selectedOverview === "c250" ? "btn-gray" : "btn-emerald"], "btn-sm"])

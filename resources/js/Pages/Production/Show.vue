@@ -505,7 +505,7 @@ export default {
             });
         },
 
-        setNewSubFavorite(recipe) {
+        setNewSubFavorite({ recipe }) {
             if (this.form.outputs.some(o => o.recipe.product_id === recipe.product_id)) {
                 this.form.outputs.find(o => o.recipe.product_id === recipe.product_id).recipe = recipe;
             }

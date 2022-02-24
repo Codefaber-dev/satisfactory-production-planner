@@ -86,7 +86,7 @@
         <td class='p-2'>
             <template v-if='recipe && recipes[name]'>
                 <recipe-picker
-                    @select='$emit("setNewSubFavorite")'
+                    @select='setNewSubFavorite'
                     :recipes='recipes[name]'
                     :selected='recipes[name].filter(o => o.id === recipe.id)[0]'
                     :choices='choices'
@@ -196,6 +196,10 @@ export default {
     },
 
     methods: {
+        setNewSubFavorite({recipe}) {
+            this.$emit('setNewSubFavorite',{recipe});
+        },
+
         updateClock(clock) {
             this.selectedOverview = clock;
             store.setItem(`${this.key}.clock`,this.selectedOverview);

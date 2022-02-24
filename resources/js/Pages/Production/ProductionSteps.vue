@@ -93,7 +93,7 @@ export default {
         },
 
         setNewSubFavorite({ recipe }) {
-            this.$emit('setNewSubFavorite',recipe)
+            this.$emit('setNewSubFavorite', { recipe })
         }
     },
 
