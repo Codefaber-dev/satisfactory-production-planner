@@ -12,6 +12,37 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+Array.prototype.mapAndSumProperties = function(key) {
+    let ret = {};
+    this.map(o => o[key]).forEach(oo => {
+        for(let prop in oo) {
+            if (!ret.hasOwnProperty(prop)) {
+                ret[prop] = 0;
+            }
+            ret[prop] += +oo[prop];
+        }
+    })
+    return ret;
+}
+
+Array.prototype.groupBy = function(key) {
+    let ret = {};
+    this.forEach(o => {
+        if (!ret.hasOwnProperty(o[key])) {
+            ret[o[key]] = [];
+        }
+        ret[o[key]].push(o);
+    })
+    return ret;
+}
+
+Array.prototype.sum = function(key=null) {
+    if (key) {
+        return this.map(o => o[key]).sum();
+    }
+    return this.reduce((a,b) => +a+b,0);
+}
+
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

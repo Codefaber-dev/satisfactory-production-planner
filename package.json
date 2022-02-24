@@ -25,6 +25,7 @@
         "lodash": "^4.17.19",
         "markdown-it": "^12.3.2",
         "marked": "^4.0.12",
+        "mitt": "^3.0.0",
         "postcss": "^8.4.5",
         "postcss-import": "^14.0.2",
         "prettier": "^2.5.1",

@@ -50,145 +50,28 @@
                 </tr>
 
                 <template v-for='(material,name) in level'>
-                    <tbody
-                        v-for='{recipe,qty,ingredients,variant,overview,overridden,imported} in material.production'
-                        v-show="
-                            !imported && (
-                                !hideCompleted ||
-                                !productionChecks[name + '-' + (recipe?.description || 'base')] )
-                        "
-                        :class="[productionChecks[name + '-' + (recipe?.description || 'base')] ? 'opacity-25' : 'opacity-100']"
-                    >
-                    <tr class='border-t border-gray-200 dark:border-slate-700'>
-                        <td class='p-2'>
-                            <div @click="$emit('toggle',name + '-' + (recipe?.description || 'base'))"
-                                class='flex cursor-pointer items-center rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg dark:text-slate-800'
-                            >
-                                <cloud-image
-                                    class='mr-2'
-                                    :public-id='name'
-                                    width='48'
-                                    crop='scale'
-                                    :alt='name'
-                                />
-
-                                <div class='flex w-full flex-col space-y-2'>
-                                    <span class='font-semibold'>
-                                        {{ name }}
-                                        <span v-if='overridden'
-                                              class='rounded-lg bg-amber-300 px-2 py-1 text-xs'>
-                                            Override
-                                        </span>
-
-                                    </span>
-                                    <span class='font-light'>
-                                        {{ qty }} per min
-                                    </span>
-                                    <div
-                                         class='flex w-full flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg'
-                                    >
-                                        <span class='font-semibold'>
-                                            Destination
-                                        </span>
-                                        <div class='flex flex-col' v-for='(out_qty, mat) in material.outputs'>
-                                            <div class='flex' v-if='mat !== "final"'>
-                                                <cloud-image class='mr-2 inline-flex'
-                                                             :public-id='mat'
-                                                             width='32' crop='scale'
-                                                             :alt='mat' />
-                                                <span class='text-xs'>
-                                                    {{ mat }}
-                                                    <br>
-                                                    {{ +out_qty.toFixed(4) }} per min
-                                                    ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
-                                                </span>
-                                            </div>
-                                            <template v-else>
-                                                <div class='text-xs font-bold p-2 my-2 rounded bg-lime-300'>
-                                                    Output {{ out_qty }} per min
-                                                    ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td nowrap class='p-2'>
-                            <div v-if='recipe  && Object.keys(ingredients).length'
-                                 class='rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg dark:text-slate-800'>
-                                <div
-                                    class='my-2 flex items-center'
-                                    v-for='(in_qty, name) in ingredients'
-                                >
-                                    <cloud-image class='mr-2' :public-id='name' width='48'
-                                                 crop='scale' :alt='name' />
-                                    <span class='font-semibold'>
-                                        {{ name }}
-                                        <span v-if='newImports[name]'
-                                              class='rounded-lg bg-green-300 px-2 py-1 text-xs'>
-                                            Imported
-                                        </span>
-                                        <br />
-                                        <span class='font-light'>
-                                            {{ Math.round(10000 * in_qty) / 10000 }}
-                                            per min
-                                        </span>
-                                        <br />
-                                        <span class='font-light italic'>
-                                            {{ Math.round((100 * 100 * in_qty) / production.all_materials[name]) / 100
-                                            }}%
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class='p-2'>
-                            <template v-if='recipe && recipes[name]'>
-                                    <recipe-picker
-                                        @select='setNewSubFavorite'
-                                        :recipes='recipes[name]'
-                                        :selected='recipes[name].filter(o => o.id === recipe.id)[0]'
-                                        :choices='choices'
-                                    ></recipe-picker>
-                            </template>
-                        </td>
-
-                        <td class='p-2'>
-                            <template v-if='recipe && recipes[name]'>
-                                <select v-model='overview.selected_variant_name'
-                                        class='w-full rounded py-2 text-right shadow dark:bg-sky-800'
-                                >
-                                    <option
-                                        class='text-right'
-                                        :value='mk'
-                                        v-for='(opt, mk) in overview.details'>
-                                        {{ opt.num_buildings }}x {{ mk }} @{{ opt.clock_speed }}%
-                                        [{{ Math.round(opt.power_usage) }} MW]
-                                    </option>
-                                </select>
-                            </template>
-                        </td>
-                    </tr>
-                    <tr v-if='recipe' v-show='diagrams'>
-                        <td class='text-center' colspan='100'>
-                            <build-diagram
-                                :footprint='overview.details[overview.selected_variant_name].footprint' />
-                        </td>
-                    </tr>
-                    </tbody>
+                    <ProductionStep
+                        v-for='prod in material.production'
+                        v-show="!prod.imported && (
+                             !hideCompleted ||
+                             !productionChecks[name + '-' + (prod.recipe?.description || 'base')] )"
+                        :class="[productionChecks[name + '-' + (prod.recipe?.description || 'base')] ? 'opacity-25' : 'opacity-100']"
+                        :choices='choices' :diagrams='diagrams' :material='material'
+                        :name='name' :new-imports='newImports' :production='prod'
+                        :recipes='recipes' :all-materials='production.all_materials'
+                        :overviews='overviews'
+                      @setNewSubFavorite='setNewSubFavorite' />
                 </template>
             </template>
         </table>
     </div>
 </template>
 <script>
-import BuildDiagram from '@/Pages/Production/BuildDiagram';
-import RecipePicker from '@/Components/RecipePicker';
+import ProductionStep from '@/Pages/Production/ProductionStep';
 
 export default {
     name: 'production-steps',
-    components: { BuildDiagram, RecipePicker },
+    components: { ProductionStep},
     props: {
         diagrams: {},
         hideCompleted: {},
@@ -200,7 +83,8 @@ export default {
         recipes: {},
         toggleProductionCheck: {},
         choices: {},
-        even: {}
+        even: {},
+        overviews: {},
     },
 
     methods: {
@@ -216,7 +100,7 @@ export default {
     computed: {
         resultsArray() {
             return Object.values(this.production.results).filter(o => Object.values(o).some(oo => !oo.raw && !oo.imported));
-        }
+        },
     }
 };
 </script>

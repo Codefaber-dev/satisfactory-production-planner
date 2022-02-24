@@ -90,6 +90,22 @@ class Multiplexer
         return $this->calcs->map(fn($calc) => $calc->getByproducts())->sumByKey();
     }
 
+    public function getOverviews()
+    {
+        return $this->getResults()->map(function($tier) {
+           return $tier->map(function($product) {
+              return $product->production->filter(fn($row) => $row['overview'])->pluck('overviews');
+           })->collapse()->filter();
+        })->collapse()
+            ->map(fn($overview) => [$overview["c100"]["product"] . "|" . $overview["c100"]["recipe"] => [
+                "clock" => "c100",
+                "selected_variant_name" => $overview["c100"]["selected_variant_name"],
+                "overviews" => $overview,
+                "overview" => $overview["c100"]
+            ]])
+            ->collapse();
+    }
+
     public function ratioOfAvailableRawMaterials(): float
     {
         $raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];

@@ -10,9 +10,22 @@
         <table>
             <tbody
                 class='border-b border-gray-200 dark:border-slate-800'
-                v-for='(
-                                        o, bldg
-                                    ) in production__building_summary.variants'
+            >
+            <tr>
+                <td class='p-2'>
+                    <div class='flex items-center'>
+                        <cloud-image public-id='PowerShard' height='36' width='36'></cloud-image>
+                        Power Shards
+                    </div>
+                </td>
+                <td colspan='2' class='text-right p-2'>
+                    {{ powerShards }}
+                </td>
+            </tr>
+            </tbody>
+            <tbody
+                class='border-b border-gray-200 dark:border-slate-800'
+                v-for='(o, bldg) in production__building_summary.variants'
             >
             <tr>
                 <td class='p-2'>{{ o.num_buildings }}x {{ bldg }}</td>
@@ -23,9 +36,7 @@
                     <div class='flex flex-col'>
                         <div
                             :key='mat'
-                            v-for='(
-                                                        num, mat
-                                                    ) in o.build_cost'
+                            v-for='(num, mat) in o.build_cost'
                         >
                             {{ mat }} {{ num }}
                         </div>
@@ -47,9 +58,7 @@
                     <div class='flex flex-col'>
                         <div
                             :key='mat'
-                            v-for='(
-                                                        num, mat
-                                                    ) in production__building_summary.total_build_cost'
+                            v-for='(num, mat) in production__building_summary.total_build_cost'
                         >
                             {{ mat }} {{ num }}
                         </div>
@@ -65,7 +74,14 @@ export default {
     name: 'building-summary',
     props: {
         production__building_summary: {},
+        production__building_details: {},
         production__total_power: {},
     },
+
+    computed: {
+        powerShards() {
+            return this.production__building_details.map(o => +o.footprint.power_shards).reduce((a,b) => a+b,0);
+        }
+    }
 };
 </script>

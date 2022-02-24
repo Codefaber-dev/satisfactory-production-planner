@@ -58,10 +58,12 @@ class ProductionController extends Controller
             'recipe' => $calc->getSteps()->getRecipe(),
             'overrides' => $calc->getSteps()->getOverrides(),
             'byproducts' => $calc->getByproducts(),
+            'overviews' => $calc->getOverviews()
         ];
 
-        $imports = request('imports');
+        //dd($calc->getOverviews());
 
+        $imports = request('imports');
 
         $belt_speed = request('belt_speed',780);
 
@@ -101,7 +103,8 @@ class ProductionController extends Controller
             'final' => $m->getFinals(),
             'recipe' => $m->getRecipes(),
             'overrides' => $m->getOverrides(),
-            'byproducts' => $m->getByproducts()
+            'byproducts' => $m->getByproducts(),
+            'overviews' => $m->getOverviews()
         ];
 
         $imports = request('imports');

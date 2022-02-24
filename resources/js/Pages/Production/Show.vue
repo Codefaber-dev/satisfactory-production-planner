@@ -135,14 +135,15 @@
                                             :raw-unchanged='rawUnchanged' />
 
                         <!-- middle -->
-                        <production-steps :diagrams='diagrams' :hide-completed='hideCompleted' :new-imports='newImports'
-                                      :production='production'
+                        <production-steps ref='productionSteps' :diagrams='diagrams' :hide-completed='hideCompleted' :new-imports='newImports'
+                                      :production='production' :overviews='overviews'
                                       :production-checks='productionChecks' :recipes='recipes' :choices='allChosenRecipes'
                                       @setNewSubFavorite='setNewSubFavorite' :even='newEven'
                                       @toggle='toggleProductionCheck' @toggleDiagrams='toggleDiagrams' @toggleEvenRows='toggleEvenRows' />
 
                         <!-- right -->
-                        <building-summary :production__building_summary='production__building_summary'
+                        <building-summary :production__building_details='production__building_details'
+                                          :production__building_summary='production__building_summary'
                                       :production__total_power='production__total_power' />
                     </div>
                 </div>
@@ -170,6 +171,19 @@ export default {
         ProductionSummary,
         AppLayout,
         ProductionWarning
+    },
+
+    mounted() {
+        this.Bus.on('UpdateOverviews', ({key, clock, selected_variant_name}) => {
+            // console.log({
+            //     key,
+            //     clock,
+            //     selected_variant_name
+            // })
+            this.overviews[key].clock = clock;
+            this.overviews[key].selected_variant_name = selected_variant_name;
+            this.$forceUpdate();
+        });
     },
 
     props: [
@@ -234,7 +248,8 @@ export default {
             newImports: this.imports ? Object.fromEntries((this.imports || "").split(",").map(o=>[o,true])) : {},
             showWarnings: true,
             newChoices: this.choices || {},
-            newEven: !!this.even
+            newEven: !!this.even,
+            overviews: this.production.overviews
         };
     },
 
@@ -244,55 +259,87 @@ export default {
         },
 
         production__building_details() {
-            let ret = [];
+            // if (! this.$refs.productionSteps) {
+            //     return [];
+            // }
 
-            for (let tier in this.production.results) {
-                if (+tier === 1) continue;
-
-                for (let ing in this.production.results[tier]) {
-                    this.production.results[tier][ing].production.forEach(p => {
-                        let selected =
-                        ret.push({
-                            product: ing,
-                            variant_name: p.overview.selected_variant_name,
-                            ...p.overview.details[p.overview.selected_variant_name],
-                        });
-                    });
-                }
-            }
-
-            return ret;
-        },
-
-        production__building_summary() {
-            let ret = {};
-            ret.total_build_cost = {};
-            ret.variants = {};
-            this.production__building_details.forEach((o) => {
-                if (!ret.variants.hasOwnProperty(o.variant_name))
-                    ret.variants[o.variant_name] = Object.assign({}, o);
-                else {
-                    ret.variants[o.variant_name].num_buildings += o.num_buildings;
-                    ret.variants[o.variant_name].power_usage += o.power_usage;
-                }
-
-                for (let prop in o.build_cost) {
-                    // increment the build cost for the particular building
-                    if (ret.variants[o.variant_name].build_cost.hasOwnProperty(prop))
-                        ret.variants[o.variant_name].build_cost[prop] +=
-                            o.build_cost[prop];
-                    else
-                        ret.variants[o.variant_name].build_cost[prop] =
-                            o.build_cost[prop];
-
-                    // increment the total build cost
-                    if (ret.total_build_cost.hasOwnProperty(prop))
-                        ret.total_build_cost[prop] += o.build_cost[prop];
-                    else ret.total_build_cost[prop] = o.build_cost[prop];
+            return Object.values(this.overviews).map(o => {
+                let clock = o.clock,
+                    variant_name = o.selected_variant_name;
+                return {
+                    clock,
+                    variant_name,
+                    ...o.overviews[clock].details[variant_name]
                 }
             });
 
+            // let ret = [];
+            //
+            // for (let tier in this.production.results) {
+            //     if (+tier === 1) continue;
+            //
+            //     for (let ing in this.production.results[tier]) {
+            //         this.production.results[tier][ing].production.forEach(p => {
+            //             let selected =
+            //             ret.push({
+            //                 product: ing,
+            //                 variant_name: p.overview.selected_variant_name,
+            //                 ...p.overview.details[p.overview.selected_variant_name],
+            //             });
+            //         });
+            //     }
+            // }
+            //
+            // return ret;
+        },
+
+        production__building_summary() {
+            let deets = this.production__building_details.groupBy("variant_name"),
+                ret = {
+                    variants: {}
+                };
+
+
+            for (let prop in deets) {
+                ret.variants[prop] = {
+                    build_cost: deets[prop].mapAndSumProperties("build_cost"),
+                    num_buildings: deets[prop].sum("num_buildings"),
+                    power_usage: deets[prop].sum("power_usage"),
+                }
+            }
+
+            ret.total_build_cost = this.production__building_details.mapAndSumProperties("build_cost");
+
             return ret;
+
+            // let ret = {};
+            // ret.total_build_cost = {};
+            // ret.variants = {};
+            // this.production__building_details.forEach((o) => {
+            //     if (!ret.variants.hasOwnProperty(o.variant_name))
+            //         ret.variants[o.variant_name] = Object.assign({}, o);
+            //     else {
+            //         ret.variants[o.variant_name].num_buildings += o.num_buildings;
+            //         ret.variants[o.variant_name].power_usage += o.power_usage;
+            //     }
+            //
+            //     for (let prop in o.build_cost) {
+            //         // increment the build cost for the particular building
+            //         if (ret.variants[o.variant_name].build_cost.hasOwnProperty(prop))
+            //             ret.variants[o.variant_name].build_cost[prop] +=
+            //                 o.build_cost[prop];
+            //         else
+            //             ret.variants[o.variant_name].build_cost[prop] =
+            //                 o.build_cost[prop];
+            //
+            //         // increment the total build cost
+            //         if (ret.total_build_cost.hasOwnProperty(prop))
+            //             ret.total_build_cost[prop] += o.build_cost[prop];
+            //         else ret.total_build_cost[prop] = o.build_cost[prop];
+            //     }
+            // });
+
+            // return ret;
         },
 
         production__total_power() {
@@ -339,6 +386,11 @@ export default {
     },
 
     methods: {
+        updateOverviews() {
+            this.overviews = this.productionSteps.overviews || [];
+            this.$forceUpdate();
+        },
+
         async fetch(options = {}) {
             if (this.yield < 1) return false;
 

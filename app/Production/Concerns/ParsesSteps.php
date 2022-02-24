@@ -96,6 +96,22 @@ trait ParsesSteps
         })->collapse();
     }
 
+    public function getOverviews(): Collection
+    {
+        return $this->results->map(function($tier) {
+           return $tier->map(function($product) {
+              return $product->production->filter(fn($row) => $row['overview'])->pluck('overviews');
+           })->collapse()->filter();
+        })->collapse()
+            ->map(fn($overview) => [$overview["c100"]["product"] . "|" . $overview["c100"]["recipe"] => [
+                "clock" => "c100",
+                "selected_variant_name" => $overview["c100"]["selected_variant_name"],
+                "overviews" => $overview,
+                "overview" => $overview["c100"]
+            ]])
+            ->collapse();
+    }
+
     public static function groupAndSortResults(Collection $results): Collection
     {
         return $results->sortBy(['tier', 'name'])->groupBy(['tier', 'name'])
@@ -116,6 +132,9 @@ trait ParsesSteps
                                 $variant = $group->dataGet("0.variant");
                                 $belt_speed = $group->dataGet("0.belt_speed");
                                 $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant) : null;
+                                $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150) : null;
+                                $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200) : null;
+                                $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250) : null;
 
                                 $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
 
@@ -131,6 +150,12 @@ trait ParsesSteps
                                     "qty" => $qty,
                                     "recipe" => $recipe,
                                     "overview" => $overview ? $overview->toArray() : null,
+                                    "overviews" => [
+                                        "c100" => $overview ? $overview->toArray() : null,
+                                        "c150" => $overview_150 ? $overview_150->toArray() : null,
+                                        "c200" => $overview_200 ? $overview_200->toArray() : null,
+                                        "c250" => $overview_250 ? $overview_250->toArray() : null,
+                                    ],
                                     "power_usage" => $power_usage,
                                     "tier" => $group->dataGet("0.tier"),
                                     "variant" => $group->dataGet("0.variant"),

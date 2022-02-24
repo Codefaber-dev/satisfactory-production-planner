@@ -19,12 +19,15 @@ class BuildingDetails extends Collection
     // even rows
     protected $even = false;
 
-    public static function calc(Recipe $recipe, $qty, $belt_speed = 720): static
+    protected $base_clock = 100;
+
+    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100): static
     {
         return (new static)
             ->setRecipe($recipe)
             ->setQty($qty)
             ->setBeltSpeed($belt_speed)
+            ->setBaseClock($base_clock)
             ->setEven(request('even',false))
             ->getBuildingDetails();
     }
@@ -50,6 +53,13 @@ class BuildingDetails extends Collection
         return $this;
     }
 
+    protected function setBaseClock($base_clock): static
+    {
+        $this->base_clock = $base_clock;
+
+        return $this;
+    }
+
     public function setEven($even): static
     {
         $this->even = $even;
@@ -61,10 +71,21 @@ class BuildingDetails extends Collection
     {
         $this->items = $this->recipe->building->variants->map(function ($variant) {
             // calc number of buildings needed
-            $num_buildings = 1 * ceil($this->qty / $this->recipe->base_per_min / $variant->multiplier);
+            $num_buildings = 1 * ceil($this->qty / $this->recipe->base_per_min / $variant->multiplier / ($this->base_clock/100));
 
             // calc the clock speed for the buildings
             $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
+
+            // calc shards per building
+            $shards_per_building = match(true) {
+                $clock_speed > 200 => 3,
+                $clock_speed > 150 => 2,
+                $clock_speed > 100 => 1,
+                default => 0
+            };
+
+            // calc the number of power shards
+            $power_shards = $num_buildings * $shards_per_building;
 
             // calc the power_usage for the buildings
             $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
@@ -90,6 +111,13 @@ class BuildingDetails extends Collection
             if($this->even) {
                 $num_buildings = $rows * $buildings_per_row;
                 $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
+                $shards_per_building = match(true) {
+                    $clock_speed > 200 => 3,
+                    $clock_speed > 150 => 2,
+                    $clock_speed > 100 => 1,
+                    default => 0
+                };
+                $power_shards = $num_buildings * $shards_per_building;
                 $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
                     return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
@@ -102,6 +130,7 @@ class BuildingDetails extends Collection
                 'belt_load' => $belt_load_in,
                 'rows' => $rows,
                 'num_buildings' => $num_buildings,
+                'power_shards' => $power_shards,
                 'buildings_per_row' => $buildings_per_row,
                 'building_length' => $this->recipe->building->length,
                 'building_length_foundations' => ceil($this->recipe->building->length/8),

@@ -1,5 +1,9 @@
 # Satisfactory Production Planner
-By CodeFaber
+
+## v0.0.9
+[Release Notes](#release-notes)
+
+#### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
 
 ### 🗣️ Discord
 Eager to share feedback or have suggestions for improvements?
@@ -13,14 +17,26 @@ Your factories and favorites will persist across sessions if you [register](http
 I hate spam as much as the next guy. I will never send you spam or give your information out to anyone.
 
 ### 💲 Support
-Servers don't grow on trees. If you feel like chipping in that would be toit, but no pressure. 
+Servers don't grow on trees. If you feel like chipping in that would be toit, but no pressure.
 
 [Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y)
 
-## 📔 Release Notes
+## <a name="release-notes"></a>
+
+
+##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
+### v0.0.9
+New Feature
+- Overclocking ⏱️ Production Planner now supports overclocking for individual products. Selecting a different "Max Clock" will automatically update diagrams and power calculations and show the number of power shards required.
+
+![Overclocking](https://res.cloudinary.com/codefaber/image/upload/c_scale,w_316/v1645676655/satisfactory/overclocking.png)
+
+![Power Summary](https://res.cloudinary.com/codefaber/image/upload/v1645676990/satisfactory/PowerSummary.png)
+
+
 ### v0.0.8
 New Features
 - Multiple Outputs 🎉 Production Planner now supports up to 6 products from the same production line. [Check It Out](/dashboard/multi?imports=Iron+Ingot,Caterium+Ingot,Screw,Copper+Ingot&variant=mk1&product[0]=Motor&product[1]=Rotor&product[2]=Stator&yield[0]=10&yield[1]=10&yield[2]=10&recipe[0]=Motor&recipe[1]=Rotor&recipe[2]=Quickwire+Stator&choices[Steel+Ingot]=Solid+Steel+Ingot&choices[Iron+Rod]=Steel+Rod)

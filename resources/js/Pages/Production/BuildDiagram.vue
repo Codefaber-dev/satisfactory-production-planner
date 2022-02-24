@@ -46,6 +46,14 @@
                         {{ footprint.belt_speed }}
                     </span>
                 </li>
+                <li class='flex border-b border-gray-300'>
+                    <span class='ml-2 font-semibold'>
+                        Power Shards
+                    </span>
+                    <span class='flex-1 text-right'>
+                        {{ footprint.power_shards }}
+                    </span>
+                </li>
             </ul>
         </div>
         <div
