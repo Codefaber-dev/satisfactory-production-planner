@@ -122,18 +122,22 @@
                     </div>
                 </div>
             </div>
-            <p class='ml-4 py-2' v-if="!!imports && !editing">
-                Imports
-                <cloud-image
-                    v-for="name in imports.split(',')"
-                    :public-id="name"
-                    crop="scale"
-                    quality="100"
-                    width="36"
-                    class="inline-flex px-2"
-                    alt="logo"
-                />
-            </p>
+            <div class='ml-4 py-2 flex items-center' v-if="!!imports && !editing">
+                <span class='font-bold mr-4'>Imports</span>
+                <div class='flex items-center space-x-4'>
+                    <div v-for="name in imports.split(',')" class='flex items-center'>
+                        <cloud-image
+                            :public-id='name'
+                            crop='scale'
+                            quality='100'
+                            width='48'
+                            class='inline-flex px-2'
+                            alt='logo'
+                        />
+                        {{ name }}
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>

@@ -686,6 +686,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: 1rem;
 }.mr-8{
   margin-right: 2rem;
+}.ml-20{
+  margin-left: 5rem;
 }.block{
   display: block;
 }.inline{
