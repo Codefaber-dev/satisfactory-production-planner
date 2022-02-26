@@ -41,6 +41,7 @@ Route::get('/fix-recipes', function() {
     //r('Seismic Nobelisk', force: true);
 
     r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
+    r('Plutonium Fuel Rod', force: true);
 });
 //
 //Route::get('testing', function() {
