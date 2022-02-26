@@ -30,16 +30,18 @@ use Inertia\Inertia;
 //    return ProductionCalculator::calc($ingredient, $qty, $recipe);
 //});
 
-//Route::get('/fix-recipes', function() {
-//    r('Aluminum Scrap')->update(['base_per_min' => 360]);
-//    r('Aluminum Scrap', force: true);
-//
-//    r('Electric Motor')->addIngredient(i('Electromagnetic Control Rod'), 3.75);
-//    r('Electric Motor', force: true);
-//
-//    r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
-//    r('Seismic Nobelisk', force: true);
-//});
+Route::get('/fix-recipes', function() {
+    //r('Aluminum Scrap')->update(['base_per_min' => 360]);
+    //r('Aluminum Scrap', force: true);
+    //
+    //r('Electric Motor')->addIngredient(i('Electromagnetic Control Rod'), 3.75);
+    //r('Electric Motor', force: true);
+    //
+    //r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
+    //r('Seismic Nobelisk', force: true);
+
+    r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
+});
 //
 //Route::get('testing', function() {
 //    return energy('Unpackage Fuel');

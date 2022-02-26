@@ -1648,7 +1648,7 @@ class RecipeSeeder extends Seeder
             ],
             "Plutonium Fuel Rod" => [
                 "base_yield" => 1,
-                "base_per_min" => 0.3,
+                "base_per_min" => 0.25,
                 "ingredients" => [
                     "Encased Plutonium Cell" => 7.5,
                     "Steel Beam" => 4.5,
