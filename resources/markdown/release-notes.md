@@ -19,6 +19,8 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ### 💲 Support
 Servers don't grow on trees. If you feel like chipping in that would be toit, but no pressure.
 
+🙏 I want to say a huge thank you to those who have donated, it is greatly appreciated.
+
 [Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y)
 
 ## <a name="release-notes"></a>
@@ -28,6 +30,10 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
+### v0.1.0
+- UI Improvements and bug fixes
+
+
 ### v0.0.9
 New Feature
 - Overclocking ⏱️ Production Planner now supports overclocking for individual products. Selecting a different "Max Clock" will automatically update diagrams and power calculations and show the number of power shards required.

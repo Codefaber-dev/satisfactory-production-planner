@@ -24,59 +24,54 @@
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
                             <span class="font-semibold">Select a product</span>
-                            <select
-                                @change="setDefaultRecipe"
-                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100"
-                                v-model="product"
-                                name="product"
-                                id="product"
-                            >
-                                <option
-                                    :key="option.id"
-                                    v-for="option in products"
-                                    :value="option"
-                                >
-                                    {{ option.name }}
-                                </option>
-                            </select>
+                            <product-picker
+                                @select='selectProduct'
+                                :selected='product'
+                                :products='products'/>
                         </div>
                         <div
-                            v-if="product"
+                            v-if="product && product.name.length"
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
                             <span class="font-semibold">Select a recipe</span>
-                            <select
-                                ref="recipe"
-                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100"
-                                v-model="recipe"
-                                name="recipe"
-                                id="recipe"
-                            >
-                                <option
-                                    :data-recipe-id="option.id"
-                                    :key="option.id"
-                                    v-for="option in recipes[product.name]"
-                                    :value="option"
-                                >
-                                    <span v-if="option.favorite">&star;</span>
-                                    {{ option.description || 'default' }}
-                                </option>
-                            </select>
-                            <button
-                                :disabled="working"
-                                @click="setNewFavorite"
-                                class="btn btn-emerald"
-                                v-if="
-                                    recipe &&
-                                    !recipe.favorite &&
-                                    recipes[product.name].length > 1
-                                "
-                            >
-                                Set Favorite
-                            </button>
+                            <recipe-picker
+                                class='border-sky-300 dark:border-slate-500'
+                                :recipes="recipes[product.name]"
+                                :selected="recipe"
+                                @select="selectRecipe"
+                            />
+<!--                            <select-->
+<!--                                ref="recipe"-->
+<!--                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100"-->
+<!--                                v-model="recipe"-->
+<!--                                name="recipe"-->
+<!--                                id="recipe"-->
+<!--                            >-->
+<!--                                <option-->
+<!--                                    :data-recipe-id="option.id"-->
+<!--                                    :key="option.id"-->
+<!--                                    v-for="option in recipes[product.name]"-->
+<!--                                    :value="option"-->
+<!--                                >-->
+<!--                                    <span v-if="option.favorite">&star;</span>-->
+<!--                                    {{ option.description || 'default' }}-->
+<!--                                </option>-->
+<!--                            </select>-->
+<!--                            <button-->
+<!--                                :disabled="working"-->
+<!--                                @click="setNewFavorite"-->
+<!--                                class="btn btn-emerald"-->
+<!--                                v-if="-->
+<!--                                    recipe &&-->
+<!--                                    !recipe.favorite &&-->
+<!--                                    recipes[product.name].length > 1-->
+<!--                                "-->
+<!--                            >-->
+<!--                                Set Favorite-->
+<!--                            </button>-->
                         </div>
                         <div
-                            v-if="recipe"
+                            v-if="recipe && recipe.base_per_min"
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
                             <span class="font-semibold"
@@ -138,17 +133,21 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout';
 import { Inertia } from '@inertiajs/inertia';
+import ProductPicker from '@/Components/ProductPicker';
+import RecipePicker from '@/Components/RecipePicker';
 
 export default {
     props: ['products', 'recipes', 'favorites'],
     components: {
         AppLayout,
+        ProductPicker,
+        RecipePicker
     },
 
     data() {
         return {
-            product: null,
-            recipe: null,
+            product: { name: '' },
+            recipe: { product : { name : ''} },
             yield: null,
             done: false,
             working: false,
@@ -190,6 +189,19 @@ export default {
             });
         },
 
+        selectProduct({product}) {
+            if (!product || !product.name) {
+                return;
+            }
+
+            this.product = product;
+            this.setDefaultRecipe();
+        },
+
+        selectRecipe({recipe}) {
+            this.setRecipe(recipe);
+        },
+
         setNewFavorite() {
             const recipe = this.recipe;
             this.$inertia.post(`/favorites/${this.recipe.id}`, {
@@ -220,6 +232,7 @@ export default {
         setRecipe(recipe) {
             this.recipe = recipe;
             this.yield = 100;
+            this.$forceUpdate();
         },
         reset() {
             this.production = null;

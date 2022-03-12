@@ -1,19 +1,17 @@
 <template>
     <div
-        @click="showMenu = !showMenu"
         class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2
-        shadow transition-all hover:border-blue-300 dark:border-slate-800 dark:shadow-slate-800 dark:hover:border-sky-800 dark:hover:shadow-sky-800"
+        shadow transition-all hover:border-blue-300 dark:border-slate-500 dark:shadow-slate-800 dark:hover:border-sky-800 dark:hover:shadow-sky-800"
     >
-        <!-- favorite/choice indicator -->
-        <div class="pr-4">
-            <span v-if="selected.favorite">⭐</span>
-            <span v-else-if="selectedChosen">⏺️</span>
-            <span v-else>⬜</span>
+        <div @click="toggle" class='absolute w-full h-full inset-0 bg-transparent'>
+
         </div>
+
         <!-- selected recipe -->
-        <recipe-detail :slim="true" :recipe="selected"></recipe-detail>
+        <product-detail :slim="true" :product="selected"></product-detail>
         <!-- dropdown arrow -->
         <div
+
             class="text-lg font-bold transition-all group-hover:text-blue-300"
             :style="{ transform: `rotate(${showMenu ? 180 : 0}deg)` }"
         >
@@ -24,24 +22,21 @@
         <div
             v-show="showMenu"
             style="top: 100%"
-            class="w-full left-0 absolute z-50 flex flex-col border border-sky-300 dark:border-sky-800 bg-white shadow-lg dark:bg-slate-900 max-h-[400px] pr-4 overflow-y-auto"
+            class="w-full absolute left-0 z-50 flex flex-col border border-sky-300 dark:border-sky-900 bg-white shadow-lg dark:bg-slate-900 max-h-[400px] pr-4 overflow-y-auto"
         >
-            <div class='p-4 border-b'>
-                <button @click='select({recipe:defaultRecipe})' class='btn btn-emerald'>
-                    Use Default
-                </button>
-            </div>
-            <recipe-detail
+            <input @click='showMenu=true' ref='filter' type='text' v-model='filter' class='p-2 m-2 rounded dark:bg-slate-900' placeholder='Search...'>
+            <product-detail
                 @select="select"
-                class="rounded border-b border-gray-300 p-4 hover:bg-sky-100 dark:hover:bg-sky-900"
-                :key="recipe.id"
-                v-for="recipe in recipes"
-                v-bind="{ recipe }"
-            ></recipe-detail>
+                class="rounded border-b border-gray-300 p-4 hover:bg-sky-100 dark:hover:bg-sky-900 dark:border-sky-800"
+                :key="product"
+                v-for="product in filteredProducts"
+                :product='product'
+            ></product-detail>
         </div>
 
         <!-- modal bg -->
         <div
+            @click='hide'
             v-show="showMenu"
             class="modal-bg fixed inset-0 z-40 bg-black opacity-5"
         ></div>
@@ -49,49 +44,32 @@
 </template>
 
 <script>
-import RecipeDetail from '@/Components/RecipeDetail';
+import ProductDetail from '@/Components/ProductDetail';
 
 export default {
-    name: 'RecipePicker',
+    name: 'ProductPicker',
 
     components: {
-        RecipeDetail,
+        ProductDetail,
     },
 
-    mounted() {
-        if (this.recipes?.length === 1 && this.selected.dummy)
-            this.selected = this.recipes[0];
-
-        if ( ! this.selected?.product?.name.length ) {
-            this.select({recipe: this.defaultRecipe});
-        }
-    },
 
     props: {
-        recipes: {
+        products: {
             required: true,
         },
         selected: {
             default() {
                 return {
-                    favorite: false,
-                    product: {
-                        name: 'dummy',
-                    },
-                    dummy: true,
-                };
-            },
-        },
-        choices: {
-            type: Object,
-            default() {
-                return {};
+                    name: ''
+                }
             }
-        }
+        },
     },
 
     data() {
         return {
+            filter: '',
             showMenu: false,
             vcoConfig: {
                 handler: this.handler,
@@ -111,17 +89,17 @@ export default {
     },
 
     computed: {
-        selectedChosen() {
-            return Object.values(this.choices).some(o => (o === this.selected.description || o === this.selected.product.name));
-        },
-
-        defaultRecipe() {
-            if (this.recipes.some(o => o.favorite)) {
-                return this.recipes.find(o => o.favorite);
+        filteredProducts() {
+            if ( ! this.filter.length) {
+                return this.products;
             }
-
-            return this.recipes.filter(o => !o.description)[0];
-        }
+            return this.products.filter(o => {
+                return o.name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1;
+            });
+        },
+        selectedChosen() {
+            return Object.values(this.choices).some(o => (o === this.selected));
+        },
     },
 
     methods: {
@@ -129,8 +107,21 @@ export default {
             this.showMenu = false;
         },
 
-        select({ recipe }) {
-            this.$emit('select', { recipe });
+        toggle() {
+            this.showMenu = ! this.showMenu;
+
+            if (this.showMenu) {
+                setTimeout(() => {
+                    this.$refs.filter.focus();
+                }, 300);
+            }
+        },
+
+        select({ product }) {
+            console.log({product});
+
+            this.$emit('select', { product });
+            this.hide();
         },
 
         outside() {

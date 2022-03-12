@@ -166,7 +166,7 @@ export default {
     },
 
     mounted() {
-        setTimeout(this.emit,100);
+        setTimeout(this.emit,500);
     },
 
     data() {

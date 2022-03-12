@@ -60,6 +60,7 @@
                         :name='name' :new-imports='newImports' :production='prod'
                         :recipes='recipes' :all-materials='production.all_materials'
                         :overviews='overviews'
+                      @toggle='toggle'
                       @setNewSubFavorite='setNewSubFavorite' />
                 </template>
             </template>
@@ -81,7 +82,6 @@ export default {
         production: {},
         productionChecks: {},
         recipes: {},
-        toggleProductionCheck: {},
         choices: {},
         even: {},
         overviews: {},
@@ -94,6 +94,10 @@ export default {
 
         setNewSubFavorite({ recipe }) {
             this.$emit('setNewSubFavorite', { recipe })
+        },
+
+        toggle(material) {
+            this.$emit('toggle',material);
         }
     },
 

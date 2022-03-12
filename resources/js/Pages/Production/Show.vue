@@ -175,14 +175,11 @@ export default {
 
     mounted() {
         this.Bus.on('UpdateOverviews', ({key, clock, selected_variant_name}) => {
-            // console.log({
-            //     key,
-            //     clock,
-            //     selected_variant_name
-            // })
-            this.overviews[key].clock = clock;
-            this.overviews[key].selected_variant_name = selected_variant_name;
-            this.$forceUpdate();
+            if(this.overviews[key]) {
+                this.overviews[key].clock = clock;
+                this.overviews[key].selected_variant_name = selected_variant_name;
+                this.$forceUpdate();
+            }
         });
     },
 
