@@ -132,17 +132,18 @@ class BuildingDetails extends Collection
                 'num_buildings' => $num_buildings,
                 'power_shards' => $power_shards,
                 'buildings_per_row' => $buildings_per_row,
-                'building_length' => $this->recipe->building->length,
-                'building_length_foundations' => ceil($this->recipe->building->length/8),
+                'building_length' => $building_length = $this->recipe->building->length,
+                'building_length_foundations' => $building_length_foundations = ceil($this->recipe->building->length/8),
                 'building_width' => $this->recipe->building->width,
                 'length_m' => $length = $rows * $this->recipe->building->length,
-                'length_foundations' => $length_foundations = ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
+                'length_foundations' => $length_foundations = ($rows>1 ? 2 : 0) + $rows * ($building_length_foundations+2), //ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
                 'width_m' => $width = $this->recipe->building->width * $buildings_per_row,
                 'width_foundations' => $width_foundations = ( ceil($width/8) + 4),
                 'height_m' => $height = $this->recipe->building->height,
                 'height_walls' => $height_walls = ceil($height/4) + 1,
                 'foundations' => $foundations = $length_foundations * $width_foundations,
-                'walls' => $height_walls * (2*($length_foundations + $width_foundations))
+                'walls' => $height_walls * (2*($length_foundations + $width_foundations)),
+                'row_spacing' => ($rows === 1) ? 0 : 8 * ($building_length_foundations+2) - $building_length,
             ];
 
             return [

@@ -38,6 +38,14 @@
                         {{ footprint.buildings_per_row }}
                     </span>
                 </li>
+                <li v-show='footprint.rows > 1' class='flex border-b border-gray-300'>
+                    <span class='ml-2 font-semibold'>
+                        Row Spacing
+                    </span>
+                    <span class='flex-1 text-right'>
+                        {{ footprint.row_spacing }} m
+                    </span>
+                </li>
                 <li class='flex border-b border-gray-300'>
                     <span class='ml-2 font-semibold'>
                         Belt Speed
@@ -71,8 +79,9 @@
                     class='absolute flex h-full w-full flex-wrap items-center justify-center'
                 >
                     <template v-for='ii in Array(footprint.foundations)'>
-                        <div class='border border-blue-500'
-                             style='box-sizing: border-box;height: 2rem;width: 2rem;'></div>
+                        <div class='border border-blue-500 flex flex-wrap items-around justify-around m-0 p-0'
+                             style='box-sizing: border-box;height: 2rem;width: 2rem;'>
+                        </div>
                     </template>
                 </div>
                 <div style='padding: 2rem;'
@@ -126,7 +135,8 @@ export default {
                     building_width: 0,
                     belt_speed: 0,
                     walls: 0,
-                    height_walls: 0
+                    height_walls: 0,
+                    row_spacing: 0
                 }
             }
         },
