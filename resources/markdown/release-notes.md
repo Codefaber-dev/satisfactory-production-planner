@@ -1,6 +1,6 @@
 # Satisfactory Production Planner
 
-## v0.0.9
+## v0.1.0
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
