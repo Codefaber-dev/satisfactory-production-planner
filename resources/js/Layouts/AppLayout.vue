@@ -58,6 +58,9 @@
                             <div
                                 class="mr-3 flex h-16 items-center justify-center"
                             >
+                                <span class='mr-4 whitespace-nowrap text-emerald-800 dark:text-emerald-300'>
+                                    🙏 Donations Received: {{ '$' + $page.props.donations.toFixed(2) }}
+                                </span>
 
                                 <a target='_blank' href='https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y' class='btn btn-gray whitespace-nowrap mr-4'>
                                     Donate

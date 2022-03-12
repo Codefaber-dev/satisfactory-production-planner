@@ -48,6 +48,22 @@
                 </li>
                 <li class='flex border-b border-gray-300'>
                     <span class='ml-2 font-semibold'>
+                        Top Offset
+                    </span>
+                    <span class='flex-1 text-right'>
+                        {{ footprint.top_offset }} m
+                    </span>
+                </li>
+                <li class='flex border-b border-gray-300'>
+                    <span class='ml-2 font-semibold'>
+                        Left Offset
+                    </span>
+                    <span class='flex-1 text-right'>
+                        {{ footprint.left_offset }} m
+                    </span>
+                </li>
+                <li class='flex border-b border-gray-300'>
+                    <span class='ml-2 font-semibold'>
                         Belt Speed
                     </span>
                     <span class='flex-1 text-right'>
@@ -87,6 +103,37 @@
                 <div style='padding: 2rem;'
                      class='absolute flex h-full w-full flex-wrap items-center justify-center'
                 >
+                    <!-- top offset -->
+                    <div class='absolute top-0 left-[40%] border-l border-black flex items-center justify-center box-border'
+                         :style="{height: footprint.top_offset/4 + 'rem'}">
+                        <div :style="{ width: '40px', height: '1.5rem', top: footprint.top_offset/8-0.75 + 'rem', left: '-20px' }"
+                             class='absolute p-1 bg-blue-300 text-black text-xs whitespace-nowrap'>{{ footprint.top_offset }} m</div>
+                    </div>
+                    <!-- bottom offset -->
+                    <div class='absolute bottom-0 left-[40%] border-l border-black flex items-center justify-center box-border'
+                         :style="{height: footprint.bottom_offset/4 + 'rem'}">
+                        <div :style="{ width: '40px', height: '1.5rem', top: footprint.bottom_offset/8-0.75 + 'rem', left: '-20px' }"
+                             class='absolute p-1 bg-blue-300 text-black text-xs whitespace-nowrap'>{{ footprint.bottom_offset }} m</div>
+                    </div>
+                    <!-- left offset -->
+                    <div class='absolute left-0 bottom-1/2 border-b border-black flex items-center justify-center box-border'
+                         :style="{width: footprint.left_offset/4 + 'rem'}">
+
+                        <div :style="{ width: '2rem', height: '1.5rem', left: footprint.left_offset/8-1 + 'rem', top: '-0.75rem' }"
+                             class='absolute p-1 bg-blue-300 text-black text-xs whitespace-nowrap'>{{ footprint.left_offset }} m</div>
+                    </div>
+                    <!-- right offset -->
+                    <div class='absolute right-0 bottom-1/2 border-b border-black flex items-center justify-center box-border'
+                         :style="{width: footprint.left_offset/4 + 'rem'}">
+                        <div :style="{ width: '2rem', height: '1.5rem', left: footprint.left_offset/8-1 + 'rem', top: '-0.75rem' }"
+                             class='absolute p-1 bg-blue-300 text-black text-xs whitespace-nowrap'>{{ footprint.left_offset }} m</div>
+                    </div>
+                    <!-- row spacing -->
+                    <div v-if='footprint.rows > 1' class='absolute left-[40%] top-0 border-l border-black flex items-center justify-center box-border'
+                         :style="{height: footprint.row_spacing/4 + 'rem', marginTop: (footprint.row_spacing_offset + footprint.building_top_offset)/4 + 'rem'}">
+                        <div :style="{ width: '40px', height: '1.5rem', top: footprint.row_spacing/8-0.75 + 'rem', left: '-20px' }"
+                             class='absolute p-1 bg-blue-300 text-black text-xs whitespace-nowrap'>{{ footprint.row_spacing }} m</div>
+                    </div>
                     <div class='flex w-full items-center justify-center'
                          v-for='(ii,row) in Array(footprint.rows)'
                     >
@@ -94,6 +141,7 @@
                              :style="{
                                 height: footprint.building_length /4 +'rem',
                                 width: footprint.building_width /4 +'rem',
+                                marginTop: footprint.building_top_offset /4 + 'rem',
                             }"
                              :class="1 + col + row * footprint.buildings_per_row <= footprint.num_buildings
                                 ? [
@@ -136,7 +184,12 @@ export default {
                     belt_speed: 0,
                     walls: 0,
                     height_walls: 0,
-                    row_spacing: 0
+                    row_spacing: 0,
+                    row_spacing_offset: 0,
+                    top_offset: 0,
+                    bottom_offset: 0,
+                    left_offset: 0,
+                    building_top_offset: 0
                 }
             }
         },

@@ -101,7 +101,7 @@ class BuildingDetails extends Collection
             })->max();
 
             // calc the number of rows needed
-            $rows = max(ceil($belt_load_in / $this->belt_speed), 1, ceil($this->qty / $this->belt_speed));
+            $rows = (int) max(ceil($belt_load_in / $this->belt_speed), 1, ceil($this->qty / $this->belt_speed));
 
             // calc the footprint
             //$rows = ceil($num_buildings/16); // max 16 buildings per row
@@ -125,6 +125,7 @@ class BuildingDetails extends Collection
             }
 
             $footprint = [
+                'foundation_border_y' => $foundation_border_y = ($rows > 1),
                 'monogram' => $this->recipe->building->name[0],
                 'belt_speed' => $this->belt_speed,
                 'belt_load' => $belt_load_in,
@@ -134,9 +135,9 @@ class BuildingDetails extends Collection
                 'buildings_per_row' => $buildings_per_row,
                 'building_length' => $building_length = $this->recipe->building->length,
                 'building_length_foundations' => $building_length_foundations = ceil($this->recipe->building->length/8),
-                'building_width' => $this->recipe->building->width,
+                'building_width' => $building_width = $this->recipe->building->width,
                 'length_m' => $length = $rows * $this->recipe->building->length,
-                'length_foundations' => $length_foundations = ($rows>1 ? 2 : 0) + $rows * ($building_length_foundations+2), //ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
+                'length_foundations' => $length_foundations = ($foundation_border_y ? 2 : 0) + $rows * ($building_length_foundations+2), //ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
                 'width_m' => $width = $this->recipe->building->width * $buildings_per_row,
                 'width_foundations' => $width_foundations = ( ceil($width/8) + 4),
                 'height_m' => $height = $this->recipe->building->height,
@@ -144,6 +145,11 @@ class BuildingDetails extends Collection
                 'foundations' => $foundations = $length_foundations * $width_foundations,
                 'walls' => $height_walls * (2*($length_foundations + $width_foundations)),
                 'row_spacing' => ($rows === 1) ? 0 : 8 * ($building_length_foundations+2) - $building_length,
+                'top_offset' => $top_offset = ceil((8 * ($building_length_foundations+2) - $building_length ) / 2 + ($foundation_border_y ? 8 : 0)),
+                'bottom_offset' => $top_offset = floor((8 * ($building_length_foundations+2) - $building_length ) / 2 + ($foundation_border_y ? 8 : 0)),
+                'row_spacing_offset' => $top_offset + $building_length,
+                'left_offset' => 16 + (8*($width_foundations-4) - $building_width*$buildings_per_row)/2,
+                'building_top_offset' => $building_length%2 ? 0.5 : 0,
             ];
 
             return [

@@ -46,7 +46,8 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'user' => auth()->check() ? $request->user()->toArray() : new User(),
             'releaseNotes' => $releaseNotes,
-            'version' => $version
+            'version' => $version,
+            'donations' => 1*config('app.donations'),
         ]);
     }
 }

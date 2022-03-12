@@ -1,6 +1,6 @@
 # Satisfactory Production Planner
 
-## v0.1.0
+## v0.2.0
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -30,6 +30,12 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
 ___
+### v0.2.0
+- 📊 Diagram Improvements - diagrams now display offset lengths to aid in positioning. When more than 1 row is required, the Row Spacing length is also displayed. Users of the Smart! mod can set the Y spacing value to this length to achieve the displayed spacing. To set the Y spacing (default keymappings), hold P, press the up arrow, then scroll the mouse wheel until the spacing is correct.
+
+
+![Overclocking](https://res.cloudinary.com/codefaber/image/upload/v1645676655/satisfactory/offsets.png)
+
 ### v0.1.0
 - UI Improvements and bug fixes
 
