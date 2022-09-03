@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductionLineController;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -22,6 +23,11 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// redirect the old domain to the new
+Route::domain('satisfactory.codefaber.dev')->group(function() {
+    Route::permanentRedirect('{any}', str_replace("satisfactory.codefaber.dev","satisfactoryproductionplanner.com",Request::fullUrl()));
+});
 
 //if (config('app.env') !== 'production')
 //    auth()->loginUsingId(1);
