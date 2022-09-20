@@ -17,6 +17,10 @@
         <!-- Scripts -->
         @routes
         <script src="{{ mix('js/app.js') }}" defer></script>
+
+        @production
+        <script defer data-domain="satisfactoryproductionplanner.com" src="https://plausible.io/js/plausible.js"></script>
+        @endproduction
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-slate-900" style="background-attachment: fixed">
         @inertia

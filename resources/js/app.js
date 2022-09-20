@@ -6,11 +6,12 @@ import mitt from 'mitt';
 import { App as InertiaApp, plugin as InertiaPlugin, InertiaLink } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
 import CloudImage from '@/Components/CloudImage';
+import {createPinia} from 'pinia';
 
 const el = document.getElementById('app');
 
 const Bus = mitt();
-
+const Pinia = createPinia();
 
 const app = createApp({
     render: () =>
@@ -21,6 +22,7 @@ const app = createApp({
     });
 
     app.mixin({ methods: { route } })
+        .use(Pinia)
         .use(InertiaPlugin)
         .component('CloudImage',CloudImage)
         .component('InertiaLink',InertiaLink)

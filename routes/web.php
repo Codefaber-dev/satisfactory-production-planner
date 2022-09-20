@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ProductionCalculator;
+use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\MultiProductionLineController;
 use App\Http\Controllers\PowerPlanController;
@@ -92,5 +93,5 @@ Route::patch('/factories/{id}', [ProductionLineController::class,'update']);
 Route::delete('/factories/{id}', [ProductionLineController::class,'destroy']);
 
 
-
+Route::get('/checklist',[ChecklistController::class,'index'])->name('checklist');
 

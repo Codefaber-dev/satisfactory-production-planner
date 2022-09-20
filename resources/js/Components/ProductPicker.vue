@@ -1,18 +1,14 @@
 <template>
     <div
-        class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2
-        shadow transition-all hover:border-blue-300 dark:border-slate-500 dark:shadow-slate-800 dark:hover:border-sky-800 dark:hover:shadow-sky-800"
+        class="group relative flex cursor-pointer items-center justify-between rounded border border-gray-400 px-4 py-2 shadow transition-all hover:border-blue-300 dark:border-slate-500 dark:shadow-slate-800 dark:hover:border-sky-800 dark:hover:shadow-sky-800"
     >
-        <div @click="toggle" class='absolute w-full h-full inset-0 bg-transparent'>
-
-        </div>
+        <div @click="toggle" class="absolute inset-0 h-full w-full bg-transparent"></div>
 
         <!-- selected recipe -->
         <product-detail :slim="true" :product="selected"></product-detail>
         <!-- dropdown arrow -->
         <div
-
-            class="text-lg font-bold transition-all group-hover:text-blue-300"
+            class="pointer-events-none text-lg font-bold transition-all group-hover:text-blue-300"
             :style="{ transform: `rotate(${showMenu ? 180 : 0}deg)` }"
         >
             🔽
@@ -22,24 +18,27 @@
         <div
             v-show="showMenu"
             style="top: 100%"
-            class="w-full absolute left-0 z-50 flex flex-col border border-sky-300 dark:border-sky-900 bg-white shadow-lg dark:bg-slate-900 max-h-[400px] pr-4 overflow-y-auto"
+            class="absolute left-0 z-50 flex max-h-[400px] w-full flex-col overflow-y-auto border border-sky-300 bg-white pr-4 shadow-lg dark:border-sky-900 dark:bg-slate-900"
         >
-            <input @click='showMenu=true' ref='filter' type='text' v-model='filter' class='p-2 m-2 rounded dark:bg-slate-900' placeholder='Search...'>
+            <input
+                @click="showMenu = true"
+                ref="filter"
+                type="text"
+                v-model="filter"
+                class="m-2 rounded p-2 dark:bg-slate-900"
+                placeholder="Search..."
+            />
             <product-detail
                 @select="select"
-                class="rounded border-b border-gray-300 p-4 hover:bg-sky-100 dark:hover:bg-sky-900 dark:border-sky-800"
+                class="rounded border-b border-gray-300 p-4 hover:bg-sky-100 dark:border-sky-800 dark:hover:bg-sky-900"
                 :key="product"
                 v-for="product in filteredProducts"
-                :product='product'
+                :product="product"
             ></product-detail>
         </div>
 
         <!-- modal bg -->
-        <div
-            @click='hide'
-            v-show="showMenu"
-            class="modal-bg fixed inset-0 z-40 bg-black opacity-5"
-        ></div>
+        <div @click="hide" v-show="showMenu" class="modal-bg fixed inset-0 z-40 bg-black opacity-5"></div>
     </div>
 </template>
 
@@ -53,7 +52,6 @@ export default {
         ProductDetail,
     },
 
-
     props: {
         products: {
             required: true,
@@ -61,9 +59,9 @@ export default {
         selected: {
             default() {
                 return {
-                    name: ''
-                }
-            }
+                    name: '',
+                };
+            },
         },
     },
 
@@ -90,15 +88,15 @@ export default {
 
     computed: {
         filteredProducts() {
-            if ( ! this.filter.length) {
+            if (!this.filter.length) {
                 return this.products;
             }
-            return this.products.filter(o => {
+            return this.products.filter((o) => {
                 return o.name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1;
             });
         },
         selectedChosen() {
-            return Object.values(this.choices).some(o => (o === this.selected));
+            return Object.values(this.choices).some((o) => o === this.selected);
         },
     },
 
@@ -108,7 +106,7 @@ export default {
         },
 
         toggle() {
-            this.showMenu = ! this.showMenu;
+            this.showMenu = !this.showMenu;
 
             if (this.showMenu) {
                 setTimeout(() => {
@@ -118,7 +116,7 @@ export default {
         },
 
         select({ product }) {
-            console.log({product});
+            console.log({ product });
 
             this.$emit('select', { product });
             this.hide();
@@ -129,9 +127,7 @@ export default {
         },
 
         handler(event) {
-            console.log(
-                'Clicked outside (Using config), middleware returned true :)'
-            );
+            console.log('Clicked outside (Using config), middleware returned true :)');
         },
         // Note: The middleware will be executed if the event was fired outside the element.
         //       It should have only sync functionality and it should return a boolean to

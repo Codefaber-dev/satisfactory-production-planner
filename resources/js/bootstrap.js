@@ -43,6 +43,14 @@ Array.prototype.sum = function(key=null) {
     return this.reduce((a,b) => +a+b,0);
 }
 
+String.prototype.$ucfirst = function() {
+    return this.substring(0,1).toUpperCase() + this.substring(1).toLowerCase();
+}
+
+String.prototype.$ucwords = function() {
+    return this.split(' ').map(o => o.$ucfirst()).join(' ');
+}
+
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

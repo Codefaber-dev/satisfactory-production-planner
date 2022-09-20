@@ -1,14 +1,14 @@
 <template>
     <app-layout>
         <!-- busy overlay -->
-        <div v-if='working' class='fixed inset-0 z-[1000] bg-slate-900 bg-opacity-30'></div>
+        <div v-if="working" class="fixed inset-0 z-[1000] bg-slate-900 bg-opacity-30"></div>
 
         <template #header>
-            <div class='flex flex-col justify-center space-y-4 text-xl font-semibold'>
-                <span class='flex items-center'>
+            <div class="flex flex-col justify-center space-y-4 text-xl font-semibold">
+                <span class="flex items-center">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 mr-2"
+                        class="mr-2 h-6 w-6"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -23,133 +23,176 @@
                     {{ newFactory ? newFactory.name : 'New Production Line' }}
                 </span>
 
-                <div v-for='(row,index) in form.outputs' class='flex flex-col items-center space-x-0 space-y-2 md:flex-row md:space-x-2 md:space-y-0'>
-                    <div class='relative flex w-full items-center md:w-48'>
-                        <input ref='yield' autofocus='autofocus' @change='fetch' type='number' step='0.5' min='0'
-                               v-model='row.yield'
-                               class='w-full appearance-none rounded py-2 px-1 shadow dark:bg-sky-800 md:w-48' />
-                        <div class='absolute right-8 bottom-2 pointer-events-none'>per min</div>
+                <div
+                    v-for="(row, index) in form.outputs"
+                    class="flex flex-col items-center space-x-0 space-y-2 md:flex-row md:space-x-2 md:space-y-0"
+                >
+                    <div class="relative flex w-full items-center md:w-48">
+                        <input
+                            ref="yield"
+                            autofocus="autofocus"
+                            @change="fetch"
+                            type="number"
+                            step="0.5"
+                            min="0"
+                            v-model="row.yield"
+                            class="w-full appearance-none rounded py-2 px-1 shadow dark:bg-sky-800 md:w-48"
+                        />
+                        <div class="pointer-events-none absolute right-8 bottom-2">per min</div>
                     </div>
-                    <select @change='setDefaultRecipe(row)'
-                            class='w-full md:w-[unset] rounded py-2 px-1 shadow dark:bg-sky-800' v-model='row.product'>
-                        <option :key='option.id' v-for='option in products' :value='option'>
+                    <select
+                        @change="setDefaultRecipe(row)"
+                        class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
+                        v-model="row.product"
+                    >
+                        <option :key="option.id" v-for="option in products" :value="option">
                             {{ option.name }}
                         </option>
                     </select>
-                    <select v-if='row.product' @change='fetch' class='w-full md:w-[unset] rounded py-2 px-1 shadow dark:bg-sky-800'
-                            v-model='row.recipe'>
-                        <option :key='option.id' v-for='option in recipes[row.product.name]' :value='option'>
-                            <template v-if='option.favorite'>&star;</template>
+                    <select
+                        v-if="row.product"
+                        @change="fetch"
+                        class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
+                        v-model="row.recipe"
+                    >
+                        <option :key="option.id" v-for="option in recipes[row.product.name]" :value="option">
+                            <template v-if="option.favorite">&star;</template>
                             {{ option.description || 'default' }}
                         </option>
                     </select>
-                    <template v-if='index === 0'>
-                        <select @change='fetch' v-model='form.variant'
-                                class='w-full md:w-[unset] rounded py-2 px-1 shadow dark:bg-sky-800'>
-                            <option value='mk1'>Production mk1 (base)</option>
-                            <option value='mk2'>Production mk2 (mk++ mod)</option>
-                            <option value='mk3'>Production mk3 (mk++ mod)</option>
-                            <option value='mk4'>Production mk4 (mk++ mod)</option>
+                    <template v-if="index === 0">
+                        <select
+                            @change="fetch"
+                            v-model="form.variant"
+                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
+                        >
+                            <option value="mk1">Production mk1 (base)</option>
+                            <option value="mk2">Production mk2 (mk++ mod)</option>
+                            <option value="mk3">Production mk3 (mk++ mod)</option>
+                            <option value="mk4">Production mk4 (mk++ mod)</option>
                         </select>
-                        <select @change='fetch' v-model='form.belt_speed'
-                                class='w-full md:w-[unset] rounded py-2 px-1 shadow dark:bg-sky-800'>
-                            <option value='60'>Belts mk1 (base)</option>
-                            <option value='120'>Belts mk2 (base)</option>
-                            <option value='270'>Belts mk3 (base)</option>
-                            <option value='480'>Belts mk4 (base)</option>
-                            <option value='780'>Belts mk5 (base)</option>
-                            <option value='2000'>Belts mk6 (Covered Conveyor Belt Mod)</option>
-                            <option value='7500'>Belts mk7 (Covered Conveyor Belt Mod)</option>
+                        <select
+                            @change="fetch"
+                            v-model="form.belt_speed"
+                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
+                        >
+                            <option value="60">Belts mk1 (base)</option>
+                            <option value="120">Belts mk2 (base)</option>
+                            <option value="270">Belts mk3 (base)</option>
+                            <option value="480">Belts mk4 (base)</option>
+                            <option value="780">Belts mk5 (base)</option>
+                            <option value="2000">Belts mk6 (Covered Conveyor Belt Mod)</option>
+                            <option value="7500">Belts mk7 (Covered Conveyor Belt Mod)</option>
                         </select>
-                        <button :disabled='form.outputs.length>=6' @click='addOutput' class='btn btn-emerald'>
+                        <button :disabled="form.outputs.length >= 6" @click="addOutput" class="btn btn-emerald">
                             Add Output
                         </button>
                     </template>
                     <template v-else>
-                        <button class='btn-sm btn-gray' @click='removeOutput(index)'>
-                            X
-                        </button>
+                        <button class="btn-sm btn-gray" @click="removeOutput(index)">X</button>
                     </template>
                 </div>
 
                 <div class="my-4 space-x-4">
-                    <button
-                        :disabled="working"
-                        @click="saveMyFactory"
-                        class="btn btn-emerald"
-                    >
-                        {{ newFactory ? "Save Changes To Factory" : "Save To My Factories" }}
+                    <button :disabled="working" @click="saveMyFactory" class="btn btn-emerald">
+                        {{ newFactory ? 'Save Changes To Factory' : 'Save To My Factories' }}
                     </button>
-                    <inertia-link class='btn btn-emerald' href='/dashboard'>
-                        Start Over
-                    </inertia-link>
+                    <inertia-link class="btn btn-emerald" href="/dashboard"> Start Over </inertia-link>
                 </div>
-<!--            <div class="mt-4 flex flex-col">-->
-<!--                <hr class="mb-4" />-->
-<!--                <span class="font-semibold">-->
-<!--                    Recipe:-->
-<!--                    <ul class="flex">-->
-<!--                        <li-->
-<!--                            class="px-4 font-medium"-->
-<!--                            v-for="ing in production.final.recipe.ingredients"-->
-<!--                        >-->
-<!--                            {{ ing.name }} ({{ +ing.pivot.base_qty }} per min)-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </span>-->
-<!--                <span class="font-semibold">-->
-<!--                    Byproducts:-->
-<!--                    <ul class="flex">-->
-<!--                        <li-->
-<!--                            class="px-4 font-medium"-->
-<!--                            v-for="ing in production.final.recipe.byproducts"-->
-<!--                        >-->
-<!--                            {{ ing.name }} ({{ +ing.pivot.base_qty }} per min)-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </span>-->
-<!--            </div>-->
+                <!--            <div class="mt-4 flex flex-col">-->
+                <!--                <hr class="mb-4" />-->
+                <!--                <span class="font-semibold">-->
+                <!--                    Recipe:-->
+                <!--                    <ul class="flex">-->
+                <!--                        <li-->
+                <!--                            class="px-4 font-medium"-->
+                <!--                            v-for="ing in production.final.recipe.ingredients"-->
+                <!--                        >-->
+                <!--                            {{ ing.name }} ({{ +ing.pivot.base_qty }} per min)-->
+                <!--                        </li>-->
+                <!--                    </ul>-->
+                <!--                </span>-->
+                <!--                <span class="font-semibold">-->
+                <!--                    Byproducts:-->
+                <!--                    <ul class="flex">-->
+                <!--                        <li-->
+                <!--                            class="px-4 font-medium"-->
+                <!--                            v-for="ing in production.final.recipe.byproducts"-->
+                <!--                        >-->
+                <!--                            {{ ing.name }} ({{ +ing.pivot.base_qty }} per min)-->
+                <!--                        </li>-->
+                <!--                    </ul>-->
+                <!--                </span>-->
+                <!--            </div>-->
             </div>
         </template>
         <!-- end template header -->
 
+        <div class="py-12">
+            <div class="mx-auto flex sm:px-6 lg:px-8">
+                <div v-if="done && production" class="relative flex flex-1 flex-col space-y-2 p-4 dark:text-gray-100">
+                    <production-warning :overrides="production.overrides" :show-warnings="showWarnings" />
 
-        <div class='py-12'>
-            <div class='mx-auto flex sm:px-6 lg:px-8'>
-                <div
-                    v-if='done && production'
-                    class='relative flex flex-1 flex-col space-y-2 p-4 dark:text-gray-100'
-                >
-                    <production-warning :overrides='production.overrides' :show-warnings="showWarnings" />
+                    <!-- Tabs -->
+                    <div class="xl:hidden">
+                        <ul class="flex space-x-4">
+                            <li>
+                                <button @click="selectedTab = 'productionSteps'">Production Steps</button>
+                            </li>
+                            <li>
+                                <button @click="selectedTab = 'productionSummary'">Production Summary</button>
+                            </li>
+                            <li>
+                                <button @click="selectedTab = 'buildingSummary'">Building Summary</button>
+                            </li>
+                        </ul>
+                    </div>
 
-                    <div class='flex flex-col md:flex-row space-y-8 space-x-0 md:space-y-0 flex-1 md:space-x-8 py-4'>
+                    <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-8">
                         <!-- Left Side -->
-                        <production-summary :building-checks='buildingChecks'
-                                            :disabled-raw-materials='disabledRawMaterials'
-                                            @fetch='fetch' @fetchNewYield='fetchNewYield' :help-import='helpImport'
-                                            :help-raw-materials='helpRawMaterials' :new-imports='newImports'
-                                            :production='production'
-                                            :production__building_summary='production__building_summary'
-                                            :production__total_power='production__total_power'
-                                            :raw-materials='rawMaterials'
-                                            :raw-unchanged='rawUnchanged' />
+                        <production-summary
+                            :building-checks="buildingChecks"
+                            :disabled-raw-materials="disabledRawMaterials"
+                            @fetch="fetch"
+                            @fetchNewYield="fetchNewYield"
+                            :help-import="helpImport"
+                            :help-raw-materials="helpRawMaterials"
+                            :new-imports="newImports"
+                            :production="production"
+                            :production__building_summary="production__building_summary"
+                            :production__total_power="production__total_power"
+                            :raw-materials="rawMaterials"
+                            :raw-unchanged="rawUnchanged"
+                        />
 
                         <!-- middle -->
-                        <production-steps ref='productionSteps' :diagrams='diagrams' :hide-completed='hideCompleted' :new-imports='newImports'
-                                      :production='production' :overviews='overviews'
-                                      :production-checks='productionChecks' :recipes='recipes' :choices='allChosenRecipes'
-                                      @setNewSubFavorite='setNewSubFavorite' :even='newEven'
-                                      @toggle='toggleProductionCheck' @toggleDiagrams='toggleDiagrams' @toggleEvenRows='toggleEvenRows' />
+                        <production-steps
+                            ref="productionSteps"
+                            :diagrams="diagrams"
+                            :hide-completed="hideCompleted"
+                            :new-imports="newImports"
+                            :production="production"
+                            :overviews="overviews"
+                            :production-checks="productionChecks"
+                            :recipes="recipes"
+                            :choices="allChosenRecipes"
+                            @setNewSubFavorite="setNewSubFavorite"
+                            :even="newEven"
+                            @toggle="toggleProductionCheck"
+                            @toggleDiagrams="toggleDiagrams"
+                            @toggleEvenRows="toggleEvenRows"
+                        />
 
                         <!-- right -->
-                        <building-summary :production__building_details='production__building_details'
-                                          :production__building_summary='production__building_summary'
-                                      :production__total_power='production__total_power' />
+                        <building-summary
+                            :production__building_details="production__building_details"
+                            :production__building_summary="production__building_summary"
+                            :production__total_power="production__total_power"
+                        />
                     </div>
                 </div>
             </div>
         </div>
-
     </app-layout>
 </template>
 
@@ -161,7 +204,6 @@ import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
 
-
 export default {
     name: 'ShowNew',
 
@@ -170,12 +212,12 @@ export default {
         ProductionSteps,
         ProductionSummary,
         AppLayout,
-        ProductionWarning
+        ProductionWarning,
     },
 
     mounted() {
-        this.Bus.on('UpdateOverviews', ({key, clock, selected_variant_name}) => {
-            if(this.overviews[key]) {
+        this.Bus.on('UpdateOverviews', ({ key, clock, selected_variant_name }) => {
+            if (this.overviews[key]) {
                 this.overviews[key].clock = clock;
                 this.overviews[key].selected_variant_name = selected_variant_name;
                 this.$forceUpdate();
@@ -199,29 +241,31 @@ export default {
         'imports',
         'multi',
         'choices',
-        'even'
+        'even',
     ],
 
     data() {
-        let outputs = this.multi ? this.multi.products.map((o,i) => {
-            return {
-                yield: this.multi.yields[i],
-                product: this.products.filter(oo => oo.id === o.id)[0],
-                recipe: this.recipes[o.name].filter(o => o.id === this.multi.recipes[i].id)[0]
-            }
-        }) : [
-            {
-                yield: this.yield,
-                product: this.products.filter(o => o.id === this.product.id)[0],
-                recipe: this.recipes[this.product.name].filter(o => o.id === this.production.recipe.id)[0],
-            }
-        ];
+        let outputs = this.multi
+            ? this.multi.products.map((o, i) => {
+                  return {
+                      yield: this.multi.yields[i],
+                      product: this.products.filter((oo) => oo.id === o.id)[0],
+                      recipe: this.recipes[o.name].filter((o) => o.id === this.multi.recipes[i].id)[0],
+                  };
+              })
+            : [
+                  {
+                      yield: this.yield,
+                      product: this.products.filter((o) => o.id === this.product.id)[0],
+                      recipe: this.recipes[this.product.name].filter((o) => o.id === this.production.recipe.id)[0],
+                  },
+              ];
 
         return {
             form: {
                 outputs,
                 variant: this.variant,
-                belt_speed: this.belt_speed || 780
+                belt_speed: this.belt_speed || 780,
             },
             newFactory: this.multi ? this.multiFactory : this.factory,
             done: true,
@@ -242,17 +286,26 @@ export default {
             newConstraints: [],
             rawUnchanged: true,
             diagrams: store.getItem('diagrams', true),
-            newImports: this.imports ? Object.fromEntries((this.imports || "").split(",").map(o=>[o,true])) : {},
+            newImports: this.imports ? Object.fromEntries((this.imports || '').split(',').map((o) => [o, true])) : {},
             showWarnings: true,
             newChoices: this.choices || {},
             newEven: !!this.even,
-            overviews: this.production.overviews
+            overviews: this.production.overviews,
+            selectedTab: 'productionSteps',
         };
     },
 
     computed: {
         allChosenRecipes() {
-            return Object.assign({}, this.newChoices, Object.fromEntries(this.form.outputs.filter(o => o.product && o.recipe).map(o => [o.product.name,(o.recipe.description || o.product.name) ])));
+            return Object.assign(
+                {},
+                this.newChoices,
+                Object.fromEntries(
+                    this.form.outputs
+                        .filter((o) => o.product && o.recipe)
+                        .map((o) => [o.product.name, o.recipe.description || o.product.name])
+                )
+            );
         },
 
         production__building_details() {
@@ -260,14 +313,14 @@ export default {
             //     return [];
             // }
 
-            return Object.values(this.overviews).map(o => {
+            return Object.values(this.overviews).map((o) => {
                 let clock = o.clock,
                     variant_name = o.selected_variant_name;
                 return {
                     clock,
                     variant_name,
-                    ...o.overviews[clock].details[variant_name]
-                }
+                    ...o.overviews[clock].details[variant_name],
+                };
             });
 
             // let ret = [];
@@ -291,21 +344,20 @@ export default {
         },
 
         production__building_summary() {
-            let deets = this.production__building_details.groupBy("variant_name"),
+            let deets = this.production__building_details.groupBy('variant_name'),
                 ret = {
-                    variants: {}
+                    variants: {},
                 };
-
 
             for (let prop in deets) {
                 ret.variants[prop] = {
-                    build_cost: deets[prop].mapAndSumProperties("build_cost"),
-                    num_buildings: deets[prop].sum("num_buildings"),
-                    power_usage: deets[prop].sum("power_usage"),
-                }
+                    build_cost: deets[prop].mapAndSumProperties('build_cost'),
+                    num_buildings: deets[prop].sum('num_buildings'),
+                    power_usage: deets[prop].sum('power_usage'),
+                };
             }
 
-            ret.total_build_cost = this.production__building_details.mapAndSumProperties("build_cost");
+            ret.total_build_cost = this.production__building_details.mapAndSumProperties('build_cost');
 
             return ret;
 
@@ -340,11 +392,11 @@ export default {
         },
 
         production__total_power() {
-            return this.production__building_details.map(o => +o.power_usage).reduce((a, b) => a + b, 0);
+            return this.production__building_details.map((o) => +o.power_usage).reduce((a, b) => a + b, 0);
         },
 
         production__total_buildings() {
-            return this.production__building_details.map(o => +o.num_buildings).reduce((a, b) => a + b, 0);
+            return this.production__building_details.map((o) => +o.num_buildings).reduce((a, b) => a + b, 0);
         },
 
         endpoint() {
@@ -353,13 +405,13 @@ export default {
             }
 
             let p = this.form.outputs[0],
-                parts = [p.product.name, p.yield, (p.recipe.description || p.product.name), this.form.variant];
+                parts = [p.product.name, p.yield, p.recipe.description || p.product.name, this.form.variant];
 
             return parts.join('/');
         },
 
         params() {
-            let params =  {
+            let params = {
                 imports: Object.keys(this.newImports)
                     .filter((o) => this.newImports[o])
                     .join(','),
@@ -368,18 +420,20 @@ export default {
                 variant: this.form.variant,
                 choices: this.newChoices,
                 even: this.newEven ? 1 : 0,
-            }
+            };
 
             if (this.form.outputs.length > 1) {
-                params.product = this.form.outputs.filter(o => o.product && o.recipe).map(o => o.product.name);
-                params.yield = this.form.outputs.filter(o => o.product && o.recipe).map(o => o.yield);
-                params.recipe = this.form.outputs.filter(o => o.product && o.recipe).map(o => o.recipe.description || o.product.name);
-                delete(params.factory);
+                params.product = this.form.outputs.filter((o) => o.product && o.recipe).map((o) => o.product.name);
+                params.yield = this.form.outputs.filter((o) => o.product && o.recipe).map((o) => o.yield);
+                params.recipe = this.form.outputs
+                    .filter((o) => o.product && o.recipe)
+                    .map((o) => o.recipe.description || o.product.name);
+                delete params.factory;
                 params.multiFactory = this.newFactory ? this.newFactory.id : '';
             }
 
             return params;
-        }
+        },
     },
 
     methods: {
@@ -411,20 +465,20 @@ export default {
 
             if (!raw.length) return false;
 
-            this.$inertia.get(`/newyield/${this.endpoint}`,{
+            this.$inertia.get(`/newyield/${this.endpoint}`, {
                 ...this.params,
-                raw: raw.join(',')
+                raw: raw.join(','),
             });
         },
 
         toggleEvenRows() {
-            this.newEven = ! this.newEven;
-            this.fetch({preserveScroll: true});
+            this.newEven = !this.newEven;
+            this.fetch({ preserveScroll: true });
         },
 
         toggleDiagrams() {
-           this.diagrams = !this.diagrams;
-           this.savePrefs();
+            this.diagrams = !this.diagrams;
+            this.savePrefs();
         },
 
         addOutput() {
@@ -438,7 +492,7 @@ export default {
         },
 
         removeOutput(index) {
-            this.form.outputs.splice(index,1);
+            this.form.outputs.splice(index, 1);
             this.newFactory = null;
             this.fetch();
         },
@@ -479,12 +533,12 @@ export default {
         },
 
         saveMultiFactory() {
-             let name,
-                 imports = Object.keys(this.newImports)
+            let name,
+                imports = Object.keys(this.newImports)
                     .filter((o) => this.newImports[o])
                     .join(',');
 
-             if (this.newFactory) {
+            if (this.newFactory) {
                 return this.$inertia.patch(`/factories/multi/${this.newFactory.id}`, {
                     outputs: this.form.outputs,
                     choices: this.newChoices,
@@ -503,14 +557,13 @@ export default {
         },
 
         setNewSubFavorite({ recipe }) {
-            if (this.form.outputs.some(o => o.recipe.product_id === recipe.product_id)) {
-                this.form.outputs.find(o => o.recipe.product_id === recipe.product_id).recipe = recipe;
-            }
-            else {
+            if (this.form.outputs.some((o) => o.recipe.product_id === recipe.product_id)) {
+                this.form.outputs.find((o) => o.recipe.product_id === recipe.product_id).recipe = recipe;
+            } else {
                 this.newChoices[recipe.product.name] = recipe.description || recipe.product.name;
             }
             this.fetch({
-                preserveScroll: true
+                preserveScroll: true,
             });
         },
 
@@ -535,7 +588,8 @@ export default {
         },
 
         toggleProductionCheck(material) {
-            if (this.productionChecks.hasOwnProperty(material)) this.productionChecks[material] = !this.productionChecks[material];
+            if (this.productionChecks.hasOwnProperty(material))
+                this.productionChecks[material] = !this.productionChecks[material];
             else this.productionChecks[material] = true;
         },
 
@@ -569,13 +623,16 @@ export default {
         // },
 
         helpRawMaterials() {
-            alert('Constrained by something? Enter your actual available raw materials then click Update Yield. Click the green button next to the input to ignore that material for the recalculation.');
+            alert(
+                'Constrained by something? Enter your actual available raw materials then click Update Yield. Click the green button next to the input to ignore that material for the recalculation.'
+            );
         },
 
         helpImport() {
-            alert('Choose whether to produce each intermediate product in this factory (default) or to import select products from elsewhere.');
+            alert(
+                'Choose whether to produce each intermediate product in this factory (default) or to import select products from elsewhere.'
+            );
         },
     },
 };
 </script>
-
