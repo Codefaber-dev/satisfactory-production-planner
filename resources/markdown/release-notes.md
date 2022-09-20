@@ -1,6 +1,8 @@
 # Satisfactory Production Planner
+## New Domain
+## satisfactoryproductionplanner.com
 
-## v0.2.0
+## v0.3.0
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -11,7 +13,7 @@ Eager to share feedback or have suggestions for improvements?
 [Join The Discussion On Discord](https://discord.gg/dqGQECppCy)
 
 ### 👤 User Registration
-Your factories and favorites will persist across sessions if you [register](https://satisfactory.codefaber.dev), but it's entirely optional. 
+Your factories and favorites will persist across sessions if you [register](https://satisfactoryproductionplanner.com), but it's entirely optional. 
 
 ### 🔏️ Privacy
 I hate spam as much as the next guy. I will never send you spam or give your information out to anyone.
@@ -28,6 +30,12 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.3.0
+Update 6 & New Domain
+- Satisfactory Production Planner has been updated with the changes introduced in Update 6 including new items and tweaks to existing recipes. Please let me know if you spot any errors and I will work to get those corrected. Enjoy.
+- This project has a new home now at satisfactoryproductionplanner.com. If you have existing shortcuts to the old domain, they will continue to work and redirect to the new one.
+
 
 ___
 ### v0.2.0

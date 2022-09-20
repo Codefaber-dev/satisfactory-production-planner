@@ -31,9 +31,9 @@ class Ingredient extends Model
         return (bool) $this->raw;
     }
 
-    public function scopeOfName(Builder $query, $name)
+    public function scopeOfName(Builder $query, $name, $default = null)
     {
-        return $query->whereName($name)->first();
+        return $query->whereName($name)->first() ?: $default;
     }
 
     public function scopeProcessed(Builder $query)
@@ -87,6 +87,13 @@ class Ingredient extends Model
     public function recipes()
     {
         return $this->hasMany(Recipe::class,'product_id');
+    }
+
+    public function usedInRecipes()
+    {
+        return Recipe::whereHas('ingredients', function($query) {
+            return $query->where('id',$this->id);
+        })->get();
     }
 
     /**

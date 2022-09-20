@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ProductionCalculator;
+use App\Helpers\UpdateSix;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\MultiProductionLineController;
@@ -47,9 +48,16 @@ Route::get('/fix-recipes', function() {
     //r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
     //r('Seismic Nobelisk', force: true);
 
-    r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
-    r('Plutonium Fuel Rod', force: true);
+    // r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
+    // r('Plutonium Fuel Rod', force: true);
 });
+
+Route::get('/fix-recipes-u6', function() {
+    UpdateSix::update();
+});
+
+
+
 //
 //Route::get('testing', function() {
 //    return energy('Unpackage Fuel');

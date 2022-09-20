@@ -14,6 +14,16 @@ function guest_token(): string
     return Session::getId();
 }
 
+function forgetRecipe($name) {
+    $key = is_string($name) ? $name : ($name->description ?? $name->product->name);
+    Cache::forget("recipes.$key");
+}
+
+function forgetIngredient($name) {
+    $key = is_string($name) ? $name : $name->name;
+    Cache::forget("ingredients.$key");
+}
+
 function r($name, $force=false) {
     $key = is_string($name) ? $name : ($name->description ?? $name->product->name);
 

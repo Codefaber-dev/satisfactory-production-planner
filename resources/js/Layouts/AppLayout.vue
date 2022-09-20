@@ -51,12 +51,12 @@
                                 >
                                     My Favorite Recipes
                                 </jet-nav-link>
-                                <jet-nav-link
+                                <!-- <jet-nav-link
                                     :href="route('checklist')"
                                     :active="route().current('checklist')"
                                 >
                                     Production Checklist
-                                </jet-nav-link>
+                                </jet-nav-link> -->
                             </div>
                         </div>
 
