@@ -468,7 +468,7 @@ class RecipeSeeder extends Seeder
                 [
                     "description" => "Crystal Computer",
                     "base_yield" => 3,
-                    "base_per_min" => 2.8,
+                    "base_per_min" => 2.8125,
                     "ingredients" => [
                         "Circuit Board" => 7.5,
                         "Crystal Oscillator" => 2.8125,

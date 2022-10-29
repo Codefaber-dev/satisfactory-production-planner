@@ -693,6 +693,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-bottom: 0.5rem;
 }.mr-8{
   margin-right: 2rem;
+}.mb-1{
+  margin-bottom: 0.25rem;
 }.box-border{
   box-sizing: border-box;
 }.block{

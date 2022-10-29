@@ -21,7 +21,8 @@
                     </div>
 
                     <div
-                        class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                        class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg 
+                        border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
                     >
                         <span class="font-semibold"> Destination </span>
                         <div class="flex flex-shrink-0 flex-grow flex-col" v-for="(out_qty, mat) in material.outputs">
@@ -48,6 +49,28 @@
                                     Output {{ out_qty }} per min ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
                                 </div>
                             </template>
+                        </div>
+                    </div>
+
+                    <div v-if="Object.keys(production.byproducts).length" 
+                    class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg 
+                        border border-yellow-500 bg-yellow-200 p-2 shadow-lg">
+                        <span class="font-semibold mb-1"> Byproducts </span>
+
+                        <div class="flex flex-shrink-0 flex-grow flex-col" v-for="(qty, name) in production.byproducts">
+                            <div class="flex w-full">
+                                <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
+
+                                <div class="mr-2 flex flex-shrink-0 flex-grow flex-col space-y-2">
+                                    <span class="font-semibold">
+                                        {{ name }}
+                                        <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
+                                            Override
+                                        </span>
+                                    </span>
+                                    <span class="font-light"> {{ qty }} per min </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
