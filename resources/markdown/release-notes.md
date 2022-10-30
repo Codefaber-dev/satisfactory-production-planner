@@ -34,7 +34,7 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 ### v0.3.1
 Byproduct Recycling ♻️
 - Production steps will now utilize byproducts produced in other steps
-- This also works for [multi-product lines](https://satisfactoryproductionplanner.com/dashboard/multi?imports%3D%26belt_speed%3D780%26variant%3Dmk1%26choices%5BFuel%5D%3DResidual%20Fuel%26even%3D0%26product%5B%5D%3DPackaged%20Fuel%26product%5B%5D%3DPlastic%26yield%5B%5D%3D100%26yield%5B%5D%3D250%26recipe%5B%5D%3DPackaged%20Fuel%26recipe%5B%5D%3DPlastic%26multiFactory%3D)
+- This also works for [multi-product lines](<https://satisfactoryproductionplanner.com/dashboard/multi?imports=&belt_speed=780&variant=mk1&choices[Fuel]=Residual Fuel&even=0&product[]=Packaged Fuel&product[]=Plastic&yield[]=100&yield[]=250&recipe[]=Packaged Fuel&recipe[]=Plastic&multiFactory=>)
 
 
 ### v0.3.0
