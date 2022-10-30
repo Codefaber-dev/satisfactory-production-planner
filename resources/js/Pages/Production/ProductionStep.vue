@@ -77,7 +77,12 @@
                                 </span>
                                 <br />
                                 <span class="font-light italic">
-                                    {{ Math.round((100 * 100 * in_qty) / allMaterials[name]) / 100 }}%
+                                    {{
+                                        Math.round(
+                                            (100 * 100 * in_qty) /
+                                                (allMaterials[name] || Object.values(byproductsUsed[name]).sum())
+                                        ) / 100
+                                    }}%
                                 </span>
                             </div>
                         </div>
