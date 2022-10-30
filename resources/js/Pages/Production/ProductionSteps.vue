@@ -19,6 +19,7 @@
             <tr>
                 <th class="font-semibold">Ingredient (Click To Toggle)</th>
                 <th class="font-semibold">Inputs</th>
+                <th class="font-semibold">Byproducts</th>
                 <th class="font-semibold">Recipe</th>
                 <th class="font-semibold">Production</th>
             </tr>
@@ -42,7 +43,7 @@
 
                 <template v-for="(material, name) in level">
                     <ProductionStep
-                        v-for="prod in material.production"
+                        v-for="prod in material.production.filter((o) => o.recipe)"
                         v-show="
                             !prod.imported &&
                             (!hideCompleted || !productionChecks[name + '-' + (prod.recipe?.description || 'base')])
@@ -60,6 +61,7 @@
                         :production="prod"
                         :recipes="recipes"
                         :all-materials="production.all_materials"
+                        :byproducts-used="production.byproducts_used"
                         :overviews="overviews"
                         @toggle="toggle"
                         @setNewSubFavorite="setNewSubFavorite"

@@ -112,7 +112,7 @@ class RecipeProductionTest extends TestCase
             ]
         );
 
-        dd($production->getSlimResults());
+        //dd($production->getSlimResults());
 
         $this->assertEquals(145, $production->get('2.Caterium Ingot.total'));
         $this->assertEquals(725, $production->get('2.Copper Ingot.total'));

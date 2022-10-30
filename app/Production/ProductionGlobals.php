@@ -14,10 +14,12 @@ class ProductionGlobals
     protected Collection $overrides;
     protected Collection $favorites;
     protected Collection $imports;
+
+    protected Collection $byproducts;
     protected string $variant;
     protected int $belt_speed;
 
-    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant)
+    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant)
     {
         $this->choices = collect($choices);
         $this->overrides = collect($overrides);
@@ -25,13 +27,14 @@ class ProductionGlobals
             collect($favorites) :
             Favorites::all()->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse();
         $this->imports = collect($imports);
+        $this->byproducts = collect($byproducts);
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed',780);
     }
 
-    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, string $variant): static
+    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant): static
     {
-        return new static($choices, $overrides, $favorites, $imports, $variant);
+        return new static($choices, $overrides, $favorites, $imports, $byproducts, $variant);
     }
 
     public static function fromArray(array $globals): static
@@ -41,6 +44,7 @@ class ProductionGlobals
             overrides: $globals['overrides'] ?? [],
             favorites: $globals['favorites'] ?? null,
             imports: $globals['imports'] ?? [],
+            byproducts: $globals['byproducts'] ?? [],
             variant: $globals['variant'] ?? 'mk1'
         );
     }
@@ -65,9 +69,24 @@ class ProductionGlobals
         return $this->getImports()->contains($ingredient);
     }
 
+    public function isByproduct(string $ingredient): bool
+    {
+        return $this->getByproducts()->has($ingredient);
+    }
+
     public function isOverride(string $ingredient): bool
     {
         return isset($this->overrides[$ingredient]);
+    }
+
+    public function getByproducts(): ?Collection
+    {
+        return $this->byproducts;
+    }
+
+    public function getByproduct(string $ingredient)
+    {
+        return $this->byproducts->get($ingredient);
     }
 
     public function getChoices(): ?Collection

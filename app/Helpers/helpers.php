@@ -59,7 +59,7 @@ function raw($recipe, $use_alts = false, $qty = 1) {
 }
 
 // lower is better
-function energy(Recipe $recipe, $use_alts = false)
+function energy(Recipe|string $recipe, $use_alts = false)
 {
     try {
         $qty = $recipe->base_per_min;

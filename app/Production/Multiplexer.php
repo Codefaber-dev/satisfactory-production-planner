@@ -25,6 +25,13 @@ class Multiplexer
         return ProductionCalculator::groupAndSortResults($results);
     }
 
+    public function recalculateUsingByproducts()
+    {
+        $this->calcs->each(function($calc) {
+           $calc->recalculateUsingByproducts($this->getByproducts());
+        });
+    }
+
     public function getRawMaterials()
     {
         $results = $this->getResults();
@@ -90,11 +97,16 @@ class Multiplexer
         return $this->calcs->map(fn($calc) => $calc->getByproducts())->sumByKey();
     }
 
+    public function getByproductsUsed()
+    {
+        return $this->calcs->map(fn($calc) => $calc->getByproductsUsed())->sumByKey();
+    }
+
     public function getOverviews()
     {
         return $this->getResults()->map(function($tier) {
            return $tier->map(function($product) {
-              return $product->production->filter(fn($row) => $row['overview'])->pluck('overviews');
+              return $product->production->filter(fn($row) => isset($row['overview']))->pluck('overviews');
            })->collapse()->filter();
         })->collapse()
             ->map(fn($overview) => [$overview["c100"]["product"] . "|" . $overview["c100"]["recipe"] => [

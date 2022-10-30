@@ -7,6 +7,7 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
 use Illuminate\Support\Collection;
+use phpDocumentor\Reflection\Types\Static_;
 
 class ProductionCalculator
 {
@@ -25,6 +26,8 @@ class ProductionCalculator
 
     protected ?Collection $choices;
 
+    protected ?Collection $byproducts;
+
     protected $imports;
 
     protected $variant;
@@ -35,7 +38,7 @@ class ProductionCalculator
     protected $raw_available;
 
     public static function make(
-        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1", $choices = []
+        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1", $choices = [], $byproducts = []
     ): static {
         $production = (new static)->setProduct($product)
             ->setQty($qty)
@@ -44,7 +47,8 @@ class ProductionCalculator
             ->setFavorites($favorites)
             ->setImports($imports)
             ->setVariant($variant)
-            ->setChoices($choices);
+            ->setChoices($choices)
+            ->setByproducts($byproducts);
 
         $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
@@ -52,7 +56,23 @@ class ProductionCalculator
 
         $production->doParse();
 
+        // if production byproducts can be utilized then calculate again
+
+        if($production->hasUsableByproducts())
+        {
+            $production->recalculateUsingByproducts();
+        }
+
         return $production;
+    }
+
+    public function recalculateUsingByproducts($byproducts = null)
+    {
+        $this->setByproducts($byproducts ?? $this->getByproducts());
+
+        $this->calculate();
+
+        $this->doParse();
     }
 
     public function setProduct($product): static
@@ -103,6 +123,13 @@ class ProductionCalculator
         return $this;
     }
 
+    public function setByproducts($byproducts = []): static
+    {
+        $this->byproducts = collect($byproducts);
+
+        return $this;
+    }
+
     public function getQty()
     {
         return $this->qty;
@@ -124,7 +151,8 @@ class ProductionCalculator
                 overrides: $this->overrides,
                 favorites: $this->favorites,
                 imports: $this->imports,
-                variant: $this->variant)
+                variant: $this->variant,
+                byproducts: $this->byproducts)
         );
     }
 
@@ -150,14 +178,14 @@ class ProductionCalculator
 
     public function setFavorites(Collection|array|null $favorites): static
     {
-        $this->favorites = $favorites;
+        $this->favorites = collect($favorites);
 
         return $this;
     }
 
     public function setChoices(Collection|array|null $choices): static
     {
-        $this->choices = $choices;
+        $this->choices = collect($choices);
 
         return $this;
     }
@@ -222,5 +250,14 @@ class ProductionCalculator
             })
             ->filter()
             ->min() ?? 1;
+    }
+
+    public function getByproductsUsed(): Collection
+    {
+        return $this->results->flatMap(function($tier) {
+            return $tier->map(function($production, $name) {
+               return $production->byproduct_outputs;
+            });
+        })->filter();
     }
 }

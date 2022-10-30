@@ -24,7 +24,7 @@ class CollectionMacroTest extends TestCase
             ]
         ]);
 
-        $this->assertEquals([6,8,10,12], $a->crossSum());
+        $this->assertEquals([6,8,10,12], $a->crossSum()->toArray());
     }
 
     /** @test */
@@ -39,7 +39,7 @@ class CollectionMacroTest extends TestCase
             ]
         ]);
 
-       $this->assertEquals([6,8,10,12], $a->crossSumByKey('val'));
+       $this->assertEquals([6,8,10,12], $a->crossSumByKey('val')->toArray());
     }
 
     /** @test */
@@ -51,6 +51,6 @@ class CollectionMacroTest extends TestCase
             ],
         ]);
 
-       $this->assertEquals([1,2,3,4], $a->crossSumByKey('val'));
+       $this->assertEquals([1,2,3,4], $a->crossSumByKey('val')->toArray());
     }
 }

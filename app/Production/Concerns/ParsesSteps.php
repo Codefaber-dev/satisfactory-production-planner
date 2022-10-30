@@ -84,6 +84,11 @@ trait ParsesSteps
         return $this->raw_results->pluck('byproducts')->filter()->sumByKey();
     }
 
+    public function hasUsableByproducts(): bool
+    {
+        return (bool) $this->getIntermediateMaterials()->intersectByKeys($this->getByproducts())->count();
+    }
+
     public function getAllMaterials()
     {
         return $this->results->map(function($tier) {
@@ -116,52 +121,74 @@ trait ParsesSteps
     {
         return $results->sortBy(['tier', 'name'])->groupBy(['tier', 'name'])
             ->map(function($products, $tier){
-                return $products->map(function($recipes, $product) {
-                    $recipes = collect($recipes);
-                    return [$product => (object) [
-                        "raw" => i($product)->isRaw(),
-                        "imported" => $recipes->max('imported'),
-                        "overridden" => $recipes->max('overridden'),
-                        "total" => $recipes->sum('qty'),
-                        "outputs" => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
-                        "production" => $recipes
-                            ->groupBy(fn($row) => $row['name'].".".$row['description'])
-                            ->map(function($group) {
-                                $qty = round($group->sum('qty'),4);
-                                $recipe = $group->dataGet("0.recipe");
-                                $variant = $group->dataGet("0.variant");
-                                $belt_speed = $group->dataGet("0.belt_speed");
-                                $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant) : null;
-                                $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150) : null;
-                                $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200) : null;
-                                $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250) : null;
+                return $products
+                    //->filter(fn($recipes) => $recipes->sum('qty') > 0)
+                    ->map(function($recipes, $product) {
+                        $recipes = collect($recipes);
+                        return [$product => (object) [
+                            "raw" => i($product)->isRaw(),
+                            "imported" => $recipes->max('imported'),
+                            "overridden" => $recipes->max('overridden'),
+                            "total" => $recipes->sum('qty'),
+                            "outputs" => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
+                            "byproduct_outputs" => $recipes->pluck('outputs')->groupBy('dest')->map->sum('byproduct_qty')->filter()->toArray(),
+                            "production" => $recipes
+                                ->groupBy(fn($row) => $row['name'].".".$row['description'])
+                                //->filter(fn($recipe) => $recipe->qty > 0)
+                                ->map(function($group) {
+                                    //$group = $g->filter(fn($recipe) => $recipe['qty'] > 0);
 
-                                $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
+                                    $qty = round($group->sum('qty'),4);
+                                    $recipe = $group->dataGet("0.recipe");
+                                    $variant = $group->dataGet("0.variant");
+                                    $belt_speed = $group->dataGet("0.belt_speed");
 
-                                return [
-                                    "byproducts" => $group->crossSumByKey("byproducts"),
-                                    "description" => $group->dataGet("0.description"),
-                                    "imported" => $group->dataGet("0.imported"),
-                                    "ingredients" => $group->crossSumByKey("ingredients"),
-                                    "name" => $group->dataGet("0.name"),
-                                    "outputs" => $group->pluck("outputs"),
-                                    "overridden" => $group->dataGet("0.overridden"),
-                                    "overrides" => $group->dataGet("0.overrides"),
-                                    "qty" => $qty,
-                                    "recipe" => $recipe,
-                                    "overview" => $overview ? $overview->toArray() : null,
-                                    "overviews" => [
-                                        "c100" => $overview ? $overview->toArray() : null,
-                                        "c150" => $overview_150 ? $overview_150->toArray() : null,
-                                        "c200" => $overview_200 ? $overview_200->toArray() : null,
-                                        "c250" => $overview_250 ? $overview_250->toArray() : null,
-                                    ],
-                                    "power_usage" => $power_usage,
-                                    "tier" => $group->dataGet("0.tier"),
-                                    "variant" => $group->dataGet("0.variant"),
-                                ];
-                            })->values(),
-                    ]];
+                                    if ( $qty <= 0 ) {
+                                        return [
+                                            "byproducts" => $group->crossSumByKey("byproducts"),
+                                            "description" => $group->dataGet("0.description"),
+                                            "imported" => $group->dataGet("0.imported"),
+                                            "ingredients" => $group->crossSumByKey("ingredients"),
+                                            "name" => $group->dataGet("0.name"),
+                                            "outputs" => $group->pluck("outputs"),
+                                            "overridden" => $group->dataGet("0.overridden"),
+                                            "overrides" => $group->dataGet("0.overrides"),
+                                            "tier" => $group->dataGet("0.tier"),
+                                            "variant" => $group->dataGet("0.variant"),
+                                        ];
+                                    }
+
+                                    $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant) : null;
+                                    $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150) : null;
+                                    $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200) : null;
+                                    $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250) : null;
+
+                                    $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
+
+                                    return [
+                                        "byproducts" => $group->crossSumByKey("byproducts"),
+                                        "description" => $group->dataGet("0.description"),
+                                        "imported" => $group->dataGet("0.imported"),
+                                        "ingredients" => $group->crossSumByKey("ingredients"),
+                                        "name" => $group->dataGet("0.name"),
+                                        "outputs" => $group->pluck("outputs"),
+                                        "overridden" => $group->dataGet("0.overridden"),
+                                        "overrides" => $group->dataGet("0.overrides"),
+                                        "qty" => $qty,
+                                        "recipe" => $recipe,
+                                        "overview" => $overview ? $overview->toArray() : null,
+                                        "overviews" => [
+                                            "c100" => $overview ? $overview->toArray() : null,
+                                            "c150" => $overview_150 ? $overview_150->toArray() : null,
+                                            "c200" => $overview_200 ? $overview_200->toArray() : null,
+                                            "c250" => $overview_250 ? $overview_250->toArray() : null,
+                                        ],
+                                        "power_usage" => $power_usage,
+                                        "tier" => $group->dataGet("0.tier"),
+                                        "variant" => $group->dataGet("0.variant"),
+                                    ];
+                                })->values(),
+                        ]];
                 })->collapse();
             });
     }

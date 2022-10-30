@@ -26,8 +26,8 @@ trait Setters
     protected $byproducts;
     protected $warning;
     protected $imported = false;
+    protected $all_byproduct = false;
     protected ?BuildingOverview $overview = null;
-
 
     public function setProduct($product): static
     {

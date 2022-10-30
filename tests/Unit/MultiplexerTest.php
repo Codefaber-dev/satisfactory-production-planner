@@ -18,9 +18,6 @@ class MultiplexerTest extends TestCase
         config()->set('database.connections.mysql.database','satis_pp');
     }
 
-    /**
-     * @test
-     */
     public function it_()
     {
         $m = new Multiplexer;

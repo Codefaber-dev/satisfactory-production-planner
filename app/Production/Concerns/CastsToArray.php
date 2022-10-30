@@ -20,9 +20,11 @@ trait CastsToArray
             'children' => optional($this->getChildren())->toArray(),
             'outputs' => [
                 'dest' => ($this->getParent() ?? 'final'),
-                'qty' => $this->getQty()
+                'qty' => $this->getQty(),
+                'byproduct_qty' => $this->use_byproduct ?? 0,
             ],
             'imported' => $this->isImported($this->getName()),
+            'all_byproduct' => $this->all_byproduct,
             'overridden' => $this->isOverride($this->getName()),
             'overview' => optional($this->getOverview())->toArray() ?? [],
             'power_usage' => $this->getPowerUsage(),

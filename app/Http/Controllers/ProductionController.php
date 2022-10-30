@@ -51,6 +51,7 @@ class ProductionController extends Controller
 
         $production = [
             'results' => $calc->getResults(),
+            'byproducts_used' => $calc->getByproductsUsed(),
             'raw_materials' => $calc->getRawMaterials(),
             'intermediate_materials' => $calc->getIntermediateMaterials(),
             'all_materials' => $calc->getAllMaterials(),
@@ -95,8 +96,12 @@ class ProductionController extends Controller
             $m->add($calc);
         }
 
+        // now recalculate to take advantage of byproducts
+        $m->recalculateUsingByproducts();
+
         $production = [
             'results' => $m->getResults(),
+            'byproducts_used' => $m->getByproductsUsed(),
             'raw_materials' => $m->getRawMaterials(),
             'intermediate_materials' => $m->getIntermediateMaterials(),
             'all_materials' => $m->getAllMaterials(),

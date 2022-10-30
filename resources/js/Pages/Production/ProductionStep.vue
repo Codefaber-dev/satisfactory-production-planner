@@ -1,10 +1,10 @@
 <template>
     <tbody>
         <tr class="border-t border-gray-200 dark:border-slate-700">
-            <td class="whitespace-nowrap p-2">
+            <td class="whitespace-nowrap p-2 dark:text-slate-800">
                 <div
                     @click="$emit('toggle', name + '-' + (recipe?.description || 'base'))"
-                    class="flex flex-shrink-0 flex-grow cursor-pointer flex-col items-center space-y-2 whitespace-nowrap rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg dark:text-slate-800"
+                    class="flex flex-shrink-0 flex-grow cursor-pointer flex-col items-center space-y-2 whitespace-nowrap rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg"
                 >
                     <div class="flex w-full">
                         <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
@@ -21,8 +21,7 @@
                     </div>
 
                     <div
-                        class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg 
-                        border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                        class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
                     >
                         <span class="font-semibold"> Destination </span>
                         <div class="flex flex-shrink-0 flex-grow flex-col" v-for="(out_qty, mat) in material.outputs">
@@ -46,36 +45,16 @@
                             </div>
                             <template v-else>
                                 <div class="my-2 rounded bg-lime-300 p-2 text-xs font-bold">
-                                    Output {{ out_qty }} per min ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
+                                    Output {{ +out_qty.toFixed(4) }} per min ({{
+                                        Math.round((100 * 100 * out_qty) / qty) / 100
+                                    }}%)
                                 </div>
                             </template>
                         </div>
                     </div>
-
-                    <div v-if="Object.keys(production.byproducts).length" 
-                    class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg 
-                        border border-yellow-500 bg-yellow-200 p-2 shadow-lg">
-                        <span class="font-semibold mb-1"> Byproducts </span>
-
-                        <div class="flex flex-shrink-0 flex-grow flex-col" v-for="(qty, name) in production.byproducts">
-                            <div class="flex w-full">
-                                <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
-
-                                <div class="mr-2 flex flex-shrink-0 flex-grow flex-col space-y-2">
-                                    <span class="font-semibold">
-                                        {{ name }}
-                                        <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
-                                            Override
-                                        </span>
-                                    </span>
-                                    <span class="font-light"> {{ qty }} per min </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </td>
-            <td nowrap class="p-2">
+            <td nowrap class="p-2 dark:text-slate-800">
                 <div class="flex w-full flex-shrink-0 flex-grow">
                     <div
                         v-if="recipe && Object.keys(ingredients).length"
@@ -100,6 +79,69 @@
                                 <span class="font-light italic">
                                     {{ Math.round((100 * 100 * in_qty) / allMaterials[name]) / 100 }}%
                                 </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td nowrap class="p-2 dark:text-slate-800">
+                <div
+                    v-if="Object.keys(production.byproducts).length"
+                    class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg"
+                >
+                    <span class="mb-1 font-semibold"> Byproducts </span>
+
+                    <div
+                        class="flex flex-shrink-0 flex-grow flex-col"
+                        v-for="(qty, byproduct) in production.byproducts"
+                    >
+                        <div class="flex w-full">
+                            <cloud-image class="mr-2" :public-id="byproduct" width="48" crop="scale" :alt="byproduct" />
+
+                            <div class="mr-2 flex flex-shrink-0 flex-grow flex-col space-y-2">
+                                <span class="font-semibold">
+                                    {{ byproduct }}
+                                    <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
+                                        Override
+                                    </span>
+                                </span>
+                                <span class="font-light"> {{ +qty.toFixed(4) }} per min </span>
+                            </div>
+                        </div>
+                        <div
+                            v-if="Object.keys(byproductsUsed).includes(byproduct)"
+                            class="mt-2 flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                        >
+                            <span class="font-semibold"> Destination </span>
+                            <div
+                                class="flex flex-shrink-0 flex-grow flex-col"
+                                v-for="(out_qty, mat) in byproductsUsed[byproduct]"
+                            >
+                                <div class="flex" v-if="mat !== 'final'">
+                                    <div class="mr-2 flex">
+                                        <cloud-image
+                                            class="inline-flex"
+                                            :public-id="mat"
+                                            width="32"
+                                            crop="scale"
+                                            :alt="mat"
+                                        />
+                                    </div>
+                                    <span class="whitespace-nowrap text-xs">
+                                        {{ mat }}
+                                        <br />
+                                        {{ +out_qty.toFixed(4) }} per min ({{
+                                            Math.round((100 * 100 * out_qty) / qty) / 100
+                                        }}%)
+                                    </span>
+                                </div>
+                                <template v-else>
+                                    <div class="my-2 rounded bg-lime-300 p-2 text-xs font-bold">
+                                        Output {{ +out_qty.toFixed(4) }} per min ({{
+                                            Math.round((100 * 100 * out_qty) / qty) / 100
+                                        }}%)
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -212,6 +254,7 @@ export default {
         allMaterials: {},
         material: {},
         overviews: {},
+        byproductsUsed: {},
     },
 
     mounted() {

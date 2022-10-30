@@ -27,6 +27,11 @@ class BuildingOverview
 
     public function __construct(Recipe $recipe, $qty, $belt_speed, $variant = "mk1", $clock_speed = 100)
     {
+        if (! $qty) {
+            // qty is 0, so skip it
+            return;
+        }
+
         $this->recipe = $recipe;
         $this->qty = $qty;
         $this->belt_speed = $belt_speed;

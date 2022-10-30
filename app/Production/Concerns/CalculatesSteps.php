@@ -13,15 +13,33 @@ trait CalculatesSteps
 
     protected $children;
 
+    protected $use_byproduct;
+
     protected function calculate(): void
     {
         if ($this->getProduct()->isRaw()) {
             return;
         }
 
+        // determine if the current ingredient is imported
         if($this->isImported($this->getName())) {
             $this->imported = true;
             return;
+        }
+
+        // determine if the current ingredient is a byproduct of another step
+        if($this->isByproduct($this->getName())) {
+            $use_byproduct_qty = min($this->getQty(), $this->getByproduct($this->getName()));
+            $new_qty = max(0, $this->getQty() - $use_byproduct_qty);
+
+            $this->setQty($new_qty);
+
+            $this->use_byproduct = $use_byproduct_qty;
+
+            if($new_qty === 0) {
+                $this->all_byproduct = true;
+                return;
+            }
         }
 
         //$this->setOverview(BuildingOverview::make(
