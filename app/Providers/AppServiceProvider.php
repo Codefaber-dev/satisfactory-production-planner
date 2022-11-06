@@ -26,12 +26,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Collection::macro('crossSum', function () {
+            if ($this->isEmpty()) {
+                return 0;
+            }
+
             $ret = collect($this->reduce(function ($a, $b) {
                 $ret = [];
 
                 if(is_array($b)) {
                     foreach ($b as $key => $val) {
-                        if($val || $a[$key]) {
+                        if(!is_null($val) || $a[$key]) {
                             $ret[$key] = $val + ($a[$key] ?? 0);
                         }
                     }
@@ -44,7 +48,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Collection::macro('crossSumByKey', function ($target) {
-            return $this->pluck($target)->crossSum();
+            if ( ! $this->filter(fn($row) => isset($row[$target]) && !! $row[$target])->count() ) {
+                return 0;
+            }
+
+            return $this->filter(fn($row) => isset($row[$target]) && !! $row[$target])->pluck($target)->crossSum();
         });
 
         Collection::macro('sumByKey', function(){

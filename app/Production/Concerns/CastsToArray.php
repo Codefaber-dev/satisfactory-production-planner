@@ -10,7 +10,7 @@ trait CastsToArray
             'tier' => $this->getTier(),
             'name' => $this->getName(),
             'recipe' => $this->getRecipe(),
-            'ingredients' => optional($this->getIngredients())->toArray(),
+            'ingredients' => optional($this->getIngredients())->toArray() ?? [],
             'byproducts' => optional($this->getByproducts())->toArray(),
             'description' => $this->getDescription(),
             'qty' => $this->getQty(),

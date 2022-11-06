@@ -17,6 +17,7 @@
         </div>
         <table class="table-auto">
             <tr>
+                <th></th>
                 <th class="font-semibold">Ingredient (Click To Toggle)</th>
                 <th class="font-semibold">Inputs</th>
                 <th class="font-semibold">Byproducts</th>
@@ -38,7 +39,7 @@
             </tr>
             <template v-for="(level, index) in resultsArray">
                 <tr>
-                    <th class="bg-blue-200 py-2 dark:bg-slate-800" colspan="100">Level {{ index + 1 }}</th>
+                    <th class="bg-blue-200 py-2 text-2xl dark:bg-slate-800" colspan="100">Level {{ index + 1 }}</th>
                 </tr>
 
                 <template v-for="(material, name) in level">
@@ -53,6 +54,8 @@
                                 ? 'opacity-25'
                                 : 'opacity-100',
                         ]"
+                        :level-index="index + 1"
+                        :step-index="getStepIndex(level, name)"
                         :choices="choices"
                         :diagrams="diagrams"
                         :material="material"
@@ -102,6 +105,17 @@ export default {
 
         toggle(material) {
             this.$emit('toggle', material);
+        },
+
+        getStepIndex(level, name) {
+            console.log({ level, name });
+            return Object.keys(level)
+                .map((key) => {
+                    return { key, ...level[key] };
+                })
+                .filter((row) => row.production.filter((o) => o.recipe).length)
+                .filter((row) => !row.imported)
+                .findIndex((row) => row.key === name);
         },
     },
 

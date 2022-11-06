@@ -114,13 +114,15 @@ class Ingredient extends Model
      */
     public function baseRecipe(): Recipe
     {
-        if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
+        return Cache::rememberForever("base_recipe.{$this->id}", function(){
+            if ( $recipe =  $this->recipes()->firstWhere('alt_recipe',false) )
             return $recipe;
 
-        if ( $recipe = $this->recipes->first() )
-            return $recipe;
+            if ( $recipe = $this->recipes->first() )
+                return $recipe;
 
-        throw new ErrorException("Ingredient {$this->name} has no base recipe");
+            throw new ErrorException("Ingredient {$this->name} has no base recipe");
+        });
     }
 
     public function mostEnergyEfficientRecipe()

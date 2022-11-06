@@ -28,6 +28,7 @@ class ProductionGlobals
         $this->byproducts = collect($byproducts);
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed',780);
+        $this->used_byproducts = collect([]);
     }
 
     public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant): static
@@ -120,5 +121,26 @@ class ProductionGlobals
     public function addOverride(string $ingredient, Recipe $override): void
     {
         $this->overrides[$ingredient] = $override;
+    }
+
+    public function useByproduct($name, $qty)
+    {
+        if (! isset($this->used_byproducts[$name])) {
+            $this->used_byproducts[$name] = 0;
+        }
+
+        $this->used_byproducts[$name] += $qty;
+    }
+
+    public function availableByproduct($name)
+    {
+        if (! $this->isByproduct($name)) {
+            return 0;
+        }
+
+        $total = $this->getByproduct($name);
+        $used = $this->used_byproducts[$name] ?? 0;
+
+        return $total - $used;
     }
 }

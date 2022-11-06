@@ -1,6 +1,9 @@
 <template>
     <tbody>
         <tr class="border-t border-gray-200 dark:border-slate-700">
+            <th class="text-lg">
+                <div class="flex flex-col items-center justify-center px-1">{{ levelIndex }}.{{ stepLetter }}</div>
+            </th>
             <td class="whitespace-nowrap p-2 dark:text-slate-800">
                 <div
                     @click="$emit('toggle', name + '-' + (recipe?.description || 'base'))"
@@ -62,26 +65,24 @@
                     >
                         <div
                             class="my-2 flex flex-shrink-0 flex-grow items-center"
-                            v-for="(in_qty, name) in ingredients"
+                            v-for="(in_qty, ingr) in ingredients"
                         >
-                            <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
+                            <cloud-image class="mr-2" :public-id="ingr" width="48" crop="scale" :alt="ingr" />
                             <div class="flex flex-grow flex-col whitespace-nowrap font-semibold">
-                                {{ name }}
-                                <template v-if="byproductsUsed.hasOwnProperty(name)"> (Used Byproduct) </template>
-                                <span v-if="newImports[name]" class="rounded-lg bg-green-300 px-2 py-1 text-xs">
+                                {{ ingr }}
+                                <template v-if="usesByproduct(ingr)"> (Used Byproduct) </template>
+                                <span v-if="newImports[ingr]" class="rounded-lg bg-green-300 px-2 py-1 text-xs">
                                     Imported
                                 </span>
                                 <br />
                                 <span class="font-light">
-                                    {{ Math.round(10000 * in_qty) / 10000 }}
-                                    <template v-if="byproductsUsed.hasOwnProperty(name)"
-                                        >({{ Object.values(byproductsUsed[name]).sum() }})</template
-                                    >
+                                    {{ in_qty.$round4() }}
+                                    <template v-if="usesByproduct(ingr)"> ({{ getByproductUsed(ingr) }}) </template>
                                     per min
                                 </span>
                                 <br />
                                 <span class="font-light italic">
-                                    {{ Math.round((100 * 100 * in_qty) / getDenominator(name)) / 100 }}%
+                                    {{ Math.round((100 * 100 * in_qty) / getDenominator(ingr)) / 100 }}%
                                 </span>
                             </div>
                         </div>
@@ -259,6 +260,8 @@ export default {
         material: {},
         overviews: {},
         byproductsUsed: {},
+        stepIndex: {},
+        levelIndex: {},
     },
 
     mounted() {
@@ -291,13 +294,25 @@ export default {
         footprint() {
             return this.overview.details[this.selectedVariantName].footprint;
         },
+
+        stepLetter() {
+            return Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ')[this.stepIndex];
+        },
     },
 
     methods: {
-        getDenominator(name) {
-            let byp = this.byproductsUsed.hasOwnProperty(name) ? Object.values(this.byproductsUsed[name]).sum() : 0;
+        usesByproduct(ingr) {
+            return this.byproductsUsed.hasOwnProperty(ingr) && this.byproductsUsed[ingr].hasOwnProperty(this.name);
+        },
 
-            return this.allMaterials?.[name] + byp;
+        getByproductUsed(ingr) {
+            return this.byproductsUsed?.[ingr]?.[this.name]?.$round4() || 0;
+        },
+
+        getDenominator(name) {
+            let byp = this.getByproductUsed(name);
+
+            return byp + (+this.allMaterials?.[name] || 0);
         },
 
         setNewSubFavorite({ recipe }) {

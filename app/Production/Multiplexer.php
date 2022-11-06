@@ -43,7 +43,7 @@ class Multiplexer
 
         return $results[1]->map(function($val, $name) {
             return round($val->total,4);
-        });
+        })->filter(fn($val, $name) => $val>0);
     }
 
     public function getIntermediateMaterials()

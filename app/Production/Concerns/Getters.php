@@ -23,14 +23,24 @@ trait Getters
         }
     }
 
-    public function isImported(string $ingredient): bool
+    public function isRaw(): bool
     {
-        return $this->globals->isImported($ingredient);
+        return $this->getProduct()->isRaw();
     }
 
-    public function isByproduct(string $ingredient): bool
+    public function isImported(): bool
     {
-        return $this->globals->isByproduct($ingredient);
+        return $this->globals->isImported($this->getName());
+    }
+
+    public function isByproduct(): bool
+    {
+        return $this->globals->isByproduct($this->getName());
+    }
+
+    public function availableByproduct(): float
+    {
+        return $this->globals->availableByproduct($this->getName());
     }
 
     public function getName(): string

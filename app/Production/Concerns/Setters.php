@@ -111,6 +111,13 @@ trait Setters
         return $this;
     }
 
+    public function useByproduct(string $ingredient, float $qty): void
+    {
+        $this->globals->useByproduct($ingredient, $qty);
+
+        $this->use_byproduct = $qty;
+    }
+
     protected function overrideFavoritesIfNecessary(): void
     {
         $favorites = $this->getFavorites()->values()->pluck('description');

@@ -4,6 +4,7 @@ namespace App\Production\Concerns;
 
 use App\Production\BuildingOverview;
 use App\Production\Step;
+use ErrorException;
 use Illuminate\Support\Collection;
 
 trait ParsesSteps
@@ -59,7 +60,7 @@ trait ParsesSteps
 
         return $this->results[1]->map(function($val, $name) {
             return round($val->total,4);
-        });
+        })->filter(fn($val,$name) => $val>0);
     }
 
     public function getIntermediateMaterials()
@@ -135,7 +136,7 @@ trait ParsesSteps
                             "production" => $recipes
                                 ->groupBy(fn($row) => $row['name'].".".$row['description'])
                                 //->filter(fn($recipe) => $recipe->qty > 0)
-                                ->map(function($group) {
+                                ->map(function($group) use ($product) {
                                     //$group = $g->filter(fn($recipe) => $recipe['qty'] > 0);
 
                                     $qty = round($group->sum('qty'),4);
@@ -156,6 +157,7 @@ trait ParsesSteps
                                             "tier" => $group->dataGet("0.tier"),
                                             "variant" => $group->dataGet("0.variant"),
                                         ];
+
                                     }
 
                                     $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant) : null;

@@ -12,45 +12,50 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-Array.prototype.mapAndSumProperties = function(key) {
+Array.prototype.mapAndSumProperties = function (key) {
     let ret = {};
-    this.map(o => o[key]).forEach(oo => {
-        for(let prop in oo) {
+    this.map((o) => o[key]).forEach((oo) => {
+        for (let prop in oo) {
             if (!ret.hasOwnProperty(prop)) {
                 ret[prop] = 0;
             }
             ret[prop] += +oo[prop];
         }
-    })
+    });
     return ret;
-}
+};
 
-Array.prototype.groupBy = function(key) {
+Array.prototype.groupBy = function (key) {
     let ret = {};
-    this.forEach(o => {
+    this.forEach((o) => {
         if (!ret.hasOwnProperty(o[key])) {
             ret[o[key]] = [];
         }
         ret[o[key]].push(o);
-    })
+    });
     return ret;
-}
+};
 
-Array.prototype.sum = function(key=null) {
+Array.prototype.sum = function (key = null) {
     if (key) {
-        return this.map(o => o[key]).sum();
+        return this.map((o) => o[key]).sum();
     }
-    return this.reduce((a,b) => +a+b,0);
-}
+    return this.reduce((a, b) => +a + b, 0);
+};
 
-String.prototype.$ucfirst = function() {
-    return this.substring(0,1).toUpperCase() + this.substring(1).toLowerCase();
-}
+String.prototype.$ucfirst = function () {
+    return this.substring(0, 1).toUpperCase() + this.substring(1).toLowerCase();
+};
 
-String.prototype.$ucwords = function() {
-    return this.split(' ').map(o => o.$ucfirst()).join(' ');
-}
+String.prototype.$ucwords = function () {
+    return this.split(' ')
+        .map((o) => o.$ucfirst())
+        .join(' ');
+};
 
+Number.prototype.$round4 = function () {
+    return Math.round(this * 10000) / 10000;
+};
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

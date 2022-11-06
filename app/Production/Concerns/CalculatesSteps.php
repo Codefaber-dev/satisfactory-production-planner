@@ -18,31 +18,25 @@ trait CalculatesSteps
     protected function calculate(): void
     {
         // determine if the current ingredient is a byproduct of another step
-        if($this->isByproduct($this->getName())) {
-            $use_byproduct_qty = min($this->getQty(), $this->getByproduct($this->getName()));
-            $new_qty = max(0, $this->getQty() - $use_byproduct_qty);
+        if($this->isByproduct()) {
+            $this->recycleByproducts();
 
-            $this->setQty($new_qty);
-
-            $this->use_byproduct = $use_byproduct_qty;
-
-            if($new_qty === 0) {
+            if($this->getQty() === 0) {
                 $this->all_byproduct = true;
                 return;
             }
         }
-        
-        if ($this->getProduct()->isRaw()) {
+
+        // determine if the current ingredient is raw
+        if ($this->isRaw()) {
             return;
         }
 
         // determine if the current ingredient is imported
-        if($this->isImported($this->getName())) {
+        if($this->isImported()) {
             $this->imported = true;
             return;
         }
-
-
 
         //$this->setOverview(BuildingOverview::make(
         //    recipe: $this->getRecipe(),
@@ -61,7 +55,6 @@ trait CalculatesSteps
 
             // how much of the ingredient we need to make per minute
             $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty;
-
 
             // return a new production step
             return static::make(
@@ -95,5 +88,15 @@ trait CalculatesSteps
         $this->setWarning("Using {$description} recipe for {$this->getName()} to avoid circular dependency.");
 
         $this->setRecipe($recipe);
+    }
+
+    protected function recycleByproducts(): void
+    {
+        // how much byproduct should be used
+        $use_byproduct_qty = min($this->getQty(), $this->availableByproduct());
+        $this->useByproduct($this->getName(), $use_byproduct_qty);
+
+        // set the new qty, but not negative
+        $this->setQty(max(0, $this->getQty() - $use_byproduct_qty));
     }
 }
