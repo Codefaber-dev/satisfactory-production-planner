@@ -67,22 +67,21 @@
                             <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
                             <div class="flex flex-grow flex-col whitespace-nowrap font-semibold">
                                 {{ name }}
+                                <template v-if="byproductsUsed.hasOwnProperty(name)"> (Used Byproduct) </template>
                                 <span v-if="newImports[name]" class="rounded-lg bg-green-300 px-2 py-1 text-xs">
                                     Imported
                                 </span>
                                 <br />
                                 <span class="font-light">
                                     {{ Math.round(10000 * in_qty) / 10000 }}
+                                    <template v-if="byproductsUsed.hasOwnProperty(name)"
+                                        >({{ Object.values(byproductsUsed[name]).sum() }})</template
+                                    >
                                     per min
                                 </span>
                                 <br />
                                 <span class="font-light italic">
-                                    {{
-                                        Math.round(
-                                            (100 * 100 * in_qty) /
-                                                (allMaterials[name] || Object.values(byproductsUsed[name]).sum())
-                                        ) / 100
-                                    }}%
+                                    {{ Math.round((100 * 100 * in_qty) / getDenominator(name)) / 100 }}%
                                 </span>
                             </div>
                         </div>
@@ -295,6 +294,12 @@ export default {
     },
 
     methods: {
+        getDenominator(name) {
+            let byp = this.byproductsUsed.hasOwnProperty(name) ? Object.values(this.byproductsUsed[name]).sum() : 0;
+
+            return this.allMaterials?.[name] + byp;
+        },
+
         setNewSubFavorite({ recipe }) {
             this.$emit('setNewSubFavorite', { recipe });
         },

@@ -8,7 +8,9 @@ use App\Models\Recipe;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use function get_class;
 use function guest_token;
+use function is_object;
 
 class GuestFavorites implements FavoritesContract
 {
@@ -71,5 +73,15 @@ class GuestFavorites implements FavoritesContract
         return Recipe::find($ids);
     }
 
+    public function getMappedFavorites(null|array|Collection $favorites): Collection
+    {
+        switch(true) {
+            case is_null($favorites) :
+            case is_array($favorites) && empty($favorites) :
+            case is_object($favorites) && get_class($favorites) === Collection::class && $favorites->isEmpty() :
+                return $this->all()->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse();
+        }
 
+        return collect($favorites);
+    }
 }

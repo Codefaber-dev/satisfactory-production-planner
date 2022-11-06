@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Models\Building;
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\ProductionCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -28,17 +29,13 @@ class RecipeEnergyTest extends TestCase
     /** @test */
     public function it_calcs_the_energy_cost_of_iron_plate()
     {
-        // energy cost of a recipe is the energy cost of the extraction of the raw materials,
-        // plus the energy cost of production
+        $iron_plate = 60 * Building::ofName("Constructor")->variant("mk1")->base_power / r('Iron Plate')->base_per_min;
 
-        $extraction = 1.5*energy('Iron Ore');
-        $smelter = 1e6 * Building::ofName("Smelter")->variant("mk1")->base_power;
-        $constructor = 1e6 * Building::ofName("Constructor")->variant("mk1")->base_power;
-        $yield = r("Iron Plate")->base_per_min;
-        $production = ($smelter+$constructor)/$yield;
-        $total = $extraction + $production;
+        $iron_ingots = 1.5 * 60 * Building::ofName("Smelter")->variant("mk1")->base_power / r('Iron Ingot')->base_per_min;
 
-        $this->assertEquals($total, energy('Iron Plate'));
+        $iron_ores = 1.5 * energyStage('Iron Ore');
+
+        $this->assertEquals($total = $iron_ores + $iron_ingots + $iron_plate, energy('Iron Plate'));
     }
 
     /** @test */
@@ -47,14 +44,13 @@ class RecipeEnergyTest extends TestCase
         // energy cost of a recipe is the energy cost of the extraction of the raw materials,
         // plus the energy cost of production
 
-        $extraction = 0.5*energy(i('Copper Ore'));
-        $smelter = 1e6 * Building::ofName("Smelter")->variant("mk1")->calculatePowerUsage(1);
-        $constructor = 1e6 * Building::ofName("Constructor")->variant("mk1")->calculatePowerUsage(0.5);
-        $yield = r("Wire")->base_per_min;
-        $production = ($smelter+$constructor)/$yield;
-        $total = $extraction + $production;
+        $ore = 0.5*energyStage('Copper Ore');
 
-        $this->assertEquals((int)$total, energy('Wire'));
+        $copper_ingots = 0.5 * 60 * Building::ofName("Smelter")->variant("mk1")->base_power / r('Copper Ingot')->base_per_min;
+
+        $wire = 60 * Building::ofName("Constructor")->variant("mk1")->base_power / r('Wire')->base_per_min;
+
+        $this->assertEquals($ore + $copper_ingots + $wire, energy('Wire'));
     }
 
     ///** @test */

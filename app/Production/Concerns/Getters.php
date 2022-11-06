@@ -186,4 +186,12 @@ trait Getters
         }
         return $this->getBuildingDetails()->pluck('power_usage');
     }
+
+    public function getTotalEnergy(): Collection
+    {
+        if($this->getProduct()->isRaw()) {
+            return collect();
+        }
+        return $this->getBuildingDetails()->pluck('total_energy');
+    }
 }

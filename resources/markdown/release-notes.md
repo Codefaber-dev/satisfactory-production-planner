@@ -2,7 +2,7 @@
 ## New Domain
 ## satisfactoryproductionplanner.com
 
-## v0.3.1
+## v0.3.2
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -30,6 +30,14 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.3.2
+Improved Byproduct Recycling ♻️
+- Raw ingredient byproducts (e.g. water) will now by recycled if possible.
+- Added additional value in parentheses where byproducts are used as inputs.
+- Bug fix. Fixed an issue that prevented favorite recipes from being used correctly.
+
+![Better Recycling](https://res.cloudinary.com/codefaber/image/upload/v1667716128/satisfactory/better-recycling.png)
 
 ### v0.3.1
 Byproduct Recycling ♻️

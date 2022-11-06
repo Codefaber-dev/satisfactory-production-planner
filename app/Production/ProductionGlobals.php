@@ -23,9 +23,7 @@ class ProductionGlobals
     {
         $this->choices = collect($choices);
         $this->overrides = collect($overrides);
-        $this->favorites = ! is_null($favorites) ?
-            collect($favorites) :
-            Favorites::all()->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse();
+        $this->favorites = Favorites::getMappedFavorites($favorites);
         $this->imports = collect($imports);
         $this->byproducts = collect($byproducts);
         $this->variant = $variant;

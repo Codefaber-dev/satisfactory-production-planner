@@ -197,6 +197,27 @@ class ProductionCalculator
         return $this;
     }
 
+    public function getTotalEnergy($variant = 0): float
+    {
+        /**
+         * variants
+         * 0 mk1
+         * 1 mk2
+         * 2 mk3
+         * 3 mk4
+         */
+
+        return $this->getResults()
+            ->skip(1)
+            ->map(fn($tier) => $tier->map(fn($product) => collect($product->production)->values())->values())
+            ->values()
+            ->collapse()
+            ->collapse()
+            ->pluck('total_energy')
+            ->map(fn($details) => collect($details)->values()->all())
+            ->crossSum()[$variant];
+    }
+
     public function getPowerUsage($variant = 0): float
     {
         /**
@@ -260,4 +281,16 @@ class ProductionCalculator
             });
         })->filter();
     }
+
+    //public function getRawByproductsUsed()
+    //{
+    //    return collect($this->getByproducts())
+    //
+    //        ->filter(function($qty, $ingredient){
+    //            return i($ingredient)->isRaw();
+    //        })
+    //        ->filter(function($qty, $ingredient){
+    //            return $this->getRawMaterials()->has($ingredient);
+    //        });
+    //}
 }

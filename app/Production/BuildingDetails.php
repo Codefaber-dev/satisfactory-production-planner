@@ -90,6 +90,16 @@ class BuildingDetails extends Collection
             // calc the power_usage for the buildings
             $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
 
+            // calc the energy used per item
+            $mj_per_s = $variant->calculatePowerUsage($clock_speed / 100);
+            $s_per_min = 60;
+            $mj_per_min = $mj_per_s * $s_per_min;
+            $min_per_item = 1 / ($this->recipe->base_per_min * $clock_speed/100);
+            $energy_per_item = $mj_per_min * $min_per_item;
+
+            // calc the total energy used
+            $total_energy = $energy_per_item * $this->qty;
+
             // calc the build cost
             $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
                 return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
@@ -119,6 +129,10 @@ class BuildingDetails extends Collection
                 };
                 $power_shards = $num_buildings * $shards_per_building;
                 $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
+                // calc the energy used per item
+                $energy_per_item = $power_usage / ($this->recipe->base_per_min * $clock_speed);
+                // calc the total energy used
+                $total_energy = $energy_per_item * $this->qty;
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
                     return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
                 })->collapse();
@@ -154,7 +168,7 @@ class BuildingDetails extends Collection
 
             return [
                 "{$this->recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'build_cost','footprint'),
+                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost','footprint'),
             ];
         })->collapse()->all();
 

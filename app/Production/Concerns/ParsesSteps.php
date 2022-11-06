@@ -86,7 +86,7 @@ trait ParsesSteps
 
     public function hasUsableByproducts(): bool
     {
-        return (bool) $this->getIntermediateMaterials()->intersectByKeys($this->getByproducts())->count();
+        return (bool) $this->getAllMaterials()->intersectByKeys($this->getByproducts())->count();
     }
 
     public function getAllMaterials()
@@ -105,7 +105,7 @@ trait ParsesSteps
     {
         return $this->results->map(function($tier) {
            return $tier->map(function($product) {
-              return $product->production->filter(fn($row) => $row['overview'])->pluck('overviews');
+              return $product->production->filter(fn($row) => isset($row['overview']))->pluck('overviews');
            })->collapse()->filter();
         })->collapse()
             ->map(fn($overview) => [$overview["c100"]["product"] . "|" . $overview["c100"]["recipe"] => [
@@ -165,6 +165,8 @@ trait ParsesSteps
 
                                     $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
 
+                                    $total_energy = $overview ? $overview->details->pluck('total_energy') : null;
+
                                     return [
                                         "byproducts" => $group->crossSumByKey("byproducts"),
                                         "description" => $group->dataGet("0.description"),
@@ -184,6 +186,7 @@ trait ParsesSteps
                                             "c250" => $overview_250 ? $overview_250->toArray() : null,
                                         ],
                                         "power_usage" => $power_usage,
+                                        "total_energy" => $total_energy,
                                         "tier" => $group->dataGet("0.tier"),
                                         "variant" => $group->dataGet("0.variant"),
                                     ];

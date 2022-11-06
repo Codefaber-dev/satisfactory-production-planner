@@ -66,8 +66,6 @@ class RecipeProductionTest extends TestCase
             qty: 10
         );
 
-        //dd($production->getSteps()->getFavorites());
-
         $production->getSteps()->assertIntermediateRecipe('Screw','Steel Screw');
     }
 
@@ -157,16 +155,16 @@ class RecipeProductionTest extends TestCase
         $this->assertNull($production->get('1.Caterium Ore.total'));
         $this->assertNull($production->get('1.Copper Ore.total'));
 
-        $this->assertEquals(933.75, $production->get('1.Crude Oil.total'));
+        $this->assertEquals(765, $production->get('1.Crude Oil.total'));
         $this->assertEquals(150, $production->get('1.Water.total'));
         $this->assertEquals(145, $production->get('2.Caterium Ingot.total'));
         $this->assertEquals(725, $production->get('2.Copper Ingot.total'));
-        $this->assertEquals(75, $production->get('2.Heavy Oil Residue.total'));
+        $this->assertEquals(0, $production->get('2.Heavy Oil Residue.total'));
         $this->assertEquals(510, $production->get('2.Rubber.total'));
-        $this->assertEquals(75, $production->get('2.Plastic.total'));
+        $this->assertEquals(0, $production->get('2.Plastic.total'));
         $this->assertEquals(1740, $production->get('3.Quickwire.total'));
         $this->assertEquals(300, $production->get('3.Plastic.total'));
-        $this->assertEquals(150, $production->get('3.Empty Canister.total'));
+        $this->assertEquals(0, $production->get('3.Empty Canister.total'));
         $this->assertEquals(150, $production->get('4.Packaged Water.total'));
         $this->assertEquals(210, $production->get('4.Circuit Board.total'));
         $this->assertEquals(150, $production->get('5.Fuel.total'));

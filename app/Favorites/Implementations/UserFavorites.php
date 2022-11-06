@@ -54,4 +54,16 @@ class UserFavorites implements FavoritesContract
     {
         return $this->user->favorite_recipes;
     }
+
+    public function getMappedFavorites(null|array|Collection $favorites): Collection
+    {
+        switch(true) {
+            case is_null($favorites) :
+            case is_array($favorites) && empty($favorites) :
+            case is_object($favorites) && get_class($favorites) === Collection::class && $favorites->isEmpty() :
+                return $this->all()->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse();
+        }
+
+        return collect($favorites);
+    }
 }

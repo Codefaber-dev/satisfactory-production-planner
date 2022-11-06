@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 interface FavoritesContract
 {
     public function all(): Collection;
+    public function getMappedFavorites(null|array|Collection $favorites): Collection;
     public function get(Ingredient $ingredient): Recipe;
     public function set(Ingredient $ingredient, Recipe $recipe): void;
     public function setByName(Ingredient $ingredient, string $name): void;

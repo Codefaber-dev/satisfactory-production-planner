@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void setByName(Ingredient $ingredient, string $name)
  * @method static void setDefault(Ingredient $ingredient)
  * @method static bool isFavorite(Recipe $recipe)
+ * @method static Collection getMappedFavorites(null|array|Collection $favorites)
 */
 class Favorites extends Facade
 {

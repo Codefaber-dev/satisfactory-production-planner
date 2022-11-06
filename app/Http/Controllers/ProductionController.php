@@ -10,6 +10,7 @@ use App\MultiFactories\Facades\MultiFactories;
 use App\Production\Multiplexer;
 use App\Production\ProductionCalculator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
@@ -20,7 +21,9 @@ class ProductionController extends Controller
     protected function baseData()
     {
         $products = Ingredient::processed()->orderBy('name')->get();
-        $recipes = Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
+        $recipes = Cache::remember('all_recipes', now()->addDay(), function() {
+            return Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
+        });
         $favorites = Favorites::all();
         $factory = Factories::find(request('factory'));
         $multiFactory = MultiFactories::find(request('multiFactory'));
