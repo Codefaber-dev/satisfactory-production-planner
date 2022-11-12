@@ -13,11 +13,18 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => 'Satisfactory Production Planner',
 
     'version' => '0.3.2',
 
     'donations' => env('DONATIONS',0),
+
+    /**
+     * SEO Stuff
+     */
+    'description' => 'Build factories not spreadsheets. Plan your Satisfactory production and factory layouts.',
+    'twitterUsername' => 'Codefaber',
+    'logoImage' => 'https://satisfactoryproductionplanner.com/images/IronIngot.png',
 
     /*
     |--------------------------------------------------------------------------

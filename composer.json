@@ -6,11 +6,13 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "archtechx/laravel-seo": "^0.5.1",
         "aws/aws-sdk-php": "^3.209",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "inertiajs/inertia-laravel": "^0.4.2",
+        "intervention/image": "^2.7",
         "laravel/framework": "^8.40",
         "laravel/jetstream": "^2.3",
         "laravel/sanctum": "^2.6",

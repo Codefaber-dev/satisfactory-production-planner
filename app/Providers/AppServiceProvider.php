@@ -25,6 +25,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // seo stuff
+        seo()->title(config('app.name'))
+            ->description(config('app.description'))
+            ->url(config('app.url'))
+            ->twitterCreator(config('app.twitterUsername'))
+            ->twitterImage(config('app.logoImage'))
+            ->twitter()
+            ->favicon();
+
         Collection::macro('crossSum', function () {
             if ($this->isEmpty()) {
                 return 0;
