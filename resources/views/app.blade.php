@@ -21,6 +21,18 @@
 
         @production
         <script defer data-domain="satisfactoryproductionplanner.com" src="https://plausible.io/js/plausible.js"></script>
+            
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEFR2C3YV2"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-TEFR2C3YV2');
+        </script>
+
         @endproduction
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-slate-900" style="background-attachment: fixed">
