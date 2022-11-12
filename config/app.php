@@ -24,7 +24,7 @@ return [
      */
     'description' => 'Build factories not spreadsheets. Plan your Satisfactory production and factory layouts.',
     'twitterUsername' => 'Codefaber',
-    'cardImage' => 'https://satisfactoryproductionplanner.com/images/twitter-card-image.png',
+    'cardImage' => 'https://res.cloudinary.com/codefaber/image/upload/w_800,h_418,c_fill/v1668281085/satisfactory/twitter-card-image.png',
 
     /*
     |--------------------------------------------------------------------------
