@@ -2,6 +2,12 @@
  * @license MIT */
 
 /*!
+  * pinia v2.0.12
+  * (c) 2022 Eduardo San Martin Morote
+  * @license MIT
+  */
+
+/*!
  * The buffer module from node.js, for the browser.
  *
  * @author   Feross Aboukhadijeh <http://feross.org>

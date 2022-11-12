@@ -31,6 +31,13 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
+### v0.3.3
+Better Step Navigation ➡️
+- Production steps are now labeled by level (e.g. 1.A, 3.B)
+- Destination details now have links that take you to the relevant production step
+
+![Better Step Navigation](https://res.cloudinary.com/codefaber/image/upload/v1668285571/satisfactory/better-step-navigation.png)
+
 ### v0.3.2
 Improved Byproduct Recycling ♻️
 - Raw ingredient byproducts (e.g. water) will now by recycled if possible.

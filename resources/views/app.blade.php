@@ -21,7 +21,7 @@
 
         @production
         <script defer data-domain="satisfactoryproductionplanner.com" src="https://plausible.io/js/plausible.js"></script>
-            
+
 
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEFR2C3YV2"></script>

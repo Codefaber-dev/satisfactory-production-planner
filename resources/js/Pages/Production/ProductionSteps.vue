@@ -18,7 +18,7 @@
         <table class="table-auto">
             <tr>
                 <th></th>
-                <th class="font-semibold">Ingredient (Click To Toggle)</th>
+                <th class="font-semibold">Ingredient</th>
                 <th class="font-semibold">Inputs</th>
                 <th class="font-semibold">Byproducts</th>
                 <th class="font-semibold">Recipe</th>
@@ -54,7 +54,9 @@
                                 ? 'opacity-25'
                                 : 'opacity-100',
                         ]"
+                        :finished="productionChecks[name + '-' + (prod.recipe?.description || 'base')]"
                         :level-index="index + 1"
+                        :level-step-map="levelStepMap"
                         :step-index="getStepIndex(level, name)"
                         :choices="choices"
                         :diagrams="diagrams"
@@ -117,6 +119,10 @@ export default {
                 .filter((row) => !row.imported)
                 .findIndex((row) => row.key === name);
         },
+
+        stepLetter(index) {
+            return Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ')[index];
+        },
     },
 
     computed: {
@@ -124,6 +130,17 @@ export default {
             return Object.values(this.production.results).filter((o) =>
                 Object.values(o).some((oo) => !oo.raw && !oo.imported)
             );
+        },
+
+        levelStepMap() {
+            let ret = {};
+
+            this.resultsArray.forEach((level, levelIndex) => {
+                Object.keys(level).forEach((mat) => {
+                    ret[mat] = `${levelIndex + 1}.${this.stepLetter(this.getStepIndex(level, mat))}`;
+                });
+            });
+            return ret;
         },
     },
 };

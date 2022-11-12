@@ -1,24 +1,31 @@
 <template>
-    <tbody>
+    <tbody :class="shouldFlash ? ['dark:bg-slate-500', 'bg-slate-300'] : []" class="transition-all duration-300">
         <tr class="border-t border-gray-200 dark:border-slate-700">
             <th class="text-lg">
-                <div class="flex flex-col items-center justify-center px-1">{{ levelIndex }}.{{ stepLetter }}</div>
+                <div :id="identifier" class="flex flex-col items-center justify-center px-1">
+                    {{ identifier }}
+                </div>
             </th>
             <td class="whitespace-nowrap p-2 dark:text-slate-800">
                 <div
-                    @click="$emit('toggle', name + '-' + (recipe?.description || 'base'))"
-                    class="flex flex-shrink-0 flex-grow cursor-pointer flex-col items-center space-y-2 whitespace-nowrap rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg"
+                    class="flex flex-shrink-0 flex-grow flex-col items-center space-y-2 whitespace-nowrap rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg"
                 >
                     <div class="flex w-full">
                         <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
 
                         <div class="mr-2 flex flex-shrink-0 flex-grow flex-col space-y-2">
-                            <span class="font-semibold">
-                                {{ name }}
+                            <div class="flex items-center justify-between font-semibold">
+                                <span class="flex-1">{{ name }}</span>
                                 <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
                                     Override
                                 </span>
-                            </span>
+                                <span
+                                    class="cursor-pointer rounded bg-emerald-400 p-1 hover:bg-emerald-500"
+                                    @click="$emit('toggle', name + '-' + (recipe?.description || 'base'))"
+                                >
+                                    {{ finished ? '✅' : '⬜' }}
+                                </span>
+                            </div>
                             <span class="font-light"> {{ qty }} per min </span>
                         </div>
                     </div>
@@ -39,7 +46,12 @@
                                     />
                                 </div>
                                 <span class="whitespace-nowrap text-xs">
-                                    {{ mat }}
+                                    <a
+                                        @click="flashDestination(levelStepMap[mat])"
+                                        :href="`#${levelStepMap[mat]}`"
+                                        class="text-sky-700"
+                                        >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
+                                    </a>
                                     <br />
                                     {{ +out_qty.toFixed(4) }} per min ({{
                                         Math.round((100 * 100 * out_qty) / qty) / 100
@@ -262,10 +274,20 @@ export default {
         byproductsUsed: {},
         stepIndex: {},
         levelIndex: {},
+        levelStepMap: {},
+        finished: {},
     },
 
     mounted() {
         setTimeout(this.emit, 500);
+
+        this.Bus.on('flash', ({ dest }) => {
+            if (dest === this.identifier) {
+                console.log('flashing now');
+                this.shouldFlash = true;
+                setTimeout(() => (this.shouldFlash = false), 1200);
+            }
+        });
     },
 
     data() {
@@ -283,6 +305,7 @@ export default {
             ingredients: this.production.ingredients,
             qty: this.production.qty,
             overridden: this.production.overridden,
+            shouldFlash: false,
         };
     },
 
@@ -298,9 +321,18 @@ export default {
         stepLetter() {
             return Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ')[this.stepIndex];
         },
+
+        identifier() {
+            return this.levelIndex + '.' + this.stepLetter;
+        },
     },
 
     methods: {
+        flashDestination(dest) {
+            console.log('emitting flash');
+            this.Bus.emit('flash', { dest });
+        },
+
         usesByproduct(ingr) {
             return this.byproductsUsed.hasOwnProperty(ingr) && this.byproductsUsed[ingr].hasOwnProperty(this.name);
         },
