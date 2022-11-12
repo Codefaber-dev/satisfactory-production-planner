@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
             ->description(config('app.description'))
             ->url(config('app.url'))
             ->twitterCreator(config('app.twitterUsername'))
-            ->twitterImage(config('app.logoImage'))
+            ->twitterImage(config('app.cardImage'))
             ->twitter()
             ->favicon();
 
