@@ -2,7 +2,7 @@
 ## New Domain
 ## satisfactoryproductionplanner.com
 
-## v0.3.2
+## v0.3.3
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
