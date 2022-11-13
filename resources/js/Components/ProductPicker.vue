@@ -20,8 +20,12 @@
             style="top: 100%"
             class="absolute left-0 z-50 flex max-h-[400px] w-full flex-col overflow-y-auto border border-sky-300 bg-white pr-4 shadow-lg dark:border-sky-900 dark:bg-slate-900"
         >
+            <div v-if="filter" class="absolute right-12 top-4 text-slate-900 dark:text-slate-100">
+                Press Enter To Select
+            </div>
             <input
                 @click="showMenu = true"
+                @keyup.enter.prevent.stop="selectSingleResult"
                 ref="filter"
                 type="text"
                 v-model="filter"
@@ -95,9 +99,9 @@ export default {
                 return o.name.toLowerCase().indexOf(this.filter.toLowerCase()) > -1;
             });
         },
-        selectedChosen() {
-            return Object.values(this.choices).some((o) => o === this.selected);
-        },
+        // selectedChosen() {
+        //     return Object.values(this.choices).some((o) => o === this.selected) || {};
+        // },
     },
 
     methods: {
@@ -111,7 +115,29 @@ export default {
             if (this.showMenu) {
                 setTimeout(() => {
                     this.$refs.filter.focus();
+                    this.$refs.filter.select();
                 }, 300);
+            }
+        },
+
+        selectSingleResult() {
+            if (this.filteredProducts.length === 1) {
+                console.log('Only one result. Selecting it.');
+                let o = {
+                    product: Object.assign({}, this.filteredProducts[0]),
+                };
+
+                this.$emit('select', o);
+                this.hide();
+            }
+
+            // see if there is an exact match
+            if (this.filteredProducts.some((o) => o.name.toLowerCase() === this.filter.toLowerCase())) {
+                let o = {
+                    product: this.filteredProducts.filter((o) => o.name.toLowerCase() === this.filter.toLowerCase())[0],
+                };
+                this.$emit('select', o);
+                this.hide();
             }
         },
 

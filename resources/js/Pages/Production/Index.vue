@@ -1,9 +1,7 @@
 <template>
     <app-layout>
         <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-100"
-            >
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-100">
                 New Production Line
                 <span v-if="product">: {{ product.name }}</span>
             </h2>
@@ -12,10 +10,7 @@
         <div class="py-12">
             <div class="mx-auto flex max-w-7xl space-x-10 sm:px-6 lg:px-8">
                 <!-- left column -->
-                <form
-                    :class="[done ? 'w-1/3' : 'w-full']"
-                    @submit.prevent="fetch"
-                >
+                <form :class="[done ? 'w-1/3' : 'w-full']" @submit.prevent="fetch">
                     <div
                         class="flex flex-col items-center space-y-8 bg-white p-4 shadow-xl transition-all dark:bg-slate-700 sm:rounded-lg"
                     >
@@ -24,59 +19,54 @@
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
                             <span class="font-semibold">Select a product</span>
-                            <product-picker
-                                @select='selectProduct'
-                                :selected='product'
-                                :products='products'/>
+                            <product-picker @select="selectProduct" :selected="product" :products="products" />
                         </div>
                         <div
-                            v-if="product && product.name.length"
+                            v-if="product && product.name.length && recipe"
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
                             <span class="font-semibold">Select a recipe</span>
                             <recipe-picker
-                                class='border-sky-300 dark:border-slate-500'
+                                class="border-sky-300 dark:border-slate-500"
                                 :recipes="recipes[product.name]"
                                 :selected="recipe"
                                 @select="selectRecipe"
                             />
-<!--                            <select-->
-<!--                                ref="recipe"-->
-<!--                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100"-->
-<!--                                v-model="recipe"-->
-<!--                                name="recipe"-->
-<!--                                id="recipe"-->
-<!--                            >-->
-<!--                                <option-->
-<!--                                    :data-recipe-id="option.id"-->
-<!--                                    :key="option.id"-->
-<!--                                    v-for="option in recipes[product.name]"-->
-<!--                                    :value="option"-->
-<!--                                >-->
-<!--                                    <span v-if="option.favorite">&star;</span>-->
-<!--                                    {{ option.description || 'default' }}-->
-<!--                                </option>-->
-<!--                            </select>-->
-<!--                            <button-->
-<!--                                :disabled="working"-->
-<!--                                @click="setNewFavorite"-->
-<!--                                class="btn btn-emerald"-->
-<!--                                v-if="-->
-<!--                                    recipe &&-->
-<!--                                    !recipe.favorite &&-->
-<!--                                    recipes[product.name].length > 1-->
-<!--                                "-->
-<!--                            >-->
-<!--                                Set Favorite-->
-<!--                            </button>-->
+                            <!--                            <select-->
+                            <!--                                ref="recipe"-->
+                            <!--                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100"-->
+                            <!--                                v-model="recipe"-->
+                            <!--                                name="recipe"-->
+                            <!--                                id="recipe"-->
+                            <!--                            >-->
+                            <!--                                <option-->
+                            <!--                                    :data-recipe-id="option.id"-->
+                            <!--                                    :key="option.id"-->
+                            <!--                                    v-for="option in recipes[product.name]"-->
+                            <!--                                    :value="option"-->
+                            <!--                                >-->
+                            <!--                                    <span v-if="option.favorite">&star;</span>-->
+                            <!--                                    {{ option.description || 'default' }}-->
+                            <!--                                </option>-->
+                            <!--                            </select>-->
+                            <!--                            <button-->
+                            <!--                                :disabled="working"-->
+                            <!--                                @click="setNewFavorite"-->
+                            <!--                                class="btn btn-emerald"-->
+                            <!--                                v-if="-->
+                            <!--                                    recipe &&-->
+                            <!--                                    !recipe.favorite &&-->
+                            <!--                                    recipes[product.name].length > 1-->
+                            <!--                                "-->
+                            <!--                            >-->
+                            <!--                                Set Favorite-->
+                            <!--                            </button>-->
                         </div>
                         <div
                             v-if="recipe && recipe.base_per_min"
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
-                            <span class="font-semibold"
-                                >Enter quantity per minute</span
-                            >
+                            <span class="font-semibold">Enter quantity per minute</span>
                             <input
                                 @input="fetch"
                                 type="number"
@@ -90,9 +80,7 @@
                             v-if="yield"
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
-                            <span class="font-semibold"
-                                >Select default building variant</span
-                            >
+                            <span class="font-semibold">Select default building variant</span>
                             <select
                                 @change="fetch"
                                 v-model="variant"
@@ -106,20 +94,8 @@
                         </div>
 
                         <div class="space-x-4">
-                            <button
-                                :disabled="working"
-                                @click="fetch"
-                                class="btn btn-emerald"
-                                v-if="yield"
-                            >
-                                Go
-                            </button>
-                            <button
-                                :disabled="working"
-                                v-if="product"
-                                @click="reset"
-                                class="btn btn-gray"
-                            >
+                            <button :disabled="working" @click="fetch" class="btn btn-emerald" v-if="yield">Go</button>
+                            <button :disabled="working" v-if="product" @click="reset" class="btn btn-gray">
                                 Reset
                             </button>
                         </div>
@@ -141,13 +117,13 @@ export default {
     components: {
         AppLayout,
         ProductPicker,
-        RecipePicker
+        RecipePicker,
     },
 
     data() {
         return {
             product: { name: '' },
-            recipe: { product : { name : ''} },
+            recipe: { product: { name: '' } },
             yield: null,
             done: false,
             working: false,
@@ -163,9 +139,9 @@ export default {
             this.working = true;
 
             this.$inertia.get(
-                `/dashboard/${this.product.name}/${this.yield}/${
-                    this.recipe.description || this.product.name
-                }/${this.variant}`
+                `/dashboard/${this.product.name}/${this.yield}/${this.recipe.description || this.product.name}/${
+                    this.variant
+                }`
             );
 
             // fetch(`/calc/${this.product.name}/${this.yield}/${this.recipe.description||this.product.name}`)
@@ -189,8 +165,12 @@ export default {
             });
         },
 
-        selectProduct({product}) {
+        selectProduct({ product }) {
+            this.reset();
+
             if (!product || !product.name) {
+                console.log('invalid product, using dummy');
+                this.product = { name: '' };
                 return;
             }
 
@@ -198,7 +178,7 @@ export default {
             this.setDefaultRecipe();
         },
 
-        selectRecipe({recipe}) {
+        selectRecipe({ recipe }) {
             this.setRecipe(recipe);
         },
 
@@ -211,22 +191,30 @@ export default {
         },
 
         setDefaultRecipe() {
+            // if there is only one recipe, use it
             if (this.recipes[this.product.name].length === 1) {
                 this.setRecipe(this.recipes[this.product.name][0]);
                 return;
             }
 
-            this.recipes[this.product.name].forEach((recipe) => {
-                if (this.isFavorite(recipe)) {
-                    this.setRecipe(recipe);
-                }
-            });
+            // if there is a favorite recipe, use that
+            if (this.recipes[this.product.name].some((o) => this.isFavorite(o))) {
+                this.setRecipe(this.recipes[this.product.name].filter((o) => this.isFavorite(o))[0]);
+                return;
+            }
+
+            // if there is a base recipe, use that
+            if (this.recipes[this.product.name].some((o) => !o.alt_recipe)) {
+                this.setRecipe(this.recipes[this.product.name].filter((o) => !o.alt_recipe)[0]);
+                return;
+            }
+
+            // else, use the first recipe available
+            this.setRecipe(this.recipes[this.product.name][0]);
         },
 
         isFavorite(recipe) {
-            return (
-                !!recipe && recipe.hasOwnProperty('favorite') && recipe.favorite
-            );
+            return !!recipe && recipe.hasOwnProperty('favorite') && recipe.favorite;
         },
 
         setRecipe(recipe) {
@@ -240,7 +228,7 @@ export default {
             this.done = false;
             this.yield = null;
             this.recipe = null;
-            this.product = null;
+            this.product = { name: '' };
         },
     },
 };

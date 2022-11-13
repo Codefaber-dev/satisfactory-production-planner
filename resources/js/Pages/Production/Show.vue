@@ -571,12 +571,35 @@ export default {
             this.$inertia.post(`/favorites/${this.recipe.id}`);
         },
 
+        // setDefaultRecipe(row) {
+        //     this.recipes[row.product.name].forEach((recipe) => {
+        //         if (this.isFavorite(recipe)) {
+        //             row.recipe = recipe;
+        //         }
+        //     });
+        // },
+
         setDefaultRecipe(row) {
-            this.recipes[row.product.name].forEach((recipe) => {
-                if (this.isFavorite(recipe)) {
-                    row.recipe = recipe;
-                }
-            });
+            // if there is only one recipe, use it
+            if (this.recipes[row.product.name].length === 1) {
+                this.setRecipe(this.recipes[row.product.name][0]);
+                return;
+            }
+
+            // if there is a favorite recipe, use that
+            if (this.recipes[row.product.name].some((o) => this.isFavorite(o))) {
+                this.setRecipe(this.recipes[row.product.name].filter((o) => this.isFavorite(o))[0]);
+                return;
+            }
+
+            // if there is a base recipe, use that
+            if (this.recipes[row.product.name].some((o) => !o.alt_recipe)) {
+                this.setRecipe(this.recipes[row.product.name].filter((o) => !o.alt_recipe)[0]);
+                return;
+            }
+
+            // else, use the first recipe available
+            this.setRecipe(this.recipes[row.product.name][0]);
         },
 
         isFavorite(recipe) {

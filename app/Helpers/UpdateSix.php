@@ -9,12 +9,12 @@ use InvalidArgumentException;
 
 class UpdateSix {
 
-    public static function update() 
+    public static function update()
     {
         echo "<pre>";
         // cleanup deprecated stuff
         static::cleanup();
-        echo "Finished cleaning deprecated stuff \n";    
+        echo "Finished cleaning deprecated stuff \n";
 
         // seed the ingredients
         static::ingredients();
@@ -25,7 +25,7 @@ class UpdateSix {
         echo "Created new recipes. \n Done with update.";
     }
 
-    protected static function cleanup() 
+    protected static function cleanup()
     {
         $recipes = [
             'Polyester Fabric',
@@ -51,7 +51,7 @@ class UpdateSix {
             optional(r($recipe))->delete();
             forgetRecipe($recipe);
         });
-        
+
     }
 
     protected static function ingredients()
@@ -272,7 +272,7 @@ class UpdateSix {
                 "Shatter Rebar" => [
                     [
                         "base_yield" => 1,
-                        "base_per_min" => 10,
+                        "base_per_min" => 5,
                         "ingredients" => [
                             "Iron Rebar" => 20,
                             "Quartz Crystal" => 30,
@@ -387,7 +387,7 @@ class UpdateSix {
 
             collect($products)->each(function ($recipes, $product_name) use ($building) {
                 echo "Processing Ingredient: {$product_name} \n";
-                
+
                 $product = Ingredient::ofName($product_name);
 
 
