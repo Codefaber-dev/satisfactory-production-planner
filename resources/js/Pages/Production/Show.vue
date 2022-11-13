@@ -223,6 +223,28 @@ export default {
                 this.$forceUpdate();
             }
         });
+
+        this.Bus.on('AddOutput', ({ product, recipe, qty }) => {
+            product = this.products.find((o) => o.name === product);
+            recipe = this.recipes[product.name].find((o) => o.id === recipe.id);
+            qty = +qty.$round4();
+
+            this.pushOutput({
+                qty,
+                product,
+                recipe,
+            });
+
+            this.fetch();
+        });
+
+        this.Bus.on('ScaleOutputs', ({ ratio }) => {
+            this.form.outputs.forEach((o) => {
+                o.yield = (+o.yield * ratio).$round4();
+            });
+
+            this.fetch();
+        });
     },
 
     props: [
@@ -481,14 +503,32 @@ export default {
             this.savePrefs();
         },
 
-        addOutput() {
+        updateYield(name, qty) {
+            this.form.outputs.find((o) => o.product.name === name).yield = qty;
+        },
+
+        pushOutput({ qty, product, recipe }) {
+            if (this.form.outputs.some((o) => o.product.name === product.name)) {
+                let old_yield = +this.form.outputs.find((o) => o.product.name === product.name).yield;
+                this.updateYield(product.name, old_yield + qty);
+                return;
+            }
+
             this.form.outputs.push({
-                yield: 10,
-                product: null,
-                recipe: null,
+                yield: qty,
+                product,
+                recipe,
             });
 
             this.newFactory = null;
+        },
+
+        addOutput() {
+            this.pushOutput({
+                qty: 10,
+                product: null,
+                recipe: null,
+            });
         },
 
         removeOutput(index) {

@@ -243,6 +243,26 @@
                     <!--                        3 Power Shards-->
                     <!--                    </option>-->
                     <!--                </select>-->
+                    <div class="mt-2 flex items-center justify-end space-x-2">
+                        <span>Maximize Clock Speed</span>
+                        <button
+                            @click="maximizeOutput(false)"
+                            class="btn-sm"
+                            :disabled="!canMaximize"
+                            :class="[canMaximize ? 'btn-emerald' : 'btn-gray opacity-20']"
+                            v-show="!material.outputs?.final"
+                        >
+                            Output Extra
+                        </button>
+                        <button
+                            @click="maximizeOutput(true)"
+                            :disabled="!canMaximize"
+                            :class="[canMaximize ? 'btn-emerald' : 'btn-gray opacity-20']"
+                            class="btn-sm"
+                        >
+                            Scale Up Factory
+                        </button>
+                    </div>
                 </template>
             </td>
         </tr>
@@ -325,9 +345,53 @@ export default {
         identifier() {
             return this.levelIndex + '.' + this.stepLetter;
         },
+
+        canMaximize() {
+            return this.overview.selected_variant.clock_speed < this.overview.selected_variant.max_clock_speed;
+        },
     },
 
     methods: {
+        maximizeOutput(scale) {
+            let qty = this.overview.qty,
+                num_buildings = this.overview.selected_variant.num_buildings,
+                max_clock_speed = this.overview.selected_variant.max_clock_speed,
+                base_per_min = this.recipe.base_per_min,
+                newQty = ((base_per_min * num_buildings * max_clock_speed) / 100).$round4(),
+                ratio = newQty / qty,
+                delta = newQty - qty;
+
+            console.log({
+                qty,
+                max_clock_speed,
+                newQty,
+                ratio,
+                delta,
+            });
+
+            // add additional output
+            if (!scale) {
+                console.log('Adding Output', {
+                    product: this.name,
+                    recipe: this.recipe,
+                    qty: delta,
+                });
+
+                this.Bus.emit('AddOutput', {
+                    product: this.name,
+                    recipe: this.recipe,
+                    qty: delta,
+                });
+            }
+
+            // scale the entire factory
+            else {
+                this.Bus.emit('ScaleOutputs', {
+                    ratio,
+                });
+            }
+        },
+
         flashDestination(dest) {
             console.log('emitting flash');
             this.Bus.emit('flash', { dest });

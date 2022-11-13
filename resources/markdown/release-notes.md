@@ -2,7 +2,7 @@
 ## New Domain
 ## satisfactoryproductionplanner.com
 
-## v0.3.3
+## v0.3.4
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -30,6 +30,14 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.3.4
+One-click Clock Speed Maximizing ⏱️
+- You can now choose to maximize the clock speed of an individual production step (credit to @CharlesMB on discord)
+- Output will be adjusted to run clock at max speed (e.g. 100%, 150%, etc.)
+- You can choose to add the extra items as an additional output or scale up the entire production line
+
+![Clock Speed Maximizer](https://res.cloudinary.com/codefaber/image/upload/v1668382230/satisfactory/maximize-clock-speed.png)
 
 ### v0.3.3
 Better Step Navigation ➡️

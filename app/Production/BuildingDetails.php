@@ -84,6 +84,14 @@ class BuildingDetails extends Collection
                 default => 0
             };
 
+            // calc the max clock speed
+            $max_clock_speed = match(true) {
+                $clock_speed > 200 => 250,
+                $clock_speed > 150 => 200,
+                $clock_speed > 100 => 150,
+                default => 100
+            };
+
             // calc the number of power shards
             $power_shards = $num_buildings * $shards_per_building;
 
@@ -127,6 +135,13 @@ class BuildingDetails extends Collection
                     $clock_speed > 100 => 1,
                     default => 0
                 };
+                // calc the max clock speed
+                $max_clock_speed = match(true) {
+                    $clock_speed > 200 => 250,
+                    $clock_speed > 150 => 200,
+                    $clock_speed > 100 => 150,
+                    default => 100
+                };
                 $power_shards = $num_buildings * $shards_per_building;
                 $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
                 // calc the energy used per item
@@ -168,7 +183,7 @@ class BuildingDetails extends Collection
 
             return [
                 "{$this->recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost','footprint'),
+                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost','footprint','max_clock_speed'),
             ];
         })->collapse()->all();
 
