@@ -7,6 +7,9 @@
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
 
+### 📣 Patreon
+[Become a Patron](https://www.patreon.com/SatisfactoryProductionPlanner) today and help support ongoing development.
+
 ### 🗣️ Discord
 Eager to share feedback or have suggestions for improvements?
 

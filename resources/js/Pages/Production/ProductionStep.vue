@@ -26,7 +26,7 @@
                                     {{ finished ? '✅' : '⬜' }}
                                 </span>
                             </div>
-                            <span class="font-light"> {{ qty }} per min </span>
+                            <span class="font-light"> {{ qty }} </span>
                         </div>
                     </div>
 
@@ -53,14 +53,12 @@
                                         >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
                                     </a>
                                     <br />
-                                    {{ +out_qty.toFixed(4) }} per min ({{
-                                        Math.round((100 * 100 * out_qty) / qty) / 100
-                                    }}%)
+                                    {{ +out_qty.toFixed(4) }} ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
                                 </span>
                             </div>
                             <template v-else>
                                 <div class="my-2 rounded bg-lime-300 p-2 text-xs font-bold">
-                                    Output {{ +out_qty.toFixed(4) }} per min ({{
+                                    Output {{ +out_qty.toFixed(4) }} ({{
                                         Math.round((100 * 100 * out_qty) / qty) / 100
                                     }}%)
                                 </div>
@@ -90,7 +88,6 @@
                                 <span class="font-light">
                                     {{ in_qty.$round4() }}
                                     <template v-if="usesByproduct(ingr)"> ({{ getByproductUsed(ingr) }}) </template>
-                                    per min
                                 </span>
                                 <br />
                                 <span class="font-light italic">
@@ -122,7 +119,7 @@
                                         Override
                                     </span>
                                 </span>
-                                <span class="font-light"> {{ +qty.toFixed(4) }} per min </span>
+                                <span class="font-light"> {{ +qty.toFixed(4) }} </span>
                             </div>
                         </div>
                         <div
@@ -147,14 +144,12 @@
                                     <span class="whitespace-nowrap text-xs">
                                         {{ mat }}
                                         <br />
-                                        {{ +out_qty.toFixed(4) }} per min ({{
-                                            Math.round((100 * 100 * out_qty) / qty) / 100
-                                        }}%)
+                                        {{ +out_qty.toFixed(4) }} ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
                                     </span>
                                 </div>
                                 <template v-else>
                                     <div class="my-2 rounded bg-lime-300 p-2 text-xs font-bold">
-                                        Output {{ +out_qty.toFixed(4) }} per min ({{
+                                        Output {{ +out_qty.toFixed(4) }} ({{
                                             Math.round((100 * 100 * out_qty) / qty) / 100
                                         }}%)
                                     </div>

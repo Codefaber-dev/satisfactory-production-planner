@@ -2,14 +2,13 @@
     <div :class="{ dark }">
         <jet-banner />
 
-        <release-notes ref='releaseNotes' v-bind='{version: $page.props.version,releaseNotes: $page.props.releaseNotes}'/>
+        <release-notes
+            ref="releaseNotes"
+            v-bind="{ version: $page.props.version, releaseNotes: $page.props.releaseNotes }"
+        />
 
-        <div
-            class="min-h-screen bg-gray-100 dark:bg-slate-800 dark:text-gray-100"
-        >
-            <nav
-                class="border-b border-gray-100 bg-white dark:border-sky-500 dark:bg-slate-900"
-            >
+        <div class="min-h-screen bg-gray-100 dark:bg-slate-800 dark:text-gray-100">
+            <nav class="border-b border-gray-100 bg-white dark:border-sky-500 dark:bg-slate-900">
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
@@ -17,38 +16,22 @@
                             <!-- Logo -->
                             <div class="flex flex-shrink-0 items-center">
                                 <inertia-link :href="route('dashboard')">
-                                    <jet-application-mark
-                                        class="block h-9 w-auto"
-                                    />
+                                    <jet-application-mark class="block h-9 w-auto" />
                                 </inertia-link>
                             </div>
 
                             <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
-                            >
-                                <jet-nav-link
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <jet-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                                     Production Planner
                                 </jet-nav-link>
-                                <jet-nav-link
-                                    :href="route('power.index')"
-                                    :active="route().current('power')"
-                                >
+                                <jet-nav-link :href="route('power.index')" :active="route().current('power')">
                                     Power Planner
                                 </jet-nav-link>
-                                <jet-nav-link
-                                    :href="route('factories')"
-                                    :active="route().current('factories')"
-                                >
+                                <jet-nav-link :href="route('factories')" :active="route().current('factories')">
                                     My Factories
                                 </jet-nav-link>
-                                <jet-nav-link
-                                    :href="route('favorites')"
-                                    :active="route().current('favorites')"
-                                >
+                                <jet-nav-link :href="route('favorites')" :active="route().current('favorites')">
                                     My Favorite Recipes
                                 </jet-nav-link>
                                 <!-- <jet-nav-link
@@ -61,37 +44,42 @@
                         </div>
 
                         <div class="hidden sm:ml-6 sm:flex sm:items-center">
-                            <div
-                                class="mr-3 flex h-16 items-center justify-center"
-                            >
-                                <span class='mr-4 whitespace-nowrap text-emerald-800 dark:text-emerald-300'>
-                                    🙏 Donations Received: {{ '$' + $page.props.donations.toFixed(2) }}
-                                </span>
+                            <div class="mr-3 flex h-16 items-center justify-center">
+                                <!--                                <span class="mr-4 whitespace-nowrap text-emerald-800 dark:text-emerald-300">-->
+                                <!--                                    🙏 Donations: {{ '$' + $page.props.donations }}-->
+                                <!--                                </span>-->
 
-                                <a target='_blank' href='https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y' class='btn btn-gray whitespace-nowrap mr-4'>
+                                <a
+                                    target="_blank"
+                                    href="https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y"
+                                    class="btn btn-gray mr-4 whitespace-nowrap"
+                                >
                                     Donate
                                 </a>
 
-                                <button @click='showReleaseNotes' class='btn btn-gray whitespace-nowrap mr-4'>
+                                <a
+                                    target="_blank"
+                                    href="https://www.patreon.com/SatisfactoryProductionPlanner"
+                                    class="btn btn-gray mr-4 whitespace-nowrap"
+                                >
+                                    Become a Patron
+                                </a>
+
+                                <button @click="showReleaseNotes" class="btn btn-gray mr-4 whitespace-nowrap">
                                     Release Notes
                                 </button>
 
                                 <a
                                     href="https://discord.gg/dqGQECppCy"
                                     target="_blank"
-                                    class='btn btn-emerald whitespace-nowrap mr-4'
+                                    class="btn btn-emerald mr-4 whitespace-nowrap"
                                 >
                                     Join the Discussion on Discord
                                 </a>
 
                                 <!-- dark mode toggle -->
-                                <div
-                                    class="flex w-full items-center justify-center dark:text-gray-200"
-                                >
-                                    <label
-                                        for="darkToggle"
-                                        class="flex cursor-pointer items-center"
-                                    >
+                                <div class="flex w-full items-center justify-center dark:text-gray-200">
+                                    <label for="darkToggle" class="flex cursor-pointer items-center">
                                         <!-- light mode -->
                                         <div class="mr-2 font-medium">
                                             <svg
@@ -120,9 +108,7 @@
                                                 class="sr-only"
                                             />
                                             <!-- line -->
-                                            <div
-                                                class="block h-8 w-14 rounded-full bg-gray-600 dark:bg-gray-200"
-                                            ></div>
+                                            <div class="block h-8 w-14 rounded-full bg-gray-600 dark:bg-gray-200"></div>
                                             <!-- dot -->
                                             <div
                                                 class="dot absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition"
@@ -158,10 +144,7 @@
                                                 type="button"
                                                 class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition hover:text-gray-700 focus:outline-none dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:hover:border-blue-300 dark:hover:bg-gray-900 dark:hover:text-blue-300 dark:focus:text-blue-200"
                                             >
-                                                {{
-                                                    $page.props?.user.name ||
-                                                    'Guest'
-                                                }}
+                                                {{ $page.props?.user.name || 'Guest' }}
 
                                                 <svg
                                                     class="ml-2 -mr-0.5 h-4 w-4"
@@ -179,57 +162,33 @@
                                         </span>
                                     </template>
 
-                                    <template
-                                        v-if="$page.props?.user.id"
-                                        #content
-                                    >
+                                    <template v-if="$page.props?.user.id" #content>
                                         <!-- Account Management -->
-                                        <div
-                                            class="block px-4 py-2 text-xs text-gray-400 dark:text-gray-100"
-                                        >
+                                        <div class="block px-4 py-2 text-xs text-gray-400 dark:text-gray-100">
                                             Manage Account
                                         </div>
 
-                                        <jet-dropdown-link
-                                            :href="route('profile.show')"
-                                        >
-                                            Profile
-                                        </jet-dropdown-link>
+                                        <jet-dropdown-link :href="route('profile.show')"> Profile </jet-dropdown-link>
 
                                         <jet-dropdown-link
                                             :href="route('api-tokens.index')"
-                                            v-if="
-                                                $page.props.jetstream
-                                                    .hasApiFeatures
-                                            "
+                                            v-if="$page.props.jetstream.hasApiFeatures"
                                         >
                                             API Tokens
                                         </jet-dropdown-link>
 
-                                        <div
-                                            class="border-t border-gray-100"
-                                        ></div>
+                                        <div class="border-t border-gray-100"></div>
 
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
-                                            <jet-dropdown-link as="button">
-                                                Log Out
-                                            </jet-dropdown-link>
+                                            <jet-dropdown-link as="button"> Log Out </jet-dropdown-link>
                                         </form>
                                     </template>
 
                                     <template v-else #content>
-                                        <jet-dropdown-link
-                                            :href="route('login')"
-                                        >
-                                            Login
-                                        </jet-dropdown-link>
+                                        <jet-dropdown-link :href="route('login')"> Login </jet-dropdown-link>
 
-                                        <jet-dropdown-link
-                                            :href="route('register')"
-                                        >
-                                            Register
-                                        </jet-dropdown-link>
+                                        <jet-dropdown-link :href="route('register')"> Register </jet-dropdown-link>
                                     </template>
                                 </jet-dropdown>
                             </div>
@@ -238,23 +197,14 @@
                         <!-- Hamburger -->
                         <div class="-mr-2 flex items-center sm:hidden">
                             <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
+                                @click="showingNavigationDropdown = !showingNavigationDropdown"
                                 class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none dark:text-gray-100"
                             >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
+                                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                     <path
                                         :class="{
                                             hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
+                                            'inline-flex': !showingNavigationDropdown,
                                         }"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
@@ -264,8 +214,7 @@
                                     <path
                                         :class="{
                                             hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
+                                            'inline-flex': showingNavigationDropdown,
                                         }"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
@@ -287,10 +236,7 @@
                     class="sm:hidden"
                 >
                     <div class="space-y-1 pt-2 pb-3">
-                        <jet-responsive-nav-link
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
+                        <jet-responsive-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </jet-responsive-nav-link>
                     </div>
@@ -299,9 +245,7 @@
                     <div class="border-t border-gray-200 pt-4 pb-1">
                         <div class="flex items-center px-4">
                             <div>
-                                <div
-                                    class="text-base font-medium text-gray-800"
-                                >
+                                <div class="text-base font-medium text-gray-800">
                                     {{ $page.props?.user.name }}
                                 </div>
                                 <div class="text-sm font-medium text-gray-500">
@@ -328,30 +272,21 @@
 
                             <!-- Authentication -->
                             <form method="POST" @submit.prevent="logout">
-                                <jet-responsive-nav-link as="button">
-                                    Log Out
-                                </jet-responsive-nav-link>
+                                <jet-responsive-nav-link as="button"> Log Out </jet-responsive-nav-link>
                             </form>
                         </div>
                         <!-- Guest Options -->
                         <div v-else>
-                            <jet-responsive-nav-link :href="route('login')">
-                                Login
-                            </jet-responsive-nav-link>
+                            <jet-responsive-nav-link :href="route('login')"> Login </jet-responsive-nav-link>
 
-                            <jet-responsive-nav-link :href="route('register')">
-                                Register
-                            </jet-responsive-nav-link>
+                            <jet-responsive-nav-link :href="route('register')"> Register </jet-responsive-nav-link>
                         </div>
                     </div>
                 </div>
             </nav>
 
             <!-- Page Heading -->
-            <header
-                class="bg-white shadow dark:bg-sky-900"
-                v-if="$slots.header"
-            >
+            <header class="bg-white shadow dark:bg-sky-900" v-if="$slots.header">
                 <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <slot name="header"></slot>
                 </div>
@@ -431,14 +366,10 @@ export default {
 
         setDarkMode() {
             if (this.dark) {
-                document
-                    .querySelector('html')
-                    .classList.add('dark', 'bg-slate-800');
+                document.querySelector('html').classList.add('dark', 'bg-slate-800');
                 document.querySelector('html').classList.remove('bg-gray-100');
             } else {
-                document
-                    .querySelector('html')
-                    .classList.remove('dark', 'bg-slate-800');
+                document.querySelector('html').classList.remove('dark', 'bg-slate-800');
                 document.querySelector('html').classList.add('bg-gray-100');
             }
         },

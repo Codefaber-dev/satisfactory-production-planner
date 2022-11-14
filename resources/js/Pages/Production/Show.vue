@@ -128,9 +128,9 @@
         </template>
         <!-- end template header -->
 
-        <div class="py-12">
-            <div class="mx-auto flex sm:px-6 lg:px-8">
-                <div v-if="done && production" class="relative flex flex-1 flex-col space-y-2 p-4 dark:text-gray-100">
+        <div class="">
+            <div class="mx-auto flex px-2">
+                <div v-if="done && production" class="relative flex flex-1 flex-col space-y-2 p-2 dark:text-gray-100">
                     <production-warning :overrides="production.overrides" :show-warnings="showWarnings" />
 
                     <!-- Tabs -->
@@ -148,7 +148,7 @@
                         </ul>
                     </div>
 
-                    <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-8">
+                    <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-4">
                         <!-- Left Side -->
                         <production-summary
                             :building-checks="buildingChecks"
@@ -160,6 +160,7 @@
                             :new-imports="newImports"
                             :production="production"
                             :production__building_summary="production__building_summary"
+                            :production__building_details="production__building_details"
                             :production__total_power="production__total_power"
                             :raw-materials="rawMaterials"
                             :raw-unchanged="rawUnchanged"
@@ -181,13 +182,6 @@
                             @toggle="toggleProductionCheck"
                             @toggleDiagrams="toggleDiagrams"
                             @toggleEvenRows="toggleEvenRows"
-                        />
-
-                        <!-- right -->
-                        <building-summary
-                            :production__building_details="production__building_details"
-                            :production__building_summary="production__building_summary"
-                            :production__total_power="production__total_power"
                         />
                     </div>
                 </div>
@@ -508,7 +502,7 @@ export default {
         },
 
         pushOutput({ qty, product, recipe }) {
-            if (this.form.outputs.some((o) => o.product.name === product.name)) {
+            if (product && this.form.outputs.some((o) => o.product.name === product.name)) {
                 let old_yield = +this.form.outputs.find((o) => o.product.name === product.name).yield;
                 this.updateYield(product.name, old_yield + qty);
                 return;
