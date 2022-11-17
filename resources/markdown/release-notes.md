@@ -2,7 +2,7 @@
 ## New Domain
 ## satisfactoryproductionplanner.com
 
-## v0.3.4
+## v0.3.5
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -34,6 +34,9 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
+### v0.3.5
+- Fixed a bug where the production calculator would fail to take belt speed into account when calculating number of buildings required.
+
 ### v0.3.4
 One-click Clock Speed Maximizing ⏱️
 - You can now choose to maximize the clock speed of an individual production step (credit to @CharlesMB on discord)
@@ -51,7 +54,7 @@ Better Step Navigation ➡️
 
 ### v0.3.2
 Improved Byproduct Recycling ♻️
-- Raw ingredient byproducts (e.g. water) will now by recycled if possible.
+- Raw ingredient byproducts (e.g. water) will now be recycled if possible.
 - Added additional value in parentheses where byproducts are used as inputs.
 - Bug fix. Fixed an issue that prevented favorite recipes from being used correctly.
 
@@ -91,7 +94,7 @@ New Feature
 
 ### v0.0.8
 New Features
-- Multiple Outputs 🎉 Production Planner now supports up to 6 products from the same production line. [Check It Out](/dashboard/multi?imports=Iron+Ingot,Caterium+Ingot,Screw,Copper+Ingot&variant=mk1&product[0]=Motor&product[1]=Rotor&product[2]=Stator&yield[0]=10&yield[1]=10&yield[2]=10&recipe[0]=Motor&recipe[1]=Rotor&recipe[2]=Quickwire+Stator&choices[Steel+Ingot]=Solid+Steel+Ingot&choices[Iron+Rod]=Steel+Rod)
+- Multiple Outputs 🎉 Production Planner now supports up to 6 products from the same production line. [Check It Out](https://satisfactoryproductionplanner.com/dashboard/multi?imports=Iron+Ingot,Caterium+Ingot,Screw,Copper+Ingot&variant=mk1&product[0]=Motor&product[1]=Rotor&product[2]=Stator&yield[0]=10&yield[1]=10&yield[2]=10&recipe[0]=Motor&recipe[1]=Rotor&recipe[2]=Quickwire+Stator&choices[Steel+Ingot]=Solid+Steel+Ingot&choices[Iron+Rod]=Steel+Rod)
 - Force even rows in build diagrams. You can optionally force symmetrical rows of buildings in the production planner. Build costs and power calculations will update to reflect the selected configuration.
 
 Fixes
@@ -104,7 +107,7 @@ Fixes
 ### v0.0.7
 
 Fixed Bugs
-- Fixed issues with saving factories and viewing saved factories. Error happened with guests and logged in users when saving factories using default recipe.
+- Fixed issues with saving factories and viewing saved factories. Error happened with guests and logged-in users when saving factories using default recipe.
 - Fixed error when importing all intermediate products.
 
 
@@ -155,14 +158,14 @@ Planned
 
 Fixed Issues
 - Fixed an issue where diagrams toggle would reset with each page refresh
-- Fixed an issue where logged in users were still seeing Guest options
+- Fixed an issue where logged-in users were still seeing Guest options
 
 Known Issues
 - Unpackage fuel recipe gives error 500 message. edit: seems to be an infinite recursion issue, workaround is to change the packaged fuel recipe to "Diluted Packaged Fuel".
 
 ### v0.0.1
 Features
- - "Favorite" recipes. Choose a favorite recipe and it will automatically be used whenever that part is needed.
+ - "Favorite" recipes. Choose a favorite recipe, and it will automatically be used whenever that part is needed.
  - Selectable belt speed. Diagrams will automatically adjust to accommodate chosen belt speed.
  - MK++ compatible. Select mk2, mk3, or mk4 for some or all production lines and diagrams and parts lists will be updated automatically.
  - Adjust yield by available raw materials.

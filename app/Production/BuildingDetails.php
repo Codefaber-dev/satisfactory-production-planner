@@ -70,7 +70,7 @@ class BuildingDetails extends Collection
     protected function getBuildingDetails(): static
     {
         $this->items = $this->recipe->building->variants->map(function ($variant) {
-            // calc number of buildings needed
+            // calc number of buildings needed, assuming belts can handle it
             $num_buildings = 1 * ceil($this->qty / $this->recipe->base_per_min / $variant->multiplier / ($this->base_clock/100));
 
             // calc the clock speed for the buildings
@@ -125,8 +125,11 @@ class BuildingDetails extends Collection
             //$rows = ceil($num_buildings/16); // max 16 buildings per row
             $buildings_per_row = min($num_buildings, ceil($num_buildings/$rows) );
 
+            // building delta, check if belts are too slow for nominal building count
+            $building_delta = ($rows*$buildings_per_row) - $num_buildings;
+
             // force even rows
-            if($this->even) {
+            if($this->even || $building_delta > 1) {
                 $num_buildings = $rows * $buildings_per_row;
                 $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
                 $shards_per_building = match(true) {
