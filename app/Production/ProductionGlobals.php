@@ -70,7 +70,7 @@ class ProductionGlobals
 
     public function isByproduct(string $ingredient): bool
     {
-        return $this->getByproducts()->has($ingredient);
+        return $this->getByproducts()->has($ingredient) && $this->getByproduct($ingredient) > 0;
     }
 
     public function isOverride(string $ingredient): bool

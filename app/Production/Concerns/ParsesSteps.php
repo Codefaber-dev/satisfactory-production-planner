@@ -71,12 +71,8 @@ trait ParsesSteps
             $this->results;
 
         return $intermediate->map(function($tier) {
-            return $tier->map(function($val, $name) {
-                if($name !== $this->product->name) {
-                    return round($val->total,4);
-                }
-                return null;
-            })->filter();
+            return $tier->reject(fn($val,$name) => $this->isFinalProduct($name))
+                    ->map(fn($val, $name) => round($val->total,4))->filter();
         })->collapse();
     }
 
@@ -93,13 +89,16 @@ trait ParsesSteps
     public function getAllMaterials()
     {
         return $this->results->map(function($tier) {
-            return $tier->map(function($val, $name) {
-                if($name !== $this->product->name) {
-                    return round($val->total,4);
-                }
-                return null;
-            })->filter();
+            return $tier
+                    ->reject(fn($val,$name) => $this->isFinalProduct($name))
+                    ->map(fn($val, $name) => round($val->total,4))
+                    ->filter();
         })->collapse();
+    }
+
+    public function isFinalProduct($name): bool
+    {
+        return $this->product->name === $name;
     }
 
     public function getOverviews(): Collection

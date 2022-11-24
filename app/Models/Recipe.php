@@ -90,6 +90,18 @@ class Recipe extends Model
             ]);
     }
 
+    public function setIngredients($ingredients)
+    {
+        $this->attributes['ingredients'] = $ingredients->map(function($qty, $ing) {
+            $ing = i($ing);
+            $ing->pivot = (object) [
+                "base_qty" => $qty,
+                "ingredient_id" => $ing->id,
+            ];
+            return $ing;
+        })->values();
+    }
+
     /**
      * A recipe has many byproducts
      *

@@ -58,8 +58,11 @@ class ProductionCalculator
 
         // if production byproducts can be utilized then calculate again
 
-        if($production->hasUsableByproducts())
+        if ($production->hasUsableByproducts())
         {
+            // do it three times for good measure
+            $production->recalculateUsingByproducts();
+            $production->recalculateUsingByproducts();
             $production->recalculateUsingByproducts();
         }
 
@@ -145,14 +148,15 @@ class ProductionCalculator
         $this->steps = Step::make(
             product: $this->product,
             qty: $this->qty,
-            recipe: $this->recipe,
             globals: ProductionGlobals::make(
                 choices: $this->choices,
                 overrides: $this->overrides,
                 favorites: $this->favorites,
                 imports: $this->imports,
-                variant: $this->variant,
-                byproducts: $this->byproducts)
+                byproducts: $this->byproducts,
+                variant: $this->variant
+            ),
+            recipe: $this->recipe,
         );
     }
 

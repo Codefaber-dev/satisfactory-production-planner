@@ -132,7 +132,7 @@
                     <th class="text-lg font-semibold" colspan="3">Byproducts</th>
                 </tr>
                 <tr v-for="(qty, name) in production.byproducts">
-                    <td colspan="2" class="p-2">
+                    <td v-if="qty > 0" colspan="2" class="p-2">
                         <div class="flex">
                             <cloud-image
                                 class="mr-2 inline-flex"

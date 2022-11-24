@@ -26,15 +26,18 @@
                                     {{ finished ? '✅' : '⬜' }}
                                 </span>
                             </div>
-                            <span class="font-light"> {{ qty }} </span>
+                            <span class="font-light"> {{ formatQty(qty) }} </span>
                         </div>
                     </div>
 
                     <div
-                        class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                        class="flex w-full flex-shrink-0 flex-grow flex-col space-y-1 rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
                     >
                         <span class="font-semibold"> Destination </span>
-                        <div class="flex flex-shrink-0 flex-grow flex-col" v-for="(out_qty, mat) in material.outputs">
+                        <div
+                            class="flex flex-shrink-0 flex-grow flex-col space-y-1"
+                            v-for="(out_qty, mat) in material.outputs"
+                        >
                             <div class="flex" v-if="mat !== 'final'">
                                 <div class="mr-2 flex">
                                     <cloud-image
@@ -53,14 +56,12 @@
                                         >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
                                     </a>
                                     <br />
-                                    {{ +out_qty.toFixed(4) }} ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
+                                    {{ formatQtyWithPercentage(out_qty, qty) }}
                                 </span>
                             </div>
                             <template v-else>
                                 <div class="my-2 rounded bg-lime-300 p-2 text-xs font-bold">
-                                    Output {{ +out_qty.toFixed(4) }} ({{
-                                        Math.round((100 * 100 * out_qty) / qty) / 100
-                                    }}%)
+                                    Output {{ formatQtyWithPercentage(out_qty, qty) }}
                                 </div>
                             </template>
                         </div>
@@ -84,12 +85,10 @@
                                 <span v-if="newImports[ingr]" class="rounded-lg bg-green-300 px-2 py-1 text-xs">
                                     Imported
                                 </span>
-                                <br />
                                 <span class="font-light">
-                                    {{ in_qty.$round4() }}
+                                    {{ formatQty(in_qty) }}
                                     <template v-if="usesByproduct(ingr)"> ({{ getByproductUsed(ingr) }}) </template>
                                 </span>
-                                <br />
                                 <span class="font-light italic">
                                     {{ Math.round((100 * 100 * in_qty) / getDenominator(ingr)) / 100 }}%
                                 </span>
@@ -124,7 +123,7 @@
                         </div>
                         <div
                             v-if="Object.keys(byproductsUsed).includes(byproduct)"
-                            class="mt-2 flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                            class="mt-2 flex w-full flex-shrink-0 flex-grow flex-col space-y-1 rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
                         >
                             <span class="font-semibold"> Destination </span>
                             <div
@@ -142,9 +141,14 @@
                                         />
                                     </div>
                                     <span class="whitespace-nowrap text-xs">
-                                        {{ mat }}
+                                        <a
+                                            @click="flashDestination(levelStepMap[mat])"
+                                            :href="`#${levelStepMap[mat]}`"
+                                            class="text-sky-700"
+                                            >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
+                                        </a>
                                         <br />
-                                        {{ +out_qty.toFixed(4) }} ({{ Math.round((100 * 100 * out_qty) / qty) / 100 }}%)
+                                        {{ formatQtyWithPercentage(out_qty, qty) }}
                                     </span>
                                 </div>
                                 <template v-else>
@@ -400,8 +404,12 @@ export default {
             return this.byproductsUsed?.[ingr]?.[this.name]?.$round4() || 0;
         },
 
+        getTotalByproductUsed(ingr) {
+            return Object.values(this.byproductsUsed?.[ingr] || {}).sum();
+        },
+
         getDenominator(name) {
-            let byp = this.getByproductUsed(name);
+            let byp = this.getTotalByproductUsed(name);
 
             return byp + (+this.allMaterials?.[name] || 0);
         },
@@ -430,6 +438,18 @@ export default {
                 clock: this.selectedOverview,
                 selected_variant_name: this.selectedVariantName,
             });
+        },
+
+        formatPercentage(num, den) {
+            return Math.round((100 * 100 * num) / den) / 100;
+        },
+
+        formatQtyWithPercentage(num, den) {
+            return this.formatQty(num) + ' (' + this.formatPercentage(num, den) + '%)';
+        },
+
+        formatQty(num) {
+            return +num.$round4() + ' per min';
         },
     },
 };

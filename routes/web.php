@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductionLineController;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -50,13 +51,15 @@ Route::get('/fix-recipes', function() {
 
     // r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
     // r('Plutonium Fuel Rod', force: true);
+
+    r('Residual Rubber')->addIngredient(i('Water'), 40);
+    r('Residual Rubber', force: true);
+    Cache::forget('all_recipes');
 });
 
 Route::get('/fix-recipes-u6', function() {
     UpdateSix::update();
 });
-
-
 
 //
 //Route::get('testing', function() {

@@ -9,6 +9,7 @@ use App\Models\Recipe;
 use App\MultiFactories\Facades\MultiFactories;
 use App\Production\Multiplexer;
 use App\Production\ProductionCalculator;
+use App\Production\ProductionGlobals;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -99,7 +100,10 @@ class ProductionController extends Controller
             $m->add($calc);
         }
 
-        // now recalculate to take advantage of byproducts
+        // now recalculate to take advantage of byproducts,
+        // do it several times to ensure a steady state
+        $m->recalculateUsingByproducts();
+        $m->recalculateUsingByproducts();
         $m->recalculateUsingByproducts();
 
         $production = [

@@ -150,6 +150,8 @@ trait Getters
             case $ingredient->is($this->getProduct());
                 return $this->getRecipe();
 
+
+
             // use a chosen recipe if there is one
             case $recipe = $this->getChoice($ingredient) :
             // use an override if there is one
@@ -199,9 +201,10 @@ trait Getters
 
     public function getTotalEnergy(): Collection
     {
-        if($this->getProduct()->isRaw()) {
+        if ($this->getProduct()->isRaw()) {
             return collect();
         }
+
         return $this->getBuildingDetails()->pluck('total_energy');
     }
 }
