@@ -33,6 +33,8 @@
           gtag('config', 'G-TEFR2C3YV2');
         </script>
 
+        <!-- adsense -->
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9180042246032056" crossorigin="anonymous"></script>
         @endproduction
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-slate-900" style="background-attachment: fixed">
