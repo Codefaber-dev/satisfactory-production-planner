@@ -82,12 +82,12 @@
                             <div>
                                 <span>{{ name }}</span>
                                 <br />
-                                <span class="italic">{{ qty }}</span>
+                                <span class="italic">{{ qty }} per min</span>
                             </div>
                         </div>
                     </td>
                     <td class="p-2 text-right">
-                        <div class="flex space-x-2">
+                        <div class="flex justify-end space-x-2 pr-2">
                             <label
                                 :for="`importToggle${name.replace(/ /gi, '')}`"
                                 class="flex cursor-pointer items-center"
@@ -177,21 +177,39 @@
                 </td>
             </tr>
             <tr>
+                <td colspan="2" class="p-2">Total Power Generated (MW)</td>
+                <td class="p-2 text-right">
+                    {{ Math.abs(Math.ceil(production__total_power_generated)) }}
+                </td>
+            </tr>
+            <tr v-if="production__net_power < 0">
+                <td colspan="2" class="p-2">Net Power Generated (MW)</td>
+                <td class="p-2 text-right">
+                    {{ Math.abs(Math.ceil(production__net_power)) }}
+                </td>
+            </tr>
+            <tr v-if="production__net_power > 0">
+                <td colspan="2" class="p-2">Net Power Used (MW)</td>
+                <td class="p-2 text-right">
+                    {{ Math.abs(Math.ceil(production__net_power)) }}
+                </td>
+            </tr>
+            <tr>
                 <td colspan="2" class="p-2">Coal Generator Equiv.</td>
                 <td class="p-2 text-right">
-                    {{ Math.ceil(production__total_power / 75) }}
+                    {{ Math.abs(Math.ceil(production__net_power / 75)) }}
                 </td>
             </tr>
             <tr>
                 <td colspan="2" class="p-2">Fuel Generator Equiv.</td>
                 <td class="p-2 text-right">
-                    {{ Math.ceil(production__total_power / 150) }}
+                    {{ Math.abs(Math.ceil(production__net_power / 150)) }}
                 </td>
             </tr>
             <tr>
                 <td colspan="2" class="p-2">Nuclear Power Plant Equiv.</td>
                 <td class="p-2 text-right">
-                    {{ Math.ceil(production__total_power / 2500) }}
+                    {{ Math.abs(Math.ceil(production__net_power / 2500)) }}
                 </td>
             </tr>
 
@@ -225,7 +243,7 @@
         <building-summary
             :production__building_details="production__building_details"
             :production__building_summary="production__building_summary"
-            :production__total_power="production__total_power"
+            :production__total_power="production__net_power"
         />
     </div>
 </template>
@@ -251,6 +269,8 @@ export default {
         production__building_summary: {},
         production__building_details: {},
         production__total_power: {},
+        production__total_power_generated: {},
+        production__net_power: {},
         rawMaterials: {},
         rawUnchanged: {},
     },

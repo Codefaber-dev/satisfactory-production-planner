@@ -162,6 +162,8 @@
                             :production__building_summary="production__building_summary"
                             :production__building_details="production__building_details"
                             :production__total_power="production__total_power"
+                            :production__total_power_generated="production__total_power_generated"
+                            :production__net_power="production__net_power"
                             :raw-materials="rawMaterials"
                             :raw-unchanged="rawUnchanged"
                         />
@@ -408,6 +410,20 @@ export default {
         },
 
         production__total_power() {
+            return this.production__building_details
+                .filter((o) => +o.power_usage > 0)
+                .map((o) => +o.power_usage)
+                .reduce((a, b) => a + b, 0);
+        },
+
+        production__total_power_generated() {
+            return this.production__building_details
+                .filter((o) => +o.power_usage < 0)
+                .map((o) => +o.power_usage)
+                .reduce((a, b) => a + b, 0);
+        },
+
+        production__net_power() {
             return this.production__building_details.map((o) => +o.power_usage).reduce((a, b) => a + b, 0);
         },
 

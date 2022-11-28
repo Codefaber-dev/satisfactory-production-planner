@@ -4,6 +4,7 @@ namespace App\Production;
 
 use App\Models\Recipe;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class BuildingDetails extends Collection
 {
@@ -114,9 +115,10 @@ class BuildingDetails extends Collection
             })->collapse();
 
             // calculate the max belt load
-            $belt_load_in = $this->recipe->ingredients->map(function ($ingredient) use ($num_buildings,$clock_speed,$variant) {
-                return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
-            })->max();
+            $belt_load_in = $this->recipe->ingredients->reject(fn($ing) => $ing->is_liquid)
+                    ->map(function ($ingredient) use ($num_buildings,$clock_speed,$variant) {
+                        return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
+                    })->max();
 
             // calc the number of rows needed
             $rows = (int) max(ceil($belt_load_in / $this->belt_speed), 1, ceil($this->qty / $this->belt_speed));
@@ -130,6 +132,7 @@ class BuildingDetails extends Collection
 
             // force even rows
             if($this->even || $building_delta > 1) {
+                //Log::debug("Building delta: $building_delta");
                 $num_buildings = $rows * $buildings_per_row;
                 $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
                 $shards_per_building = match(true) {

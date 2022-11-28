@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Building;
 use App\Production\ProductionCalculator;
 use App\Helpers\RawIngredientCalculator;
 use App\Models\Ingredient;
@@ -49,6 +50,10 @@ function i($name) {
 
         return $name;
     });
+}
+
+function b($name) {
+    return Building::whereName($name)->first();
 }
 
 function raw($recipe, $use_alts = false, $qty = 1) {

@@ -52,8 +52,26 @@ Route::get('/fix-recipes', function() {
     // r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
     // r('Plutonium Fuel Rod', force: true);
 
-    r('Residual Rubber')->addIngredient(i('Water'), 40);
-    r('Residual Rubber', force: true);
+    //r('Residual Rubber')->addIngredient(i('Water'), 40);
+    //r('Residual Rubber', force: true);
+
+
+    b('Nuclear Power Plant')->v("mk3")->delete();
+    b('Nuclear Power Plant')->v("mk4")->delete();
+    b('Nuclear Power Plant')->v("mk1")->update(['multiplier' => 1, 'is_generator' => true]);
+    b('Nuclear Power Plant')->v("mk2")->update(['multiplier' => 1.5, 'base_power' => 2500, 'is_generator' => true]);
+
+    i('Water')->update(['is_liquid' => true]);
+    i('Crude Oil')->update(['is_liquid' => true]);
+    i('Heavy Oil Residue')->update(['is_liquid' => true]);
+    i('Fuel')->update(['is_liquid' => true]);
+    i('Turbofuel')->update(['is_liquid' => true]);
+    i('Liquid Biofuel')->update(['is_liquid' => true]);
+    i('Alumina Solution')->update(['is_liquid' => true]);
+    i('Sulfuric Acid')->update(['is_liquid' => true]);
+    i('Nitrogen Gas')->update(['is_liquid' => true]);
+    i('Nitric Acid')->update(['is_liquid' => true]);
+
     Cache::forget('all_recipes');
 });
 

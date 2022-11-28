@@ -54,6 +54,8 @@ class BuildingVariant extends Model
         if ($clock_speed > 2.5)
             throw new InvalidArgumentException("Clock speed must be at most 2.5");
 
-        return pow($clock_speed,1.6) * $this->base_power;
+        $multiplier = $this->is_generator ? -1 : 1;
+
+        return pow($clock_speed,1.6) * $this->base_power * $multiplier;
     }
 }

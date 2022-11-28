@@ -28,4 +28,9 @@ class Building extends Model
     {
         return $this->variants()->ofName($name);
     }
+
+    public function v($name)
+    {
+        return $this->variant($name);
+    }
 }

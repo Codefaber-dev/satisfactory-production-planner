@@ -43,7 +43,8 @@ class BuildingOverview
             return [$building => "[x{$details['num_buildings']} {$details['clock_speed']}%] [{$details['power_usage']} MW]"];
         })->collapse();
 
-        $this->selected_variant = $this->details->keys()->filter(fn($key) => Str::of($key)->contains($variant))->first();
+        $this->selected_variant = $this->details->keys()->filter(fn($key) => Str::of($key)->contains($variant))->first()
+         ?? $this->details->keys()->first();
     }
 
     public static function make(Recipe $recipe, $qty, $belt_speed, $variant = "mk1", $clock_speed = 100): static
