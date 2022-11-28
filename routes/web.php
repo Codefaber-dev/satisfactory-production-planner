@@ -8,6 +8,7 @@ use App\Http\Controllers\MultiProductionLineController;
 use App\Http\Controllers\PowerPlanController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionLineController;
+use App\Http\Controllers\SharedFactoryController;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Foundation\Application;
@@ -120,6 +121,8 @@ Route::get('/factories', [ProductionLineController::class,'index'])->name('facto
 Route::post('/factories', [ProductionLineController::class,'store']);
 Route::patch('/factories/{id}', [ProductionLineController::class,'update']);
 Route::delete('/factories/{id}', [ProductionLineController::class,'destroy']);
+
+Route::get('/shared/{hashId}', [SharedFactoryController::class, 'show'])->name('shared_factory');
 
 
 Route::get('/checklist',[ChecklistController::class,'index'])->name('checklist');

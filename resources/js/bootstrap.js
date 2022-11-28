@@ -57,6 +57,26 @@ Number.prototype.$round4 = function () {
     return Math.round(this * 10000) / 10000;
 };
 
+const copyToClipboard = function (text) {
+    if (typeof navigator.clipboard?.writeText === 'function') {
+        navigator.clipboard.writeText(text);
+        return;
+    }
+
+    let dummy = document.createElement('textarea');
+    // to avoid breaking orgin page when copying more words
+    // cant copy when adding below this code
+    // dummy.style.display = 'none'
+    document.body.appendChild(dummy);
+    //Be careful if you use textarea. setAttribute('value', value), which works with "input" does not work with "textarea". – Eduard
+    dummy.value = text;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+};
+
+window.copyToClipboard = copyToClipboard;
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

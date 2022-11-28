@@ -11,6 +11,7 @@
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "hashids/hashids": "^4.1",
         "inertiajs/inertia-laravel": "^0.4.2",
         "intervention/image": "^2.7",
         "laravel/framework": "^8.40",

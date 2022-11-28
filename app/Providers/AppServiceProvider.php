@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Exception;
+use Hashids\Hashids;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        app()->singleton('Hashids', function() {
+            return new Hashids(config('services.hashids.salt'),12);
+        });
     }
 
     /**

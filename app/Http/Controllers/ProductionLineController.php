@@ -47,7 +47,8 @@ class ProductionLineController extends Controller
             'yield' => request('yield'),
             'notes' => request()->has('notes') ? request('notes',"") : null,
             'imports' => request()->has('imports') ? request('imports',"") : null,
-            'choices' => request()->has('choices') ? request('choices',[]) : []
+            'choices' => request()->has('choices') ? request('choices',[]) : [],
+            'is_shared' => request()->has('is_shared') ? request('is_shared',false) : false
         ];
 
         Factories::update($id, $attributes);

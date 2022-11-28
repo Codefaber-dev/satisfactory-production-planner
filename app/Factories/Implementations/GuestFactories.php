@@ -61,6 +61,8 @@ class GuestFactories implements FactoriesContract
         $line->yield = (isset($attributes['yield']) && !! $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
+        $line->is_shared = (isset($attributes['is_shared'])) ? $attributes['is_shared'] : $line->is_shared;
+
 
         $line->recipe_id ??= Ingredient::find($line->ingredient_id)->baseRecipe()->id;
 

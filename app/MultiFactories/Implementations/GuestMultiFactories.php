@@ -57,6 +57,7 @@ class GuestMultiFactories implements MultiFactoriesContract
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
         $line->choices = (isset($attributes['choices'])) ? $attributes['choices'] : $line->choices;
+        $line->is_shared = (isset($attributes['is_shared'])) ? $attributes['is_shared'] : $line->is_shared;
 
         $this->set($id, $line);
 

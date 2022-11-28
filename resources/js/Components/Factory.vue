@@ -19,8 +19,30 @@
                 />
             </svg>
 
-            <span class="ml-2 text-xl font-semibold">
-                <span v-show="!editing">{{ name }}</span>
+            <span class="ml-2 flex items-center text-xl font-semibold">
+                <span v-show="!editing">
+                    <a target="_blank" :href="`/shared/${hash_id}`">{{ name }}</a>
+                </span>
+                <span
+                    class="ml-6 flex rounded-xl bg-emerald-300 px-2 py-1 text-sm dark:bg-emerald-800"
+                    v-show="is_shared"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="mr-1 h-6 w-6"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+                        />
+                    </svg>
+                    Public
+                </span>
                 <input
                     @keyup.enter="saveEdits"
                     ref="newName"
@@ -31,38 +53,27 @@
             </span>
         </div>
 
-        <div class='absolute flex' style='top: -48px; right: 2rem'>
+        <div class="absolute flex" style="top: -48px; right: 2rem">
             <div v-show="!editing" class="mx-4 flex space-x-2">
-                <inertia-link
-                    as="button"
-                    :href="url"
-                    class="btn btn-emerald"
-                >
-                    Plan
-                </inertia-link>
-                <button @click="toggleEditing" class="btn btn-orange">
-                    Edit
-                </button>
-                <button @click="deletePrompt" class="btn btn-rose">
-                    Delete
-                </button>
+                <button @click="shareLink" class="btn-sm btn-emerald">{{ shareBtnText }}</button>
+                <inertia-link as="button" :href="url" class="btn btn-emerald"> Plan </inertia-link>
+                <button @click="toggleEditing" class="btn btn-orange">Edit</button>
+                <button @click="deletePrompt" class="btn btn-rose">Delete</button>
             </div>
 
-            <div v-show="editing" class="mx-4 flex space-x-2">
-                <button @click="saveEdits" class="btn btn-emerald">
-                    Save
-                </button>
-                <button @click="cancelEditing" class="btn btn-rose">
-                    Cancel
-                </button>
+            <div v-show="editing" class="mx-4 flex items-center space-x-2">
+                <label v-show="$page.props?.user">
+                    <input v-model="form.is_shared" type="checkbox" />
+                    Share With Community
+                </label>
+                <button @click="saveEdits" class="btn btn-emerald">Save</button>
+                <button @click="cancelEditing" class="btn btn-rose">Cancel</button>
             </div>
         </div>
 
-        <div class='flex flex-col w-full'>
-            <div class='flex w-full'>
-                <div
-                    class="relative flex flex-col items-start justify-center text-center text-2xl font-semibold"
-                >
+        <div class="flex w-full flex-col">
+            <div class="flex w-full">
+                <div class="relative flex flex-col items-start justify-center text-center text-2xl font-semibold">
                     <div
                         class="flex w-24 flex-col items-center justify-center divide-y divide-black rounded-l-xl bg-sky-300 p-4 dark:divide-white dark:bg-sky-900"
                     >
@@ -83,21 +94,13 @@
                     class="relative flex w-full items-center rounded-r-xl border-4 border-sky-300 bg-white shadow dark:border-sky-900 dark:bg-slate-900"
                 >
                     <div class="mx-8 flex flex-1 items-center space-x-4 py-2">
-                        <cloud-image
-                            :public-id="product.name"
-                            crop="scale"
-                            quality="100"
-                            width="64"
-                            alt="logo"
-                        />
+                        <cloud-image :public-id="product.name" crop="scale" quality="100" width="64" alt="logo" />
 
                         <div class="flex flex-1 flex-col">
                             <div v-show="!editing" class="flex text-2xl font-bold">
                                 {{ product.name }}
                             </div>
-                            <span v-show="!editing" class="italic">{{
-                                recipe.description || 'default'
-                            }}</span>
+                            <span v-show="!editing" class="italic">{{ recipe.description || 'default' }}</span>
                             <div
                                 v-html="renderedNotes"
                                 v-if="!!notes && !editing"
@@ -118,28 +121,26 @@
                                 :selected="selectedRecipe"
                             ></recipe-picker>
                         </div>
-
                     </div>
                 </div>
             </div>
-            <div class='ml-4 py-2 flex items-center' v-if="!!imports && !editing">
-                <span class='font-bold mr-4'>Imports</span>
-                <div class='flex items-center space-x-4'>
-                    <div v-for="name in imports.split(',')" class='flex items-center'>
+            <div class="ml-4 flex items-center py-2" v-if="!!imports && !editing">
+                <span class="mr-4 font-bold">Imports</span>
+                <div class="flex items-center space-x-4">
+                    <div v-for="name in imports.split(',')" class="flex items-center">
                         <cloud-image
-                            :public-id='name'
-                            crop='scale'
-                            quality='100'
-                            width='48'
-                            class='inline-flex px-2'
-                            alt='logo'
+                            :public-id="name"
+                            crop="scale"
+                            quality="100"
+                            width="48"
+                            class="inline-flex px-2"
+                            alt="logo"
                         />
                         {{ name }}
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -164,7 +165,9 @@ export default {
         imports: String,
         notes: String,
         choices: Object,
-        url: String
+        url: String,
+        is_shared: Boolean,
+        hash_id: String,
     },
 
     data() {
@@ -177,11 +180,20 @@ export default {
                 recipe_id: this.recipe?.id,
                 imports: this.imports,
                 notes: this.notes,
+                is_shared: !!this.is_shared,
             },
+            shareBtnText: 'Share Link',
         };
     },
 
     methods: {
+        shareLink() {
+            copyToClipboard(`https://satisfactoryproductionplanner.com/shared/${this.hash_id}`);
+
+            this.shareBtnText = 'Copied...';
+            setTimeout(() => (this.shareBtnText = 'Share Link'), 1200);
+        },
+
         parse(el) {
             return Markdown.renderInline(el);
         },
@@ -222,7 +234,7 @@ export default {
 
     computed: {
         renderedNotes() {
-            return Markdown.render(this.form.notes);
+            return Markdown.render(this.form.notes || '');
         },
     },
 };
