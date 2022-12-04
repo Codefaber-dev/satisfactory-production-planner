@@ -57,21 +57,48 @@ Route::get('/fix-recipes', function() {
     //r('Residual Rubber', force: true);
 
 
-    b('Nuclear Power Plant')->v("mk3")->delete();
-    b('Nuclear Power Plant')->v("mk4")->delete();
-    b('Nuclear Power Plant')->v("mk1")->update(['multiplier' => 1, 'is_generator' => true]);
-    b('Nuclear Power Plant')->v("mk2")->update(['multiplier' => 1.5, 'base_power' => 2500, 'is_generator' => true]);
+    //b('Nuclear Power Plant')->v("mk3")->delete();
+    //b('Nuclear Power Plant')->v("mk4")->delete();
+    //b('Nuclear Power Plant')->v("mk1")->update(['multiplier' => 1, 'is_generator' => true]);
+    //b('Nuclear Power Plant')->v("mk2")->update(['multiplier' => 1.5, 'base_power' => 2500, 'is_generator' => true]);
+    //
+    //i('Water')->update(['is_liquid' => true]);
+    //i('Crude Oil')->update(['is_liquid' => true]);
+    //i('Heavy Oil Residue')->update(['is_liquid' => true]);
+    //i('Fuel')->update(['is_liquid' => true]);
+    //i('Turbofuel')->update(['is_liquid' => true]);
+    //i('Liquid Biofuel')->update(['is_liquid' => true]);
+    //i('Alumina Solution')->update(['is_liquid' => true]);
+    //i('Sulfuric Acid')->update(['is_liquid' => true]);
+    //i('Nitrogen Gas')->update(['is_liquid' => true]);
+    //i('Nitric Acid')->update(['is_liquid' => true]);
 
-    i('Water')->update(['is_liquid' => true]);
-    i('Crude Oil')->update(['is_liquid' => true]);
-    i('Heavy Oil Residue')->update(['is_liquid' => true]);
-    i('Fuel')->update(['is_liquid' => true]);
-    i('Turbofuel')->update(['is_liquid' => true]);
-    i('Liquid Biofuel')->update(['is_liquid' => true]);
-    i('Alumina Solution')->update(['is_liquid' => true]);
-    i('Sulfuric Acid')->update(['is_liquid' => true]);
-    i('Nitrogen Gas')->update(['is_liquid' => true]);
-    i('Nitric Acid')->update(['is_liquid' => true]);
+    /**
+     *
+     * [
+                    "base_yield" => 1,
+                    "base_per_min" => 6,
+                    "ingredients" => [
+                        "Heat Sink" => 12,
+                        "Rubber" => 12,
+                        "Water" => 30,
+                        "Nitrogen Gas" => 150,
+                    ],
+                ]
+     */
+    $r = i('Cooling System')->recipes()->create([
+        'building_id' => b('Blender')->id,
+        'base_yield' => 1,
+        'base_per_min' => 6,
+        'alt_recipe' => false
+    ]);
+
+    $r->addIngredient(i('Heat Sink'),12);
+    $r->addIngredient(i('Rubber'),12);
+    $r->addIngredient(i('Water'),30);
+    $r->addIngredient(i('Nitrogen Gas'),150);
+
+    i('Cooling System', true);
 
     Cache::forget('all_recipes');
 });
