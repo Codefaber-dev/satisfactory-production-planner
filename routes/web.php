@@ -73,32 +73,19 @@ Route::get('/fix-recipes', function() {
     //i('Nitrogen Gas')->update(['is_liquid' => true]);
     //i('Nitric Acid')->update(['is_liquid' => true]);
 
-    /**
-     *
-     * [
-                    "base_yield" => 1,
-                    "base_per_min" => 6,
-                    "ingredients" => [
-                        "Heat Sink" => 12,
-                        "Rubber" => 12,
-                        "Water" => 30,
-                        "Nitrogen Gas" => 150,
-                    ],
-                ]
-     */
-    $r = i('Cooling System')->recipes()->create([
-        'building_id' => b('Blender')->id,
-        'base_yield' => 1,
-        'base_per_min' => 6,
-        'alt_recipe' => false
-    ]);
-
-    $r->addIngredient(i('Heat Sink'),12);
-    $r->addIngredient(i('Rubber'),12);
-    $r->addIngredient(i('Water'),30);
-    $r->addIngredient(i('Nitrogen Gas'),150);
-
-    i('Cooling System', true);
+    //$r = i('Cooling System')->recipes()->create([
+    //    'building_id' => b('Blender')->id,
+    //    'base_yield' => 1,
+    //    'base_per_min' => 6,
+    //    'alt_recipe' => false
+    //]);
+    //
+    //$r->addIngredient(i('Heat Sink'),12);
+    //$r->addIngredient(i('Rubber'),12);
+    //$r->addIngredient(i('Water'),30);
+    //$r->addIngredient(i('Nitrogen Gas'),150);
+    //
+    //i('Cooling System', true);
 
     Cache::forget('all_recipes');
 });

@@ -1,8 +1,7 @@
 # Satisfactory Production Planner
-## New Domain
 ## satisfactoryproductionplanner.com
 
-## v0.3.5
+## v0.3.6 FICSMAS Release 🎄
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -28,11 +27,19 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 
 [Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y)
 
+#### Donations to date: $290
+
+
 ## <a name="release-notes"></a>
-
-
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.3.6
+Added FICSMAS Event 🎄🌟❄️
+- Added FICSMAS Products to Production Planner
+- Added missing default recipe for Cooling System
+- Various bug fixes
+
 
 ### v0.3.5
 - Fixed a bug where the production calculator would fail to take belt speed into account when calculating number of buildings required.
