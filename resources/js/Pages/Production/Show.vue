@@ -84,9 +84,7 @@
                             <option value="2000">Belts mk6 (Covered Conveyor Belt Mod)</option>
                             <option value="7500">Belts mk7 (Covered Conveyor Belt Mod)</option>
                         </select>
-                        <button :disabled="form.outputs.length >= 6" @click="addOutput" class="btn btn-emerald">
-                            Add Output
-                        </button>
+                        <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
                     <template v-else>
                         <button class="btn-sm btn-gray" @click="removeOutput(index)">X</button>
