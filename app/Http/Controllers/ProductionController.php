@@ -106,6 +106,7 @@ class ProductionController extends Controller
         $m->recalculateUsingByproducts();
         $m->recalculateUsingByproducts();
 
+
         $production = [
             'results' => $m->getResults(),
             'byproducts_used' => $m->getByproductsUsed(),

@@ -28,6 +28,8 @@ class ProductionCalculator
 
     protected ?Collection $byproducts;
 
+    protected ?Collection $used_byproducts;
+
     protected $imports;
 
     protected $variant;
@@ -48,7 +50,8 @@ class ProductionCalculator
             ->setImports($imports)
             ->setVariant($variant)
             ->setChoices($choices)
-            ->setByproducts($byproducts);
+            ->setByproducts($byproducts)
+            ->setUsedByproducts([]);
 
         $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
@@ -69,9 +72,11 @@ class ProductionCalculator
         return $production;
     }
 
-    public function recalculateUsingByproducts($byproducts = null)
+    public function recalculateUsingByproducts($byproducts = null, $used_byproducts = null)
     {
         $this->setByproducts($byproducts ?? $this->getByproducts());
+
+        $this->setUsedByproducts($used_byproducts);
 
         $this->calculate();
 
@@ -133,6 +138,18 @@ class ProductionCalculator
         return $this;
     }
 
+    public function setUsedByproducts($used_byproducts = []): static
+    {
+        $this->used_byproducts = collect($used_byproducts);
+
+        return $this;
+    }
+
+    public function getUsedByproducts(): ?Collection
+    {
+        return $this->used_byproducts;
+    }
+
     public function getQty()
     {
         return $this->qty;
@@ -154,7 +171,8 @@ class ProductionCalculator
                 favorites: $this->favorites,
                 imports: $this->imports,
                 byproducts: $this->byproducts,
-                variant: $this->variant
+                variant: $this->variant,
+                used_byproducts: $this->used_byproducts
             ),
             recipe: $this->recipe,
         );

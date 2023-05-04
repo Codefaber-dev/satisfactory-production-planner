@@ -16,10 +16,11 @@ class ProductionGlobals
     protected Collection $imports;
 
     protected Collection $byproducts;
+    protected Collection $used_byproducts;
     protected string $variant;
     protected int $belt_speed;
 
-    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant)
+    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts)
     {
         $this->choices = collect($choices);
         $this->overrides = collect($overrides);
@@ -28,12 +29,12 @@ class ProductionGlobals
         $this->byproducts = collect($byproducts);
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed',780);
-        $this->used_byproducts = collect([]);
+        $this->used_byproducts = $used_byproducts;
     }
 
-    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant): static
+    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts): static
     {
-        return new static($choices, $overrides, $favorites, $imports, $byproducts, $variant);
+        return new static($choices, $overrides, $favorites, $imports, $byproducts, $variant, $used_byproducts);
     }
 
     public static function fromArray(array $globals): static
@@ -44,7 +45,8 @@ class ProductionGlobals
             favorites: $globals['favorites'] ?? null,
             imports: $globals['imports'] ?? [],
             byproducts: $globals['byproducts'] ?? [],
-            variant: $globals['variant'] ?? 'mk1'
+            variant: $globals['variant'] ?? 'mk1',
+            used_byproducts: $globals['used_byproducts'] ?? []
         );
     }
 

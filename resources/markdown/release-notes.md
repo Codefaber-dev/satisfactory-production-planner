@@ -38,6 +38,7 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 Minor Fixes
 - Fixed yield per minute of High-Speed Connector Recipe
 - Removed Seismic Nobelisk Alt
+- Fixed an issue with recycling byproducts with multiple outputs producing/consuming the same byproduct. It mistakenly count the same byproduct multiple times.
 
 
 ### v0.3.6

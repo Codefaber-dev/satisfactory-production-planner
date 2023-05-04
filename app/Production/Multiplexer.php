@@ -27,8 +27,11 @@ class Multiplexer
 
     public function recalculateUsingByproducts()
     {
-        $this->calcs->each(function($calc) {
-           $calc->recalculateUsingByproducts($this->getByproducts());
+        $used_byproducts = [];
+
+        $this->calcs->each(function($calc) use (&$used_byproducts) {
+           $calc->recalculateUsingByproducts($this->getByproducts(), $used_byproducts);
+           $used_byproducts = $calc->getUsedByproducts();
         });
     }
 
