@@ -1,7 +1,7 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-## v0.3.6 FICSMAS Release 🎄
+## v0.3.7
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -33,6 +33,12 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.3.7
+Minor Fixes
+- Fixed yield per minute of High-Speed Connector Recipe
+- Removed Seismic Nobelisk Alt
+
 
 ### v0.3.6
 Added FICSMAS Event 🎄🌟❄️

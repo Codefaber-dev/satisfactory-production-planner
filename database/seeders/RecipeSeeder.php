@@ -1567,7 +1567,7 @@ class RecipeSeeder extends Seeder
             "High-Speed Connector" => [
                 [
                     "base_yield" => 1,
-                    "base_per_min" => 3.8,
+                    "base_per_min" => 3.75,
                     "ingredients" => [
                         "Quickwire" => 210,
                         "Cable" => 37.5,
