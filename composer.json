@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.1",
         "archtechx/laravel-seo": "^0.5.1",
-        "aws/aws-sdk-php": "^3.209",
+        "aws/aws-sdk-php": "*",
         "guzzlehttp/guzzle": "^7.2",
         "hashids/hashids": "^4.1",
         "inertiajs/inertia-laravel": "^0.6.9",
