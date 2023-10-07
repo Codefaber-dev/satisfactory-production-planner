@@ -27,12 +27,20 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 
 [Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y)
 
-#### Donations to date: $290
+#### Donations to date: $400
 
 
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.3.9
+New Feature: Production Checklist ☑️
+- Track your progression with an interactive checklist
+- Try it now [here](/checklist)
+
+![Production Checklist](https://res.cloudinary.com/codefaber/image/upload/v1696719094/satisfactory/production-checklist.png)
+
 
 ### v0.3.8
 Minor Fixes

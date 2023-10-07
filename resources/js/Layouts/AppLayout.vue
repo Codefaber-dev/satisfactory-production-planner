@@ -34,12 +34,9 @@
                                 <jet-nav-link :href="route('favorites')" :active="route().current('favorites')">
                                     My Favorite Recipes
                                 </jet-nav-link>
-                                <!-- <jet-nav-link
-                                    :href="route('checklist')"
-                                    :active="route().current('checklist')"
-                                >
-                                    Production Checklist
-                                </jet-nav-link> -->
+                                <jet-nav-link :href="route('checklist')" :active="route().current('checklist')">
+                                    Checklist
+                                </jet-nav-link>
                             </div>
                         </div>
 
@@ -62,7 +59,7 @@
                                     href="https://www.patreon.com/SatisfactoryProductionPlanner"
                                     class="btn btn-gray mr-4 whitespace-nowrap"
                                 >
-                                    Become a Patron
+                                    Patreon
                                 </a>
 
                                 <button @click="showReleaseNotes" class="btn btn-gray mr-4 whitespace-nowrap">
@@ -74,7 +71,7 @@
                                     target="_blank"
                                     class="btn btn-emerald mr-4 whitespace-nowrap"
                                 >
-                                    Join the Discussion on Discord
+                                    Discord
                                 </a>
 
                                 <!-- dark mode toggle -->
