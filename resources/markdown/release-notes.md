@@ -1,7 +1,7 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-## v0.3.8
+## v0.3.9
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)

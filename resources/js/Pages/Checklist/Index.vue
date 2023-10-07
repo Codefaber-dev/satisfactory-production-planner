@@ -25,7 +25,7 @@
                             class="w-full rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800"
                         />
 
-                        <span class="font-semibold"> Tier </span>
+                        <span class="font-semibold"> Tier Filters </span>
 
                         <label
                             class="cursor-pointer rounded bg-slate-200 px-2 py-1 dark:bg-slate-700"
@@ -37,7 +37,7 @@
                             Tier {{ tag }}
                         </label>
 
-                        <span class="font-semibold"> Tags </span>
+                        <span class="font-semibold"> Tag Filters </span>
 
                         <input
                             v-model="tagFilter"
