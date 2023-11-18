@@ -1,7 +1,7 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-## v0.3.9
+## v0.4.0
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -33,6 +33,20 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v0.4.0
+Quality Of Life Improvements 
+- You can now select how building rows are broken out to avoid over-saturating belts.
+  - Default behavior is to rate limit input and output belt speeds
+  - Clicking the Limit Belt Rates button will toggle between the options: Inputs & Outputs, just Inputs, or just Outputs
+  - E.g. if you limit outputs, then inputs will be allowed to exceed your set max belt speed and vice versa
+![Speed Limits Button](https://res.cloudinary.com/codefaber/image/upload/v1700288200/satisfactory/speed-limit-button.png)
+  - Added max input and output rate stats to diagram legend
+![Speed Limits](https://res.cloudinary.com/codefaber/image/upload/v1700288200/satisfactory/speed-limit-toggle.png)
+- Removed auto-update behavior from many form elements in favor of Update button
+- Fixed power calculation method (reduced exponent from 1.6 to 1.321928 as of U7)
+- Fixed parts list and building summary incorrectly showing buildings for imported products
+
 
 ### v0.3.9
 New Feature: Production Checklist ☑️

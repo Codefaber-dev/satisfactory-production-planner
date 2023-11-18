@@ -68,7 +68,6 @@
                         >
                             <span class="font-semibold">Enter quantity per minute</span>
                             <input
-                                @input="fetch"
                                 type="number"
                                 step="0.5"
                                 min="0"
@@ -82,7 +81,6 @@
                         >
                             <span class="font-semibold">Select default building variant</span>
                             <select
-                                @change="fetch"
                                 v-model="variant"
                                 class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800"
                             >

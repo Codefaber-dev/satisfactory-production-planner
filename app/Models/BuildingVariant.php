@@ -56,6 +56,6 @@ class BuildingVariant extends Model
 
         $multiplier = $this->is_generator ? -1 : 1;
 
-        return pow($clock_speed,1.6) * $this->base_power * $multiplier;
+        return pow($clock_speed,1.321928) * $this->base_power * $multiplier;
     }
 }

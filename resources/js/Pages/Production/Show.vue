@@ -31,7 +31,6 @@
                         <input
                             ref="yield"
                             autofocus="autofocus"
-                            @change="fetch"
                             type="number"
                             step="0.5"
                             min="0"
@@ -51,7 +50,6 @@
                     </select>
                     <select
                         v-if="row.product"
-                        @change="fetch"
                         class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
                         v-model="row.recipe"
                     >
@@ -62,7 +60,6 @@
                     </select>
                     <template v-if="index === 0">
                         <select
-                            @change="fetch"
                             v-model="form.variant"
                             class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
                         >
@@ -72,7 +69,6 @@
                             <option value="mk4">Production mk4 (mk++ mod)</option>
                         </select>
                         <select
-                            @change="fetch"
                             v-model="form.belt_speed"
                             class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
                         >
@@ -95,7 +91,8 @@
                     <button :disabled="working" @click="saveMyFactory" class="btn btn-emerald">
                         {{ newFactory ? 'Save Changes To Factory' : 'Save To My Factories' }}
                     </button>
-                    <inertia-link class="btn btn-emerald" href="/dashboard"> Start Over </inertia-link>
+                    <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
+                    <inertia-link class="btn btn-text" href="/dashboard"> Start Over </inertia-link>
                 </div>
                 <!--            <div class="mt-4 flex flex-col">-->
                 <!--                <hr class="mb-4" />-->
@@ -179,9 +176,11 @@
                             :choices="allChosenRecipes"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
+                            :speed-limit="newSpeedLimit"
                             @toggle="toggleProductionCheck"
                             @toggleDiagrams="toggleDiagrams"
                             @toggleEvenRows="toggleEvenRows"
+                            @toggleSpeedLimit="toggleSpeedLimit"
                         />
                     </div>
                 </div>
@@ -258,6 +257,7 @@ export default {
         'multi',
         'choices',
         'even',
+        'speedLimit',
     ],
 
     data() {
@@ -306,6 +306,7 @@ export default {
             showWarnings: true,
             newChoices: this.choices || {},
             newEven: !!this.even,
+            newSpeedLimit: this.speedLimit || 'both',
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
         };
@@ -450,6 +451,7 @@ export default {
                 variant: this.form.variant,
                 choices: this.newChoices,
                 even: this.newEven ? 1 : 0,
+                speedLimit: this.newSpeedLimit,
             };
 
             if (this.form.outputs.length > 1) {
@@ -467,6 +469,18 @@ export default {
     },
 
     methods: {
+        toggleSpeedLimit() {
+            if (this.newSpeedLimit === 'both') {
+                this.newSpeedLimit = 'inputs';
+            } else if (this.newSpeedLimit === 'inputs') {
+                this.newSpeedLimit = 'outputs';
+            } else {
+                this.newSpeedLimit = 'both';
+            }
+
+            this.fetch();
+        },
+
         updateOverviews() {
             this.overviews = this.productionSteps.overviews || [];
             this.$forceUpdate();

@@ -122,6 +122,17 @@ class BuildingDetails extends Collection
 
             // calc the number of rows needed
             $rows = (int) max(ceil($belt_load_in / $this->belt_speed), 1, ceil($this->qty / $this->belt_speed));
+            $input_rows = (int) max(ceil($belt_load_in / $this->belt_speed), 1);
+            $output_rows = (int) max(ceil($this->qty / $this->belt_speed), 1);
+
+            // set the alternate rows based on limit settings
+            if (request('speedLimit') === 'outputs') {
+                $rows = $output_rows;
+            }
+            if (request('speedLimit') === 'inputs') {
+                $rows = $input_rows;
+            }
+
 
             // calc the footprint
             //$rows = ceil($num_buildings/16); // max 16 buildings per row
@@ -164,6 +175,10 @@ class BuildingDetails extends Collection
                 'monogram' => $this->recipe->building->name[0],
                 'belt_speed' => $this->belt_speed,
                 'belt_load' => $belt_load_in,
+                'belt_load_in' => round($belt_load_in/$rows,2),
+                'belt_load_out' => round($this->qty/$rows,2),
+                'belt_utilization_in' =>  round(100 * $belt_load_in/$rows/$this->belt_speed),
+                'belt_utilization_out' =>  round(100 * $this->qty/$rows/$this->belt_speed),
                 'rows' => $rows,
                 'num_buildings' => $num_buildings,
                 'power_shards' => $power_shards,

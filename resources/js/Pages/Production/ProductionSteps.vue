@@ -14,6 +14,15 @@
                 {{ even ? '✅' : '⬜' }}
                 Force Even Rows
             </button>
+            <button
+                v-text="
+                    `Limit Belt Rates: ${
+                        speedLimit === 'both' ? 'Inputs & Outputs' : speedLimit === 'inputs' ? 'Inputs' : 'Outputs'
+                    }`
+                "
+                @click="$emit('toggleSpeedLimit')"
+                class="btn btn-emerald"
+            ></button>
         </div>
         <table class="table-auto">
             <tr>
@@ -94,6 +103,10 @@ export default {
         choices: {},
         even: {},
         overviews: {},
+        speedLimit: {
+            type: String,
+            default: 'both',
+        },
     },
 
     methods: {

@@ -1,9 +1,9 @@
 <template>
     <div class="flex-col border border-gray-500 bg-white text-sm shadow-lg dark:border-sky-700 dark:bg-slate-900">
-        <table>
+        <table class="w-full">
             <tbody class="border-b border-gray-200 dark:border-slate-800">
                 <tr class="bg-sky-300 dark:bg-sky-700">
-                    <th class="text-lg font-semibold" colspan="3">Building Summary</th>
+                    <th class="text-lg font-semibold" colspan="4">Building Summary</th>
                 </tr>
                 <tr>
                     <td class="p-2">

@@ -104,9 +104,10 @@ trait ParsesSteps
     public function getOverviews(): Collection
     {
         return $this->results->map(function($tier) {
-           return $tier->map(function($product) {
-              return $product->production->filter(fn($row) => isset($row['overview']))->pluck('overviews');
-           })->collapse()->filter();
+           return $tier->reject(fn($product) => $product->imported)
+               ->map(function($product) {
+                  return $product->production->filter(fn($row) => isset($row['overview']))->pluck('overviews');
+               })->collapse()->filter();
         })->collapse()
             ->map(fn($overview) => [$overview["c100"]["product"] . "|" . $overview["c100"]["recipe"] => [
                 "clock" => "c100",
