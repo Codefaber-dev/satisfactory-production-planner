@@ -82,43 +82,50 @@ class ProductionController extends Controller
         $recipes = collect(request('recipe'))->map(fn($name) => r($name));
         $variant = request('variant');
         $choices = collect(request('choices'))->map(fn($name) => r($name));
-        $m = new Multiplexer;
-
         $multi = compact('products','yields','recipes');
 
-        foreach($products as $key => $product) {
-            $qty = $yields[$key];
-            $recipe = $recipes[$key];
-            $calc = ProductionCalculator::make(
-                product: $product,
-                qty: $qty,
-                recipe: $recipe,
-                imports: request()->has('imports') ? explode(",",request("imports")) : [],
-                variant: $variant,
-                choices: $recipes->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse()->merge($choices)
-            );
-            $m->add($calc);
-        }
+        $cacheKey = "multi_production_" . md5(collect(compact('products','yields','recipes','variant','choices'))->toJson());
 
-        // now recalculate to take advantage of byproducts,
-        // do it several times to ensure a steady state
-        $m->recalculateUsingByproducts();
-        $m->recalculateUsingByproducts();
-        $m->recalculateUsingByproducts();
+        $production = Cache::rememberForever($cacheKey, function() use ($products, $yields, $recipes, $variant,$choices) {
+
+            $m = new Multiplexer;
 
 
-        $production = [
-            'results' => $m->getResults(),
-            'byproducts_used' => $m->getByproductsUsed(),
-            'raw_materials' => $m->getRawMaterials(),
-            'intermediate_materials' => $m->getIntermediateMaterials(),
-            'all_materials' => $m->getAllMaterials(),
-            'final' => $m->getFinals(),
-            'recipe' => $m->getRecipes(),
-            'overrides' => $m->getOverrides(),
-            'byproducts' => $m->getByproducts(),
-            'overviews' => $m->getOverviews()
-        ];
+            foreach($products as $key => $product) {
+                $qty = $yields[$key];
+                $recipe = $recipes[$key];
+                $calc = ProductionCalculator::make(
+                    product: $product,
+                    qty: $qty,
+                    recipe: $recipe,
+                    imports: request()->has('imports') ? explode(",",request("imports")) : [],
+                    variant: $variant,
+                    choices: $recipes->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse()->merge($choices)
+                );
+                $m->add($calc);
+            }
+
+            // now recalculate to take advantage of byproducts,
+            // do it several times to ensure a steady state
+            $m->recalculateUsingByproducts();
+            $m->recalculateUsingByproducts();
+            $m->recalculateUsingByproducts();
+
+
+            return $production = [
+                'results' => $m->getResults(),
+                'byproducts_used' => $m->getByproductsUsed(),
+                'raw_materials' => $m->getRawMaterials(),
+                'intermediate_materials' => $m->getIntermediateMaterials(),
+                'all_materials' => $m->getAllMaterials(),
+                'final' => $m->getFinals(),
+                'recipe' => $m->getRecipes(),
+                'overrides' => $m->getOverrides(),
+                'byproducts' => $m->getByproducts(),
+                'overviews' => $m->getOverviews()
+            ];
+        });
+
 
         $imports = request('imports');
 

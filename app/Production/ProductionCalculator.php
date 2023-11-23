@@ -7,6 +7,7 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use phpDocumentor\Reflection\Types\Static_;
 
 class ProductionCalculator
@@ -42,34 +43,40 @@ class ProductionCalculator
     public static function make(
         $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1", $choices = [], $byproducts = []
     ): static {
-        $production = (new static)->setProduct($product)
-            ->setQty($qty)
-            ->setRecipe($recipe)
-            ->setOverrides($overrides)
-            ->setFavorites($favorites)
-            ->setImports($imports)
-            ->setVariant($variant)
-            ->setChoices($choices)
-            ->setByproducts($byproducts)
-            ->setUsedByproducts([]);
 
-        $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
+        $cacheKey = "production_calc_ " . md5(collect(compact('product','qty','recipe','overrides','favorites','imports','variant','choices','byproducts'))->toJson());
 
-        $production->calculate();
+        return Cache::rememberForever($cacheKey, function() use ($product,$qty,$recipe,$overrides,$favorites,$imports,$variant,$choices,$byproducts) {
+            $production = (new static)->setProduct($product)
+                ->setQty($qty)
+                ->setRecipe($recipe)
+                ->setOverrides($overrides)
+                ->setFavorites($favorites)
+                ->setImports($imports)
+                ->setVariant($variant)
+                ->setChoices($choices)
+                ->setByproducts($byproducts)
+                ->setUsedByproducts([]);
 
-        $production->doParse();
+            $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
-        // if production byproducts can be utilized then calculate again
+            $production->calculate();
 
-        if ($production->hasUsableByproducts())
-        {
-            // do it three times for good measure
-            $production->recalculateUsingByproducts();
-            $production->recalculateUsingByproducts();
-            $production->recalculateUsingByproducts();
-        }
+            $production->doParse();
 
-        return $production;
+            // if production byproducts can be utilized then calculate again
+
+            if ($production->hasUsableByproducts())
+            {
+                // do it three times for good measure
+                $production->recalculateUsingByproducts();
+                $production->recalculateUsingByproducts();
+                $production->recalculateUsingByproducts();
+            }
+
+            return $production;
+        });
+
     }
 
     public function recalculateUsingByproducts($byproducts = null, $used_byproducts = null)
