@@ -83,8 +83,12 @@ class ProductionController extends Controller
         $variant = request('variant');
         $choices = collect(request('choices'))->map(fn($name) => r($name));
         $multi = compact('products','yields','recipes');
+        $even = request('even') ? 1 : 0;
+        $speedLimit = request('speedLimit', 'both');
+        $belt_speed = request('belt_speed',780);
+        $imports = request('imports');
 
-        $cacheKey = "multi_production_" . md5(collect(compact('products','yields','recipes','variant','choices'))->toJson());
+        $cacheKey = "multi_production_" . md5(collect(compact('products','yields','recipes','variant','choices','even','speedLimit','belt_speed','imports'))->toJson());
 
         $production = Cache::rememberForever($cacheKey, function() use ($products, $yields, $recipes, $variant,$choices) {
 
@@ -125,11 +129,6 @@ class ProductionController extends Controller
                 'overviews' => $m->getOverviews()
             ];
         });
-
-
-        $imports = request('imports');
-
-        $belt_speed = request('belt_speed',780);
 
         return Inertia::render('Production/Show',compact('production','variant','belt_speed','imports','multi') + $this->baseData());
     }
