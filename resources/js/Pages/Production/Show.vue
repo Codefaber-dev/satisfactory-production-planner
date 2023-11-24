@@ -88,7 +88,12 @@
                 </div>
 
                 <div class="my-4 space-x-4">
-                    <button :disabled="working" @click="saveMyFactory" class="btn btn-emerald">
+                    <button
+                        v-if="$page.props?.user?.name"
+                        :disabled="working"
+                        @click="saveMyFactory"
+                        class="btn btn-emerald"
+                    >
                         {{ newFactory ? 'Save Changes To Factory' : 'Save To My Factories' }}
                     </button>
                     <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>

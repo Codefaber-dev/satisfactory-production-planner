@@ -28,7 +28,11 @@
                                 <jet-nav-link :href="route('power.index')" :active="route().current('power')">
                                     Power Planner
                                 </jet-nav-link>
-                                <jet-nav-link :href="route('factories')" :active="route().current('factories')">
+                                <jet-nav-link
+                                    v-if="$page?.props?.user?.name"
+                                    :href="route('factories')"
+                                    :active="route().current('factories')"
+                                >
                                     My Factories
                                 </jet-nav-link>
                                 <jet-nav-link :href="route('favorites')" :active="route().current('favorites')">
