@@ -313,8 +313,8 @@ export default {
         let key = `${this.production.recipe.product.name}|${
                 this.production.recipe.description || this.production.recipe.product.name
             }`,
-            clock = store.getItem(`${key}.clock`, this.overviews[key].clock),
-            variant = store.getItem(`${key}.selected_variant_name`, this.overviews[key].selected_variant_name);
+            clock = store.getItem(`${key}.clock`, this.overviews?.[key]?.clock),
+            variant = store.getItem(`${key}.selected_variant_name`, this.overviews?.[key]?.selected_variant_name);
 
         return {
             key,
