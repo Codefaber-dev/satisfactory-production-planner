@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class Recipe extends Model
 {
@@ -54,7 +55,13 @@ class Recipe extends Model
         if ($recipe = $query->firstWhere('description',$name))
             return $recipe->load('ingredients');
 
-        return Ingredient::ofName($name)->baseRecipe()->load('ingredients');
+        $ingredient = Ingredient::ofName($name);
+
+        if ($ingredient->exists()) {
+            return $ingredient->baseRecipe()->load('ingredients');
+        }
+
+        Log::error("No recipe found for input name {$name}");
     }
 
     /**

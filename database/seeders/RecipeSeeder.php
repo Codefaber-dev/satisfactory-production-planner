@@ -1498,7 +1498,7 @@ class RecipeSeeder extends Seeder
                 [
                     "description" => "Insulated Crystal Oscillator",
                     "base_yield" => 1,
-                    "base_per_min" => 1.9,
+                    "base_per_min" => 1.875,
                     "ingredients" => [
                         "Quartz Crystal" => 18.75,
                         "Rubber" => 13.125,

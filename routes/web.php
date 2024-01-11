@@ -41,10 +41,13 @@ Route::domain('satisfactory.codefaber.dev')->group(function() {
 //});
 
 Route::get('/fix-recipes', function() {
-    r('High-Speed Connector')->update(['base_per_min' => 3.75]);
-    r('High-Speed Connector',force: true);
+    r('Insulated Crystal Oscillator')->update(["base_per_min" => 1.875]);
+    r('Insulated Crystal Oscillator',force: true);
 
-    r('Seismic Nobelisk')->delete();
+    //r('High-Speed Connector')->update(['base_per_min' => 3.75]);
+    //r('High-Speed Connector',force: true);
+
+    //r('Seismic Nobelisk')->delete();
 
     //r('Aluminum Scrap')->update(['base_per_min' => 360]);
     //r('Aluminum Scrap', force: true);
