@@ -105,6 +105,8 @@ Route::get('/fix-recipes-u6', function() {
 
 Route::get('/fix-update-1', function() {
     UpdateOneZero::update();
+
+    \Illuminate\Support\Facades\Artisan::call('rebuild-cache');
 });
 
 //
