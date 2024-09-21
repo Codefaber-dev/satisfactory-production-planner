@@ -1,11 +1,11 @@
 <template>
-    <img :src="url" :alt="alt" :height='height' :width='width' />
+    <img :src="url" :alt="alt" :height="height" :width="width" />
 </template>
 
 <script>
 import { Cloudinary } from 'cloudinary-core';
 
-const cl = Cloudinary.new({ cloud_name: 'codefaber' });
+const cl = Cloudinary.new({ cloud_name: 'dgev9coex' });
 
 export default {
     name: 'CloudImage',
@@ -39,8 +39,7 @@ export default {
 
             opts.quality = this.quality || 80;
 
-
-            return cl.url('satisfactory/' + publicId + '.png', opts);
+            return cl.url('/' + publicId + '.webp', opts);
         },
     },
 };

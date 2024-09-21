@@ -85,9 +85,9 @@
                                 class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800"
                             >
                                 <option>mk1</option>
-                                <option value="mk2">mk2 (mk++ mod)</option>
-                                <option value="mk3">mk3 (mk++ mod)</option>
-                                <option value="mk4">mk4 (mk++ mod)</option>
+                                <option disabled value="mk2">mk2 (mk++ mod) (no mod support yet)</option>
+                                <option disabled value="mk3">mk3 (mk++ mod) (no mod support yet)</option>
+                                <option disabled value="mk4">mk4 (mk++ mod) (no mod support yet)</option>
                             </select>
                         </div>
 

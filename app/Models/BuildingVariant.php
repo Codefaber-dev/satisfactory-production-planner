@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +12,7 @@ use function pow;
 
 class BuildingVariant extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -19,7 +20,9 @@ class BuildingVariant extends Model
     {
         collect($recipe)
             ->each(function($row) {
-                $ingredient = Ingredient::ofName($row['ingredient']);
+                $name = is_string($row['ingredient']) ? $row['ingredient'] : $row['ingredient']->value;
+
+                $ingredient = Ingredient::ofName($name);
 
                 $this->recipe()->attach([$ingredient->id => ['qty' => $row['qty']]]);
             });

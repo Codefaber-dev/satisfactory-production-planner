@@ -31,9 +31,12 @@ class Ingredient extends Model
         return (bool) $this->raw;
     }
 
-    public function scopeOfName(Builder $query, $name, $default = null)
+    public static function ofName($name, $default = null): ?Ingredient
     {
-        return $query->whereName($name)->first() ?: $default;
+        if (!is_string($name)) {
+            $name = $name->value;
+        }
+        return static::firstWhere('name', $name) ?: $default;
     }
 
     public function scopeProcessed(Builder $query)

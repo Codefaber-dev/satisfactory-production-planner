@@ -64,21 +64,20 @@
                             class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
                         >
                             <option value="mk1">Production mk1 (base)</option>
-                            <option value="mk2">Production mk2 (mk++ mod)</option>
-                            <option value="mk3">Production mk3 (mk++ mod)</option>
-                            <option value="mk4">Production mk4 (mk++ mod)</option>
+                            <option disabled value="mk2">Production mk2 (mk++ mod) (no mod support yet)</option>
+                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>
+                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>
                         </select>
                         <select
                             v-model="form.belt_speed"
                             class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
                         >
-                            <option value="60">Belts mk1 (base)</option>
-                            <option value="120">Belts mk2 (base)</option>
-                            <option value="270">Belts mk3 (base)</option>
-                            <option value="480">Belts mk4 (base)</option>
-                            <option value="780">Belts mk5 (base)</option>
-                            <option value="2000">Belts mk6 (Covered Conveyor Belt Mod)</option>
-                            <option value="7500">Belts mk7 (Covered Conveyor Belt Mod)</option>
+                            <option value="60">Belts mk1</option>
+                            <option value="120">Belts mk2</option>
+                            <option value="270">Belts mk3</option>
+                            <option value="480">Belts mk4</option>
+                            <option value="780">Belts mk5</option>
+                            <option value="1200">Belts mk6</option>
                         </select>
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
@@ -97,7 +96,7 @@
                         {{ newFactory ? 'Save Changes To Factory' : 'Save To My Factories' }}
                     </button>
                     <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
-                    <inertia-link class="btn btn-text" href="/dashboard"> Start Over </inertia-link>
+                    <inertia-link class="btn btn-gray" href="/dashboard"> Start Over </inertia-link>
                 </div>
                 <!--            <div class="mt-4 flex flex-col">-->
                 <!--                <hr class="mb-4" />-->

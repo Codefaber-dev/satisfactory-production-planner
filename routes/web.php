@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ProductionCalculator;
+use App\Helpers\UpdateOneZero;
 use App\Helpers\UpdateSix;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\FavoritesController;
@@ -100,6 +101,10 @@ Route::get('/fix-recipes', function() {
 
 Route::get('/fix-recipes-u6', function() {
     UpdateSix::update();
+});
+
+Route::get('/fix-update-1', function() {
+    UpdateOneZero::update();
 });
 
 //

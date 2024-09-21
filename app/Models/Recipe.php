@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Favorites\Facades\Favorites;
+use ErrorException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -50,18 +52,25 @@ class Recipe extends Model
         return Favorites::isFavorite($this);
     }
 
-    public function scopeOfName(Builder $query, $name)
+    public static function ofName($name): ?Recipe
     {
-        if ($recipe = $query->firstWhere('description',$name))
+        if ($recipe = static::firstWhere('description',$name)) {
             return $recipe->load('ingredients');
-
+        }
         $ingredient = Ingredient::ofName($name);
 
-        if ($ingredient->exists()) {
-            return $ingredient->baseRecipe()->load('ingredients');
+        if ($ingredient) {
+            try {
+                return $ingredient->baseRecipe()->load('ingredients');
+            }
+            catch (ErrorException $e) {
+                Log::error($e->getMessage());
+            }
         }
 
         Log::error("No recipe found for input name {$name}");
+
+        return null;
     }
 
     /**
@@ -89,7 +98,7 @@ class Recipe extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function ingredients()
+    public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredient::class)
             ->withPivot([

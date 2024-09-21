@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Ingredient as IngredientEnum;
+use App\Enums\Building as BuildingEnum;
 use App\Models\Building;
 use App\Models\BuildingVariant;
 use Illuminate\Database\Seeder;
@@ -114,7 +116,7 @@ class BuildingSeeder extends Seeder
             'outputs' => 1,
             'width' => 10,
             'length' => 15,
-            'height' => 10,
+            'height' => 11,
             'variants' => [
                 'mk1' => [
                     'multiplier' => 1,
@@ -312,15 +314,15 @@ class BuildingSeeder extends Seeder
             'inputs' => 4,
             'outputs' => 1,
             'width' => 18,
-            'length' => 19,
+            'length' => 20,
             'height' => 12,
             'variants' => [
                 'mk1' => [
                     'multiplier' => 1,
                     'base_power' => 55,
                     'recipe' => [
-                        [ 'ingredient' => 'Motor', 'qty' => 5 ],
-                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 10 ],
+                        [ 'ingredient' => 'Motor', 'qty' => 10 ],
+                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 20 ],
                         [ 'ingredient' => 'Cable', 'qty' => 50 ],
                         [ 'ingredient' => 'Plastic', 'qty' => 50 ],
                     ],
@@ -371,10 +373,10 @@ class BuildingSeeder extends Seeder
                     'multiplier' => 1,
                     'base_power' => 75,
                     'recipe' => [
-                        [ 'ingredient' => 'Motor', 'qty' => 20 ],
+                        [ 'ingredient' => 'Computer', 'qty' => 10 ],
                         [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 10 ],
+                        [ 'ingredient' => 'Motor', 'qty' => 20 ],
                         [ 'ingredient' => 'Aluminum Casing', 'qty' => 50 ],
-                        [ 'ingredient' => 'Radio Control Unit', 'qty' => 5 ],
                     ],
                 ],
                 'mk2' => [
@@ -424,12 +426,11 @@ class BuildingSeeder extends Seeder
                     'multiplier' => 1,
                     'base_power' => 250,
                     'recipe' => [
-                        [ 'ingredient' => 'Radio Control Unit', 'qty' => 25 ],
-                        [ 'ingredient' => 'Electromagnetic Control Rod', 'qty' => 100 ],
-                        [ 'ingredient' => 'Supercomputer', 'qty' => 10 ],
-                        [ 'ingredient' => 'Cooling System', 'qty' => 50 ],
-                        [ 'ingredient' => 'Fused Modular Frame', 'qty' => 20 ],
                         [ 'ingredient' => 'Turbo Motor', 'qty' => 10 ],
+                        [ 'ingredient' => 'Supercomputer', 'qty' => 10 ],
+                        [ 'ingredient' => 'Fused Modular Frame', 'qty' => 20 ],
+                        [ 'ingredient' => 'Cooling System', 'qty' => 50 ],
+                        [ 'ingredient' => 'Quickwire', 'qty' => 500 ],
                     ],
                 ],
                 'mk2' => [
@@ -468,10 +469,10 @@ class BuildingSeeder extends Seeder
 
         // Nuclear Power Plant
         [
-            'name' => 'Nuclear Power Plant',
+            'name' => BuildingEnum::NUCLEAR_POWER_PLANT,
             'inputs' => 2,
             'outputs' => 1,
-            'width' => 38,
+            'width' => 36,
             'length' => 43,
             'height' => 49,
             'variants' => [
@@ -479,46 +480,46 @@ class BuildingSeeder extends Seeder
                     'multiplier' => 1,
                     'base_power' => 2500,
                     'recipe' => [
-                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
-                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
-                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
-                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
-                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                        [ 'ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 10 ],
+                        [ 'ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 25 ],
+                        [ 'ingredient' => IngredientEnum::ALCLAD_ALUMINUM_SHEET, 'qty' => 100 ],
+                        [ 'ingredient' => IngredientEnum::CABLE, 'qty' => 200 ],
+                        [ 'ingredient' => IngredientEnum::CONCRETE, 'qty' => 250 ],
                     ],
                 ],
-                'mk2' => [
-                    'multiplier' => 1,
-                    'base_power' => 2500,
-                    'recipe' => [
-                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
-                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
-                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
-                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
-                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
-                    ],
-                ],
-                'mk3' => [
-                    'multiplier' => 1,
-                    'base_power' => 2500,
-                    'recipe' => [
-                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
-                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
-                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
-                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
-                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
-                    ],
-                ],
-                'mk4' => [
-                    'multiplier' => 1,
-                    'base_power' => 2500,
-                    'recipe' => [
-                        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
-                        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
-                        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
-                        [ 'ingredient' => 'Cable', 'qty' => 100 ],
-                        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
-                    ],
-                ],
+                //'mk2' => [
+                //    'multiplier' => 1,
+                //    'base_power' => 2500,
+                //    'recipe' => [
+                //        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                //        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                //        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                //        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                //        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                //    ],
+                //],
+                //'mk3' => [
+                //    'multiplier' => 1,
+                //    'base_power' => 2500,
+                //    'recipe' => [
+                //        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                //        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                //        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                //        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                //        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                //    ],
+                //],
+                //'mk4' => [
+                //    'multiplier' => 1,
+                //    'base_power' => 2500,
+                //    'recipe' => [
+                //        [ 'ingredient' => 'Concrete', 'qty' => 250 ],
+                //        [ 'ingredient' => 'Heavy Modular Frame', 'qty' => 25 ],
+                //        [ 'ingredient' => 'Supercomputer', 'qty' => 5 ],
+                //        [ 'ingredient' => 'Cable', 'qty' => 100 ],
+                //        [ 'ingredient' => 'Alclad Aluminum Sheet', 'qty' => 100 ],
+                //    ],
+                //],
                 //'mk2' => [
                 //    'multiplier' => 1.5,
                 //    'base_power' => 375,
@@ -552,11 +553,6 @@ class BuildingSeeder extends Seeder
                 //],
             ]
         ],
-
-
-
-
-
     ];
 
     /**

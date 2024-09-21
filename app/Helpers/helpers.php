@@ -40,8 +40,12 @@ function r($name, $force=false) {
     });
 }
 
-function i($name) {
+function i($name, bool $force = false) {
     $key = is_string($name) ? $name : $name->name;
+
+    if ($force) {
+        Cache::forget("ingredients.$key");
+    }
 
     return Cache::rememberForever("ingredients.$key", function() use ($name) {
         if (is_string($name)) {

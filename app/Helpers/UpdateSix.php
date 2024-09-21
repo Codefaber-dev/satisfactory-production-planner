@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Enums\Ingredient as IngredientEnum;
+use App\Enums\Recipe as RecipeEnum;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Models\Building;
@@ -192,6 +194,47 @@ class UpdateSix {
                 ]
             ],
             "Assembler" => [
+                // update
+                IngredientEnum::CIRCUIT_BOARD->value => [
+                    [
+                        "base_yield" => 1,
+                        "base_per_min" => 7.5,
+                        "ingredients" => [
+                            IngredientEnum::COPPER_SHEET->value => 15,
+                            IngredientEnum::PLASTIC->value => 30,
+                        ],
+                    ],
+                    [
+                        "description" => RecipeEnum::CATERIUM_CIRCUIT_BOARD->value,
+                        "base_yield" => 7,
+                        "base_per_min" => 8.75,
+                        "ingredients" => [
+                            IngredientEnum::QUICKWIRE->value => 37.5,
+                            IngredientEnum::PLASTIC->value => 12.5,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                    [
+                        "description" => RecipeEnum::ELECTRODE_CIRCUIT_BOARD->value,
+                        "base_yield" => 1,
+                        "base_per_min" => 5,
+                        "ingredients" => [
+                            IngredientEnum::RUBBER->value => 20,
+                            IngredientEnum::PETROLEUM_COKE->value => 40,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                    [
+                        "description" => RecipeEnum::SILICON_CIRCUIT_BOARD->value,
+                        "base_yield" => 5,
+                        "base_per_min" => 12.5,
+                        "ingredients" => [
+                            IngredientEnum::COPPER_SHEET->value => 27.5,
+                            IngredientEnum::SILICA->value => 27.5,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                ],
                 "Black Powder" => [
                     [
                         "base_yield" => 1,
@@ -416,7 +459,7 @@ class UpdateSix {
 
                         $ingredient = Ingredient::ofName($name);
 
-                        if (get_class($ingredient) !== Ingredient::class) {
+                        if (!$ingredient) {
                             throw new InvalidArgumentException("Could not find ingredient {$name}");
                         }
 

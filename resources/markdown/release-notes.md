@@ -1,13 +1,21 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-## v0.4.0
+### 🎉1.0 Update Release 🎉
+
+- Thank you all for your patience, there was a lot to cover in this update
+
+## v1.0.0
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
 
-### 📣 Patreon
-[Become a Patron](https://www.patreon.com/SatisfactoryProductionPlanner) today and help support ongoing development.
+### 💲 Support
+Servers don't grow on trees. If you feel like chipping in that would be toit, but no pressure.
+
+[Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y) or [Become a Patron](https://www.patreon.com/SatisfactoryProductionPlanner) today and help support ongoing development.
+
+#### Donations to date: $600
 
 ### 🗣️ Discord
 Eager to share feedback or have suggestions for improvements?
@@ -20,19 +28,19 @@ Your factories and favorites will persist across sessions if you [register](http
 ### 🔏️ Privacy
 I hate spam as much as the next guy. I will never send you spam or give your information out to anyone.
 
-### 💲 Support
-Servers don't grow on trees. If you feel like chipping in that would be toit, but no pressure.
-
-🙏 I want to say a huge thank you to those who have donated, it is greatly appreciated.
-
-[Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y)
-
-#### Donations to date: $400
-
-
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.0.0
+
+- 🎉 1.0 Is finally here. This update brings new recipes, new buildings, new products, and tweaks to several existing recipes.
+- 🪲 Please let me know if you spot any mistakes in the recipes, calculations, etc. You can find me in the [discord](https://discord.gg/dqGQECppCy).
+- 🙏 A huge thank you to all those who have donated, it really helps with costs.
+
+--- 
+
+### Previous Releases
 
 ### v0.4.0
 Quality Of Life Improvements 
