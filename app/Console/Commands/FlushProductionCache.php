@@ -48,6 +48,23 @@ class FlushProductionCache extends Command
             }
         });
 
+        $keys = collect(Redis::keys('*multi_production*'));
+
+        $this->info("Flushing {$keys->count()} keys");
+
+        $prefix = config('cache.prefix');
+
+        $keys->each(function ($item) use ($prefix) {
+            $key = str($item)->after($prefix . ":");
+
+            if (Cache::forget($key)) {
+                $this->info("Flushed $key");
+            }
+            else {
+                $this->warn("$key is not a valid cache key");
+            }
+        });
+
         return static::SUCCESS;
     }
 }
