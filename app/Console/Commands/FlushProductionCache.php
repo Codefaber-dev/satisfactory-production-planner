@@ -29,6 +29,8 @@ class FlushProductionCache extends Command
      */
     public function handle(): int
     {
+        Redis::select(1);
+
         $keys = collect(Redis::keys('*production_calc*'));
 
         $this->info("Flushing {$keys->count()} keys");
@@ -36,7 +38,7 @@ class FlushProductionCache extends Command
         $prefix = config('cache.prefix');
 
         $keys->each(function ($item) use ($prefix) {
-            $key = str($item)->after($prefix);
+            $key = str($item)->after($prefix . ":");
 
             if (Cache::forget($key)) {
                 $this->info("Flushed $key");
