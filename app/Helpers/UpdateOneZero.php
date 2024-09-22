@@ -46,7 +46,7 @@ class UpdateOneZero
     public static function buildings(): void
     {
         // soft-delete mod variants for now
-        BuildingVariant::where('name','<>','MK1')->delete();
+        BuildingVariant::where('name', '<>', 'MK1')->delete();
 
         $buildings = [
             // Assembler
@@ -62,12 +62,12 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 15,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::REINFORCED_IRON_PLATE, 'qty' => 8 ],
-                            [ 'ingredient' => IngredientEnum::CABLE, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::ROTOR, 'qty' => 4 ],
+                            ['ingredient' => IngredientEnum::REINFORCED_IRON_PLATE, 'qty' => 8],
+                            ['ingredient' => IngredientEnum::CABLE, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::ROTOR, 'qty' => 4],
                         ],
                     ],
-                ]
+                ],
             ],
 
             // Manufacturer
@@ -83,13 +83,13 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 55,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::MOTOR, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 20 ],
-                            [ 'ingredient' => IngredientEnum::CABLE, 'qty' => 50 ],
-                            [ 'ingredient' => IngredientEnum::PLASTIC, 'qty' => 50 ],
+                            ['ingredient' => IngredientEnum::MOTOR, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 20],
+                            ['ingredient' => IngredientEnum::CABLE, 'qty' => 50],
+                            ['ingredient' => IngredientEnum::PLASTIC, 'qty' => 50],
                         ],
                     ],
-                ]
+                ],
             ],
 
             // Blender
@@ -105,13 +105,13 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 75,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::COMPUTER, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::MOTOR, 'qty' => 20 ],
-                            [ 'ingredient' => IngredientEnum::ALUMINUM_CASING, 'qty' => 50 ],
+                            ['ingredient' => IngredientEnum::COMPUTER, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::MOTOR, 'qty' => 20],
+                            ['ingredient' => IngredientEnum::ALUMINUM_CASING, 'qty' => 50],
                         ],
                     ],
-                ]
+                ],
             ],
 
             // Particle Accelerator
@@ -127,14 +127,14 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 250,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::TURBO_MOTOR, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::FUSED_MODULAR_FRAME, 'qty' => 20 ],
-                            [ 'ingredient' => IngredientEnum::COOLING_SYSTEM, 'qty' => 50 ],
-                            [ 'ingredient' => IngredientEnum::QUICKWIRE, 'qty' => 500 ],
+                            ['ingredient' => IngredientEnum::TURBO_MOTOR, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::FUSED_MODULAR_FRAME, 'qty' => 20],
+                            ['ingredient' => IngredientEnum::COOLING_SYSTEM, 'qty' => 50],
+                            ['ingredient' => IngredientEnum::QUICKWIRE, 'qty' => 500],
                         ],
                     ],
-                ]
+                ],
             ],
 
             // Quantum Encoder
@@ -150,14 +150,14 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 500,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::TURBO_MOTOR, 'qty' => 20 ],
-                            [ 'ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 20 ],
-                            [ 'ingredient' => IngredientEnum::TIME_CRYSTAL, 'qty' => 50 ],
-                            [ 'ingredient' => IngredientEnum::COOLING_SYSTEM, 'qty' => 50 ],
-                            [ 'ingredient' => IngredientEnum::FICSITE_TRIGON, 'qty' => 100 ],
+                            ['ingredient' => IngredientEnum::TURBO_MOTOR, 'qty' => 20],
+                            ['ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 20],
+                            ['ingredient' => IngredientEnum::TIME_CRYSTAL, 'qty' => 50],
+                            ['ingredient' => IngredientEnum::COOLING_SYSTEM, 'qty' => 50],
+                            ['ingredient' => IngredientEnum::FICSITE_TRIGON, 'qty' => 100],
                         ],
                     ],
-                ]
+                ],
             ],
 
             // Converter
@@ -173,13 +173,13 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 500,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::FUSED_MODULAR_FRAME->value, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::COOLING_SYSTEM->value, 'qty' => 25 ],
-                            [ 'ingredient' => IngredientEnum::RADIO_CONTROL_UNIT->value, 'qty' => 50 ],
-                            [ 'ingredient' => IngredientEnum::SAM_FLUCTUATOR->value, 'qty' => 100 ],
+                            ['ingredient' => IngredientEnum::FUSED_MODULAR_FRAME->value, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::COOLING_SYSTEM->value, 'qty' => 25],
+                            ['ingredient' => IngredientEnum::RADIO_CONTROL_UNIT->value, 'qty' => 50],
+                            ['ingredient' => IngredientEnum::SAM_FLUCTUATOR->value, 'qty' => 100],
                         ],
                     ],
-                ]
+                ],
             ],
 
             // Nuclear Power Plant
@@ -195,41 +195,37 @@ class UpdateOneZero
                         'multiplier' => 1,
                         'base_power' => 2500,
                         'recipe' => [
-                            [ 'ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 10 ],
-                            [ 'ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 25 ],
-                            [ 'ingredient' => IngredientEnum::ALCLAD_ALUMINUM_SHEET, 'qty' => 100 ],
-                            [ 'ingredient' => IngredientEnum::CABLE, 'qty' => 200 ],
-                            [ 'ingredient' => IngredientEnum::CONCRETE, 'qty' => 250 ],
+                            ['ingredient' => IngredientEnum::SUPERCOMPUTER, 'qty' => 10],
+                            ['ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME, 'qty' => 25],
+                            ['ingredient' => IngredientEnum::ALCLAD_ALUMINUM_SHEET, 'qty' => 100],
+                            ['ingredient' => IngredientEnum::CABLE, 'qty' => 200],
+                            ['ingredient' => IngredientEnum::CONCRETE, 'qty' => 250],
                         ],
                     ],
-                ]
+                ],
             ],
         ];
 
-        collect($buildings)
-            ->each(function(array $atts) {
+        collect($buildings)->each(function (array $atts) {
                 $atts = (object) $atts;
 
                 $building = Building::updateOrCreate([
                     'name' => $atts->name->value,
-                    ],
-                    [
+                ], [
                         'inputs' => $atts->inputs,
                         'outputs' => $atts->outputs,
                         'width' => $atts->width,
                         'length' => $atts->length,
                         'height' => $atts->height,
-                    ]
-                );
-
+                    ]);
 
                 // clear out the variants
-                $building->variants()->withTrashed()->get()->each(function(BuildingVariant $buildingVariant) {
+                $building->variants()->withTrashed()->get()->each(function (BuildingVariant $buildingVariant) {
                     $buildingVariant->forceDelete();
                 });
                 $building->refresh();
 
-                foreach($atts->variants as $variant_name => $variant_atts ) {
+                foreach ($atts->variants as $variant_name => $variant_atts) {
                     $variant = $building->variants()->create([
                         'name' => $variant_name,
                         'multiplier' => $variant_atts['multiplier'],
@@ -257,7 +253,7 @@ class UpdateOneZero
         ];
 
         $tier3 = [
-            IngredientEnum::TIME_CRYSTAL
+            IngredientEnum::TIME_CRYSTAL,
         ];
 
         $tier4 = [
@@ -329,12 +325,7 @@ class UpdateOneZero
             }
         });
 
-        $tiers = compact('tier1', 'tier2', 'tier3', 'tier4',
-            'tier5', 'tier6', 'tier7', 'tier8',
-            'tier9', 'tier10', 'tier11', 'tier12',
-            'tier13', 'tier14', 'tier15', 'tier16',
-            'tier17', 'tier18'
-        );
+        $tiers = compact('tier1', 'tier2', 'tier3', 'tier4', 'tier5', 'tier6', 'tier7', 'tier8', 'tier9', 'tier10', 'tier11', 'tier12', 'tier13', 'tier14', 'tier15', 'tier16', 'tier17', 'tier18');
 
         collect($tiers)->each(function ($row, $tier) {
 
@@ -342,7 +333,11 @@ class UpdateOneZero
                 $name = $name->value;
                 if (! Ingredient::whereName($name)?->exists()) {
                     echo "Creating Ingredient $name \n";
-                    Ingredient::forceCreate(['name' => $name, 'raw' => false, 'tier' => intval(str_replace("tier","",$tier))]);
+                    Ingredient::forceCreate([
+                        'name' => $name,
+                        'raw' => false,
+                        'tier' => intval(str_replace("tier", "", $tier)),
+                    ]);
                 }
             });
         });
@@ -447,6 +442,18 @@ class UpdateOneZero
             ],
             "Assembler" => [
                 // update
+                IngredientEnum::SUPERCOMPUTER->value => [
+                    [
+                        "description" => RecipeEnum::OC_SUPERCOMPUTER->value,
+                        "base_yield" => 1,
+                        "base_per_min" => 3,
+                        "ingredients" => [
+                            IngredientEnum::RADIO_CONTROL_UNIT->value => 6,
+                            IngredientEnum::COOLING_SYSTEM->value => 6,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                ],
                 IngredientEnum::CIRCUIT_BOARD->value => [
                     [
                         "base_yield" => 1,
@@ -533,14 +540,16 @@ class UpdateOneZero
                         "alt_recipe" => true,
                     ],
                 ],
-                IngredientEnum::MAGNETIC_FIELD_GENERATOR->value => [[
-                    "base_yield" => 2,
-                    "base_per_min" => 1,
-                    "ingredients" => [
-                        IngredientEnum::VERSATILE_FRAMEWORK->value => 2.5,
-                        IngredientEnum::ELECTROMAGNETIC_CONTROL_ROD->value => 1,
+                IngredientEnum::MAGNETIC_FIELD_GENERATOR->value => [
+                    [
+                        "base_yield" => 2,
+                        "base_per_min" => 1,
+                        "ingredients" => [
+                            IngredientEnum::VERSATILE_FRAMEWORK->value => 2.5,
+                            IngredientEnum::ELECTROMAGNETIC_CONTROL_ROD->value => 1,
+                        ],
                     ],
-                ]],
+                ],
             ],
             "Foundry" => [
                 IngredientEnum::IRON_INGOT->value => [
@@ -713,6 +722,32 @@ class UpdateOneZero
                 ],
             ],
             "Manufacturer" => [
+                // update
+                IngredientEnum::SUPERCOMPUTER->value => [
+                    [
+                        "base_yield" => 1,
+                        "base_per_min" => 1.875,
+                        "ingredients" => [
+                            IngredientEnum::COMPUTER->value => 7.5,
+                            IngredientEnum::AI_LIMITER->value => 3.75,
+                            IngredientEnum::HIGH_SPEED_CONNECTOR->value => 5.625,
+                            IngredientEnum::PLASTIC->value => 52.5,
+                        ],
+                        "alt_recipe" => false,
+                    ],
+                    [
+                        "description" => RecipeEnum::SUPER_STATE_COMPUTER->value,
+                        "base_yield" => 1,
+                        "base_per_min" => 2.4,
+                        "ingredients" => [
+                            IngredientEnum::COMPUTER->value => 7.2,
+                            IngredientEnum::ELECTROMAGNETIC_CONTROL_ROD->value => 2.4,
+                            IngredientEnum::BATTERY->value => 24,
+                            IngredientEnum::WIRE->value => 60,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                ],
                 IngredientEnum::AUTOMATED_WIRING->value => [
                     [
                         "description" => RecipeEnum::AUTOMATED_SPEED_WIRING->value,
@@ -764,6 +799,22 @@ class UpdateOneZero
                         "alt_recipe" => true,
                     ],
                 ],
+                IngredientEnum::URANIUM_FUEL_ROD->value => [
+                    [
+                        "description" => RecipeEnum::URANIUM_FUEL_UNIT->value,
+                        "base_yield" => 3,
+                        "base_per_min" => 0.6,
+                        "ingredients" => [
+                            IngredientEnum::ENCASED_URANIUM_CELL->value => 20,
+                            IngredientEnum::ELECTROMAGNETIC_CONTROL_ROD->value => 2,
+                            IngredientEnum::CRYSTAL_OSCILLATOR->value => 0.6,
+                            IngredientEnum::ROTOR->value => 2,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                ],
+
+                // new recipes
                 IngredientEnum::SAM_FLUCTUATOR->value => [
                     [
                         "base_yield" => 1,
@@ -815,41 +866,41 @@ class UpdateOneZero
                     ],
                 ],
                 IngredientEnum::HEAVY_MODULAR_FRAME->value => [
-                [
-                    "base_yield" => 1,
-                    "base_per_min" => 2,
-                    "ingredients" => [
-                        IngredientEnum::MODULAR_FRAME->value => 10,
-                        IngredientEnum::STEEL_PIPE->value => 40,
-                        IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value => 10,
-                        IngredientEnum::SCREW->value => 240,
+                    [
+                        "base_yield" => 1,
+                        "base_per_min" => 2,
+                        "ingredients" => [
+                            IngredientEnum::MODULAR_FRAME->value => 10,
+                            IngredientEnum::STEEL_PIPE->value => 40,
+                            IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value => 10,
+                            IngredientEnum::SCREW->value => 240,
+                        ],
+                    ],
+                    [
+                        "description" => RecipeEnum::HEAVY_FLEXIBLE_FRAME->value,
+                        "base_yield" => 1,
+                        "base_per_min" => 3.75,
+                        "ingredients" => [
+                            IngredientEnum::MODULAR_FRAME->value => 18.75,
+                            IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value => 11.25,
+                            IngredientEnum::RUBBER->value => 75,
+                            IngredientEnum::SCREW->value => 390,
+                        ],
+                        "alt_recipe" => true,
+                    ],
+                    [
+                        "description" => RecipeEnum::HEAVY_ENCASED_FRAME->value,
+                        "base_yield" => 3,
+                        "base_per_min" => 2.8125,
+                        "ingredients" => [
+                            IngredientEnum::MODULAR_FRAME->value => 7.5,
+                            IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value => 9.375,
+                            IngredientEnum::STEEL_PIPE->value => 33.75,
+                            IngredientEnum::CONCRETE->value => 20.625,
+                        ],
+                        "alt_recipe" => true,
                     ],
                 ],
-                [
-                    "description" => RecipeEnum::HEAVY_FLEXIBLE_FRAME->value,
-                    "base_yield" => 1,
-                    "base_per_min" => 3.75,
-                    "ingredients" => [
-                        IngredientEnum::MODULAR_FRAME->value => 18.75,
-                        IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value => 11.25,
-                        IngredientEnum::RUBBER->value => 75,
-                        IngredientEnum::SCREW->value => 390,
-                    ],
-                    "alt_recipe" => true,
-                ],
-                [
-                    "description" => RecipeEnum::HEAVY_ENCASED_FRAME->value,
-                    "base_yield" => 3,
-                    "base_per_min" => 2.8125,
-                    "ingredients" => [
-                        IngredientEnum::MODULAR_FRAME->value => 7.5,
-                        IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value => 9.375,
-                        IngredientEnum::STEEL_PIPE->value => 33.75,
-                        IngredientEnum::CONCRETE->value => 20.625,
-                    ],
-                    "alt_recipe" => true,
-                ],
-            ],
             ],
             "Blender" => [
                 IngredientEnum::BIOCHEMICAL_SCULPTOR->value => [
@@ -882,6 +933,18 @@ class UpdateOneZero
                 ],
                 IngredientEnum::ROCKET_FUEL->value => [
                     [
+                        "base_yield" => 10,
+                        "base_per_min" => 100,
+                        "ingredients" => [
+                            IngredientEnum::TURBOFUEL->value => 60,
+                            IngredientEnum::NITRIC_ACID->value => 10,
+                        ],
+                        "byproducts" => [
+                            IngredientEnum::COMPACTED_COAL->value => 10,
+                        ],
+                        "alt_recipe" => false,
+                    ],
+                    [
                         "description" => RecipeEnum::NITRO_ROCKET_FUEL->value,
                         "base_yield" => 6,
                         "base_per_min" => 150,
@@ -895,20 +958,6 @@ class UpdateOneZero
                             IngredientEnum::COMPACTED_COAL->value => 25,
                         ],
                         "alt_recipe" => true,
-                    ],
-                ],
-                IngredientEnum::ROCKET_FUEL->value => [
-                    [
-                        "base_yield" => 10,
-                        "base_per_min" => 100,
-                        "ingredients" => [
-                            IngredientEnum::TURBOFUEL->value => 60,
-                            IngredientEnum::NITRIC_ACID->value => 10,
-                        ],
-                        "byproducts" => [
-                            IngredientEnum::COMPACTED_COAL->value => 10,
-                        ],
-                        "alt_recipe" => false,
                     ],
                 ],
             ],
@@ -1264,7 +1313,7 @@ class UpdateOneZero
                             IngredientEnum::DARK_MATTER_CRYSTAL->value => 80,
                         ],
                         "byproducts" => [
-                            IngredientEnum::COMPACTED_COAL->value => 40
+                            IngredientEnum::COMPACTED_COAL->value => 40,
                         ],
                         "alt_recipe" => true,
                     ],
@@ -1434,7 +1483,7 @@ class UpdateOneZero
                         ],
                         "alt_recipe" => true,
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -1470,7 +1519,8 @@ class UpdateOneZero
                         $recipe_model->update($atts);
                         $recipe_model->ingredients()->detach();
                         $recipe_model->byproducts()->detach();
-                    } else {
+                    }
+                    else {
                         $recipe_model = Recipe::create($atts);
                     }
 
@@ -1478,7 +1528,7 @@ class UpdateOneZero
 
                         $ingredient = Ingredient::ofName($name);
 
-                        if (!$ingredient) {
+                        if (! $ingredient) {
                             throw new InvalidArgumentException("Could not find ingredient {$name}");
                         }
 

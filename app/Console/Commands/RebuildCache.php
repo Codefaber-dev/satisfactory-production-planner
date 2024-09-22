@@ -43,6 +43,7 @@ class RebuildCache extends Command
         });
 
         $this->info("Caching all recipes");
+        Cache::forget('all_recipes');
         Cache::remember('all_recipes', now()->addDay(), function() {
             return \App\Models\Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
         });
