@@ -88,12 +88,16 @@ class ProductionController extends Controller
         $belt_speed = request('belt_speed',780);
         $imports = request('imports');
 
-        $cacheKey = "multi_production_" . md5(collect(compact('products','yields','recipes','variant','choices','even','speedLimit','belt_speed','imports'))->toJson());
+        // add request vars to cache key
+        $requestVars = request()->all();
+
+        $cacheKey = "multi_production_"
+            . md5(collect(compact('products','yields','recipes','variant','choices','even','speedLimit','belt_speed','imports'))->toJson())
+            . md5(collect($requestVars)->toJson());
 
         $production = Cache::rememberForever($cacheKey, function() use ($products, $yields, $recipes, $variant,$choices) {
 
             $m = new Multiplexer;
-
 
             foreach($products as $key => $product) {
                 $qty = $yields[$key];

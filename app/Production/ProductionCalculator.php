@@ -8,7 +8,6 @@ use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use phpDocumentor\Reflection\Types\Static_;
 
 class ProductionCalculator
 {
@@ -44,7 +43,12 @@ class ProductionCalculator
         $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1", $choices = [], $byproducts = []
     ): static {
 
-        $cacheKey = "production_calc_ " . md5(collect(compact('product','qty','recipe','overrides','favorites','imports','variant','choices','byproducts'))->toJson());
+        // add request vars to cache key
+        $requestVars = request()->all();
+
+        $cacheKey = "production_calc_ "
+            . md5(collect(compact('product','qty','recipe','overrides','favorites','imports','variant','choices','byproducts'))->toJson())
+            . md5(collect($requestVars)->toJson());
 
         return Cache::rememberForever($cacheKey, function() use ($product,$qty,$recipe,$overrides,$favorites,$imports,$variant,$choices,$byproducts) {
             $production = (new static)->setProduct($product)
