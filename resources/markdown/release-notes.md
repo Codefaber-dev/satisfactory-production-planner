@@ -5,7 +5,7 @@
 
 - Thank you all for your patience, there was a lot to cover in this update
 
-## v1.0.0
+## v1.0.1 - Recipe Fixes
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -15,7 +15,7 @@ Servers don't grow on trees. If you feel like chipping in that would be toit, bu
 
 [Donate on Paypal](https://www.paypal.com/donate/?hosted_button_id=LZHQ2LHJQA78Y) or [Become a Patron](https://www.patreon.com/SatisfactoryProductionPlanner) today and help support ongoing development.
 
-#### Donations to date: $600
+#### Donations to date: $700
 
 ### 🗣️ Discord
 Eager to share feedback or have suggestions for improvements?
@@ -32,15 +32,20 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
+### v1.0.1
+
+- 🪲 This update brings several recipe fixes. Thank you to everyone who pointed those out.
+- Recipes fixed: Cooling Device, Iron Alloy Ingot, Automated Speed Wiring, Leached Iron Ingot, Leached Copper Ingot, Leached Caterium Ingot, Copper Alloy Ingot, Dark Matter Residue, Remove Beacon, Remove Color Cartridge, Remove Steel Coated Plate, Adaptive Control Unit, Fine Concrete, Rubber Concrete, Steel Canister, Explosive Rebar, Gas Filter, Fine Black Powder, Coated Iron Plate, Automated Miner, Radio Control Unit, Radio Connection Unit, Adhered Iron Plate, Copper Rotor, Shatter Rebar, Cheap Silica, Compacted Steel Ingot
+
+--- 
+
+### Previous Releases
+
 ### v1.0.0
 
 - 🎉 1.0 Is finally here. This update brings new recipes, new buildings, new products, and tweaks to several existing recipes.
 - 🪲 Please let me know if you spot any mistakes in the recipes, calculations, etc. You can find me in the [discord](https://discord.gg/dqGQECppCy).
 - 🙏 A huge thank you to all those who have donated, it really helps with costs.
-
---- 
-
-### Previous Releases
 
 ### v0.4.0
 Quality Of Life Improvements 
