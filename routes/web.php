@@ -1,8 +1,6 @@
 <?php
 
-use App\Helpers\ProductionCalculator;
-use App\Helpers\UpdateOneZero;
-use App\Helpers\UpdateSix;
+use App\Helpers\UpdateOneZero2;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\MultiProductionLineController;
@@ -10,13 +8,9 @@ use App\Http\Controllers\PowerPlanController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionLineController;
 use App\Http\Controllers\SharedFactoryController;
-use App\Models\Ingredient;
-use App\Models\Recipe;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,85 +28,13 @@ Route::domain('satisfactory.codefaber.dev')->group(function() {
     Route::permanentRedirect('{any}', str_replace("satisfactory.codefaber.dev","satisfactoryproductionplanner.com",Request::fullUrl()));
 });
 
-//if (config('app.env') !== 'production')
-//    auth()->loginUsingId(1);
-
-//Route::get('calc/{ingredient}/{qty}/{recipe}',function($ingredient,$qty,$recipe) {
-//    return ProductionCalculator::calc($ingredient, $qty, $recipe);
-//});
-
-Route::get('/fix-recipes', function() {
-    r('Insulated Crystal Oscillator')->update(["base_per_min" => 1.875]);
-    r('Insulated Crystal Oscillator',force: true);
-
-    //r('High-Speed Connector')->update(['base_per_min' => 3.75]);
-    //r('High-Speed Connector',force: true);
-
-    //r('Seismic Nobelisk')->delete();
-
-    //r('Aluminum Scrap')->update(['base_per_min' => 360]);
-    //r('Aluminum Scrap', force: true);
-    //
-    //r('Electric Motor')->addIngredient(i('Electromagnetic Control Rod'), 3.75);
-    //r('Electric Motor', force: true);
-    //
-    //r('Seismic Nobelisk')->addIngredient(i('Crystal Oscillator'), 1.5);
-    //r('Seismic Nobelisk', force: true);
-
-    // r('Plutonium Fuel Rod')->update(['base_per_min' => 0.25]);
-    // r('Plutonium Fuel Rod', force: true);
-
-    //r('Residual Rubber')->addIngredient(i('Water'), 40);
-    //r('Residual Rubber', force: true);
-
-
-    //b('Nuclear Power Plant')->v("mk3")->delete();
-    //b('Nuclear Power Plant')->v("mk4")->delete();
-    //b('Nuclear Power Plant')->v("mk1")->update(['multiplier' => 1, 'is_generator' => true]);
-    //b('Nuclear Power Plant')->v("mk2")->update(['multiplier' => 1.5, 'base_power' => 2500, 'is_generator' => true]);
-    //
-    //i('Water')->update(['is_liquid' => true]);
-    //i('Crude Oil')->update(['is_liquid' => true]);
-    //i('Heavy Oil Residue')->update(['is_liquid' => true]);
-    //i('Fuel')->update(['is_liquid' => true]);
-    //i('Turbofuel')->update(['is_liquid' => true]);
-    //i('Liquid Biofuel')->update(['is_liquid' => true]);
-    //i('Alumina Solution')->update(['is_liquid' => true]);
-    //i('Sulfuric Acid')->update(['is_liquid' => true]);
-    //i('Nitrogen Gas')->update(['is_liquid' => true]);
-    //i('Nitric Acid')->update(['is_liquid' => true]);
-
-    //$r = i('Cooling System')->recipes()->create([
-    //    'building_id' => b('Blender')->id,
-    //    'base_yield' => 1,
-    //    'base_per_min' => 6,
-    //    'alt_recipe' => false
-    //]);
-    //
-    //$r->addIngredient(i('Heat Sink'),12);
-    //$r->addIngredient(i('Rubber'),12);
-    //$r->addIngredient(i('Water'),30);
-    //$r->addIngredient(i('Nitrogen Gas'),150);
-    //
-    //i('Cooling System', true);
-
-    Cache::forget('all_recipes');
-});
-
-Route::get('/fix-recipes-u6', function() {
-    UpdateSix::update();
-});
-
-Route::get('/fix-update-1', function() {
-    UpdateOneZero::update();
+Route::get('/apply-fixes', function() {
+    UpdateOneZero2::update();
 
     \Illuminate\Support\Facades\Artisan::call('rebuild-cache');
+    \Illuminate\Support\Facades\Artisan::call('flush-production-cache');
 });
 
-//
-//Route::get('testing', function() {
-//    return energy('Unpackage Fuel');
-//});
 
 Route::get('/favorites', [FavoritesController::class,'index'])->name('favorites');
 Route::post('/favorites/preset', [FavoritesController::class,'storePreset'])->name('favorites.storePreset');
@@ -125,10 +47,6 @@ Route::post('favorites/{recipe}', [ProductionController::class, 'addFavorite']);
 
 Route::get('/power',[PowerPlanController::class,'index'])->name('power.index');
 Route::get('/power/{output}',[PowerPlanController::class,'show'])->name('power.show');
-
-//Route::get('calc/{ingredient}/{qty}',function($ingredient,$qty) {
-//    return ProductionCalculator::calc($ingredient, $qty);
-//});
 
 Route::redirect('/', 'dashboard');
 
