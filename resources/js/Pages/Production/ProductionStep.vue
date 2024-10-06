@@ -307,6 +307,11 @@ export default {
                 setTimeout(() => (this.shouldFlash = false), 1200);
             }
         });
+
+        this.Bus.emit('RegisterQuickNav', {
+            name: this.name,
+            identifier: this.identifier,
+        });
     },
 
     data() {

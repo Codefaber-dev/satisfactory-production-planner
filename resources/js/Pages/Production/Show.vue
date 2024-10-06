@@ -1,5 +1,7 @@
 <template>
     <app-layout>
+        <ProductionQuickNav v-bind="{ productionChecks }" />
+
         <!-- busy overlay -->
         <div v-if="working" class="fixed inset-0 z-[1000] bg-slate-900 bg-opacity-30"></div>
 
@@ -200,11 +202,13 @@ import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
+import ProductionQuickNav from '@/Components/ProductionQuickNav.vue';
 
 export default {
     name: 'ShowNew',
 
     components: {
+        ProductionQuickNav,
         BuildingSummary,
         ProductionSteps,
         ProductionSummary,
