@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Recipe;
 use App\Helpers\UpdateOneZero2;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\FavoritesController;
@@ -29,7 +30,8 @@ Route::domain('satisfactory.codefaber.dev')->group(function() {
 });
 
 Route::get('/apply-fixes', function() {
-    UpdateOneZero2::update();
+    r(Recipe::TURBO_MOTOR->value)->update(['base_per_min' => 1.875]);
+    r(Recipe::TURBOFUEL->value)->update(['base_per_min' => 18.75]);
 
     \Illuminate\Support\Facades\Artisan::call('rebuild-cache');
     \Illuminate\Support\Facades\Artisan::call('flush-production-cache');
