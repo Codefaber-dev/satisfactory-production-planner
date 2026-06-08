@@ -59,7 +59,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T15 | x      | Evaluate laravel-mix→Vite migration (required if tailwind v4 chosen in T14)              | I.package, V7, V8 |
 | T16 | x      | Upgrade prettier v2→v3, prettier-plugin-tailwindcss to compatible version                 | I.package, V7  |
 | T17 | x      | Upgrade ziggy v1→v2 and update any route() JS calls with changed API                     | I.composer, I.package, V1, V7 |
-| T18 | .      | Final: run full test suite + npm build + manual smoke test; verify V1–V8                  | V1,V2,V3,V4,V5,V6,V7,V8 |
+| T18 | x      | Final: run full test suite + npm build + manual smoke test; verify V1–V8                  | V1,V2,V3,V4,V5,V6,V7,V8 |
 
 ## §B — Bug Log
 
