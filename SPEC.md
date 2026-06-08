@@ -47,7 +47,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T3  | x      | Bump PHP constraint to `^8.4` in composer.json (Herd already on 8.4.21)                   | I.composer, V6 |
 | T4  | x      | Bump inertia-laravel to ^1.0 (PHP 8.4 unblock), then minor/patch PHP upgrades             | I.composer, I.inertia, V1, V2, V9 |
 | T5  | x      | Laravel 9→10 upgrade: follow laravel.com/docs/10.x/upgrade; update config, providers      | I.composer, I.config, I.providers, V1, V2 |
-| T6  | .      | Laravel 10→11 upgrade: bootstrap/app.php consolidation, middleware changes                | I.composer, I.providers, V1, V2 |
+| T6  | x      | Laravel 10→11 upgrade: bootstrap/app.php consolidation, middleware changes                | I.composer, I.providers, V1, V2 |
 | T7  | .      | Laravel 11→12 upgrade: review breaking changes, update config                             | I.composer, I.config, V1, V2 |
 | T8  | .      | Upgrade PHPUnit 10→11 and update test syntax (static data providers, etc.)                | I.tests, V2    |
 | T9  | .      | Upgrade predis v1→v3 and verify Redis config compatibility                                | I.composer, I.config, V1 |
@@ -67,3 +67,4 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 |----|------|-------|-----|
 | B1 | 2026-06-08 | inertia-laravel ^0.6.x caps PHP ~8.3.0; blocked composer update on PHP 8.4 | V9 |
 | B2 | 2026-06-08 | 56 of 88 Unit tests were already failing on L9 (MySQL access denied + pre-existing logic bugs); same count on L10 — no regression, but V2 cannot be clean until T8 fixes syntax and pre-existing DB issues are resolved | V2 |
+| B3 | 2026-06-08 | L11 upgrade: `assertDeleted` removed from test helpers; 1 additional test failure in Feature/IngredientTest.php:85. Fix in T8 — replace with `assertModelMissing`. Also: phpunit.xml needed APP_KEY for tests — L11 EncryptionServiceProvider throws early on empty key | V2 |

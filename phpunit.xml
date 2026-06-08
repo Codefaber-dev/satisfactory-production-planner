@@ -10,6 +10,7 @@
   </testsuites>
   <php>
     <server name="APP_ENV" value="testing"/>
+    <server name="APP_KEY" value="base64:FSifZPC626UjKscoRy+pdHV3riH/w3sN8Re/Yq97Z08="/>
     <server name="BCRYPT_ROUNDS" value="4"/>
     <server name="CACHE_DRIVER" value="redis"/>
     <server name="CACHE_PREFIX" value="satis_testing"/>

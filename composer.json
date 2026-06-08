@@ -12,21 +12,21 @@
         "hashids/hashids": "^4.1",
         "inertiajs/inertia-laravel": "^1.0",
         "intervention/image": "^2.7",
-        "laravel/framework": "^10.0",
-        "laravel/jetstream": "^3.0",
-        "laravel/sanctum": "^3.2",
+        "laravel/framework": "^11.0",
+        "laravel/jetstream": "^5.0",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.7",
         "marcj/topsort": "^2.0",
         "predis/predis": "^1.1",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.7",
-        "spatie/laravel-ignition": "^2.0",
+        "barryvdh/laravel-debugbar": "^3.12",
+        "spatie/laravel-ignition": "^3.0",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^7.0",
+        "nunomaduro/collision": "^8.0",
         "phpunit/phpunit": "^10.5"
     },
     "autoload": {
