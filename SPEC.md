@@ -73,7 +73,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | T17 | x      | Upgrade ziggy v1→v2 and update any route() JS calls with changed API                     | I.composer, I.package, V1, V7 |
 | T18 | x      | Final: run full test suite + npm build + manual smoke test; verify V1–V8                  | V1,V2,V3,V4,V5,V6,V7,V8 |
 | T19 | x      | Install Laravel Pint, configure pint.json (Laravel preset), run + fix all violations      | I.composer, I.pint, V10 |
-| T20 | .      | Install Larastan (nunomaduro/larastan), configure phpstan.neon at level 5, fix or baseline violations | I.composer, I.larastan, V11 |
+| T20 | x      | Install Larastan (nunomaduro/larastan), configure phpstan.neon at level 5, fix or baseline violations | I.composer, I.larastan, V11 |
 | T21 | .      | Replace Prettier with Biome: remove prettier + prettier-plugin-tailwindcss, add @biomejs/biome, configure biome.json, update scripts | I.package, I.biome, V7, V12 |
 | T22 | .      | Add Vitest: add vitest + @vitejs/plugin-vue to devDeps, configure vitest.config.ts, write ≥1 smoke test | I.package, V13 |
 | T23 | .      | Add GitHub Actions BE workflow: phpunit + pint check on push/PR to main                   | I.ci, V1, V2, V10 |

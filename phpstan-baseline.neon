@@ -1,0 +1,817 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/RebuildCache.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SetRecipeEnergyAndResource.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 2
+			path: app/Console/Commands/SetRecipeEnergyAndResource.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Exceptions\\Handler\:\:\$dontFlash is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Foundation\\Exceptions\\Handler\:\:\$dontFlash\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Exceptions/Handler.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Exceptions\\Handler\:\:\$dontReport is not covariant with PHPDoc type array\<int, class\-string\<Throwable\>\> of overridden property Illuminate\\Foundation\\Exceptions\\Handler\:\:\$dontReport\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Exceptions/Handler.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$factories\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Factories/Implementations/UserFactories.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of method App\\Favorites\\Implementations\\GuestFavorites\:\:getCacheKey\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Favorites/Implementations/GuestFavorites.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$favorite_recipes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Favorites/Implementations/UserFavorites.php
+
+		-
+			message: '#^Access to an undefined property App\\Helpers\\ProductionCalculator\:\:\$imports\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 20
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isRaw\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of method App\\Helpers\\ProductionCalculator\:\:getRecipe\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: app/Helpers/ProductionCalculator.php
+
+		-
+			message: '#^Access to an undefined property App\\Helpers\\ProductionStats\:\:\$yield\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Helpers/ProductionStats.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isRaw\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Called ''pluck'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of method App\\Helpers\\ProductionTree\:\:getRecipe\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of method App\\Helpers\\ProductionTree\:\:walk\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Helpers/ProductionTree.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Helpers/RawIngredientCalculator.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Building\>\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Helpers/UpdateOneZero.php
+
+		-
+			message: '#^Array has 3 duplicate keys with value ''Petroleum Coke'' \(\\App\\Enums\\Ingredient\:\:PETROLEUM_COKE\-\>value, \\App\\Enums\\Ingredient\:\:PETROLEUM_COKE\-\>value, \\App\\Enums\\Ingredient\:\:PETROLEUM_COKE\-\>value\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: app/Helpers/UpdateOneZero.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Ingredient\>\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Helpers/UpdateOneZero.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Building\>\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Helpers/UpdateOneZero2.php
+
+		-
+			message: '#^Offset ''byproducts'' on array\{base_yield\: int, base_per_min\: float, ingredients\: array\{''Aluminum Casing''\: int, ''Crystal Oscillator''\: float, Computer\: float\}\|array\{Fabric\: int, Coal\: int, ''Iron Plate''\: int\}\}\|array\{base_yield\: int, base_per_min\: int, ingredients\: array\{''Automated Wiring''\: int, ''Circuit Board''\: int, ''Heavy Modular Frame''\: int, Computer\: int\}\|array\{''Iron Rebar''\: int, ''Quartz Crystal''\: int\}\|array\{''Iron Rebar''\: int, ''Smokeless Powder''\: int, ''Steel Pipe''\: int\}\}\|array\{base_yield\: int, base_per_min\: int, ingredients\: array\{''Reanimated SAM''\: int\}, alt_recipe\: bool\}\|array\{description\: string, base_yield\: int, base_per_min\: float, ingredients\: array\{''Copper Sheet''\: float, Screw\: int\}\|array\{''Heat Sink''\: int, ''High\-Speed Connector''\: float, ''Quartz Crystal''\: int\}\|array\{''Iron Plate''\: float, Rubber\: float\}\|array\{''Raw Quartz''\: float, Limestone\: float\}\|array\{Stator\: float, Wire\: int, ''High\-Speed Connector''\: float\}, alt_recipe\: bool\}\|array\{description\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Caterium Ore''\: int, ''Sulfuric Acid''\: int\}\|array\{''Copper Ore''\: int, ''Iron Ore''\: int\}\|array\{''Copper Ore''\: int, ''Sulfuric Acid''\: int\}\|array\{''Heat Sink''\: int, Motor\: float, ''Nitrogen Gas''\: int\}\|array\{''Iron Ingot''\: float, Plastic\: float\}\|array\{''Iron Ore''\: int, ''Compacted Coal''\: float\}\|array\{''Iron Ore''\: int, ''Sulfuric Acid''\: int\}\|array\{''Steel Ingot''\: int\}\|array\{''Steel Pipe''\: int, ''Iron Plate''\: int\}\|array\{Limestone\: int, Rubber\: int\}\|array\{Silica\: int, Limestone\: int\}\|array\{Sulfur\: float, ''Compacted Coal''\: int\}, alt_recipe\: bool\} in isset\(\) does not exist\.$#'
+			identifier: isset.offset
+			count: 1
+			path: app/Helpers/UpdateOneZero2.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Building\>\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Anonymous function has an unused use \$tier2\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Anonymous function has an unused use \$tier3\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Anonymous function has an unused use \$tier4\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Anonymous function has an unused use \$tier5\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Anonymous function has an unused use \$tier6\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Offset ''byproducts'' on array\{base_yield\: int, base_per_min\: float, ingredients\: array\{''Copper Sheet''\: int, Plastic\: int\}\}\|array\{base_yield\: int, base_per_min\: float, ingredients\: array\{''Encased Uranium Cell''\: int, Nobelisk\: float, ''Smokeless Powder''\: int, ''AI Limiter''\: int\}\|array\{Nobelisk\: float, ''Smokeless Powder''\: int\}, alt_recipe\: bool\}\|array\{base_yield\: int, base_per_min\: int, ingredients\: array\{''Black Powder''\: int, ''Heavy Oil Residue''\: int\}\|array\{''Copper Sheet''\: int, ''Smokeless Powder''\: int\}\|array\{''Iron Rebar''\: int, ''Quartz Crystal''\: int\}\|array\{''Iron Rebar''\: int, ''Smokeless Powder''\: int, ''Steel Pipe''\: int\}\|array\{''Iron Rebar''\: int, Quickwire\: int\}\|array\{''Iron Rod''\: int\}\|array\{''Rifle Ammo''\: int, ''Aluminum Casing''\: int, ''Packaged Turbofuel''\: int\}\|array\{''Rifle Ammo''\: int, ''Aluminum Casing''\: int, Turbofuel\: int\}\|array\{''Rifle Ammo''\: int, ''High\-Speed Connector''\: float\}\|array\{Nobelisk\: int, ''Crystal Oscillator''\: int\}\|array\{Nobelisk\: int, Biomass\: int\}, alt_recipe\: bool\}\|array\{base_yield\: int, base_per_min\: int, ingredients\: array\{''Black Powder''\: int, ''Steel Pipe''\: int\}\|array\{Coal\: int, Sulfur\: int\}\}\|array\{description\: string, base_yield\: int, base_per_min\: float, ingredients\: array\{''Circuit Board''\: float, ''Crystal Oscillator''\: float\}\|array\{''Copper Sheet''\: float, Silica\: float\}\|array\{Quickwire\: float, Plastic\: float\}, alt_recipe\: bool\}\|array\{description\?\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Alien Protein''\: int\}\|array\{''Hatcher Remains''\: int\}\|array\{''Hog Remains''\: int\}\|array\{''Plasma Spitter Remains''\: int\}\|array\{''Polymer Resin''\: int, Water\: int\}\|array\{''Stinger Remains''\: int\}\|array\{Rubber\: int, ''Petroleum Coke''\: int\}, alt_recipe\: bool\} in isset\(\) does not exist\.$#'
+			identifier: isset.offset
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Offset 0 on array\{array\{base_yield\: int, base_per_min\: float, ingredients\: array\{''Copper Sheet''\: int, Plastic\: int\}\}, array\{description\: string, base_yield\: int, base_per_min\: float, ingredients\: array\{Quickwire\: float, Plastic\: float\}, alt_recipe\: bool\}, array\{description\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{Rubber\: int, ''Petroleum Coke''\: int\}, alt_recipe\: bool\}, array\{description\: string, base_yield\: int, base_per_min\: float, ingredients\: array\{''Copper Sheet''\: float, Silica\: float\}, alt_recipe\: bool\}\}\|array\{array\{base_yield\: int, base_per_min\: float, ingredients\: array\{''Encased Uranium Cell''\: int, Nobelisk\: float, ''Smokeless Powder''\: int, ''AI Limiter''\: int\}\|array\{Nobelisk\: float, ''Smokeless Powder''\: int\}, alt_recipe\: bool\}\}\|array\{array\{base_yield\: int, base_per_min\: int, ingredients\: array\{''Black Powder''\: int, ''Heavy Oil Residue''\: int\}\|array\{''Copper Sheet''\: int, ''Smokeless Powder''\: int\}\|array\{''Iron Rebar''\: int, ''Quartz Crystal''\: int\}\|array\{''Iron Rebar''\: int, ''Smokeless Powder''\: int, ''Steel Pipe''\: int\}\|array\{''Iron Rebar''\: int, Quickwire\: int\}\|array\{''Iron Rod''\: int\}\|array\{''Rifle Ammo''\: int, ''Aluminum Casing''\: int, ''Packaged Turbofuel''\: int\}\|array\{''Rifle Ammo''\: int, ''Aluminum Casing''\: int, Turbofuel\: int\}\|array\{''Rifle Ammo''\: int, ''High\-Speed Connector''\: float\}\|array\{Nobelisk\: int, ''Crystal Oscillator''\: int\}\|array\{Nobelisk\: int, Biomass\: int\}, alt_recipe\: bool\}\}\|array\{array\{base_yield\: int, base_per_min\: int, ingredients\: array\{''Black Powder''\: int, ''Steel Pipe''\: int\}\|array\{Coal\: int, Sulfur\: int\}\}\}\|array\{array\{description\: string, base_yield\: int, base_per_min\: float, ingredients\: array\{''Circuit Board''\: float, ''Crystal Oscillator''\: float\}, alt_recipe\: bool\}\}\|array\{array\{description\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Hog Remains''\: int\}, alt_recipe\: bool\}, array\{description\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Plasma Spitter Remains''\: int\}, alt_recipe\: bool\}, array\{description\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Hatcher Remains''\: int\}, alt_recipe\: bool\}, array\{description\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Stinger Remains''\: int\}, alt_recipe\: bool\}\}\|array\{array\{description\?\: string, base_yield\: int, base_per_min\: int, ingredients\: array\{''Alien Protein''\: int\}\|array\{''Polymer Resin''\: int, Water\: int\}, alt_recipe\: bool\}\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: app/Helpers/UpdateSix.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:variant\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Helpers/helpers.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:create\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:destroy\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:edit\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:index\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:show\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:store\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingController\:\:update\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:create\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:destroy\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:edit\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:index\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:show\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:store\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\BuildingVariantController\:\:update\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/BuildingVariantController.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of static method App\\Favorites\\Facades\\Favorites\:\:set\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/FavoritesController.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of static method App\\Favorites\\Facades\\Favorites\:\:setDefault\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/FavoritesController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/ProductionController.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getOverrides\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/ProductionController.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of static method App\\Favorites\\Facades\\Favorites\:\:set\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/ProductionController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:create\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:destroy\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:edit\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:index\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:show\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:store\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\RecipeController\:\:update\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Controllers/RecipeController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\MultiProductionLine\>\|Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\ProductionLine\>\:\:getPlanUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/SharedFactoryController.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Kernel\:\:\$middleware is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Foundation\\Http\\Kernel\:\:\$middleware\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Kernel.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Kernel\:\:\$middlewareGroups is not covariant with PHPDoc type array\<string, array\<int, string\>\> of overridden property Illuminate\\Foundation\\Http\\Kernel\:\:\$middlewareGroups\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Kernel.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Kernel\:\:\$routeMiddleware is not covariant with PHPDoc type array\<string, string\> of overridden property Illuminate\\Foundation\\Http\\Kernel\:\:\$routeMiddleware\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Kernel.php
+
+		-
+			message: '#^Method App\\Http\\Middleware\\Authenticate\:\:redirectTo\(\) should return string\|null but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Middleware/Authenticate.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Middleware\\EncryptCookies\:\:\$except is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Cookie\\Middleware\\EncryptCookies\:\:\$except\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Middleware/EncryptCookies.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Middleware\\PreventRequestsDuringMaintenance\:\:\$except is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance\:\:\$except\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Middleware/PreventRequestsDuringMaintenance.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Middleware\\TrimStrings\:\:\$except is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Foundation\\Http\\Middleware\\TrimStrings\:\:\$except\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Middleware/TrimStrings.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Http\\Middleware\\VerifyCsrfToken\:\:\$except is not covariant with PHPDoc type array\<int, string\> of overridden property Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken\:\:\$except\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Http/Middleware/VerifyCsrfToken.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$base_per_min\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$building\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$byproducts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$ingredients\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Recipe\:\:getChoiceText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getChoiceText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Function energy invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Method App\\Models\\Ingredient\:\:baseRecipe\(\) should return App\\Models\\Recipe but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^PHPDoc tag @return with type Illuminate\\Database\\Eloquent\\Model\|Illuminate\\Database\\Eloquent\\Relations\\HasMany\|null is not subtype of native type App\\Models\\Recipe\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: app/Models/Ingredient.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ProductionLine\:\:\$product\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/ProductionLine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$tier\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:defaultRecipe\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Recipe.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:recipes\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Models/Recipe.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$favorite_recipes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Models\\User\:\:\$appends is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$appends\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Models\\User\:\:\$casts is not covariant with PHPDoc type array\<string, string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$casts\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Models\\User\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Models\\User\:\:\$hidden is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$hidden\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$multiFactories\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/MultiFactories/Implementations/UserMultiFactories.php
+
+		-
+			message: '#^Method App\\PowerPlanner\\Generators\\Base\:\:getNumRequired\(\) should return int but returns float\.$#'
+			identifier: return.type
+			count: 1
+			path: app/PowerPlanner/Generators/Base.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/PowerPlanner/Generators/Base.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Ionized Fuel'' \(\\App\\Enums\\Ingredient\:\:IONIZED_FUEL\-\>value, \\App\\Enums\\Ingredient\:\:IONIZED_FUEL\-\>value\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: app/PowerPlanner/Generators/FuelGenerator.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/PowerPlanner/PowerPlanner.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$height\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_liquid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$length\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$variants\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$width\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Production/BuildingDetails.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Production/BuildingOverview.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Production/BuildingOverview.php
+
+		-
+			message: '#^Called ''Model\:\:make\(\)'' which performs unnecessary work, use ''new Model\(\)''\.$#'
+			identifier: larastan.noModelMake
+			count: 1
+			path: app/Production/MultiplexerFactory.php
+
+		-
+			message: '#^Anonymous function should return non\-empty\-array\<int, object\{raw\: mixed, imported\: mixed, overridden\: mixed, total\: mixed, outputs\: array\<mixed\>, byproduct_outputs\: array\<mixed\>, production\: Illuminate\\Support\\Collection\<int, array\{byproducts\: mixed, description\: mixed, imported\: mixed, ingredients\: mixed, name\: mixed, outputs\: Illuminate\\Support\\Collection\<\(int\|string\), mixed\>, overridden\: mixed, overrides\: mixed, \.\.\.\}\>\}&stdClass\> but returns non\-empty\-array\<int, object\{raw\: mixed, imported\: mixed, overridden\: mixed, total\: mixed, outputs\: array\<mixed\>, byproduct_outputs\: array\<mixed\>, production\: Illuminate\\Support\\Collection\<int, array\{byproducts\: mixed, description\: mixed, imported\: mixed, ingredients\: mixed, name\: mixed, outputs\: Illuminate\\Support\\Collection\<\(int\|string\), mixed\>, overridden\: mixed, overrides\: mixed, \.\.\.\}\>\}&stdClass\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Production/ProductionCalculator.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,mixed\>\:\:map\(\) expects callable\(mixed, int\)\: non\-empty\-array\<int, object\{raw\: mixed, imported\: mixed, overridden\: mixed, total\: mixed, outputs\: array\<mixed\>, byproduct_outputs\: array\<mixed\>, production\: Illuminate\\Support\\Collection\<int, array\{byproducts\: mixed, description\: mixed, imported\: mixed, ingredients\: mixed, name\: mixed, outputs\: Illuminate\\Support\\Collection\<int\|string, mixed\>, overridden\: mixed, overrides\: mixed, tier\: mixed, variant\: mixed\}\|array\{byproducts\: mixed, description\: mixed, imported\: mixed, ingredients\: mixed, name\: mixed, outputs\: Illuminate\\Support\\Collection\<int\|string, mixed\>, overridden\: mixed, overrides\: mixed, qty\: float, recipe\: mixed, overview\: array\|null, overviews\: array\{c100\: array\|null, c150\: array\|null, c200\: array\|null, c250\: array\|null\}, power_usage\: Illuminate\\Support\\Collection\<int\|string, mixed\>\|null, total_energy\: Illuminate\\Support\\Collection\<int\|string, mixed\>\|null, tier\: mixed, variant\: mixed\}\>\}&stdClass\>, Closure\(mixed, mixed\)\: non\-empty\-array\<int, object\{raw\: mixed, imported\: mixed, overridden\: mixed, total\: mixed, outputs\: array\<mixed\>, byproduct_outputs\: array\<mixed\>, production\: Illuminate\\Support\\Collection\<int, array\{byproducts\: mixed, description\: mixed, imported\: mixed, ingredients\: mixed, name\: mixed, outputs\: Illuminate\\Support\\Collection\<int\|string, mixed\>, overridden\: mixed, overrides\: mixed, tier\: mixed, variant\: mixed\}\|array\{byproducts\: mixed, description\: mixed, imported\: mixed, ingredients\: mixed, name\: mixed, outputs\: Illuminate\\Support\\Collection\<int\|string, mixed\>, overridden\: mixed, overrides\: mixed, qty\: float, recipe\: mixed, overview\: array\|null, overviews\: array\{c100\: array\|null, c150\: array\|null, c200\: array\|null, c250\: array\|null\}, power_usage\: Illuminate\\Support\\Collection\<int\|string, mixed\>\|null, total_energy\: Illuminate\\Support\\Collection\<int\|string, mixed\>\|null, tier\: mixed, variant\: mixed\}\>\}&stdClass\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Production/ProductionCalculator.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Production/ProductionCalculator.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Production/ProductionGlobals.php
+
+		-
+			message: '#^Access to an undefined property App\\Production\\Step\:\:\$imports\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:addOverride\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getBeltSpeed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getChoice\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getFavorite\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getFavorites\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getOverride\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getOverrides\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:getVariant\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Call to an undefined method App\\Production\\Step\:\:isOverride\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Method App\\Production\\Step\:\:isImported\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: app/Production/Step.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:filter\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(App\\Models\\Recipe\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Parameter \#1 \$ingredient of method App\\Production\\Step\:\:getIntermediateRecipe\(\) expects App\\Models\\Ingredient, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between float and 0 will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Production/Step.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Providers\\AuthServiceProvider\:\:\$policies is not covariant with PHPDoc type array\<class\-string, class\-string\> of overridden property Illuminate\\Foundation\\Support\\Providers\\AuthServiceProvider\:\:\$policies\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Providers/AuthServiceProvider.php
+
+		-
+			message: '#^PHPDoc type array of property App\\Providers\\EventServiceProvider\:\:\$listen is not covariant with PHPDoc type array\<string, array\<int, string\>\> of overridden property Illuminate\\Foundation\\Support\\Providers\\EventServiceProvider\:\:\$listen\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Providers/EventServiceProvider.php
+
+		-
+			message: '#^PHPDoc tag @var above a method has no effect\.$#'
+			identifier: varTag.misplaced
+			count: 1
+			path: app/Providers/RouteServiceProvider.php
