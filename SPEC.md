@@ -36,6 +36,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 - **V6** PHP version constraint in `composer.json` matches or narrows to running PHP version (`^8.4`).
 - **V7** JS build succeeds (`npm run production`) after every JS phase.
 - **V8** `laravel-mix` and tailwind major versions are compatible (mix v6 supports tailwind v3 max; tailwind v4 requires Vite).
+- **V9** All packages in `require` declare support for installed PHP version before `composer update` runs.
 
 ## §T — Tasks
 
@@ -44,7 +45,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T1  | x      | Audit intervention/image usage in app — list all files and methods used                   | I.image, V4    |
 | T2  | x      | Audit Inertia usage — list all Inertia::render calls and JS `useForm`/`usePage` patterns  | I.inertia, V3  |
 | T3  | x      | Bump PHP constraint to `^8.4` in composer.json (Herd already on 8.4.21)                   | I.composer, V6 |
-| T4  | .      | Phase 1: minor/patch-only PHP upgrades (aws, guzzle, faker, debugbar stays v3)            | I.composer, V1, V2 |
+| T4  | x      | Bump inertia-laravel to ^1.0 (PHP 8.4 unblock), then minor/patch PHP upgrades             | I.composer, I.inertia, V1, V2, V9 |
 | T5  | .      | Laravel 9→10 upgrade: follow laravel.com/docs/10.x/upgrade; update config, providers      | I.composer, I.config, I.providers, V1, V2 |
 | T6  | .      | Laravel 10→11 upgrade: bootstrap/app.php consolidation, middleware changes                | I.composer, I.providers, V1, V2 |
 | T7  | .      | Laravel 11→12 upgrade: review breaking changes, update config                             | I.composer, I.config, V1, V2 |
@@ -64,3 +65,4 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 
 | id | date | cause | fix |
 |----|------|-------|-----|
+| B1 | 2026-06-08 | inertia-laravel ^0.6.x caps PHP ~8.3.0; blocked composer update on PHP 8.4 | V9 |
