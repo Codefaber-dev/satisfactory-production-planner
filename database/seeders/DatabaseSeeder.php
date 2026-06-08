@@ -15,13 +15,13 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            //UserSeeder::class,
-            //IngredientSeeder::class,
-            //BuildingSeeder::class,
-            //RecipeSeeder::class,
-            //RecipeTierSeeder::class
+            // UserSeeder::class,
+            // IngredientSeeder::class,
+            // BuildingSeeder::class,
+            // RecipeSeeder::class,
+            // RecipeTierSeeder::class
             FicsmasIngredientSeeder::class,
-            FicsmasRecipeSeeder::class
+            FicsmasRecipeSeeder::class,
         ]);
 
         Cache::forget('all_recipes');

@@ -2,11 +2,9 @@
 
 namespace Tests\Unit;
 
-
 use App\Favorites\Facades\Favorites;
 use App\Production\ProductionCalculator;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RecipeProductionTest extends TestCase
 {
@@ -14,8 +12,8 @@ class RecipeProductionTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('database.default','mysql');
-        config()->set('database.connections.mysql.database','satis_pp');
+        config()->set('database.default', 'mysql');
+        config()->set('database.connections.mysql.database', 'satis_pp');
     }
 
     /**
@@ -46,12 +44,12 @@ class RecipeProductionTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider rawIngredientsData
      */
     public function it_can_calculate_the_raw_ingredients_needed($product, $qty, $key, $expectedQty)
     {
         $production = ProductionCalculator::make($product, $qty);
-
 
         $this->assertEquals($expectedQty, $production->get($key));
     }
@@ -59,26 +57,26 @@ class RecipeProductionTest extends TestCase
     /** @test */
     public function it_can_set_favorites()
     {
-        Favorites::set(i('Screw'),r('Steel Screw'));
+        Favorites::set(i('Screw'), r('Steel Screw'));
 
         $production = ProductionCalculator::make(
-            product: "Computer",
+            product: 'Computer',
             qty: 10
         );
 
-        $production->getSteps()->assertIntermediateRecipe('Screw','Steel Screw');
+        $production->getSteps()->assertIntermediateRecipe('Screw', 'Steel Screw');
     }
 
     /** @test */
     public function it_can_handle_circular_dependencies()
     {
         $production = ProductionCalculator::make(
-            product: "Rubber",
-            qty:100,
-            recipe: "Recycled Rubber",
+            product: 'Rubber',
+            qty: 100,
+            recipe: 'Recycled Rubber',
             overrides: [],
             favorites: [
-                'Plastic' => r('Recycled Plastic')
+                'Plastic' => r('Recycled Plastic'),
             ]
         );
 
@@ -92,25 +90,25 @@ class RecipeProductionTest extends TestCase
     public function it_can_calculate_fused_quickwire()
     {
         $production = ProductionCalculator::make(
-            product: "Quickwire",
+            product: 'Quickwire',
             qty: 1740,
-            recipe: "Fused Quickwire",
+            recipe: 'Fused Quickwire',
             overrides: [],
             favorites: [
-                //'Circuit Board' => r('Caterium Circuit Board'),
-                //'Plastic' => r('Recycled Plastic'),
-                //'Rubber' => r('Recycled Rubber'),
-                //'Fuel' => r('Unpackage Fuel'),
-                //'Packaged Fuel' => r('Packaged Fuel'),
-                //'Quickwire' => r('Fused Quickwire')
+                // 'Circuit Board' => r('Caterium Circuit Board'),
+                // 'Plastic' => r('Recycled Plastic'),
+                // 'Rubber' => r('Recycled Rubber'),
+                // 'Fuel' => r('Unpackage Fuel'),
+                // 'Packaged Fuel' => r('Packaged Fuel'),
+                // 'Quickwire' => r('Fused Quickwire')
             ],
             imports: [
-                //'Caterium Ingot',
-                //'Copper Ingot'
+                // 'Caterium Ingot',
+                // 'Copper Ingot'
             ]
         );
 
-        //dd($production->getSlimResults());
+        // dd($production->getSlimResults());
 
         $this->assertEquals(145, $production->get('2.Caterium Ingot.total'));
         $this->assertEquals(725, $production->get('2.Copper Ingot.total'));
@@ -121,9 +119,9 @@ class RecipeProductionTest extends TestCase
     public function it_can_handle_the_caterium_computer_issue()
     {
         $production = ProductionCalculator::make(
-            product: "Computer",
+            product: 'Computer',
             qty: 30,
-            recipe: "Caterium Computer",
+            recipe: 'Caterium Computer',
             overrides: [],
             favorites: [
                 'Circuit Board' => r('Caterium Circuit Board'),
@@ -131,11 +129,11 @@ class RecipeProductionTest extends TestCase
                 'Rubber' => r('Recycled Rubber'),
                 'Fuel' => r('Unpackage Fuel'),
                 'Packaged Fuel' => r('Packaged Fuel'),
-                'Quickwire' => r('Fused Quickwire')
+                'Quickwire' => r('Fused Quickwire'),
             ],
             imports: [
                 'Caterium Ingot',
-                'Copper Ingot'
+                'Copper Ingot',
             ]
 
         );
@@ -144,13 +142,12 @@ class RecipeProductionTest extends TestCase
 
         $steps->assertImported('Caterium Ingot');
         $steps->assertImported('Copper Ingot');
-        $steps->assertOverride('Rubber','Rubber');
-        $steps->assertOverride('Packaged Fuel','Diluted Packaged Fuel');
-        $steps->assertIntermediateRecipe('Plastic','Recycled Plastic');
-        $steps->assertIntermediateRecipe('Quickwire','Fused Quickwire');
+        $steps->assertOverride('Rubber', 'Rubber');
+        $steps->assertOverride('Packaged Fuel', 'Diluted Packaged Fuel');
+        $steps->assertIntermediateRecipe('Plastic', 'Recycled Plastic');
+        $steps->assertIntermediateRecipe('Quickwire', 'Fused Quickwire');
 
-
-        //dd($production->getSlimResults());
+        // dd($production->getSlimResults());
 
         $this->assertNull($production->get('1.Caterium Ore.total'));
         $this->assertNull($production->get('1.Copper Ore.total'));

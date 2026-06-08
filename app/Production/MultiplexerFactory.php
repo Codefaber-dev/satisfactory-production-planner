@@ -12,10 +12,6 @@ class MultiplexerFactory
 
     protected $recipes;
 
-    /**
-     * @param $products
-     * @param $yields
-     */
     public function __construct($products, $yields)
     {
         $this->products = $products;

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FavoritesController extends Controller
@@ -40,7 +39,7 @@ class FavoritesController extends Controller
     public function destroyAll()
     {
         $favorites = Favorites::all();
-        $favorites->each(fn(Recipe $favorite) => Favorites::setDefault($favorite->product));
+        $favorites->each(fn (Recipe $favorite) => Favorites::setDefault($favorite->product));
 
         return redirect()->to('/favorites');
     }
@@ -51,10 +50,9 @@ class FavoritesController extends Controller
 
         if ($preset) {
             foreach ($preset as $item) {
-                if ( $item['recipe'] === 'default' ) {
+                if ($item['recipe'] === 'default') {
                     $recipe = i($item['product'])->baseRecipe();
-                }
-                else {
+                } else {
                     $recipe = r($item['recipe']);
                 }
 

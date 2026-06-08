@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         User::forceCreate([
             'email' => 'jeremy.bloomstrom@gmail.com',
             'name' => 'Jeremy Bloomstrom',
-            'password' => bcrypt('P@ssw0rd')
+            'password' => bcrypt('P@ssw0rd'),
         ]);
     }
 }

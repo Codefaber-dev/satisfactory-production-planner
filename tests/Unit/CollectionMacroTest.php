@@ -2,9 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\CollectionMacro;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class CollectionMacroTest extends TestCase
 {
@@ -17,14 +16,14 @@ class CollectionMacroTest extends TestCase
     {
         $a = collect([
             [
-                1,2,3,4
+                1, 2, 3, 4,
             ],
             [
-                5,6,7,8
-            ]
+                5, 6, 7, 8,
+            ],
         ]);
 
-        $this->assertEquals([6,8,10,12], $a->crossSum()->toArray());
+        $this->assertEquals([6, 8, 10, 12], $a->crossSum()->toArray());
     }
 
     /** @test */
@@ -32,14 +31,14 @@ class CollectionMacroTest extends TestCase
     {
         $a = collect([
             [
-                "val" => [1,2,3,4]
+                'val' => [1, 2, 3, 4],
             ],
             [
-                "val" => [5,6,7,8]
-            ]
+                'val' => [5, 6, 7, 8],
+            ],
         ]);
 
-       $this->assertEquals([6,8,10,12], $a->crossSumByKey('val')->toArray());
+        $this->assertEquals([6, 8, 10, 12], $a->crossSumByKey('val')->toArray());
     }
 
     /** @test */
@@ -47,10 +46,10 @@ class CollectionMacroTest extends TestCase
     {
         $a = collect([
             [
-                "val" => [1,2,3,4]
+                'val' => [1, 2, 3, 4],
             ],
         ]);
 
-       $this->assertEquals([1,2,3,4], $a->crossSumByKey('val')->toArray());
+        $this->assertEquals([1, 2, 3, 4], $a->crossSumByKey('val')->toArray());
     }
 }

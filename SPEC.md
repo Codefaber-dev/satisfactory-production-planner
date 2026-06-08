@@ -1,8 +1,8 @@
-# SPEC — Dependency Upgrade
+# SPEC — Dependency Upgrade + Tooling
 
 ## §G — Goal
 
-Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current stable releases, in phases to minimize breakage risk.
+Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable releases, then add static analysis (Larastan), code style enforcement (Pint, Biome), FE unit testing (Vitest), and CI pipelines (GitHub Actions).
 
 ## §C — Constraints
 
@@ -14,6 +14,9 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 - `maximebf/debugbar` abandoned — replace with `php-debugbar/php-debugbar` (pulled via `barryvdh/laravel-debugbar` v4 automatically).
 - JS build uses `laravel-mix` v6 (webpack); upgrading tailwind v3→v4 may require switching to Vite.
 - Tests must pass after each phase before proceeding.
+- Biome replaces Prettier (installed in T16) — must remove `prettier` + `prettier-plugin-tailwindcss` in T21.
+- Larastan level: start at 5; document suppressions in `phpstan-baseline.neon` if needed rather than downgrading level.
+- Vitest config must share `vite.config.ts` to resolve Vue SFCs and aliases.
 
 ## §I — Surfaces
 
@@ -25,6 +28,10 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 - `I.tests` — `tests/` PHPUnit 9→11 migration
 - `I.image` — all uses of `intervention/image` in app code
 - `I.inertia` — Inertia v0.6→v3 client + server adapter changes
+- `I.pint` — `pint.json` (PHP code style config)
+- `I.larastan` — `phpstan.neon` + `phpstan-baseline.neon` (static analysis config)
+- `I.biome` — `biome.json` (FE linter/formatter config)
+- `I.ci` — `.github/workflows/` (CI pipeline definitions)
 
 ## §V — Invariants
 
@@ -37,6 +44,11 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 - **V7** JS build succeeds (`npm run production`) after every JS phase.
 - **V8** `laravel-mix` and tailwind major versions are compatible (mix v6 supports tailwind v3 max; tailwind v4 requires Vite).
 - **V9** All packages in `require` declare support for installed PHP version before `composer update` runs.
+- **V10** `./vendor/bin/pint --test` exits 0 — no PHP style violations.
+- **V11** `./vendor/bin/phpstan analyse` exits 0 at configured level (≥5).
+- **V12** `npx biome check .` exits 0 — no FE lint/format violations.
+- **V13** `npm run test` (Vitest) exits 0 with ≥1 passing test.
+- **V14** All GitHub Actions workflows pass on clean commits to main (BE: phpunit + pint; FE: vitest + biome).
 
 ## §T — Tasks
 
@@ -60,6 +72,12 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T16 | x      | Upgrade prettier v2→v3, prettier-plugin-tailwindcss to compatible version                 | I.package, V7  |
 | T17 | x      | Upgrade ziggy v1→v2 and update any route() JS calls with changed API                     | I.composer, I.package, V1, V7 |
 | T18 | x      | Final: run full test suite + npm build + manual smoke test; verify V1–V8                  | V1,V2,V3,V4,V5,V6,V7,V8 |
+| T19 | x      | Install Laravel Pint, configure pint.json (Laravel preset), run + fix all violations      | I.composer, I.pint, V10 |
+| T20 | .      | Install Larastan (nunomaduro/larastan), configure phpstan.neon at level 5, fix or baseline violations | I.composer, I.larastan, V11 |
+| T21 | .      | Replace Prettier with Biome: remove prettier + prettier-plugin-tailwindcss, add @biomejs/biome, configure biome.json, update scripts | I.package, I.biome, V7, V12 |
+| T22 | .      | Add Vitest: add vitest + @vitejs/plugin-vue to devDeps, configure vitest.config.ts, write ≥1 smoke test | I.package, V13 |
+| T23 | .      | Add GitHub Actions BE workflow: phpunit + pint check on push/PR to main                   | I.ci, V1, V2, V10 |
+| T24 | .      | Add GitHub Actions FE workflow: vitest + biome check on push/PR to main                   | I.ci, V7, V12, V13 |
 
 ## §B — Bug Log
 

@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Building;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BuildingController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -20,7 +21,7 @@ class BuildingController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -30,8 +31,7 @@ class BuildingController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -41,8 +41,7 @@ class BuildingController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Building  $building
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Building $building)
     {
@@ -52,8 +51,7 @@ class BuildingController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Building  $building
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Building $building)
     {
@@ -63,9 +61,7 @@ class BuildingController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Building  $building
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Building $building)
     {
@@ -75,8 +71,7 @@ class BuildingController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Building  $building
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Building $building)
     {

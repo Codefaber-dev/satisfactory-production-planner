@@ -24,8 +24,6 @@ class FlushProductionCache extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -38,12 +36,11 @@ class FlushProductionCache extends Command
         $prefix = config('cache.prefix');
 
         $keys->each(function ($item) use ($prefix) {
-            $key = str($item)->after($prefix . ":");
+            $key = str($item)->after($prefix.':');
 
             if (Cache::forget($key)) {
                 $this->info("Flushed $key");
-            }
-            else {
+            } else {
                 $this->warn("$key is not a valid cache key");
             }
         });
@@ -55,12 +52,11 @@ class FlushProductionCache extends Command
         $prefix = config('cache.prefix');
 
         $keys->each(function ($item) use ($prefix) {
-            $key = str($item)->after($prefix . ":");
+            $key = str($item)->after($prefix.':');
 
             if (Cache::forget($key)) {
                 $this->info("Flushed $key");
-            }
-            else {
+            } else {
                 $this->warn("$key is not a valid cache key");
             }
         });

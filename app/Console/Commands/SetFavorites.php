@@ -43,27 +43,27 @@ class SetFavorites extends Command
         auth()->loginUsingId(1);
 
         $defaults = [
-            "Pure Aluminum Ingot",
-            "Biomass (Leaves)",
-            "Biocoal",
-            "Steel Screw",
-            "Caterium Wire",
-            "Insulated Cable",
-            "Caterium Circuit Board",
-            "Encased Industrial Pipe",
-            "Steel Coated Plate",
-            "Steeled Frame",
-            "Stitched Iron Plate",
-            "Solid Steel Ingot",
-            "Sloppy Alumina",
-            "Wet Concrete",
-            "Caterium Computer",
-            "Heavy Encased Frame",
-            "Diluted Fuel",
+            'Pure Aluminum Ingot',
+            'Biomass (Leaves)',
+            'Biocoal',
+            'Steel Screw',
+            'Caterium Wire',
+            'Insulated Cable',
+            'Caterium Circuit Board',
+            'Encased Industrial Pipe',
+            'Steel Coated Plate',
+            'Steeled Frame',
+            'Stitched Iron Plate',
+            'Solid Steel Ingot',
+            'Sloppy Alumina',
+            'Wet Concrete',
+            'Caterium Computer',
+            'Heavy Encased Frame',
+            'Diluted Fuel',
         ];
 
         collect($defaults)
-            ->each(function($recipe){
+            ->each(function ($recipe) {
                 auth()->user()->addFavoriteByName($recipe);
             });
 
@@ -83,9 +83,9 @@ class SetFavorites extends Command
                 ->values()
                 ->all(), 0);
 
-            $recipe = Recipe::find((int) (string) Str::of($ingredient->selectChoice($choice))->after("id:"));
+            $recipe = Recipe::find((int) (string) Str::of($ingredient->selectChoice($choice))->after('id:'));
 
-            $description = $recipe->description ?: "default";
+            $description = $recipe->description ?: 'default';
 
             $this->info("You chose $description");
 

@@ -16,7 +16,7 @@ class FavoritesProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Favorites', function() {
+        $this->app->singleton('Favorites', function () {
             if (auth()->guest()) {
                 return new FavoritesRepository(new GuestFavorites);
             }

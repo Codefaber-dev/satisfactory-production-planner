@@ -2,9 +2,11 @@
 
 namespace App\Enums;
 
+use App\Models\Recipe;
+
 trait Recipeable
 {
-    public function toRecipe(): \App\Models\Recipe
+    public function toRecipe(): Recipe
     {
         return r($this->value);
     }

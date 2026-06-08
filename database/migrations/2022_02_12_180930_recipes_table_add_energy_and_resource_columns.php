@@ -14,8 +14,8 @@ class RecipesTableAddEnergyAndResourceColumns extends Migration
     public function up()
     {
         Schema::table('recipes', function (Blueprint $table) {
-            $table->decimal('energy',20,4)->default(0);
-            $table->decimal('resource',20,4)->default(0);
+            $table->decimal('energy', 20, 4)->default(0);
+            $table->decimal('resource', 20, 4)->default(0);
         });
     }
 

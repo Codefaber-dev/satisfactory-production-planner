@@ -13,27 +13,28 @@ class ProductionLine extends Model
 
     protected $guarded = [];
 
-    protected $with = ['product.recipes.product','recipe.product'];
+    protected $with = ['product.recipes.product', 'recipe.product'];
 
     protected $casts = [
-        "choices" => "array"
+        'choices' => 'array',
     ];
 
     protected $appends = [
-        "hash_id"
+        'hash_id',
     ];
 
     public function getHashIdAttribute()
     {
-        return "pl_" . app('Hashids')->encode($this->id);
+        return 'pl_'.app('Hashids')->encode($this->id);
     }
 
     public function scopeOfHashId(Builder $query, $hashId)
     {
-        $id = app('Hashids')->decode((string) Str::of($hashId)->after("pl_"));
+        $id = app('Hashids')->decode((string) Str::of($hashId)->after('pl_'));
 
-        if (empty($id))
+        if (empty($id)) {
             return null;
+        }
 
         return static::find($id[0]);
     }
@@ -42,15 +43,16 @@ class ProductionLine extends Model
     {
         $description = $this->recipe->description ?? $this->product->name;
         $params = http_build_query([
-            "imports" => $this->imports,
-            "choices" => $this->choices ?? [],
+            'imports' => $this->imports,
+            'choices' => $this->choices ?? [],
         ]);
+
         return "/dashboard/{$this->product->name}/{$this->yield}/{$description}/?{$params}";
     }
 
     public function product()
     {
-        return $this->belongsTo(Ingredient::class,'ingredient_id');
+        return $this->belongsTo(Ingredient::class, 'ingredient_id');
     }
 
     public function recipe()

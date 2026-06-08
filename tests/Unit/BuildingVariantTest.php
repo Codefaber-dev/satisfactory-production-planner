@@ -19,7 +19,7 @@ class BuildingVariantTest extends TestCase
         $this->expectException(QueryException::class);
 
         BuildingVariant::factory()->create([
-            'name' => null
+            'name' => null,
         ]);
     }
 
@@ -29,7 +29,7 @@ class BuildingVariantTest extends TestCase
         $this->expectException(QueryException::class);
 
         BuildingVariant::factory()->create([
-            'name' => null
+            'name' => null,
         ]);
     }
 
@@ -39,7 +39,7 @@ class BuildingVariantTest extends TestCase
         $building = Building::factory()->create();
 
         $variant = BuildingVariant::factory()->create([
-            'building_id' => $building
+            'building_id' => $building,
         ]);
 
         $this->assertTrue($variant->building->is($building));
@@ -53,10 +53,9 @@ class BuildingVariantTest extends TestCase
 
         $variant = BuildingVariant::factory()->create();
 
-
         $variant->setRecipe([
-            [ 'ingredient' => $ingredient1->name, 'qty' => 20 ],
-            [ 'ingredient' => $ingredient2->name, 'qty' => 10 ],
+            ['ingredient' => $ingredient1->name, 'qty' => 20],
+            ['ingredient' => $ingredient2->name, 'qty' => 10],
         ]);
 
         $this->assertEquals(20, $variant->recipe()->find($ingredient1->id)->pivot->qty);

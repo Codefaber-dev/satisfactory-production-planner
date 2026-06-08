@@ -29,7 +29,7 @@ class RecipeFactory extends Factory
             'base_yield' => 1,
             'base_per_min' => 45,
             'description' => $this->faker->word(),
-            'alt_recipe' => true
+            'alt_recipe' => true,
         ];
     }
 }

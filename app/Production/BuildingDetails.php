@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class BuildingDetails extends Collection
 {
     /**
-     * @var \App\Models\Recipe
+     * @var Recipe
      */
     protected $recipe;
 
@@ -29,7 +29,7 @@ class BuildingDetails extends Collection
             ->setQty($qty)
             ->setBeltSpeed($belt_speed)
             ->setBaseClock($base_clock)
-            ->setEven(request('even',false))
+            ->setEven(request('even', false))
             ->getBuildingDetails();
     }
 
@@ -72,13 +72,13 @@ class BuildingDetails extends Collection
     {
         $this->items = $this->recipe->building->variants->map(function ($variant) {
             // calc number of buildings needed, assuming belts can handle it
-            $num_buildings = 1 * ceil($this->qty / $this->recipe->base_per_min / $variant->multiplier / ($this->base_clock/100));
+            $num_buildings = 1 * ceil($this->qty / $this->recipe->base_per_min / $variant->multiplier / ($this->base_clock / 100));
 
             // calc the clock speed for the buildings
             $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
 
             // calc shards per building
-            $shards_per_building = match(true) {
+            $shards_per_building = match (true) {
                 $clock_speed > 200 => 3,
                 $clock_speed > 150 => 2,
                 $clock_speed > 100 => 1,
@@ -86,7 +86,7 @@ class BuildingDetails extends Collection
             };
 
             // calc the max clock speed
-            $max_clock_speed = match(true) {
+            $max_clock_speed = match (true) {
                 $clock_speed > 200 => 250,
                 $clock_speed > 150 => 200,
                 $clock_speed > 100 => 150,
@@ -103,7 +103,7 @@ class BuildingDetails extends Collection
             $mj_per_s = $variant->calculatePowerUsage($clock_speed / 100);
             $s_per_min = 60;
             $mj_per_min = $mj_per_s * $s_per_min;
-            $min_per_item = 1 / ($this->recipe->base_per_min * $clock_speed/100);
+            $min_per_item = 1 / ($this->recipe->base_per_min * $clock_speed / 100);
             $energy_per_item = $mj_per_min * $min_per_item;
 
             // calc the total energy used
@@ -115,10 +115,10 @@ class BuildingDetails extends Collection
             })->collapse();
 
             // calculate the max belt load
-            $belt_load_in = $this->recipe->ingredients->reject(fn($ing) => $ing->is_liquid)
-                    ->map(function ($ingredient) use ($num_buildings,$clock_speed,$variant) {
-                        return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
-                    })->max();
+            $belt_load_in = $this->recipe->ingredients->reject(fn ($ing) => $ing->is_liquid)
+                ->map(function ($ingredient) use ($num_buildings, $clock_speed, $variant) {
+                    return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
+                })->max();
 
             // calc the number of rows needed
             $rows = (int) max(ceil($belt_load_in / $this->belt_speed), 1, ceil($this->qty / $this->belt_speed));
@@ -133,27 +133,26 @@ class BuildingDetails extends Collection
                 $rows = $input_rows;
             }
 
-
             // calc the footprint
-            //$rows = ceil($num_buildings/16); // max 16 buildings per row
-            $buildings_per_row = min($num_buildings, ceil($num_buildings/$rows) );
+            // $rows = ceil($num_buildings/16); // max 16 buildings per row
+            $buildings_per_row = min($num_buildings, ceil($num_buildings / $rows));
 
             // building delta, check if belts are too slow for nominal building count
-            $building_delta = ($rows*$buildings_per_row) - $num_buildings;
+            $building_delta = ($rows * $buildings_per_row) - $num_buildings;
 
             // force even rows
-            if($this->even || $building_delta > 1) {
-                //Log::debug("Building delta: $building_delta");
+            if ($this->even || $building_delta > 1) {
+                // Log::debug("Building delta: $building_delta");
                 $num_buildings = $rows * $buildings_per_row;
                 $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
-                $shards_per_building = match(true) {
+                $shards_per_building = match (true) {
                     $clock_speed > 200 => 3,
                     $clock_speed > 150 => 2,
                     $clock_speed > 100 => 1,
                     default => 0
                 };
                 // calc the max clock speed
-                $max_clock_speed = match(true) {
+                $max_clock_speed = match (true) {
                     $clock_speed > 200 => 250,
                     $clock_speed > 150 => 200,
                     $clock_speed > 100 => 150,
@@ -175,36 +174,36 @@ class BuildingDetails extends Collection
                 'monogram' => $this->recipe->building->name[0],
                 'belt_speed' => $this->belt_speed,
                 'belt_load' => $belt_load_in,
-                'belt_load_in' => round($belt_load_in/$rows,2),
-                'belt_load_out' => round($this->qty/$rows,2),
-                'belt_utilization_in' =>  round(100 * $belt_load_in/$rows/$this->belt_speed),
-                'belt_utilization_out' =>  round(100 * $this->qty/$rows/$this->belt_speed),
+                'belt_load_in' => round($belt_load_in / $rows, 2),
+                'belt_load_out' => round($this->qty / $rows, 2),
+                'belt_utilization_in' => round(100 * $belt_load_in / $rows / $this->belt_speed),
+                'belt_utilization_out' => round(100 * $this->qty / $rows / $this->belt_speed),
                 'rows' => $rows,
                 'num_buildings' => $num_buildings,
                 'power_shards' => $power_shards,
                 'buildings_per_row' => $buildings_per_row,
                 'building_length' => $building_length = $this->recipe->building->length,
-                'building_length_foundations' => $building_length_foundations = ceil($this->recipe->building->length/8),
+                'building_length_foundations' => $building_length_foundations = ceil($this->recipe->building->length / 8),
                 'building_width' => $building_width = $this->recipe->building->width,
                 'length_m' => $length = $rows * $this->recipe->building->length,
-                'length_foundations' => $length_foundations = ($foundation_border_y ? 2 : 0) + $rows * ($building_length_foundations+2), //ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
+                'length_foundations' => $length_foundations = ($foundation_border_y ? 2 : 0) + $rows * ($building_length_foundations + 2), // ceil($length/8) + ($rows > 1 ? (ceil(2*($rows+1.2))) : 2),
                 'width_m' => $width = $this->recipe->building->width * $buildings_per_row,
-                'width_foundations' => $width_foundations = ( ceil($width/8) + 4),
+                'width_foundations' => $width_foundations = (ceil($width / 8) + 4),
                 'height_m' => $height = $this->recipe->building->height,
-                'height_walls' => $height_walls = ceil($height/4) + 1,
+                'height_walls' => $height_walls = ceil($height / 4) + 1,
                 'foundations' => $foundations = $length_foundations * $width_foundations,
-                'walls' => $height_walls * (2*($length_foundations + $width_foundations)),
-                'row_spacing' => ($rows === 1) ? 0 : 8 * ($building_length_foundations+2) - $building_length,
-                'top_offset' => $top_offset = ceil((8 * ($building_length_foundations+2) - $building_length ) / 2 + ($foundation_border_y ? 8 : 0)),
-                'bottom_offset' => $top_offset = floor((8 * ($building_length_foundations+2) - $building_length ) / 2 + ($foundation_border_y ? 8 : 0)),
+                'walls' => $height_walls * (2 * ($length_foundations + $width_foundations)),
+                'row_spacing' => ($rows === 1) ? 0 : 8 * ($building_length_foundations + 2) - $building_length,
+                'top_offset' => $top_offset = ceil((8 * ($building_length_foundations + 2) - $building_length) / 2 + ($foundation_border_y ? 8 : 0)),
+                'bottom_offset' => $top_offset = floor((8 * ($building_length_foundations + 2) - $building_length) / 2 + ($foundation_border_y ? 8 : 0)),
                 'row_spacing_offset' => $top_offset + $building_length,
-                'left_offset' => 16 + (8*($width_foundations-4) - $building_width*$buildings_per_row)/2,
-                'building_top_offset' => $building_length%2 ? 0.5 : 0,
+                'left_offset' => 16 + (8 * ($width_foundations - 4) - $building_width * $buildings_per_row) / 2,
+                'building_top_offset' => $building_length % 2 ? 0.5 : 0,
             ];
 
             return [
                 "{$this->recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost','footprint','max_clock_speed'),
+                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed'),
             ];
         })->collapse()->all();
 

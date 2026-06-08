@@ -20,7 +20,6 @@ class UserTest extends TestCase
 
         $product = Ingredient::factory()->create();
 
-
         $default = Recipe::factory()->create(['product_id' => $product->id, 'alt_recipe' => false]);
         $recipe1 = Recipe::factory()->create(['product_id' => $product->id, 'alt_recipe' => true]);
         $recipe2 = Recipe::factory()->create(['product_id' => $product->id, 'alt_recipe' => true]);
@@ -44,7 +43,6 @@ class UserTest extends TestCase
         $this->assertNotContains($recipe2, $user->favorite_recipes);
         $this->assertTrue($product->defaultRecipe()->is($default));
     }
-
 
     /** @test */
     public function it_can_have_favorite_recipes_by_description()

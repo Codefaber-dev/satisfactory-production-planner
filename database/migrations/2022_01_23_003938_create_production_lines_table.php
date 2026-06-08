@@ -19,7 +19,7 @@ class CreateProductionLinesTable extends Migration
             $table->foreignId('ingredient_id')->constrained()->cascadeOnDelete();
             $table->foreignId('recipe_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->decimal('yield',12,4);
+            $table->decimal('yield', 12, 4);
             $table->timestamps();
         });
     }

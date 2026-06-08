@@ -31,7 +31,7 @@ return [
     ],
 
     'hashids' => [
-        'salt' => env('HASHIDS_SALT')
-    ]
+        'salt' => env('HASHIDS_SALT'),
+    ],
 
 ];

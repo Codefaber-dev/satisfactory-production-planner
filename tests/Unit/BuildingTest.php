@@ -4,10 +4,8 @@ namespace Tests\Unit;
 
 use App\Models\Building;
 use App\Models\BuildingVariant;
-use App\Models\Ingredient;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Tests\TestCase;
 
 class BuildingTest extends TestCase
@@ -20,7 +18,7 @@ class BuildingTest extends TestCase
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'name' => null
+            'name' => null,
         ]);
     }
 
@@ -30,7 +28,7 @@ class BuildingTest extends TestCase
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'inputs' => null
+            'inputs' => null,
         ]);
     }
 
@@ -40,7 +38,7 @@ class BuildingTest extends TestCase
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'outputs' => null
+            'outputs' => null,
         ]);
     }
 
@@ -50,7 +48,7 @@ class BuildingTest extends TestCase
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'height' => null
+            'height' => null,
         ]);
     }
 
@@ -60,7 +58,7 @@ class BuildingTest extends TestCase
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'width' => null
+            'width' => null,
         ]);
     }
 
@@ -70,7 +68,7 @@ class BuildingTest extends TestCase
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'length' => null
+            'length' => null,
         ]);
     }
 
@@ -85,6 +83,4 @@ class BuildingTest extends TestCase
         $this->assertTrue($building->variants()->skip(1)->first()->is($variants[1]));
         $this->assertTrue($building->variants()->skip(2)->first()->is($variants[2]));
     }
-
-
 }

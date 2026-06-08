@@ -2,7 +2,9 @@
 
 namespace App\Production;
 
-class StepCollection extends \Illuminate\Support\Collection
+use Illuminate\Support\Collection;
+
+class StepCollection extends Collection
 {
     public function getRecipe()
     {
@@ -11,7 +13,7 @@ class StepCollection extends \Illuminate\Support\Collection
             return $this->first()->getRecipe();
         }
 
-        return $this->map(fn($step) => $step->getRecipe());
+        return $this->map(fn ($step) => $step->getRecipe());
     }
 
     public function getOverrides()
@@ -21,6 +23,6 @@ class StepCollection extends \Illuminate\Support\Collection
             return $this->first()->getOverrides()->filter();
         }
 
-        return $this->map(fn($step) => $step->getOverrides()->filter())->collapse();
+        return $this->map(fn ($step) => $step->getOverrides()->filter())->collapse();
     }
 }

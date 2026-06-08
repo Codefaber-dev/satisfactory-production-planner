@@ -21,7 +21,7 @@ class ProductionLineFactory extends Factory
             'ingredient_id' => Ingredient::factory(),
             'recipe_id' => Recipe::factory(),
             'user_id' => User::factory(),
-            'yield' => $this->faker->numberBetween(100,500),
+            'yield' => $this->faker->numberBetween(100, 500),
         ];
     }
 }

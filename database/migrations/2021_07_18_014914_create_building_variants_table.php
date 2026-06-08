@@ -18,16 +18,16 @@ class CreateBuildingVariantsTable extends Migration
             $table->string('name');
             $table->foreignId('building_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('base_power');
-            $table->decimal('multiplier',10,4)->default(1);
+            $table->decimal('multiplier', 10, 4)->default(1);
             $table->timestamps();
 
-            $table->unique(['name','building_id']);
+            $table->unique(['name', 'building_id']);
         });
 
-        Schema::create('building_variant_ingredient', function(Blueprint $table) {
-           $table->foreignId('building_variant_id')->constrained()->cascadeOnDelete();
-           $table->foreignId('ingredient_id')->constrained()->cascadeOnDelete();
-           $table->unsignedInteger('qty');
+        Schema::create('building_variant_ingredient', function (Blueprint $table) {
+            $table->foreignId('building_variant_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('ingredient_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('qty');
         });
     }
 

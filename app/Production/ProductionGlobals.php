@@ -2,7 +2,6 @@
 
 namespace App\Production;
 
-
 use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
@@ -11,13 +10,19 @@ use Illuminate\Support\Collection;
 class ProductionGlobals
 {
     protected Collection $choices;
+
     protected Collection $overrides;
+
     protected Collection $favorites;
+
     protected Collection $imports;
 
     protected Collection $byproducts;
+
     protected Collection $used_byproducts;
+
     protected string $variant;
+
     protected int $belt_speed;
 
     public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts)
@@ -28,7 +33,7 @@ class ProductionGlobals
         $this->imports = collect($imports);
         $this->byproducts = collect($byproducts);
         $this->variant = $variant;
-        $this->belt_speed = request('belt_speed',780);
+        $this->belt_speed = request('belt_speed', 780);
         $this->used_byproducts = $used_byproducts;
     }
 

@@ -24,7 +24,7 @@ class IngredientFactory extends Factory
         return [
             'name' => $this->faker->unique()->name(),
             'raw' => $this->faker->boolean(),
-            'tier' => $this->faker->numberBetween(1,10),
+            'tier' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

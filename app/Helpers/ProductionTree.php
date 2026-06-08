@@ -4,10 +4,8 @@ namespace App\Helpers;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
-use Illuminate\Support\Str;
 use MJS\TopSort\CircularDependencyException;
 use MJS\TopSort\Implementations\StringSort;
-use function func_get_args;
 
 class ProductionTree
 {
@@ -51,7 +49,7 @@ class ProductionTree
 
         while ($sorted === false) {
             try {
-                $this->sorter = new StringSort();
+                $this->sorter = new StringSort;
 
                 $this->imports->each(function ($name) {
                     $this->sorter->add($name);
@@ -71,9 +69,7 @@ class ProductionTree
 
                 $this->sorted = $this->sorter->sort();
                 $sorted = true;
-            }
-            catch(CircularDependencyException $e)
-            {
+            } catch (CircularDependencyException $e) {
                 $this->circularWarning[] = $e->getMessage();
                 $this->imports->add($e->getStart());
             }
@@ -94,7 +90,7 @@ class ProductionTree
     protected function walk(Ingredient $ingredient, Recipe $recipe, $qty, $previous = [])
     {
         $previous[] = $ingredient->name;
-        $amountKey = implode("|", $previous);
+        $amountKey = implode('|', $previous);
 
         if (isset($this->amounts[$amountKey])) {
             return;
@@ -115,10 +111,9 @@ class ProductionTree
 
             if (! $ing->isRaw()) {
                 $this->walk($ing, $this->getRecipe($ing), $sub_qty, $previous);
-            }
-            else {
+            } else {
                 $previous[] = $ing->name;
-                $amountKey = implode("|", $previous);
+                $amountKey = implode('|', $previous);
                 $this->amounts[$amountKey] = $sub_qty;
             }
         });
@@ -127,14 +122,14 @@ class ProductionTree
     protected function getRecipe(Ingredient $ingredient)
     {
         $recipe = collect($this->overrides)->filter(function ($recipe) use ($ingredient) {
-                    return $recipe->product->is($ingredient);
-                })->first() ?? $ingredient->defaultRecipe();
+            return $recipe->product->is($ingredient);
+        })->first() ?? $ingredient->defaultRecipe();
 
         if (! $recipe) {
             return new Recipe;
         }
 
-        return $recipe; //->firstWhere('alt_recipe',false);
+        return $recipe; // ->firstWhere('alt_recipe',false);
     }
 
     public function getImports()

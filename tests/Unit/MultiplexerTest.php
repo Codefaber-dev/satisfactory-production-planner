@@ -2,11 +2,9 @@
 
 namespace Tests\Unit;
 
-
 use App\Production\Multiplexer;
 use App\Production\ProductionCalculator;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class MultiplexerTest extends TestCase
 {
@@ -14,8 +12,8 @@ class MultiplexerTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('database.default','mysql');
-        config()->set('database.connections.mysql.database','satis_pp');
+        config()->set('database.default', 'mysql');
+        config()->set('database.connections.mysql.database', 'satis_pp');
     }
 
     public function it_()

@@ -4,8 +4,8 @@ namespace Tests\Unit;
 
 use App\Models\ProductionLine;
 use Illuminate\Database\QueryException;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ProductionLineTest extends TestCase
 {

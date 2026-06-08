@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class BuildingOverview
 {
     /**
-     * @var \App\Models\Recipe
+     * @var Recipe
      */
     protected $recipe;
 
@@ -25,7 +25,7 @@ class BuildingOverview
 
     public $selected_variant;
 
-    public function __construct(Recipe $recipe, $qty, $belt_speed, $variant = "mk1", $clock_speed = 100)
+    public function __construct(Recipe $recipe, $qty, $belt_speed, $variant = 'mk1', $clock_speed = 100)
     {
         if (! $qty) {
             // qty is 0, so skip it
@@ -43,11 +43,11 @@ class BuildingOverview
             return [$building => "[x{$details['num_buildings']} {$details['clock_speed']}%] [{$details['power_usage']} MW]"];
         })->collapse();
 
-        $this->selected_variant = $this->details->keys()->filter(fn($key) => Str::of($key)->contains($variant))->first()
+        $this->selected_variant = $this->details->keys()->filter(fn ($key) => Str::of($key)->contains($variant))->first()
          ?? $this->details->keys()->first();
     }
 
-    public static function make(Recipe $recipe, $qty, $belt_speed, $variant = "mk1", $clock_speed = 100): static
+    public static function make(Recipe $recipe, $qty, $belt_speed, $variant = 'mk1', $clock_speed = 100): static
     {
         return new static($recipe, $qty, $belt_speed, $variant, $clock_speed);
     }
@@ -55,15 +55,13 @@ class BuildingOverview
     public function toArray(): array
     {
         return [
-            "qty" => $this->qty,
-            "details" => $this->details->all(),
-            "overview" => $this->overview->all(),
-            "selected_variant" => $this->details[$this->selected_variant],
-            "selected_variant_name" => $this->selected_variant,
-            "product" => $this->recipe->product->name,
-            "recipe" => $this->recipe->description ?? $this->recipe->product->name,
+            'qty' => $this->qty,
+            'details' => $this->details->all(),
+            'overview' => $this->overview->all(),
+            'selected_variant' => $this->details[$this->selected_variant],
+            'selected_variant_name' => $this->selected_variant,
+            'product' => $this->recipe->product->name,
+            'recipe' => $this->recipe->description ?? $this->recipe->product->name,
         ];
     }
-
-
 }

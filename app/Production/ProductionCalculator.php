@@ -2,7 +2,6 @@
 
 namespace App\Production;
 
-use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
@@ -40,17 +39,17 @@ class ProductionCalculator
     protected $raw_available;
 
     public static function make(
-        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = "mk1", $choices = [], $byproducts = []
+        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = 'mk1', $choices = [], $byproducts = []
     ): static {
 
         // add request vars to cache key
         $requestVars = request()->all();
 
-        $cacheKey = "production_calc_ "
-            . md5(collect(compact('product','qty','recipe','overrides','favorites','imports','variant','choices','byproducts'))->toJson())
-            . md5(collect($requestVars)->toJson());
+        $cacheKey = 'production_calc_ '
+            .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'favorites', 'imports', 'variant', 'choices', 'byproducts'))->toJson())
+            .md5(collect($requestVars)->toJson());
 
-        return Cache::rememberForever($cacheKey, function() use ($product,$qty,$recipe,$overrides,$favorites,$imports,$variant,$choices,$byproducts) {
+        return Cache::rememberForever($cacheKey, function () use ($product, $qty, $recipe, $overrides, $favorites, $imports, $variant, $choices, $byproducts) {
             $production = (new static)->setProduct($product)
                 ->setQty($qty)
                 ->setRecipe($recipe)
@@ -70,8 +69,7 @@ class ProductionCalculator
 
             // if production byproducts can be utilized then calculate again
 
-            if ($production->hasUsableByproducts())
-            {
+            if ($production->hasUsableByproducts()) {
                 // do it three times for good measure
                 $production->recalculateUsingByproducts();
                 $production->recalculateUsingByproducts();
@@ -109,8 +107,7 @@ class ProductionCalculator
 
         if ($recipe) {
             $this->recipe = r($recipe);
-        }
-        else {
+        } else {
             $this->recipe = $this->product->baseRecipe();
         }
 
@@ -242,12 +239,12 @@ class ProductionCalculator
 
         return $this->getResults()
             ->skip(1)
-            ->map(fn($tier) => $tier->map(fn($product) => collect($product->production)->values())->values())
+            ->map(fn ($tier) => $tier->map(fn ($product) => collect($product->production)->values())->values())
             ->values()
             ->collapse()
             ->collapse()
             ->pluck('total_energy')
-            ->map(fn($details) => collect($details)->values()->all())
+            ->map(fn ($details) => collect($details)->values()->all())
             ->crossSum()[$variant];
     }
 
@@ -263,25 +260,26 @@ class ProductionCalculator
 
         return $this->getResults()
             ->skip(1)
-            ->map(fn($tier) => $tier->map(fn($product) => collect($product->production)->values())->values())
+            ->map(fn ($tier) => $tier->map(fn ($product) => collect($product->production)->values())->values())
             ->values()
             ->collapse()
             ->collapse()
             ->pluck('power_usage')
-            ->map(fn($details) => collect($details)->values()->all())
+            ->map(fn ($details) => collect($details)->values()->all())
             ->crossSum()[$variant];
     }
 
     public function getEnergy($variant = 0): int
     {
-        return (int) ( 60 * $this->getPowerUsage($variant) / $this->qty );
+        return (int) (60 * $this->getPowerUsage($variant) / $this->qty);
     }
 
     public static function parseRaw($raw): array
     {
-        return collect(explode(",",$raw))
-            ->map(function($pair) {
-                [$key,$value] = explode(":",$pair);
+        return collect(explode(',', $raw))
+            ->map(function ($pair) {
+                [$key,$value] = explode(':', $pair);
+
                 return [$key => (int) $value];
             })
             ->collapse()
@@ -296,11 +294,12 @@ class ProductionCalculator
     protected function ratioOfAvailableRawMaterials(): float
     {
         return $this->getRawMaterials()
-            ->map(function($required, $key) {
-               if (isset($this->raw_available[$key]) && $available = $this->raw_available[$key]) {
-                   return $available/$required;
-               }
-               return null;
+            ->map(function ($required, $key) {
+                if (isset($this->raw_available[$key]) && $available = $this->raw_available[$key]) {
+                    return $available / $required;
+                }
+
+                return null;
             })
             ->filter()
             ->min() ?? 1;
@@ -308,15 +307,15 @@ class ProductionCalculator
 
     public function getByproductsUsed(): Collection
     {
-        return $this->results->flatMap(function($tier) {
-            return $tier->map(function($production, $name) {
-               return $production->byproduct_outputs;
+        return $this->results->flatMap(function ($tier) {
+            return $tier->map(function ($production, $name) {
+                return $production->byproduct_outputs;
             });
         })->filter();
     }
 
-    //public function getRawByproductsUsed()
-    //{
+    // public function getRawByproductsUsed()
+    // {
     //    return collect($this->getByproducts())
     //
     //        ->filter(function($qty, $ingredient){
@@ -325,5 +324,5 @@ class ProductionCalculator
     //        ->filter(function($qty, $ingredient){
     //            return $this->getRawMaterials()->has($ingredient);
     //        });
-    //}
+    // }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Exception;
 use Hashids\Hashids;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
@@ -16,8 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        app()->singleton('Hashids', function() {
-            return new Hashids(config('services.hashids.salt'),12);
+        app()->singleton('Hashids', function () {
+            return new Hashids(config('services.hashids.salt'), 12);
         });
     }
 
@@ -45,9 +44,9 @@ class AppServiceProvider extends ServiceProvider
             $ret = collect($this->reduce(function ($a, $b) {
                 $ret = [];
 
-                if(is_array($b)) {
+                if (is_array($b)) {
                     foreach ($b as $key => $val) {
-                        if(!is_null($val) || $a[$key]) {
+                        if (! is_null($val) || $a[$key]) {
                             $ret[$key] = $val + ($a[$key] ?? 0);
                         }
                     }
@@ -60,24 +59,25 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Collection::macro('crossSumByKey', function ($target) {
-            if ( ! $this->filter(fn($row) => isset($row[$target]) && !! $row[$target])->count() ) {
+            if (! $this->filter(fn ($row) => isset($row[$target]) && (bool) $row[$target])->count()) {
                 return 0;
             }
 
-            return $this->filter(fn($row) => isset($row[$target]) && !! $row[$target])->pluck($target)->crossSum();
+            return $this->filter(fn ($row) => isset($row[$target]) && (bool) $row[$target])->pluck($target)->crossSum();
         });
 
-        Collection::macro('sumByKey', function(){
-            return $this->reduce(function($curr, $acc){
-                foreach($curr as $key => $value) {
+        Collection::macro('sumByKey', function () {
+            return $this->reduce(function ($curr, $acc) {
+                foreach ($curr as $key => $value) {
                     $acc[$key] = isset($acc[$key]) ? $acc[$key] + $value : $value;
                 }
+
                 return $acc;
             }, []);
         });
 
         Collection::macro('dataGet', function ($key) {
-            return data_get($this,$key);
+            return data_get($this, $key);
         });
     }
 }

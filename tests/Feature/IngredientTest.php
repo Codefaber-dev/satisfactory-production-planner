@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Ingredient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class IngredientTest extends TestCase
@@ -31,7 +30,7 @@ class IngredientTest extends TestCase
 
         $response = $this
             ->actingAsUser()
-            ->get(route('ingredients.show',$ingredients->first()));
+            ->get(route('ingredients.show', $ingredients->first()));
 
         $response
             ->assertJsonFragment(['name' => $ingredients->first()->name]);
@@ -48,7 +47,7 @@ class IngredientTest extends TestCase
 
         $response->assertCreated();
 
-        $this->assertDatabaseHas('ingredients',$atts);
+        $this->assertDatabaseHas('ingredients', $atts);
     }
 
     /** @test */
@@ -59,16 +58,16 @@ class IngredientTest extends TestCase
         $newAtts = [
             'name' => 'New Name',
             'raw' => false,
-            'tier' => 6
+            'tier' => 6,
         ];
 
         $response = $this
             ->actingAsUser()
-            ->patch(route('ingredients.update',$ingredient), $newAtts);
+            ->patch(route('ingredients.update', $ingredient), $newAtts);
 
         $response->assertStatus(202);
 
-        $this->assertDatabaseHas('ingredients',$newAtts);
+        $this->assertDatabaseHas('ingredients', $newAtts);
     }
 
     /** @test */
@@ -78,7 +77,7 @@ class IngredientTest extends TestCase
 
         $response = $this
             ->actingAsUser()
-            ->delete(route('ingredients.destroy',$ingredient));
+            ->delete(route('ingredients.destroy', $ingredient));
 
         $response->assertStatus(202);
 

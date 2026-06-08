@@ -18,7 +18,7 @@ class IngredientTest extends TestCase
         $this->expectException(QueryException::class);
 
         Ingredient::factory()->create([
-            'name' => null
+            'name' => null,
         ]);
     }
 
@@ -28,11 +28,11 @@ class IngredientTest extends TestCase
         $this->expectException(QueryException::class);
 
         Ingredient::factory()->create([
-            'name' => 'Some Name'
+            'name' => 'Some Name',
         ]);
 
         Ingredient::factory()->create([
-            'name' => 'Some Name'
+            'name' => 'Some Name',
         ]);
     }
 
@@ -40,13 +40,13 @@ class IngredientTest extends TestCase
     public function it_can_be_raw()
     {
         $in1 = Ingredient::factory()->create([
-            'raw' => true
+            'raw' => true,
         ]);
 
         $this->assertTrue($in1->isRaw());
 
         $in2 = Ingredient::factory()->create([
-            'raw' => false
+            'raw' => false,
         ]);
 
         $this->assertFalse($in2->isRaw());
@@ -56,7 +56,7 @@ class IngredientTest extends TestCase
     public function it_can_have_a_tier()
     {
         $in = Ingredient::factory()->create([
-            'tier' => 4
+            'tier' => 4,
         ]);
 
         $in->refresh();
@@ -70,7 +70,7 @@ class IngredientTest extends TestCase
         $in = Ingredient::factory()->create();
 
         $recipe2 = Recipe::factory()->count(3)->create([
-            'product_id' => $in
+            'product_id' => $in,
         ]);
 
         $this->assertCount(3, $in->recipes);

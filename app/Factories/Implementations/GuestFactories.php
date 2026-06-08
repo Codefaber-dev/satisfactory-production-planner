@@ -8,18 +8,18 @@ use App\Models\ProductionLine;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+
 use function guest_token;
 use function http_build_query;
 
 class GuestFactories implements FactoriesContract
 {
-
     public function all(): Collection
     {
         return collect(Redis::hGetAll($this->getCacheTag()))
             ->values()
-            ->map(function($json){
-                $atts = json_decode($json,true);
+            ->map(function ($json) {
+                $atts = json_decode($json, true);
                 $product = Ingredient::find($atts['ingredient_id']);
                 if (! isset($atts['recipe'])) {
                     $atts['recipe'] = $product->baseRecipe();
@@ -29,11 +29,12 @@ class GuestFactories implements FactoriesContract
                 }
                 $description = $atts['recipe']->description ?? $product->name;
                 $params = http_build_query([
-                    "factory" => $atts["id"],
-                    "imports" => $atts["imports"],
-                    "choices" => $atts["choices"] ?? []
+                    'factory' => $atts['id'],
+                    'imports' => $atts['imports'],
+                    'choices' => $atts['choices'] ?? [],
                 ]);
                 $atts['url'] = "/dashboard/{$product->name}/{$atts['yield']}/{$description}/?{$params}";
+
                 return $atts;
             });
     }
@@ -55,14 +56,13 @@ class GuestFactories implements FactoriesContract
     {
         $line = new ProductionLine($this->find($id));
 
-        $line->name = (isset($attributes['name']) && !! $attributes['name']) ? $attributes['name'] : $line->name;
-        $line->ingredient_id = (isset($attributes['ingredient_id']) && !! $attributes['ingredient_id']) ? $attributes['ingredient_id'] : $line->ingredient_id;
-        $line->recipe_id = (isset($attributes['recipe_id']) && !! $attributes['recipe_id']) ? $attributes['recipe_id'] : $line->recipe_id;
-        $line->yield = (isset($attributes['yield']) && !! $attributes['yield']) ? $attributes['yield'] : $line->yield;
+        $line->name = (isset($attributes['name']) && (bool) $attributes['name']) ? $attributes['name'] : $line->name;
+        $line->ingredient_id = (isset($attributes['ingredient_id']) && (bool) $attributes['ingredient_id']) ? $attributes['ingredient_id'] : $line->ingredient_id;
+        $line->recipe_id = (isset($attributes['recipe_id']) && (bool) $attributes['recipe_id']) ? $attributes['recipe_id'] : $line->recipe_id;
+        $line->yield = (isset($attributes['yield']) && (bool) $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
         $line->is_shared = (isset($attributes['is_shared'])) ? $attributes['is_shared'] : $line->is_shared;
-
 
         $line->recipe_id ??= Ingredient::find($line->ingredient_id)->baseRecipe()->id;
 
@@ -73,15 +73,16 @@ class GuestFactories implements FactoriesContract
 
     public function find($id): ProductionLine|array|null
     {
-        if ( ! $atts = $this->get($id))
+        if (! $atts = $this->get($id)) {
             return null;
+        }
 
         return json_decode($atts, true);
     }
 
     protected function get($id)
     {
-        if(! $raw = Redis::hGet($this->getCacheTag(), "factories.$id")) {
+        if (! $raw = Redis::hGet($this->getCacheTag(), "factories.$id")) {
             return null;
         }
 
@@ -90,7 +91,7 @@ class GuestFactories implements FactoriesContract
 
     protected function set($id, ProductionLine $line): void
     {
-        $arr = array_merge($line->load('product.recipes.product','recipe.product')->toArray(), compact('id'));
+        $arr = array_merge($line->load('product.recipes.product', 'recipe.product')->toArray(), compact('id'));
         Redis::hSet($this->getCacheTag(), "factories.{$id}", json_encode($arr));
     }
 
@@ -99,7 +100,7 @@ class GuestFactories implements FactoriesContract
         Redis::hDel($this->getCacheTag(), "factories.{$id}");
     }
 
-    protected function getCacheTag() : string
+    protected function getCacheTag(): string
     {
         $guestToken = guest_token();
 
@@ -110,6 +111,4 @@ class GuestFactories implements FactoriesContract
     {
         $this->unset($id);
     }
-
-
 }

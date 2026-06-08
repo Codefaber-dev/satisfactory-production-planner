@@ -4,16 +4,16 @@ namespace App\Helpers;
 
 use App\Enums\Ingredient as IngredientEnum;
 use App\Enums\Recipe as RecipeEnum;
+use App\Models\Building;
 use App\Models\Ingredient;
 use App\Models\Recipe;
-use App\Models\Building;
 use InvalidArgumentException;
 
-class UpdateSix {
-
+class UpdateSix
+{
     public static function update()
     {
-        echo "<pre>";
+        echo '<pre>';
         // cleanup deprecated stuff
         static::cleanup();
         echo "Finished cleaning deprecated stuff \n";
@@ -33,23 +33,23 @@ class UpdateSix {
             'Polyester Fabric',
             'Black Powder',
             'Nobelisk',
-            'Crystal Computer'
+            'Crystal Computer',
         ];
 
         $ingredients = [
             'Alien Carapace',
             'Alien Remains',
             'Rifle Cartridge',
-            'Spiked Rebar'
+            'Spiked Rebar',
         ];
 
         // delete deprecated ingredients
-        collect($ingredients)->each(function($ing) {
-            Ingredient::where('name',$ing)->delete();
+        collect($ingredients)->each(function ($ing) {
+            Ingredient::where('name', $ing)->delete();
         });
 
         // delete deprecated recipes
-        collect($recipes)->each(function($recipe) {
+        collect($recipes)->each(function ($recipe) {
             optional(r($recipe))->delete();
             forgetRecipe($recipe);
         });
@@ -65,7 +65,7 @@ class UpdateSix {
             'Hog Remains', // i
             'Plasma Spitter Remains', // i
             'Hatcher Remains', // i
-            'Stinger Remains' // i
+            'Stinger Remains', // i
         ];
 
         $tier2 = [
@@ -92,26 +92,25 @@ class UpdateSix {
 
         $tier6 = [
             'Rifle Ammo', // image, r
-            'Turbo Rifle Ammo', //image, r
-            'Homing Rifle Ammo' // image, r
+            'Turbo Rifle Ammo', // image, r
+            'Homing Rifle Ammo', // image, r
         ];
-
 
         // seed the ingredients
         collect($tier1)
-            ->each(function($name) {
+            ->each(function ($name) {
                 if (! Ingredient::whereName($name)->exists()) {
                     echo "Creating Ingredient $name \n";
                     Ingredient::forceCreate(['name' => $name, 'raw' => true, 'tier' => 1]);
                 }
             });
 
-        collect(range(2,6))
-            ->each(function($num) use ($tier2,$tier3,$tier4,$tier5,$tier6) {
+        collect(range(2, 6))
+            ->each(function ($num) use ($tier2, $tier3, $tier4, $tier5, $tier6) {
                 $tier = "tier{$num}";
                 collect($$tier)
-                    ->each(function($name) use ($num) {
-                        if (!Ingredient::whereName($name)->exists()) {
+                    ->each(function ($name) use ($num) {
+                        if (! Ingredient::whereName($name)->exists()) {
                             echo "Creating Ingredient $name \n";
                             Ingredient::forceCreate(['name' => $name, 'raw' => false, 'tier' => $num]);
                         }
@@ -122,307 +121,307 @@ class UpdateSix {
     protected static function recipes()
     {
         $recipes = [
-            "Constructor" => [
-                "Alien Protein" => [
+            'Constructor' => [
+                'Alien Protein' => [
                     [
-                        "description" => "Hog Protein",
-                        "base_yield" => 1,
-                        "base_per_min" => 20,
-                        "ingredients" => [
-                            "Hog Remains" => 20,
+                        'description' => 'Hog Protein',
+                        'base_yield' => 1,
+                        'base_per_min' => 20,
+                        'ingredients' => [
+                            'Hog Remains' => 20,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                     [
-                        "description" => "Spitter Protein",
-                        "base_yield" => 1,
-                        "base_per_min" => 20,
-                        "ingredients" => [
-                            "Plasma Spitter Remains" => 20,
+                        'description' => 'Spitter Protein',
+                        'base_yield' => 1,
+                        'base_per_min' => 20,
+                        'ingredients' => [
+                            'Plasma Spitter Remains' => 20,
                         ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                     [
-                        "description" => "Hatcher Protein",
-                        "base_yield" => 1,
-                        "base_per_min" => 20,
-                        "ingredients" => [
-                            "Hatcher Remains" => 20,
+                        'description' => 'Hatcher Protein',
+                        'base_yield' => 1,
+                        'base_per_min' => 20,
+                        'ingredients' => [
+                            'Hatcher Remains' => 20,
                         ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                     [
-                        "description" => "Stinger Protein",
-                        "base_yield" => 1,
-                        "base_per_min" => 20,
-                        "ingredients" => [
-                            "Stinger Remains" => 20,
+                        'description' => 'Stinger Protein',
+                        'base_yield' => 1,
+                        'base_per_min' => 20,
+                        'ingredients' => [
+                            'Stinger Remains' => 20,
                         ],
-                        "alt_recipe" => true,
-                    ],
-                ],
-                "Biomass" => [
-                    [
-                        "description" => "Biomass (Alien Protein)",
-                        "base_yield" => 100,
-                        "base_per_min" => 1500,
-                        "ingredients" => [
-                            "Alien Protein" => 15,
-                        ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                 ],
-                "Organic Data Capsule" => [
+                'Biomass' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 10,
-                        "ingredients" => [
-                            "Alien Protein" => 10,
+                        'description' => 'Biomass (Alien Protein)',
+                        'base_yield' => 100,
+                        'base_per_min' => 1500,
+                        'ingredients' => [
+                            'Alien Protein' => 15,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => true,
                     ],
                 ],
-                "Iron Rebar" => [
+                'Organic Data Capsule' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 15,
-                        "ingredients" => [
-                            "Iron Rod" => 15,
+                        'base_yield' => 1,
+                        'base_per_min' => 10,
+                        'ingredients' => [
+                            'Alien Protein' => 10,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
-                ]
+                ],
+                'Iron Rebar' => [
+                    [
+                        'base_yield' => 1,
+                        'base_per_min' => 15,
+                        'ingredients' => [
+                            'Iron Rod' => 15,
+                        ],
+                        'alt_recipe' => false,
+                    ],
+                ],
             ],
-            "Assembler" => [
+            'Assembler' => [
                 // update
                 IngredientEnum::CIRCUIT_BOARD->value => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 7.5,
-                        "ingredients" => [
+                        'base_yield' => 1,
+                        'base_per_min' => 7.5,
+                        'ingredients' => [
                             IngredientEnum::COPPER_SHEET->value => 15,
                             IngredientEnum::PLASTIC->value => 30,
                         ],
                     ],
                     [
-                        "description" => RecipeEnum::CATERIUM_CIRCUIT_BOARD->value,
-                        "base_yield" => 7,
-                        "base_per_min" => 8.75,
-                        "ingredients" => [
+                        'description' => RecipeEnum::CATERIUM_CIRCUIT_BOARD->value,
+                        'base_yield' => 7,
+                        'base_per_min' => 8.75,
+                        'ingredients' => [
                             IngredientEnum::QUICKWIRE->value => 37.5,
                             IngredientEnum::PLASTIC->value => 12.5,
                         ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                     [
-                        "description" => RecipeEnum::ELECTRODE_CIRCUIT_BOARD->value,
-                        "base_yield" => 1,
-                        "base_per_min" => 5,
-                        "ingredients" => [
+                        'description' => RecipeEnum::ELECTRODE_CIRCUIT_BOARD->value,
+                        'base_yield' => 1,
+                        'base_per_min' => 5,
+                        'ingredients' => [
                             IngredientEnum::RUBBER->value => 20,
                             IngredientEnum::PETROLEUM_COKE->value => 40,
                         ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                     [
-                        "description" => RecipeEnum::SILICON_CIRCUIT_BOARD->value,
-                        "base_yield" => 5,
-                        "base_per_min" => 12.5,
-                        "ingredients" => [
+                        'description' => RecipeEnum::SILICON_CIRCUIT_BOARD->value,
+                        'base_yield' => 5,
+                        'base_per_min' => 12.5,
+                        'ingredients' => [
                             IngredientEnum::COPPER_SHEET->value => 27.5,
                             IngredientEnum::SILICA->value => 27.5,
                         ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                 ],
-                "Black Powder" => [
+                'Black Powder' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 30,
-                        "ingredients" => [
-                            "Coal" => 15,
-                            "Sulfur" => 15,
+                        'base_yield' => 1,
+                        'base_per_min' => 30,
+                        'ingredients' => [
+                            'Coal' => 15,
+                            'Sulfur' => 15,
                         ],
                     ],
                 ],
-                "Cluster Nobelisk" => [
+                'Cluster Nobelisk' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 2.5,
-                        "ingredients" => [
-                            "Nobelisk" => 7.5,
-                            "Smokeless Powder" => 10,
+                        'base_yield' => 1,
+                        'base_per_min' => 2.5,
+                        'ingredients' => [
+                            'Nobelisk' => 7.5,
+                            'Smokeless Powder' => 10,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Computer" => [
+                'Computer' => [
                     [
-                        "description" => "Crystal Computer",
-                        "base_yield" => 3,
-                        "base_per_min" => 2.8125,
-                        "ingredients" => [
-                            "Circuit Board" => 7.5,
-                            "Crystal Oscillator" => 2.8125,
+                        'description' => 'Crystal Computer',
+                        'base_yield' => 3,
+                        'base_per_min' => 2.8125,
+                        'ingredients' => [
+                            'Circuit Board' => 7.5,
+                            'Crystal Oscillator' => 2.8125,
                         ],
-                        "alt_recipe" => true,
+                        'alt_recipe' => true,
                     ],
                 ],
-                "Gas Nobelisk" => [
+                'Gas Nobelisk' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 5,
-                        "ingredients" => [
-                            "Nobelisk" => 5,
-                            "Biomass" => 50,
+                        'base_yield' => 1,
+                        'base_per_min' => 5,
+                        'ingredients' => [
+                            'Nobelisk' => 5,
+                            'Biomass' => 50,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Pulse Nobelisk" => [
+                'Pulse Nobelisk' => [
                     [
-                        "base_yield" => 5,
-                        "base_per_min" => 5,
-                        "ingredients" => [
-                            "Nobelisk" => 5,
-                            "Crystal Oscillator" => 1,
+                        'base_yield' => 5,
+                        'base_per_min' => 5,
+                        'ingredients' => [
+                            'Nobelisk' => 5,
+                            'Crystal Oscillator' => 1,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Rifle Ammo" => [
+                'Rifle Ammo' => [
                     [
-                        "base_yield" => 15,
-                        "base_per_min" => 75,
-                        "ingredients" => [
-                            "Copper Sheet" => 15,
-                            "Smokeless Powder" => 10,
+                        'base_yield' => 15,
+                        'base_per_min' => 75,
+                        'ingredients' => [
+                            'Copper Sheet' => 15,
+                            'Smokeless Powder' => 10,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Stun Rebar" => [
+                'Stun Rebar' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 10,
-                        "ingredients" => [
-                            "Iron Rebar" => 10,
-                            "Quickwire" => 50,
+                        'base_yield' => 1,
+                        'base_per_min' => 10,
+                        'ingredients' => [
+                            'Iron Rebar' => 10,
+                            'Quickwire' => 50,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Shatter Rebar" => [
+                'Shatter Rebar' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 5,
-                        "ingredients" => [
-                            "Iron Rebar" => 20,
-                            "Quartz Crystal" => 30,
+                        'base_yield' => 1,
+                        'base_per_min' => 5,
+                        'ingredients' => [
+                            'Iron Rebar' => 20,
+                            'Quartz Crystal' => 30,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Homing Rifle Ammo" => [
+                'Homing Rifle Ammo' => [
                     [
-                        "base_yield" => 10,
-                        "base_per_min" => 25,
-                        "ingredients" => [
-                            "Rifle Ammo" => 50,
-                            "High-Speed Connector" => 2.5,
+                        'base_yield' => 10,
+                        'base_per_min' => 25,
+                        'ingredients' => [
+                            'Rifle Ammo' => 50,
+                            'High-Speed Connector' => 2.5,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-                "Nobelisk" => [
+                'Nobelisk' => [
                     [
-                        "base_yield" => 1,
-                        "base_per_min" => 10,
-                        "ingredients" => [
-                            "Black Powder" => 20,
-                            "Steel Pipe" => 20,
+                        'base_yield' => 1,
+                        'base_per_min' => 10,
+                        'ingredients' => [
+                            'Black Powder' => 20,
+                            'Steel Pipe' => 20,
                         ],
-                    ],
-                ]
-            ],
-            "Refinery" => [
-                "Smokeless Powder" => [
-                    [
-                        "base_yield" => 2,
-                        "base_per_min" => 20,
-                        "ingredients" => [
-                            "Black Powder" => 20,
-                            "Heavy Oil Residue" => 10,
-                        ],
-                        "alt_recipe" => false,
-                    ],
-                ],
-                "Fabric" => [
-                    [
-                        "description" => "Polyester Fabric",
-                        "base_yield" => 1,
-                        "base_per_min" => 30,
-                        "ingredients" => [
-                            "Polymer Resin" => 30,
-                            "Water" => 30,
-                        ],
-                        "alt_recipe" => true,
-                    ]
-                ],
-            ],
-            "Manufacturer" => [
-                "Explosive Rebar" => [
-                    [
-                        "base_yield" => 1,
-                        "base_per_min" => 10,
-                        "ingredients" => [
-                            "Iron Rebar" => 20,
-                            "Smokeless Powder" => 20,
-                            "Steel Pipe" => 20
-                        ],
-                        "alt_recipe" => false,
-                    ],
-                ],
-                "Nuke Nobelisk" => [
-                    [
-                        "base_yield" => 1,
-                        "base_per_min" => 0.5,
-                        "ingredients" => [
-                            "Encased Uranium Cell" => 10,
-                            "Nobelisk" => 2.5,
-                            "Smokeless Powder" => 5,
-                            "AI Limiter" => 3
-                        ],
-                        "alt_recipe" => false,
-                    ],
-                ],
-                "Turbo Rifle Ammo" => [
-                    [
-                        "base_yield" => 50,
-                        "base_per_min" => 250,
-                        "ingredients" => [
-                            "Rifle Ammo" => 125,
-                            "Aluminum Casing" => 15,
-                            "Packaged Turbofuel" => 15,
-                        ],
-                        "alt_recipe" => false,
                     ],
                 ],
             ],
-            "Blender" => [
-                "Turbo Rifle Ammo" => [
+            'Refinery' => [
+                'Smokeless Powder' => [
                     [
-                        "base_yield" => 50,
-                        "base_per_min" => 250,
-                        "ingredients" => [
-                            "Rifle Ammo" => 125,
-                            "Aluminum Casing" => 15,
-                            "Turbofuel" => 15,
+                        'base_yield' => 2,
+                        'base_per_min' => 20,
+                        'ingredients' => [
+                            'Black Powder' => 20,
+                            'Heavy Oil Residue' => 10,
                         ],
-                        "alt_recipe" => false,
+                        'alt_recipe' => false,
                     ],
                 ],
-            ]
+                'Fabric' => [
+                    [
+                        'description' => 'Polyester Fabric',
+                        'base_yield' => 1,
+                        'base_per_min' => 30,
+                        'ingredients' => [
+                            'Polymer Resin' => 30,
+                            'Water' => 30,
+                        ],
+                        'alt_recipe' => true,
+                    ],
+                ],
+            ],
+            'Manufacturer' => [
+                'Explosive Rebar' => [
+                    [
+                        'base_yield' => 1,
+                        'base_per_min' => 10,
+                        'ingredients' => [
+                            'Iron Rebar' => 20,
+                            'Smokeless Powder' => 20,
+                            'Steel Pipe' => 20,
+                        ],
+                        'alt_recipe' => false,
+                    ],
+                ],
+                'Nuke Nobelisk' => [
+                    [
+                        'base_yield' => 1,
+                        'base_per_min' => 0.5,
+                        'ingredients' => [
+                            'Encased Uranium Cell' => 10,
+                            'Nobelisk' => 2.5,
+                            'Smokeless Powder' => 5,
+                            'AI Limiter' => 3,
+                        ],
+                        'alt_recipe' => false,
+                    ],
+                ],
+                'Turbo Rifle Ammo' => [
+                    [
+                        'base_yield' => 50,
+                        'base_per_min' => 250,
+                        'ingredients' => [
+                            'Rifle Ammo' => 125,
+                            'Aluminum Casing' => 15,
+                            'Packaged Turbofuel' => 15,
+                        ],
+                        'alt_recipe' => false,
+                    ],
+                ],
+            ],
+            'Blender' => [
+                'Turbo Rifle Ammo' => [
+                    [
+                        'base_yield' => 50,
+                        'base_per_min' => 250,
+                        'ingredients' => [
+                            'Rifle Ammo' => 125,
+                            'Aluminum Casing' => 15,
+                            'Turbofuel' => 15,
+                        ],
+                        'alt_recipe' => false,
+                    ],
+                ],
+            ],
         ];
 
         collect($recipes)->each(function ($products, $building_name) {
@@ -433,12 +432,11 @@ class UpdateSix {
 
                 $product = Ingredient::ofName($product_name);
 
-
                 // wrap the recipes if needed
                 $recipes = isset($recipes[0]) ? $recipes : [$recipes];
 
                 foreach ($recipes as $recipe) {
-                    $description = $recipe["description"] ?? $product_name;
+                    $description = $recipe['description'] ?? $product_name;
                     echo "Processing Recipe: $description \n";
 
                     $atts = [
@@ -459,14 +457,14 @@ class UpdateSix {
 
                         $ingredient = Ingredient::ofName($name);
 
-                        if (!$ingredient) {
+                        if (! $ingredient) {
                             throw new InvalidArgumentException("Could not find ingredient {$name}");
                         }
 
                         $recipe_model->addIngredient($ingredient, $qty);
                     });
 
-                    if ( isset($recipe['byproducts']))
+                    if (isset($recipe['byproducts'])) {
                         collect($recipe['byproducts'])->each(function ($qty, $name) use ($recipe_model) {
 
                             $ingredient = Ingredient::ofName($name);
@@ -477,6 +475,7 @@ class UpdateSix {
 
                             $recipe_model->addByproduct($ingredient, $qty);
                         });
+                    }
 
                 }
             });

@@ -2,10 +2,9 @@
 
 namespace App\MultiFactories\Implementations;
 
-use App\MultiFactories\Contracts\MultiFactoriesContract;
-use App\Models\Ingredient;
 use App\Models\MultiProductionLine;
 use App\Models\User;
+use App\MultiFactories\Contracts\MultiFactoriesContract;
 use Illuminate\Support\Collection;
 
 class UserMultiFactories implements MultiFactoriesContract
@@ -19,15 +18,15 @@ class UserMultiFactories implements MultiFactoriesContract
 
     public function all(): Collection
     {
-        return $this->user->multiFactories->map(function($mf) {
+        return $this->user->multiFactories->map(function ($mf) {
             $atts = $mf->toArray();
             $outputs = collect($atts['outputs']);
-            $product = $outputs->map(fn($output) => $output['product']['name'])->all();
-            $yield = $outputs->map(fn($output) => $output['yield'])->all();
-            $recipe = $outputs->map(fn($output) => $output['recipe']['description'] ?? $output['product']['name'])->all();
+            $product = $outputs->map(fn ($output) => $output['product']['name'])->all();
+            $yield = $outputs->map(fn ($output) => $output['yield'])->all();
+            $recipe = $outputs->map(fn ($output) => $output['recipe']['description'] ?? $output['product']['name'])->all();
             $choices = $atts['choices'] ?? [];
 
-            $atts["url"] = "/dashboard/multi?multiFactory={$atts['id']}&imports={$atts['imports']}&variant=mk1&" . http_build_query(compact('product','yield','recipe','choices'));
+            $atts['url'] = "/dashboard/multi?multiFactory={$atts['id']}&imports={$atts['imports']}&variant=mk1&".http_build_query(compact('product', 'yield', 'recipe', 'choices'));
 
             return $atts;
         });
@@ -46,8 +45,8 @@ class UserMultiFactories implements MultiFactoriesContract
             return new MultiProductionLine;
         }
 
-        $line->name = (isset($attributes['name']) && !! $attributes['name']) ? $attributes['name'] : $line->name;
-        $line->outputs = (isset($attributes['outputs']) && !! $attributes['outputs']) ? $attributes['outputs'] : $line->outputs;
+        $line->name = (isset($attributes['name']) && (bool) $attributes['name']) ? $attributes['name'] : $line->name;
+        $line->outputs = (isset($attributes['outputs']) && (bool) $attributes['outputs']) ? $attributes['outputs'] : $line->outputs;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
         $line->choices = (isset($attributes['choices'])) ? $attributes['choices'] : $line->choices;
@@ -67,6 +66,4 @@ class UserMultiFactories implements MultiFactoriesContract
     {
         optional($this->user->multiFactories()->find($id))->delete();
     }
-
-
 }

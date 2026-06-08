@@ -25,7 +25,7 @@ class BuildingVariantFactory extends Factory
         return [
             'name' => $this->faker->unique()->name(),
             'building_id' => Building::factory(),
-            'base_power' => $this->faker->numberBetween(6,100),
+            'base_power' => $this->faker->numberBetween(6, 100),
         ];
     }
 }

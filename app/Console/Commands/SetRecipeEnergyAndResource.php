@@ -38,20 +38,18 @@ class SetRecipeEnergyAndResource extends Command
      */
     public function handle()
     {
-        Recipe::all()->each(function(Recipe $recipe){
+        Recipe::all()->each(function (Recipe $recipe) {
             $name = $recipe->description ?? $recipe->product->name;
 
-
-            if ( true ) { // } $recipe->energy == 0 ) {
+            if (true) { // } $recipe->energy == 0 ) {
                 $this->info("Setting energy for recipe $name");
                 $recipe->energy = $recipe->getEnergyUsage() ?? 0;
             }
 
-            if ( true ) { // if ( $recipe->resource == 0 ) {
+            if (true) { // if ( $recipe->resource == 0 ) {
                 $this->info("Setting resource for recipe $name");
                 $recipe->resource = $recipe->getRarity() ?? 0;
             }
-
 
             $recipe->save();
         });

@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
-use function vprintf;
 
 class User extends Authenticatable
 {
@@ -77,16 +75,17 @@ class User extends Authenticatable
 
     public function addFavoriteByName($name)
     {
-        if ( ! $recipe = Recipe::ofName($name) )
+        if (! $recipe = Recipe::ofName($name)) {
             return;
+        }
 
         $this->addFavorite($recipe);
     }
 
     public function addFavorite(Recipe $recipe)
     {
-        $this->favorite_recipes()->wherePivot('ingredient_id','=',$recipe->product_id)->detach();
-        $this->favorite_recipes()->attach($recipe->id,['ingredient_id' => $recipe->product_id]);
+        $this->favorite_recipes()->wherePivot('ingredient_id', '=', $recipe->product_id)->detach();
+        $this->favorite_recipes()->attach($recipe->id, ['ingredient_id' => $recipe->product_id]);
     }
 
     public function removeFavorite(Recipe $recipe)
@@ -97,12 +96,13 @@ class User extends Authenticatable
     public function viewFavorites()
     {
         return $this->favorite_recipes
-            ->map(function($recipe) {
-                $description = $recipe->description ?? "default";
+            ->map(function ($recipe) {
+                $description = $recipe->description ?? 'default';
                 $ingredients = $recipe->ingredients
-                    ->map(function($ingredient){
+                    ->map(function ($ingredient) {
                         return "{$ingredient->name} ({$ingredient->pivot->base_qty} ppm)";
-                    })->implode(", ");
+                    })->implode(', ');
+
                 return "{$recipe->product->name} [$description] ($recipe->base_per_min ppm) {$ingredients}";
             })
             ->all();

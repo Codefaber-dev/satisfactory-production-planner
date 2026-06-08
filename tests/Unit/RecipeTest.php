@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-
 use App\Models\Building;
 use App\Models\Ingredient;
 use App\Models\Recipe;
@@ -20,7 +19,7 @@ class RecipeTest extends TestCase
         $this->expectException(QueryException::class);
 
         Recipe::factory()->create([
-            'product_id' => null
+            'product_id' => null,
         ]);
     }
 
@@ -30,17 +29,17 @@ class RecipeTest extends TestCase
         $this->expectException(QueryException::class);
 
         Recipe::factory()->create([
-            'building_id' => null
+            'building_id' => null,
         ]);
     }
 
     /** @test */
     public function it_has_a_base_yield()
     {
-         $this->expectException(QueryException::class);
+        $this->expectException(QueryException::class);
 
         Recipe::factory()->create([
-            'base_yield' => null
+            'base_yield' => null,
         ]);
     }
 
@@ -50,7 +49,7 @@ class RecipeTest extends TestCase
         $product = Ingredient::factory()->create();
 
         $recipe = Recipe::factory()->create([
-            'product_id' => $product->id
+            'product_id' => $product->id,
         ]);
 
         $this->assertTrue($recipe->product->is($product));
@@ -62,7 +61,7 @@ class RecipeTest extends TestCase
         $building = Building::factory()->create();
 
         $recipe = Recipe::factory()->create([
-            'building_id' => $building->id
+            'building_id' => $building->id,
         ]);
 
         $this->assertTrue($recipe->building->is($building));
