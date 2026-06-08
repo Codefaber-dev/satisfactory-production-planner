@@ -8,9 +8,9 @@ window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 Array.prototype.mapAndSumProperties = function (key) {
-    let ret = {};
+    const ret = {};
     this.map((o) => o[key]).forEach((oo) => {
-        for (let prop in oo) {
+        for (const prop in oo) {
             if (!ret.hasOwnProperty(prop)) {
                 ret[prop] = 0;
             }
@@ -21,7 +21,7 @@ Array.prototype.mapAndSumProperties = function (key) {
 };
 
 Array.prototype.groupBy = function (key) {
-    let ret = {};
+    const ret = {};
     this.forEach((o) => {
         if (!ret.hasOwnProperty(o[key])) {
             ret[o[key]] = [];
@@ -52,13 +52,13 @@ Number.prototype.$round4 = function () {
     return Math.round(this * 10000) / 10000;
 };
 
-const copyToClipboard = function (text) {
+const copyToClipboard = (text) => {
     if (typeof navigator.clipboard?.writeText === 'function') {
         navigator.clipboard.writeText(text);
         return;
     }
 
-    let dummy = document.createElement('textarea');
+    const dummy = document.createElement('textarea');
     document.body.appendChild(dummy);
     dummy.value = text;
     dummy.select();

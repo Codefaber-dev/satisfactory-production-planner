@@ -9,7 +9,7 @@
 </template>
 
 <script>
-    export default {
-        props: ['on'],
-    }
+export default {
+    props: ['on'],
+};
 </script>

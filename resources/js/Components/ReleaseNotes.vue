@@ -20,27 +20,27 @@ export default {
 
     props: {
         releaseNotes: String,
-        version: String
+        version: String,
     },
 
     data() {
-        let acked = !! +window.localStorage.getItem(`ack-releaseNotes-${this.version}`)
+        const acked = !!+window.localStorage.getItem(`ack-releaseNotes-${this.version}`);
 
         return {
-            show: ! acked,
+            show: !acked,
             ack: acked,
-        }
+        };
     },
 
     methods: {
         toggle() {
-            this.show = ! this.show;
+            this.show = !this.show;
         },
 
         acknowledge() {
-            window.localStorage.setItem(`ack-releaseNotes-${this.version}`,this.ack ? "1" : "0");
-        }
-    }
+            window.localStorage.setItem(`ack-releaseNotes-${this.version}`, this.ack ? '1' : '0');
+        },
+    },
 };
 </script>
 

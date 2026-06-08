@@ -208,7 +208,7 @@ export default {
         },
 
         deletePrompt() {
-            let conf = confirm('Are you sure you want to delete the factory?');
+            const conf = confirm('Are you sure you want to delete the factory?');
 
             if (!conf) return;
 

@@ -14,11 +14,11 @@
 </template>
 
 <script>
-    import JetSectionTitle from './SectionTitle'
+import JetSectionTitle from './SectionTitle';
 
-    export default {
-        components: {
-            JetSectionTitle,
-        }
-    }
+export default {
+    components: {
+        JetSectionTitle,
+    },
+};
 </script>

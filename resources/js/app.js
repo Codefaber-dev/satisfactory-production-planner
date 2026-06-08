@@ -16,8 +16,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });
         app.config.globalProperties.Bus = Bus;
-        app
-            .use(plugin)
+        app.use(plugin)
             .use(Pinia)
             .mixin({ methods: { route } })
             .component('CloudImage', CloudImage)

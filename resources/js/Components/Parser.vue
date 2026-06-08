@@ -20,9 +20,9 @@ export default {
 
     data() {
         return {
-            rendered: ''
-        }
-    }
+            rendered: '',
+        };
+    },
 };
 </script>
 

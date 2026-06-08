@@ -15,7 +15,7 @@
 </template>
 
 <script>
-    export default {
-        props: ['href', 'as']
-    }
+export default {
+    props: ['href', 'as'],
+};
 </script>

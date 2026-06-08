@@ -211,15 +211,9 @@ export default {
 
             return this.products.filter((o) => {
                 return (
-                    o.name
-                        .toLowerCase()
-                        .indexOf(this.searchDebounced.toLowerCase()) > -1 ||
+                    o.name.toLowerCase().indexOf(this.searchDebounced.toLowerCase()) > -1 ||
                     o.recipes.some(
-                        (oo) =>
-                            (oo.description || '')
-                                .toLowerCase()
-                                .indexOf(this.searchDebounced.toLowerCase()) >
-                            -1
+                        (oo) => (oo.description || '').toLowerCase().indexOf(this.searchDebounced.toLowerCase()) > -1
                     )
                 );
             });
@@ -240,7 +234,7 @@ export default {
             );
         },
         resetAll() {
-            const conf = confirm("Are you sure you want to remove all favorite recipes?");
+            const conf = confirm('Are you sure you want to remove all favorite recipes?');
             if (!conf) {
                 return;
             }
@@ -265,11 +259,9 @@ export default {
         getSelected(recipes) {
             if (recipes.length === 0) return recipes[0];
 
-            if (recipes.some((o) => o.favorite))
-                return recipes.filter((o) => o.favorite)[0];
+            if (recipes.some((o) => o.favorite)) return recipes.filter((o) => o.favorite)[0];
 
-            if (recipes.some((o) => !o.description))
-                return recipes.filter((o) => !o.description)[0];
+            if (recipes.some((o) => !o.description)) return recipes.filter((o) => !o.description)[0];
 
             return recipes[0];
         },

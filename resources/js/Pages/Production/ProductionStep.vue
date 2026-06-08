@@ -315,7 +315,7 @@ export default {
     },
 
     data() {
-        let key = `${this.production.recipe.product.name}|${
+        const key = `${this.production.recipe.product.name}|${
                 this.production.recipe.description || this.production.recipe.product.name
             }`,
             clock = store.getItem(`${key}.clock`, this.overviews?.[key]?.clock),
@@ -357,7 +357,7 @@ export default {
 
     methods: {
         maximizeOutput(scale) {
-            let qty = this.overview.qty,
+            const qty = this.overview.qty,
                 num_buildings = this.overview.selected_variant.num_buildings,
                 max_clock_speed = this.overview.selected_variant.max_clock_speed,
                 base_per_min = this.recipe.base_per_min,
@@ -414,7 +414,7 @@ export default {
         },
 
         getDenominator(name) {
-            let byp = this.getTotalByproductUsed(name);
+            const byp = this.getTotalByproductUsed(name);
 
             return byp + (+this.allMaterials?.[name] || 0);
         },

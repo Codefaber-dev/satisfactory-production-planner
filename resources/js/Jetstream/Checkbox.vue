@@ -24,9 +24,9 @@ export default {
             },
 
             set(val) {
-                this.$emit("update:checked", val);
+                this.$emit('update:checked', val);
             },
         },
     },
-}
+};
 </script>
