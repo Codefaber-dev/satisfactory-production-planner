@@ -51,7 +51,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T7  | x      | Laravel 11→12 upgrade: review breaking changes, update config                             | I.composer, I.config, V1, V2 |
 | T8  | x      | Upgrade PHPUnit 10→11 and update test syntax (static data providers, etc.)                | I.tests, V2    |
 | T9  | x      | Upgrade predis v1→v3 and verify Redis config compatibility                                | I.composer, I.config, V1 |
-| T10 | .      | Remove intervention/image from composer.json (audit T1: zero usages in app code)          | I.composer, V5  |
+| T10 | x      | Remove intervention/image from composer.json (audit T1: zero usages in app code)          | I.composer, V5  |
 | T11 | .      | Upgrade inertia-laravel v0.6→v3 (server); align with Inertia Vue adapter version          | I.composer, I.inertia, V3 |
 | T12 | .      | Upgrade @inertiajs/inertia-vue3 to match server adapter (v1 or v3 SDK)                   | I.package, I.inertia, V3 |
 | T13 | .      | Upgrade JS minor/patch deps: vue 3.2→3.5, @vueuse/core, axios 0.x→1.x, pinia 2→2.x      | I.package, V7  |
