@@ -54,7 +54,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T10 | x      | Remove intervention/image from composer.json (audit T1: zero usages in app code)          | I.composer, V5  |
 | T11 | x      | Upgrade inertia-laravel v0.6→v3 (server); align with Inertia Vue adapter version          | I.composer, I.inertia, V3 |
 | T12 | x      | Upgrade @inertiajs/inertia-vue3 to match server adapter (v1 or v3 SDK)                   | I.package, I.inertia, V3 |
-| T13 | .      | Upgrade JS minor/patch deps: vue 3.2→3.5, @vueuse/core, axios 0.x→1.x, pinia 2→2.x      | I.package, V7  |
+| T13 | x      | Upgrade JS minor/patch deps: vue 3.2→3.5, @vueuse/core, axios 0.x→1.x, pinia 2→2.x      | I.package, V7  |
 | T14 | .      | Upgrade tailwind v3→v4 OR pin to v3 and upgrade within v3; update tailwind config         | I.package, V7, V8 |
 | T15 | .      | Evaluate laravel-mix→Vite migration (required if tailwind v4 chosen in T14)              | I.package, V7, V8 |
 | T16 | .      | Upgrade prettier v2→v3, prettier-plugin-tailwindcss to compatible version                 | I.package, V7  |
