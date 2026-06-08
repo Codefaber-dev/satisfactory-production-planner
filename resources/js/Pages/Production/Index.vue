@@ -106,7 +106,6 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout';
-import { Inertia } from '@inertiajs/inertia';
 import ProductPicker from '@/Components/ProductPicker';
 import RecipePicker from '@/Components/RecipePicker';
 
