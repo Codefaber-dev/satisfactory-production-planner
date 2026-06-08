@@ -3,15 +3,14 @@
 namespace Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class CollectionMacroTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_cross_sum()
     {
         $a = collect([
@@ -26,7 +25,7 @@ class CollectionMacroTest extends TestCase
         $this->assertEquals([6, 8, 10, 12], $a->crossSum()->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cross_sum_by_key()
     {
         $a = collect([
@@ -41,7 +40,7 @@ class CollectionMacroTest extends TestCase
         $this->assertEquals([6, 8, 10, 12], $a->crossSumByKey('val')->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cross_sum_by_key2()
     {
         $a = collect([

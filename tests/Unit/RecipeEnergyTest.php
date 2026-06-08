@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,13 +20,13 @@ class RecipeEnergyTest extends TestCase
         $this->artisan('db:seed', ['--env' => 'testing']);
     }
 
-    /** @test */
+    #[Test]
     public function it_seeds_before_each_test()
     {
         $this->assertTrue(Recipe::count() > 30);
     }
 
-    /** @test */
+    #[Test]
     public function it_calcs_the_energy_cost_of_iron_plate()
     {
         $iron_plate = 60 * Building::ofName('Constructor')->variant('mk1')->base_power / r('Iron Plate')->base_per_min;
@@ -37,7 +38,7 @@ class RecipeEnergyTest extends TestCase
         $this->assertEquals($total = $iron_ores + $iron_ingots + $iron_plate, energy('Iron Plate'));
     }
 
-    /** @test */
+    #[Test]
     public function it_calcs_the_energy_cost_of_wire()
     {
         // energy cost of a recipe is the energy cost of the extraction of the raw materials,
@@ -52,7 +53,7 @@ class RecipeEnergyTest extends TestCase
         $this->assertEquals($ore + $copper_ingots + $wire, energy('Wire'));
     }
 
-    // /** @test */
+    // #[Test]
     // public function it_calculates_the_most_efficient_recipe_per_ingredient()
     // {
     //    Ingredient::processed()->get()->map(function($ingredient) {

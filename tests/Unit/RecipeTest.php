@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Database\QueryException;
@@ -13,7 +14,7 @@ class RecipeTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_has_a_product_id()
     {
         $this->expectException(QueryException::class);
@@ -23,7 +24,7 @@ class RecipeTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_building_id()
     {
         $this->expectException(QueryException::class);
@@ -33,7 +34,7 @@ class RecipeTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_base_yield()
     {
         $this->expectException(QueryException::class);
@@ -43,7 +44,7 @@ class RecipeTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_is_associated_with_a_product()
     {
         $product = Ingredient::factory()->create();
@@ -55,7 +56,7 @@ class RecipeTest extends TestCase
         $this->assertTrue($recipe->product->is($product));
     }
 
-    /** @test */
+    #[Test]
     public function it_is_associated_with_a_building()
     {
         $building = Building::factory()->create();
@@ -67,7 +68,7 @@ class RecipeTest extends TestCase
         $this->assertTrue($recipe->building->is($building));
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_ingredients()
     {
         $ingredients = Ingredient::factory()->count(3)->create();
@@ -84,7 +85,7 @@ class RecipeTest extends TestCase
         $this->assertEquals(20, $recipe->ingredients()->find(3)->pivot->base_qty);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_byproducts()
     {
         $byproducts = Ingredient::factory()->count(3)->create();

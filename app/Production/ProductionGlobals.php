@@ -34,7 +34,7 @@ class ProductionGlobals
         $this->byproducts = collect($byproducts);
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed', 780);
-        $this->used_byproducts = $used_byproducts;
+        $this->used_byproducts = collect($used_byproducts);
     }
 
     public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts): static

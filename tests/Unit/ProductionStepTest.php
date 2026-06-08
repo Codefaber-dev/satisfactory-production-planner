@@ -3,22 +3,22 @@
 namespace Tests\Unit;
 
 use App\Favorites\Facades\Favorites;
+use PHPUnit\Framework\Attributes\Test;
 use App\Production\Step;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ProductionStepTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        config()->set('database.default', 'mysql');
-        config()->set('database.connections.mysql.database', 'satis_pp');
+        $this->seed();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_has_getters()
     {
         $step = Step::make(
@@ -45,9 +45,7 @@ class ProductionStepTest extends TestCase
         $this->assertCount(0, $step->getByproducts());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_specify_a_recipe()
     {
         $step = Step::make(
@@ -64,9 +62,7 @@ class ProductionStepTest extends TestCase
         $this->assertEquals('Heavy Encased Frame', $step->getDescription());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_specify_recipe_favorites()
     {
         $step = Step::make(
@@ -85,9 +81,7 @@ class ProductionStepTest extends TestCase
 
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_use_recipe_favorites()
     {
         Favorites::set(i('Screw'), r('Steel Screw'));
@@ -105,7 +99,7 @@ class ProductionStepTest extends TestCase
 
     }
 
-    /** @test */
+    #[Test]
     public function it_can_import_things()
     {
         $step = Step::make(
@@ -126,9 +120,7 @@ class ProductionStepTest extends TestCase
         $step->assertImported('Screw');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_specify_recipe_overrides()
     {
         $step = Step::make(
@@ -150,9 +142,7 @@ class ProductionStepTest extends TestCase
         $step->assertOverride('Screw', 'Steel Screw');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_can_override_a_favorite()
     {
         $step = Step::make(
@@ -172,7 +162,7 @@ class ProductionStepTest extends TestCase
         $step->assertIntermediateRecipe('Screw', 'Cast Screw');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_a_circular_dependency()
     {
         $step = Step::make(

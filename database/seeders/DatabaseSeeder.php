@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            // UserSeeder::class,
-            // IngredientSeeder::class,
-            // BuildingSeeder::class,
-            // RecipeSeeder::class,
-            // RecipeTierSeeder::class
+            IngredientSeeder::class,
+            BuildingSeeder::class,
+            BuildingVariantSeeder::class,
+            RecipeSeeder::class,
+            RecipeTierSeeder::class,
             FicsmasIngredientSeeder::class,
             FicsmasRecipeSeeder::class,
         ]);

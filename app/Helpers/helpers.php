@@ -77,12 +77,13 @@ function raw($recipe, $use_alts = false, $qty = 1)
 function energyStage(Recipe|string $recipe)
 {
     if (is_string($recipe)) {
+        $name = $recipe;
         try {
-            $recipe = r($recipe);
+            $model = r($recipe);
 
-            return 60 * $recipe->building->variant('mk1')->base_power / $recipe->base_per_min;
+            return 60 * $model->building->variant('mk1')->base_power / $model->base_per_min;
         } catch (ErrorException) {
-            return config("raw_materials.energy cost.{$recipe}");
+            return config("raw_materials.energy cost.{$name}");
         }
     }
 

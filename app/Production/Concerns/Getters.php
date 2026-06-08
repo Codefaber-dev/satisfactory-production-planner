@@ -27,9 +27,9 @@ trait Getters
         return $this->getProduct()->isRaw();
     }
 
-    public function isImported(): bool
+    public function isImported(?string $ingredient = null): bool
     {
-        return $this->globals->isImported($this->getName());
+        return $this->globals->isImported($ingredient ?? $this->getName());
     }
 
     public function isByproduct(): bool

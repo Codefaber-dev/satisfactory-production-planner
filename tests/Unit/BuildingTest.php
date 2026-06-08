@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\BuildingVariant;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,7 +13,7 @@ class BuildingTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_has_a_name()
     {
         $this->expectException(QueryException::class);
@@ -22,7 +23,7 @@ class BuildingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_inputs()
     {
         $this->expectException(QueryException::class);
@@ -32,7 +33,7 @@ class BuildingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_outputs()
     {
         $this->expectException(QueryException::class);
@@ -42,7 +43,7 @@ class BuildingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_height()
     {
         $this->expectException(QueryException::class);
@@ -52,7 +53,7 @@ class BuildingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_width()
     {
         $this->expectException(QueryException::class);
@@ -62,7 +63,7 @@ class BuildingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_length()
     {
         $this->expectException(QueryException::class);
@@ -72,7 +73,7 @@ class BuildingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_variants()
     {
         $building = Building::factory()->create();

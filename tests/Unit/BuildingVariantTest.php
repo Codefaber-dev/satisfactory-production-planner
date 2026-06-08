@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\BuildingVariant;
 use App\Models\Ingredient;
 use Illuminate\Database\QueryException;
@@ -13,7 +14,7 @@ class BuildingVariantTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_has_a_name()
     {
         $this->expectException(QueryException::class);
@@ -23,7 +24,7 @@ class BuildingVariantTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_building_id()
     {
         $this->expectException(QueryException::class);
@@ -33,7 +34,7 @@ class BuildingVariantTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_is_associated_with_a_building()
     {
         $building = Building::factory()->create();
@@ -45,7 +46,7 @@ class BuildingVariantTest extends TestCase
         $this->assertTrue($variant->building->is($building));
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_recipe()
     {
         $ingredient1 = Ingredient::factory()->create();

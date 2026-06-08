@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Ingredient;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Recipe;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,7 +13,7 @@ class IngredientTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_has_a_name()
     {
         $this->expectException(QueryException::class);
@@ -22,7 +23,7 @@ class IngredientTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_unique_name()
     {
         $this->expectException(QueryException::class);
@@ -36,7 +37,7 @@ class IngredientTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_raw()
     {
         $in1 = Ingredient::factory()->create([
@@ -52,7 +53,7 @@ class IngredientTest extends TestCase
         $this->assertFalse($in2->isRaw());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_a_tier()
     {
         $in = Ingredient::factory()->create([
@@ -64,7 +65,7 @@ class IngredientTest extends TestCase
         $this->assertEquals(4, $in->tier);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_multiple_recipes()
     {
         $in = Ingredient::factory()->create();
