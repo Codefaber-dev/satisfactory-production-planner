@@ -146,8 +146,9 @@
 
 <script>
 import RecipePicker from '@/Components/RecipePicker';
+import MarkdownIt from 'markdown-it';
 
-const Markdown = require('markdown-it')();
+const Markdown = new MarkdownIt();
 
 export default {
     name: 'Factory',

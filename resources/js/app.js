@@ -1,4 +1,4 @@
-require('./bootstrap');
+import './bootstrap';
 
 import { createApp, h } from 'vue';
 import mitt from 'mitt';
@@ -9,8 +9,10 @@ import { createPinia } from 'pinia';
 const Bus = mitt();
 const Pinia = createPinia();
 
+const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
+
 createInertiaApp({
-    resolve: (name) => require(`./Pages/${name}`).default,
+    resolve: (name) => pages[`./Pages/${name}.vue`],
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });
         app.config.globalProperties.Bus = Bus;
