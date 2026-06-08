@@ -46,10 +46,10 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | T2  | x      | Audit Inertia usage — list all Inertia::render calls and JS `useForm`/`usePage` patterns  | I.inertia, V3  |
 | T3  | x      | Bump PHP constraint to `^8.4` in composer.json (Herd already on 8.4.21)                   | I.composer, V6 |
 | T4  | x      | Bump inertia-laravel to ^1.0 (PHP 8.4 unblock), then minor/patch PHP upgrades             | I.composer, I.inertia, V1, V2, V9 |
-| T5  | .      | Laravel 9→10 upgrade: follow laravel.com/docs/10.x/upgrade; update config, providers      | I.composer, I.config, I.providers, V1, V2 |
+| T5  | x      | Laravel 9→10 upgrade: follow laravel.com/docs/10.x/upgrade; update config, providers      | I.composer, I.config, I.providers, V1, V2 |
 | T6  | .      | Laravel 10→11 upgrade: bootstrap/app.php consolidation, middleware changes                | I.composer, I.providers, V1, V2 |
 | T7  | .      | Laravel 11→12 upgrade: review breaking changes, update config                             | I.composer, I.config, V1, V2 |
-| T8  | .      | Upgrade PHPUnit 9→11 and update test syntax (assertNotSame vs assertEquals, etc.)         | I.tests, V2    |
+| T8  | .      | Upgrade PHPUnit 10→11 and update test syntax (static data providers, etc.)                | I.tests, V2    |
 | T9  | .      | Upgrade predis v1→v3 and verify Redis config compatibility                                | I.composer, I.config, V1 |
 | T10 | .      | Remove intervention/image from composer.json (audit T1: zero usages in app code)          | I.composer, V5  |
 | T11 | .      | Upgrade inertia-laravel v0.6→v3 (server); align with Inertia Vue adapter version          | I.composer, I.inertia, V3 |
@@ -66,3 +66,4 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | id | date | cause | fix |
 |----|------|-------|-----|
 | B1 | 2026-06-08 | inertia-laravel ^0.6.x caps PHP ~8.3.0; blocked composer update on PHP 8.4 | V9 |
+| B2 | 2026-06-08 | 56 of 88 Unit tests were already failing on L9 (MySQL access denied + pre-existing logic bugs); same count on L10 — no regression, but V2 cannot be clean until T8 fixes syntax and pre-existing DB issues are resolved | V2 |
