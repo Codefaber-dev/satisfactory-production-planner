@@ -42,7 +42,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 baseline to current
 | id  | status | task                                                                                      | cites          |
 |-----|--------|-------------------------------------------------------------------------------------------|----------------|
 | T1  | x      | Audit intervention/image usage in app — list all files and methods used                   | I.image, V4    |
-| T2  | .      | Audit Inertia usage — list all Inertia::render calls and JS `useForm`/`usePage` patterns  | I.inertia, V3  |
+| T2  | x      | Audit Inertia usage — list all Inertia::render calls and JS `useForm`/`usePage` patterns  | I.inertia, V3  |
 | T3  | .      | Bump PHP constraint to `^8.4` in composer.json (Herd already on 8.4.21)                   | I.composer, V6 |
 | T4  | .      | Phase 1: minor/patch-only PHP upgrades (aws, guzzle, faker, debugbar stays v3)            | I.composer, V1, V2 |
 | T5  | .      | Laravel 9→10 upgrade: follow laravel.com/docs/10.x/upgrade; update config, providers      | I.composer, I.config, I.providers, V1, V2 |
