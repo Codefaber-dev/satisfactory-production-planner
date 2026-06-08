@@ -82,6 +82,6 @@ class IngredientTest extends TestCase
 
         $response->assertStatus(202);
 
-        $this->assertDeleted($ingredient);
+        $this->assertModelMissing($ingredient);
     }
 }

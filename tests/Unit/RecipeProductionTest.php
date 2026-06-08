@@ -172,7 +172,7 @@ class RecipeProductionTest extends TestCase
         $this->assertEquals(30, $production->get('5.Computer.total'));
     }
 
-    public function rawIngredientsData()
+    public static function rawIngredientsData()
     {
         return [
             // Iron Ingot
