@@ -91,7 +91,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | T31 | x      | Fix guest Redis TTL leak: GuestFactories, GuestMultiFactories, GuestFavorites store hashes with no expiry; set TTL on hSet operations equal to session lifetime (config('session.lifetime') * 60) | V18 |
 | T32 | x      | Fix cache key typo: ProductionCalculator.php:48 `'production_calc_ '` has trailing space — strip it | V2 |
 | T33 | x      | Add cache for b() helper: Building::whereName() called on every invocation with no memoization; wrap in Cache::rememberForever("buildings.{$name}") | V2 |
-| T34 | .      | Fix even-rows branch energy: BuildingDetails.php:144-166 even-rows branch updates clock_speed but not energy_per_item/total_energy; recalculate both after num_buildings/clock_speed update using same formula as lines 103-110 | V2, V15 |
+| T34 | x      | Fix even-rows branch energy: BuildingDetails.php:144-166 even-rows branch updates clock_speed but not energy_per_item/total_energy; recalculate both after num_buildings/clock_speed update using same formula as lines 103-110 | V2, V15 |
 | T35 | .      | Add model-update cache invalidation: Ingredient and Recipe `saved`/`updated` observers should forget base_recipe.*, recipes.*, ingredients.* and flush production_calc_* keys | V2, V16 |
 
 ## §B — Bug Log

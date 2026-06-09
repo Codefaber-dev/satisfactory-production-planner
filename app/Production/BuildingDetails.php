@@ -163,6 +163,11 @@ class BuildingDetails extends Collection
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
                     return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
                 })->collapse();
+                $mj_per_s = $variant->calculatePowerUsage($clock_speed / 100);
+                $mj_per_min = $mj_per_s * 60;
+                $min_per_item = 1 / ($this->recipe->base_per_min * $clock_speed / 100);
+                $energy_per_item = $mj_per_min * $min_per_item;
+                $total_energy = $energy_per_item * $this->qty;
             }
 
             $footprint = [

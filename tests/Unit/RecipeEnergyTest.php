@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
+use App\Production\BuildingDetails;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\Ingredient;
 use App\Models\Recipe;
@@ -29,28 +30,63 @@ class RecipeEnergyTest extends TestCase
     #[Test]
     public function it_calcs_the_energy_cost_of_iron_plate()
     {
-        $iron_plate = 60 * Building::ofName('Constructor')->variant('mk1')->base_power / r('Iron Plate')->base_per_min;
+        // energy() uses qty = base_per_min * 1000; even-rows fires at that scale,
+        // adjusting clock below 100%. Derive the adjusted clock from BuildingDetails
+        // (same source as energy()), then compute expected energy via calculatePowerUsage.
+        $belt_speed = 780; // ProductionGlobals default
 
-        $iron_ingots = 1.5 * 60 * Building::ofName('Smelter')->variant('mk1')->base_power / r('Iron Ingot')->base_per_min;
+        $plate_recipe = r('Iron Plate');
+        $ingot_recipe = r('Iron Ingot');
 
-        $iron_ores = 1.5 * energyStage('Iron Ore');
+        // Sub-stage qty matches what ProductionCalculator calculates: parent_qty * (ingredient_base_qty / parent_base_per_min)
+        $qty_plate = $plate_recipe->base_per_min * 1000;
+        $ingot_ratio = $plate_recipe->ingredients->firstWhere('name', 'Iron Ingot')->pivot->base_qty / $plate_recipe->base_per_min;
+        $qty_ingot = $qty_plate * $ingot_ratio;
 
-        $this->assertEquals($total = $iron_ores + $iron_ingots + $iron_plate, energy('Iron Plate'));
+        $clock_plate = BuildingDetails::calc($plate_recipe, $qty_plate, $belt_speed)->first()['clock_speed'];
+        $clock_ingot = BuildingDetails::calc($ingot_recipe, $qty_ingot, $belt_speed)->first()['clock_speed'];
+
+        $constructor = Building::ofName('Constructor')->variant('mk1');
+        $smelter = Building::ofName('Smelter')->variant('mk1');
+
+        $iron_plate = 60 * $constructor->calculatePowerUsage($clock_plate / 100)
+            / ($plate_recipe->base_per_min * $clock_plate / 100);
+
+        $iron_ingots = $ingot_ratio * 60 * $smelter->calculatePowerUsage($clock_ingot / 100)
+            / ($ingot_recipe->base_per_min * $clock_ingot / 100);
+
+        $iron_ores = $ingot_ratio * energyStage('Iron Ore');
+
+        $this->assertEqualsWithDelta($iron_ores + $iron_ingots + $iron_plate, energy('Iron Plate'), 1e-9);
     }
 
     #[Test]
     public function it_calcs_the_energy_cost_of_wire()
     {
-        // energy cost of a recipe is the energy cost of the extraction of the raw materials,
-        // plus the energy cost of production
+        $belt_speed = 780;
 
-        $ore = 0.5 * energyStage('Copper Ore');
+        $wire_recipe = r('Wire');
+        $copper_ingot_recipe = r('Copper Ingot');
 
-        $copper_ingots = 0.5 * 60 * Building::ofName('Smelter')->variant('mk1')->base_power / r('Copper Ingot')->base_per_min;
+        $qty_wire = $wire_recipe->base_per_min * 1000;
+        $ingot_ratio = $wire_recipe->ingredients->firstWhere('name', 'Copper Ingot')->pivot->base_qty / $wire_recipe->base_per_min;
+        $qty_ingot = $qty_wire * $ingot_ratio;
 
-        $wire = 60 * Building::ofName('Constructor')->variant('mk1')->base_power / r('Wire')->base_per_min;
+        $clock_wire = BuildingDetails::calc($wire_recipe, $qty_wire, $belt_speed)->first()['clock_speed'];
+        $clock_ingot = BuildingDetails::calc($copper_ingot_recipe, $qty_ingot, $belt_speed)->first()['clock_speed'];
 
-        $this->assertEquals($ore + $copper_ingots + $wire, energy('Wire'));
+        $constructor = Building::ofName('Constructor')->variant('mk1');
+        $smelter = Building::ofName('Smelter')->variant('mk1');
+
+        $wire = 60 * $constructor->calculatePowerUsage($clock_wire / 100)
+            / ($wire_recipe->base_per_min * $clock_wire / 100);
+
+        $copper_ingots = $ingot_ratio * 60 * $smelter->calculatePowerUsage($clock_ingot / 100)
+            / ($copper_ingot_recipe->base_per_min * $clock_ingot / 100);
+
+        $ore = $ingot_ratio * energyStage('Copper Ore');
+
+        $this->assertEqualsWithDelta($ore + $copper_ingots + $wire, energy('Wire'), 1e-9);
     }
 
     // #[Test]
