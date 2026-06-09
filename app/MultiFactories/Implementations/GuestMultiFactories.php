@@ -88,6 +88,7 @@ class GuestMultiFactories implements MultiFactoriesContract
         $atts = array_merge($line->toArray(), compact('id'));
         $this->unset($id);
         Redis::hSet($this->getCacheTag(), "multi-factories.{$id}", json_encode($atts));
+        Redis::expire($this->getCacheTag(), config('session.lifetime') * 60);
     }
 
     protected function unset($id): void

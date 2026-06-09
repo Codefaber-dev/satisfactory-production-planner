@@ -93,6 +93,7 @@ class GuestFactories implements FactoriesContract
     {
         $arr = array_merge($line->load('product.recipes.product', 'recipe.product')->toArray(), compact('id'));
         Redis::hSet($this->getCacheTag(), "factories.{$id}", json_encode($arr));
+        Redis::expire($this->getCacheTag(), config('session.lifetime') * 60);
     }
 
     protected function unset($id): void

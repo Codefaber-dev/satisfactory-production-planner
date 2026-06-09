@@ -31,6 +31,7 @@ class GuestFavorites implements FavoritesContract
     public function set(Ingredient $ingredient, Recipe $recipe): void
     {
         Redis::hSet($this->getCacheTag(), $this->getCacheKey($ingredient), $recipe->id);
+        Redis::expire($this->getCacheTag(), config('session.lifetime') * 60);
     }
 
     public function setDefault(Ingredient $ingredient): void
