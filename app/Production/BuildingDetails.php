@@ -160,10 +160,6 @@ class BuildingDetails extends Collection
                 };
                 $power_shards = $num_buildings * $shards_per_building;
                 $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
-                // calc the energy used per item
-                $energy_per_item = $power_usage / ($this->recipe->base_per_min * $clock_speed);
-                // calc the total energy used
-                $total_energy = $energy_per_item * $this->qty;
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
                     return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
                 })->collapse();
