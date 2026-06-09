@@ -40,6 +40,6 @@
         }
     },
     "files": {
-        "ignore": ["vendor/**", "node_modules/**", "public/**", "*.blade.php"]
+        "ignore": ["vendor/**", "node_modules/**", "public/**", "*.blade.php", ".claude/**"]
     }
 }

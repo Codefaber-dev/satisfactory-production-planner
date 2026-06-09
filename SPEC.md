@@ -49,6 +49,7 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 - **V12** `npx biome check .` exits 0 — no FE lint/format violations.
 - **V13** `npm run test` (Vitest) exits 0 with ≥1 passing test.
 - **V14** All GitHub Actions workflows pass on clean commits to main (BE: phpunit + pint; FE: vitest + biome).
+- **V15** `energy('Iron Plate')` and `energy('Wire')` return values matching the manual stage-sum formula in RecipeEnergyTest (test formula is the spec).
 
 ## §T — Tasks
 
@@ -75,10 +76,13 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | T19 | x      | Install Laravel Pint, configure pint.json (Laravel preset), run + fix all violations      | I.composer, I.pint, V10 |
 | T20 | x      | Install Larastan (nunomaduro/larastan), configure phpstan.neon at level 5, fix or baseline violations | I.composer, I.larastan, V11 |
 | T21 | x      | Replace Prettier with Biome: remove prettier + prettier-plugin-tailwindcss, add @biomejs/biome, configure biome.json, update scripts | I.package, I.biome, V7, V12 |
-| T22 | .      | Add Vitest: add vitest + @vitejs/plugin-vue to devDeps, configure vitest.config.ts, write ≥1 smoke test | I.package, V13 |
-| T23 | .      | Add GitHub Actions BE workflow: phpunit + pint check on push/PR to main                   | I.ci, V1, V2, V10 |
-| T24 | .      | Add GitHub Actions FE workflow: vitest + biome check on push/PR to main                   | I.ci, V7, V12, V13 |
+| T22 | x      | Add Vitest: add vitest + @vitejs/plugin-vue to devDeps, configure vitest.config.ts, write ≥1 smoke test | I.package, V13 |
+| T23 | x      | Add GitHub Actions BE workflow: phpunit + pint check on push/PR to main                   | I.ci, V1, V2, V10 |
+| T24 | x      | Add GitHub Actions FE workflow: vitest + biome check on push/PR to main                   | I.ci, V7, V12, V13 |
 | T25 | x      | Fix all 56 failing Unit tests: B4 ProductionGlobals collect(), B5 remove MySQL override + add RefreshDatabase, B6 fix DatabaseSeeder seeder order, B7 convert @test/@dataProvider to #[Test]/#[DataProvider] attributes | I.tests, V2 |
+| T26 | x      | Fix BuildingDetails.php even-rows energy: preserve non-even `$energy_per_item` inside `if ($this->even \|\| $building_delta > 1)` block — current wrong formula `$power_usage / (base_per_min * clock_speed_pct)` returns ~6× too small; use pre-computed `$energy_per_item = $mj_per_min * $min_per_item` from before the block | I.tests, V2, V15 |
+| T27 | x      | Fix raw_materials.php miner power values to wiki v1.0: Mk.2 12 MW → 15 MW; audit all other entries (Water extractor, Oil extractor, etc.) against wiki; update RecipeEnergyTest expected values to match corrected config | I.tests, V2, V15 |
+| T28 | x      | Fix raw material energy unit inconsistency: config stores MW/(items/min) but production formula uses MJ/item (= MW × 60 / base_per_min); multiply all config values by 60 OR update energyStage() fallback to `return 60 * config(...)` — then update RecipeEnergyTest expected values | I.tests, V2, V15 |
 
 ## §B — Bug Log
 
@@ -93,3 +97,5 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | B7 | 2026-06-08 | All test files still use `@test`/`@dataProvider` doc annotations — deprecated in PHPUnit 11, triggers 64 warnings; T8 marked done but annotation migration was not completed | V2 |
 | B8 | 2026-06-08 | RecipeEnergyTest::it_calcs_energy_cost_of_iron_plate/wire — test compares manual formula vs energy() function; two paths compute different values (~24.15 vs ~4.19); pre-existing logic mismatch (was in original 56 failures due to DB issue masking this); energyStage() variable shadowing bug fixed (helpers.php) but formula equivalence is not established | V2 |
 | B9 | 2026-06-08 | .env file missing from repo clone — Laravel Dotenv tries to read it, generates PHP warning output during tests, PHPUnit marks tests as risky; fix: cp .env.example .env locally | V2 |
+| B10 | 2026-06-08 | BuildingDetails.php even-rows branch (triggered when `building_delta > 1`, i.e. belt_speed 780 + qty = base_per_min * 1000) overwrites `energy_per_item` with `$power_usage / (base_per_min * clock_speed_pct)` — wrong formula gives ~6× too small energy; correct value is `$mj_per_min * $min_per_item` computed before the block (= `building_base_power * 60 / base_per_min`); getTotalEnergy() chains this, so energy() helper returns ~4.19 instead of ~24.15 for Iron Plate | V2, V15 |
+| B11 | 2026-06-08 | raw_materials.php config stores miner energy as `MW / (items/min)` (no ×60), but production formula uses `MW * 60 / base_per_min` (= MJ/item); raw extraction contribution is 60× too small in absolute terms. Also: config comment says Miner Mk.2 = 12 MW but wiki.gg (v1.0) says 15 MW — pre-1.0 early access value. Neither issue causes RecipeEnergyTest to fail (test uses same config values via energyStage()), but physically incorrect energy model | V15 |
