@@ -2,6 +2,7 @@
 
 namespace App\Production;
 
+use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
@@ -42,11 +43,19 @@ class ProductionCalculator
         $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = 'mk1', $choices = [], $byproducts = []
     ): static {
 
+        // Encode effective favorites in the cache key to prevent cross-user contamination (B13).
+        // When null, load recipe IDs from session NOW (outside the closure) so the key differs
+        // per user. The closure still receives the original $favorites so ProductionGlobals
+        // resolves them in the normal keyed format via getMappedFavorites().
+        $favoritesKey = is_null($favorites)
+            ? Favorites::all()->pluck('id')->sort()->values()->all()
+            : collect($favorites)->map(fn ($r) => is_object($r) ? $r->id : $r)->sort()->values()->all();
+
         // add request vars to cache key
         $requestVars = request()->all();
 
-        $cacheKey = 'production_calc_ '
-            .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'favorites', 'imports', 'variant', 'choices', 'byproducts'))->toJson())
+        $cacheKey = 'production_calc_'
+            .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'imports', 'variant', 'choices', 'byproducts'))->put('favorites', $favoritesKey)->toJson())
             .md5(collect($requestVars)->toJson());
 
         return Cache::rememberForever($cacheKey, function () use ($product, $qty, $recipe, $overrides, $favorites, $imports, $variant, $choices, $byproducts) {

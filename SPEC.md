@@ -2,7 +2,7 @@
 
 ## §G — Goal
 
-Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable releases, then add static analysis (Larastan), code style enforcement (Pint, Biome), FE unit testing (Vitest), and CI pipelines (GitHub Actions).
+Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable releases, then add static analysis (Larastan), code style enforcement (Pint, Biome), FE unit testing (Vitest), and CI pipelines (GitHub Actions). Post-upgrade: harden caching layer (cross-user contamination, TTL leaks, blocking ops, invalidation).
 
 ## §C — Constraints
 
@@ -50,6 +50,9 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 - **V13** `npm run test` (Vitest) exits 0 with ≥1 passing test.
 - **V14** All GitHub Actions workflows pass on clean commits to main (BE: phpunit + pint; FE: vitest + biome).
 - **V15** `energy('Iron Plate')` and `energy('Wire')` return values matching the manual stage-sum formula in RecipeEnergyTest (test formula is the spec).
+- **V16** Two different guest users requesting the same production plan get identical results regardless of their session favorites (cache key must encode effective favorites, not the raw null sentinel).
+- **V17** `flush-production-cache` artisan command exits 0 and all matching Redis keys are deleted; `Redis::select()` side effects do not persist to subsequent operations in the same worker.
+- **V18** Guest Redis hashes (factories, multi-factories, favorites) have TTL ≥ session lifetime; no unbounded accumulation.
 
 ## §T — Tasks
 
@@ -83,6 +86,13 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | T26 | x      | Fix BuildingDetails.php even-rows energy: preserve non-even `$energy_per_item` inside `if ($this->even \|\| $building_delta > 1)` block — current wrong formula `$power_usage / (base_per_min * clock_speed_pct)` returns ~6× too small; use pre-computed `$energy_per_item = $mj_per_min * $min_per_item` from before the block | I.tests, V2, V15 |
 | T27 | x      | Fix raw_materials.php miner power values to wiki v1.0: Mk.2 12 MW → 15 MW; audit all other entries (Water extractor, Oil extractor, etc.) against wiki; update RecipeEnergyTest expected values to match corrected config | I.tests, V2, V15 |
 | T28 | x      | Fix raw material energy unit inconsistency: config stores MW/(items/min) but production formula uses MJ/item (= MW × 60 / base_per_min); multiply all config values by 60 OR update energyStage() fallback to `return 60 * config(...)` — then update RecipeEnergyTest expected values | I.tests, V2, V15 |
+| T29 | x      | Fix cross-user cache contamination: ProductionCalculator::make() passes favorites=null → ProductionGlobals loads session favorites inside the cached closure; cache key must include resolved favorites (load before key hash, not inside closure) | V2, V16 |
+| T30 | .      | Fix FlushProductionCache: replace `Redis::select(1)` + `Redis::keys()` with SCAN on the configured cache connection; avoid mutating shared phpredis connection state | V17 |
+| T31 | .      | Fix guest Redis TTL leak: GuestFactories, GuestMultiFactories, GuestFavorites store hashes with no expiry; set TTL on hSet operations equal to session lifetime (config('session.lifetime') * 60) | V18 |
+| T32 | x      | Fix cache key typo: ProductionCalculator.php:48 `'production_calc_ '` has trailing space — strip it | V2 |
+| T33 | .      | Add cache for b() helper: Building::whereName() called on every invocation with no memoization; wrap in Cache::rememberForever("buildings.{$name}") | V2 |
+| T34 | .      | Fix even-rows branch energy: BuildingDetails.php:144-166 even-rows branch updates clock_speed but not energy_per_item/total_energy; recalculate both after num_buildings/clock_speed update using same formula as lines 103-110 | V2, V15 |
+| T35 | .      | Add model-update cache invalidation: Ingredient and Recipe `saved`/`updated` observers should forget base_recipe.*, recipes.*, ingredients.* and flush production_calc_* keys | V2, V16 |
 
 ## §B — Bug Log
 
@@ -99,3 +109,11 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | B9 | 2026-06-08 | .env file missing from repo clone — Laravel Dotenv tries to read it, generates PHP warning output during tests, PHPUnit marks tests as risky; fix: cp .env.example .env locally | V2 |
 | B10 | 2026-06-08 | BuildingDetails.php even-rows branch (triggered when `building_delta > 1`, i.e. belt_speed 780 + qty = base_per_min * 1000) overwrites `energy_per_item` with `$power_usage / (base_per_min * clock_speed_pct)` — wrong formula gives ~6× too small energy; correct value is `$mj_per_min * $min_per_item` computed before the block (= `building_base_power * 60 / base_per_min`); getTotalEnergy() chains this, so energy() helper returns ~4.19 instead of ~24.15 for Iron Plate | V2, V15 |
 | B11 | 2026-06-08 | raw_materials.php config stores miner energy as `MW / (items/min)` (no ×60), but production formula uses `MW * 60 / base_per_min` (= MJ/item); raw extraction contribution is 60× too small in absolute terms. Also: config comment says Miner Mk.2 = 12 MW but wiki.gg (v1.0) says 15 MW — pre-1.0 early access value. Neither issue causes RecipeEnergyTest to fail (test uses same config values via energyStage()), but physically incorrect energy model | V15 |
+| B12 | 2026-06-09 | ProductionCalculator.php:48 cache key literal `'production_calc_ '` has trailing space — key format is `production_calc_ <hash>` not `production_calc_<hash>`; cosmetic but inconsistent with FlushProductionCache search pattern | T32 |
+| B13 | 2026-06-09 | Cross-user cache contamination: show() passes favorites=null to ProductionCalculator::make(); inside the cached closure ProductionGlobals calls Favorites::getMappedFavorites(null) which loads session-specific favorites from Redis; cache key hashes null for all users → first requesting user's favorites bake into shared cached production result; subsequent users with same product/qty/recipe get first user's recipe choices | V16, T29 |
+| B14 | 2026-06-09 | GuestFactories, GuestMultiFactories, GuestFavorites store Redis hashes with no TTL; PHP sessions expire (default 120 min) but Redis guest data accumulates indefinitely → unbounded Redis memory growth | V18, T31 |
+| B15 | 2026-06-09 | FlushProductionCache::handle() calls Redis::select(1) which mutates the shared phpredis default connection for the lifetime of the PHP-FPM worker; subsequent Redis operations on the default connection in the same worker silently use DB 1 instead of DB 0 | V17, T30 |
+| B16 | 2026-06-09 | FlushProductionCache uses Redis::keys('*production_calc*') — O(N) blocking scan that freezes the Redis server for all clients during execution; must use SCAN with cursor for production safety | V17, T30 |
+| B17 | 2026-06-09 | No cache invalidation on model save: editing a Recipe or Ingredient in DB leaves stale base_recipe.*, recipes.*, ingredients.*, and production_calc_* entries; no Eloquent observer or model event hooks trigger invalidation | T35 |
+| B18 | 2026-06-09 | BuildingDetails.php even-rows branch (lines 144-166) updates num_buildings and clock_speed but skips recalculating energy_per_item and total_energy; calculatePowerUsage() is nonlinear (exponent 1.321928) so energy_per_item must be recomputed from updated clock_speed; T26 removed the ~6× wrong formula but the remaining pre-branch value uses the wrong clock_speed | V15, T34 |
+| B19 | 2026-06-09 | b() helper (helpers.php:63) calls Building::whereName($name)->first() on every invocation with no caching; buildings are static game data; causes redundant DB queries in every production calculation | T33 |
