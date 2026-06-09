@@ -62,7 +62,9 @@ function i($name, bool $force = false)
 
 function b($name)
 {
-    return Building::whereName($name)->first();
+    return Cache::rememberForever("buildings.{$name}", function () use ($name) {
+        return Building::whereName($name)->first();
+    });
 }
 
 function raw($recipe, $use_alts = false, $qty = 1)
