@@ -88,6 +88,37 @@ class PowerPlannerGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function fuel_generator_has_all_five_fuel_types(): void
+    {
+        $result = FuelGenerator::make(250)->calculate();
+        $fuel = $result['fuel'];
+
+        $this->assertCount(5, $fuel, 'Expected exactly 5 fuel types (duplicate key check)');
+        $this->assertArrayHasKey(Ingredient::FUEL->value, $fuel);
+        $this->assertArrayHasKey(Ingredient::LIQUID_BIOFUEL->value, $fuel);
+        $this->assertArrayHasKey(Ingredient::TURBOFUEL->value, $fuel);
+        $this->assertArrayHasKey(Ingredient::ROCKET_FUEL->value, $fuel);
+        $this->assertArrayHasKey(Ingredient::IONIZED_FUEL->value, $fuel);
+
+        // rates: gross_output(250MW) * 60 / energy_mj
+        $this->assertEqualsWithDelta(250 * 60 / 750, $fuel[Ingredient::FUEL->value], 1e-9);
+        $this->assertEqualsWithDelta(250 * 60 / 2000, $fuel[Ingredient::TURBOFUEL->value], 1e-9);
+        $this->assertEqualsWithDelta(250 * 60 / 3600, $fuel[Ingredient::ROCKET_FUEL->value], 1e-9);
+        $this->assertEqualsWithDelta(250 * 60 / 5000, $fuel[Ingredient::IONIZED_FUEL->value], 1e-9);
+    }
+
+    #[Test]
+    public function base_buildable_fuels_includes_rocket_ionized_ficsonium(): void
+    {
+        $result = FuelGenerator::make(250)->calculate();
+        $buildable = $result['buildable_fuels'];
+
+        $this->assertContains(Ingredient::ROCKET_FUEL->value, $buildable);
+        $this->assertContains(Ingredient::IONIZED_FUEL->value, $buildable);
+        $this->assertContains(Ingredient::FICSONIUM_FUEL_ROD->value, $buildable);
+    }
+
+    #[Test]
     public function power_planner_returns_all_four_generator_types(): void
     {
         $results = PowerPlanner::make(100)->calculate();

@@ -29,8 +29,11 @@ abstract class Base implements GeneratorContract
         Ingredient::FUEL->value,
         Ingredient::LIQUID_BIOFUEL->value,
         Ingredient::TURBOFUEL->value,
+        Ingredient::ROCKET_FUEL->value,
+        Ingredient::IONIZED_FUEL->value,
         Ingredient::URANIUM_FUEL_ROD->value,
         Ingredient::PLUTONIUM_FUEL_ROD->value,
+        Ingredient::FICSONIUM_FUEL_ROD->value,
     ];
 
     protected int $output;

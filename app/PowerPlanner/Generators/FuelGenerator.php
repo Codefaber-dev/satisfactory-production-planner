@@ -11,12 +11,12 @@ class FuelGenerator extends Base
 
     protected $gross_output = 250; // 250 MW = 15000 MJ / min
 
-    // fuel per min
+    // fuel per min — MJ values from satisfactory.wiki.gg/wiki/Fuel_Generator
     protected $fuel = [
         Ingredient::FUEL->value => 15000 / 750,
         Ingredient::LIQUID_BIOFUEL->value => 15000 / 750,
         Ingredient::TURBOFUEL->value => 15000 / 2000,
-        Ingredient::IONIZED_FUEL->value => 15000 / 3600,
+        Ingredient::ROCKET_FUEL->value => 15000 / 3600,
         Ingredient::IONIZED_FUEL->value => 15000 / 5000,
     ];
 

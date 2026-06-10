@@ -41,6 +41,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - **V28** `php artisan db:seed` completes without exceptions.
 - **V29** `RecipeEnergyTest` passes without regression after V22/V23 corrections.
 - **V30** `FicsoniumFuelRod` power planner class: `power_output=2500`, `fuel_per_min=1`, no byproduct.
+- **V31** `FuelGenerator` fuel map has no duplicate keys; includes all 5 valid liquid fuels: Fuel (750 MJ), Turbofuel (2000 MJ), Liquid Biofuel (750 MJ), Rocket Fuel (3600 MJ), Ionized Fuel (5000 MJ). Packaged variants excluded (Fuel Generator is pipe-input only). `Base::buildable_fuels` includes `ROCKET_FUEL`, `IONIZED_FUEL`, `FICSONIUM_FUEL_ROD`.
 
 ## §T — Tasks
 
@@ -70,6 +71,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T69 | x      | Create `FicsoniumFuelRod` power planner class in `app/PowerPlanner/` mirroring existing fuel rod classes: power_output=2500 MW, fuel_per_min=1, no byproduct | I.power-planner, V30 |
 | T70 | x      | Run `php artisan db:seed` (fresh DB) and verify V28; log failures as §B entries | V28 |
 | T71 | x      | Verify/update RecipeEnergyTest after T48/T49 corrections; run full test suite; verify ≥ 80% coverage | I.tests, V29 |
+| T72 | x      | Fix `FuelGenerator`: remove duplicate `IONIZED_FUEL` key (second entry → `ROCKET_FUEL` at 3600 MJ); add `ROCKET_FUEL`, `IONIZED_FUEL`, `FICSONIUM_FUEL_ROD` to `Base::buildable_fuels` | I.power-planner, V31 |
 
 ## §B — Bug Log
 
@@ -101,3 +103,4 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | B24 | 2026-06-10 | Smokeless Powder added to IngredientSeeder but no Refinery recipe seeded; ProductionTree iterates all processed ingredients and throws ErrorException | T59, T71 |
 | B25 | 2026-06-10 | Dissolved Silica added to IngredientSeeder but no base recipe; only appears as byproduct of Quartz Purification; fix: add Refinery entry with Quartz Crystal as byproduct | T71 |
 | B26 | 2026-06-10 | energyStage() finds Converter recipes for raw ores (Copper Ore, Iron Ore, etc.) after T68 backport and returns 500 MW Converter cost instead of config mining cost; fix: check isRaw() before recipe lookup | V15, T71 |
+| B27 | 2026-06-10 | FuelGenerator fuel map has duplicate key `IONIZED_FUEL` — second entry (15000/5000) silently shadows first; Rocket Fuel absent from generator; packaged liquid fuel variants not listed | V31, T72 |
