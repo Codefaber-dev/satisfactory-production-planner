@@ -3,9 +3,9 @@
 namespace Tests\Unit;
 
 use App\Favorites\Facades\Favorites;
-use PHPUnit\Framework\Attributes\Test;
 use App\Production\Step;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ProductionStepTest extends TestCase

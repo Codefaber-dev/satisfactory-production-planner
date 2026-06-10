@@ -3,10 +3,10 @@
 namespace Tests\Unit;
 
 use App\Models\Ingredient;
-use PHPUnit\Framework\Attributes\Test;
 use App\Models\Recipe;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class IngredientTest extends TestCase

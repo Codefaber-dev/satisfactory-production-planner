@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Ingredient;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class IngredientTest extends TestCase

@@ -3,10 +3,10 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
-use PHPUnit\Framework\Attributes\Test;
 use App\Models\BuildingVariant;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class BuildingTest extends TestCase

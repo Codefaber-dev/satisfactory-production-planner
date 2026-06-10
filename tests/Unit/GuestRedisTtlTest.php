@@ -26,7 +26,7 @@ class GuestRedisTtlTest extends TestCase
     {
         $ingredient = Ingredient::where('name', 'Iron Plate')->firstOrFail();
         $recipe = $ingredient->baseRecipe();
-        $favorites = new GuestFavorites();
+        $favorites = new GuestFavorites;
         $favorites->set($ingredient, $recipe);
 
         $ttl = Redis::ttl($favorites->getCacheTag());
@@ -40,7 +40,7 @@ class GuestRedisTtlTest extends TestCase
     {
         $ingredient = Ingredient::where('name', 'Iron Plate')->firstOrFail();
         $recipe = $ingredient->baseRecipe();
-        $factories = new GuestFactories();
+        $factories = new GuestFactories;
         $factories->create([
             'ingredient_id' => $ingredient->id,
             'recipe_id' => $recipe->id,
@@ -48,7 +48,7 @@ class GuestRedisTtlTest extends TestCase
             'imports' => 0,
         ]);
 
-        $cacheTag = 'factories.' . guest_token();
+        $cacheTag = 'factories.'.guest_token();
         $ttl = Redis::ttl($cacheTag);
         $expected = config('session.lifetime') * 60;
 
@@ -60,7 +60,7 @@ class GuestRedisTtlTest extends TestCase
     {
         $ingredient = Ingredient::where('name', 'Iron Plate')->firstOrFail();
         $recipe = $ingredient->baseRecipe();
-        $multiFactories = new GuestMultiFactories();
+        $multiFactories = new GuestMultiFactories;
         $multiFactories->create([
             'outputs' => [
                 [
@@ -73,7 +73,7 @@ class GuestRedisTtlTest extends TestCase
             'choices' => [],
         ]);
 
-        $cacheTag = 'multi-factories.' . guest_token();
+        $cacheTag = 'multi-factories.'.guest_token();
         $ttl = Redis::ttl($cacheTag);
         $expected = config('session.lifetime') * 60;
 

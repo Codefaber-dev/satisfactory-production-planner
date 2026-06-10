@@ -3,11 +3,11 @@
 namespace Tests\Unit;
 
 use App\Models\Building;
-use App\Production\BuildingDetails;
-use PHPUnit\Framework\Attributes\Test;
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\BuildingDetails;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RecipeEnergyTest extends TestCase

@@ -3,9 +3,9 @@
 namespace Tests\Unit;
 
 use App\Models\ProductionLine;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ProductionLineTest extends TestCase
