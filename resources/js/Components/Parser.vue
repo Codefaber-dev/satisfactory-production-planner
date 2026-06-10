@@ -1,8 +1,8 @@
 <template>
     <div>
-        <template ref='content' v-if='false'>
+        <div ref='content' style='display:none'>
             <slot></slot>
-        </template>
+        </div>
         <div v-html='rendered'></div>
     </div>
 </template>
@@ -14,8 +14,8 @@ export default {
     name: 'Parser',
 
     mounted() {
-        console.log(this.$slots);
-        this.rendered = marked.parse(this.$refs.content.innerText);
+        const text = this.$refs.content?.textContent ?? '';
+        this.rendered = marked.parse(text.trim());
     },
 
     data() {

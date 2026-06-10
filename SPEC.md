@@ -103,10 +103,10 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | T41 | x      | Unit tests for ProductionTree + RawIngredientCalculator — assert tree structure for known recipe chain, assert raw totals match expected values | V2, V19 |
 | T42 | x      | Feature tests for RecipeController CRUD — index/show/store/update/destroy; assert auth guard, validation rules, and that save triggers observer (V17/B17) | V2, V19 |
 | T43 | x      | Unit tests for IngredientObserver + RecipeObserver — assert that saved/updated events forget the correct cache keys and enqueue flush of production_calc_* | V17, V19 |
-| T44 | .      | Vitest unit tests for SatisfactoryStore.js — state shape, addFactory, removeFactory, updateFactory, serialization round-trip | V20 |
-| T45 | .      | Vitest unit tests for ProductPicker.vue + RecipePicker.vue — product/recipe list renders, selection emits correct event, filter narrows list | V20 |
-| T46 | .      | Vitest unit tests for Factory.vue + MultiFactory.vue — renders step rows, quantity prop drives display, edit/remove events fire | V20 |
-| T47 | .      | Vitest unit tests for Parser.vue — valid import string parses to correct factory state, malformed input shows error, no mutation of prop | V20 |
+| T44 | x      | Vitest unit tests for SatisfactoryStore.js — state shape, addFactory, removeFactory, updateFactory, serialization round-trip | V20 |
+| T45 | x      | Vitest unit tests for ProductPicker.vue + RecipePicker.vue — product/recipe list renders, selection emits correct event, filter narrows list | V20 |
+| T46 | x      | Vitest unit tests for Factory.vue + MultiFactory.vue — renders step rows, quantity prop drives display, edit/remove events fire | V20 |
+| T47 | x      | Vitest unit tests for Parser.vue — valid import string parses to correct factory state, malformed input shows error, no mutation of prop | V20 |
 
 ## §B — Bug Log
 
