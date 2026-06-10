@@ -2,9 +2,9 @@ import { defineStore } from 'pinia';
 import { useStorage } from '@vueuse/core';
 import product_list from './product_list';
 
-product_list.forEach((o) => {
+for (const o of product_list) {
     o.tier = o.tags.filter((name) => +name.includes('tier'))[0].replace('tier ', '');
-});
+}
 
 const fresh_product_list = [...product_list];
 
@@ -27,7 +27,7 @@ export const useSatisfactoryStore = defineStore('satisfactory', {
             this.checklist = [...fresh_product_list];
         },
 
-        filter(search, tags = [], tiers = [], showHidden) {
+        filter(search, tags, tiers, showHidden) {
             return this.checklist.filter((o) => {
                 if (o.hidden && !showHidden) {
                     return false;

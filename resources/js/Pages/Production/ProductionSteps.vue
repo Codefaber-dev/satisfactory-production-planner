@@ -148,11 +148,11 @@ export default {
         levelStepMap() {
             const ret = {};
 
-            this.resultsArray.forEach((level, levelIndex) => {
-                Object.keys(level).forEach((mat) => {
+            for (const [levelIndex, level] of this.resultsArray.entries()) {
+                for (const mat of Object.keys(level)) {
                     ret[mat] = `${levelIndex + 1}.${this.stepLetter(this.getStepIndex(level, mat))}`;
-                });
-            });
+                }
+            }
             return ret;
         },
     },

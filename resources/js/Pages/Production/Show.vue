@@ -240,9 +240,9 @@ export default {
         });
 
         this.Bus.on('ScaleOutputs', ({ ratio }) => {
-            this.form.outputs.forEach((o) => {
+            for (const o of this.form.outputs) {
                 o.yield = (+o.yield * ratio).$round4();
-            });
+            }
 
             this.fetch();
         });
@@ -339,8 +339,8 @@ export default {
             // }
 
             return Object.values(this.overviews).map((o) => {
-                const clock = o.clock,
-                    variant_name = o.selected_variant_name;
+                const clock = o.clock;
+                const variant_name = o.selected_variant_name;
                 return {
                     clock,
                     variant_name,
@@ -369,10 +369,10 @@ export default {
         },
 
         production__building_summary() {
-            const deets = this.production__building_details.groupBy('variant_name'),
-                ret = {
-                    variants: {},
-                };
+            const deets = this.production__building_details.groupBy('variant_name');
+            const ret = {
+                variants: {},
+            };
 
             for (const prop in deets) {
                 ret.variants[prop] = {
@@ -443,8 +443,8 @@ export default {
                 return 'multi';
             }
 
-            const p = this.form.outputs[0],
-                parts = [p.product.name, p.yield, p.recipe.description || p.product.name, this.form.variant];
+            const p = this.form.outputs[0];
+            const parts = [p.product.name, p.yield, p.recipe.description || p.product.name, this.form.variant];
 
             return parts.join('/');
         },
@@ -468,7 +468,7 @@ export default {
                 params.recipe = this.form.outputs
                     .filter((o) => o.product && o.recipe)
                     .map((o) => o.recipe.description || o.product.name);
-                delete params.factory;
+                params.factory = undefined;
                 params.multiFactory = this.newFactory ? this.newFactory.id : '';
             }
 
@@ -572,11 +572,11 @@ export default {
                 return this.saveMultiFactory();
             }
 
-            let name,
-                imports = Object.keys(this.newImports)
-                    .filter((o) => this.newImports[o])
-                    .join(','),
-                output = this.form.outputs[0];
+            let name;
+            const imports = Object.keys(this.newImports)
+                .filter((o) => this.newImports[o])
+                .join(',');
+            const output = this.form.outputs[0];
 
             if (this.newFactory) {
                 this.$inertia.patch(`/factories/${this.newFactory.id}`, {
@@ -603,10 +603,9 @@ export default {
         },
 
         saveMultiFactory() {
-            let name,
-                imports = Object.keys(this.newImports)
-                    .filter((o) => this.newImports[o])
-                    .join(',');
+            const imports = Object.keys(this.newImports)
+                .filter((o) => this.newImports[o])
+                .join(',');
 
             if (this.newFactory) {
                 return this.$inertia.patch(`/factories/multi/${this.newFactory.id}`, {
@@ -614,9 +613,8 @@ export default {
                     choices: this.newChoices,
                     imports,
                 });
-            } else {
-                name = prompt('Provide a name for your factory');
             }
+            const name = prompt('Provide a name for your factory');
 
             this.$inertia.post('/factories/multi', {
                 name,
@@ -681,7 +679,7 @@ export default {
         },
 
         toggleProductionCheck(material) {
-            if (this.productionChecks.hasOwnProperty(material))
+            if (Object.hasOwn(this.productionChecks, material))
                 this.productionChecks[material] = !this.productionChecks[material];
             else this.productionChecks[material] = true;
         },

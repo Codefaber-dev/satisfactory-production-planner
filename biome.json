@@ -40,6 +40,17 @@
         }
     },
     "files": {
-        "ignore": ["vendor/**", "node_modules/**", "public/**", "*.blade.php", ".claude/**"]
+        "ignore": [
+            "vendor/**",
+            "node_modules/**",
+            "public/**",
+            "*.blade.php",
+            ".claude/**",
+            "coverage/**",
+            "resources/js/bootstrap.js",
+            "resources/js/Jetstream/**",
+            "resources/js/Pages/API/ApiTokenManager.vue",
+            "resources/js/Pages/Profile/TwoFactorAuthenticationForm.vue"
+        ]
     }
 }
