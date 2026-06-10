@@ -48,7 +48,7 @@ jobs:
         run: php artisan key:generate
 
       - name: Run PHPUnit tests
-        run: php artisan test
+        run: php artisan test --parallel
 
   style:
     runs-on: ubuntu-latest
