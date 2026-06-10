@@ -40,10 +40,16 @@ class ProductionController extends Controller
 
     public function show($ingredient, $qty, $recipe, $variant = 'mk1')
     {
+        $product = i($ingredient);
+
+        if (! $product) {
+            abort(404);
+        }
+
         $choices = collect(request('choices'))->map(fn ($name) => r($name));
 
         $calc = ProductionCalculator::make(
-            product: $product = i($ingredient),
+            product: $product,
             qty: $yield = $qty,
             recipe: $recipe,
             imports: request()->has('imports') ? explode(',', request('imports')) : [],

@@ -3,78 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recipe;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class RecipeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        return response()->json(Recipe::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'product_id' => 'required|exists:ingredients,id',
+            'building_id' => 'required|exists:buildings,id',
+            'base_per_min' => 'required|numeric|min:0',
+            'base_yield' => 'required|numeric|min:0',
+            'alt_recipe' => 'boolean',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $recipe = Recipe::create($validated);
+
+        return response()->json($recipe->fresh(), 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function store(Request $request)
+    public function show(Recipe $recipe): JsonResponse
     {
-        //
+        return response()->json($recipe);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @return Response
-     */
-    public function show(Recipe $recipe)
+    public function update(Request $request, Recipe $recipe): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'product_id' => 'sometimes|exists:ingredients,id',
+            'building_id' => 'sometimes|exists:buildings,id',
+            'base_per_min' => 'sometimes|numeric|min:0',
+            'base_yield' => 'sometimes|numeric|min:0',
+            'alt_recipe' => 'sometimes|boolean',
+            'description' => 'sometimes|nullable|string|max:255',
+        ]);
+
+        $recipe->update($validated);
+
+        return response()->json($recipe->fresh(), 202);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @return Response
-     */
-    public function edit(Recipe $recipe)
+    public function destroy(Recipe $recipe): JsonResponse
     {
-        //
-    }
+        $recipe->delete();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @return Response
-     */
-    public function update(Request $request, Recipe $recipe)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @return Response
-     */
-    public function destroy(Recipe $recipe)
-    {
-        //
+        return response()->json([], 202);
     }
 }

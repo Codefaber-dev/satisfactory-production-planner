@@ -53,6 +53,8 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 - **V16** Two different guest users requesting the same production plan get identical results regardless of their session favorites (cache key must encode effective favorites, not the raw null sentinel).
 - **V17** `flush-production-cache` artisan command exits 0 and all matching Redis keys are deleted; `Redis::select()` side effects do not persist to subsequent operations in the same worker.
 - **V18** Guest Redis hashes (factories, multi-factories, favorites) have TTL ≥ session lifetime; no unbounded accumulation.
+- **V19** BE unit/feature test coverage ≥ 80% for all classes in `app/Production/*`, `app/PowerPlanner/*`, and `app/Helpers/Production*` — measured via `php artisan test --coverage`.
+- **V20** FE Vitest coverage ≥ 80% for `SatisfactoryStore.js` and app-domain Components (`Factory.vue`, `MultiFactory.vue`, `Parser.vue`, `ProductPicker.vue`, `RecipePicker.vue`) — measured via `npm run test -- --coverage`.
 
 ## §T — Tasks
 
@@ -93,6 +95,18 @@ Upgrade all PHP and JS dependencies from Laravel 9 / Vue 3.2 to current stable r
 | T33 | x      | Add cache for b() helper: Building::whereName() called on every invocation with no memoization; wrap in Cache::rememberForever("buildings.{$name}") | V2 |
 | T34 | x      | Fix even-rows branch energy: BuildingDetails.php:144-166 even-rows branch updates clock_speed but not energy_per_item/total_energy; recalculate both after num_buildings/clock_speed update using same formula as lines 103-110 | V2, V15 |
 | T35 | x      | Add model-update cache invalidation: Ingredient and Recipe `saved`/`updated` observers should forget base_recipe.*, recipes.*, ingredients.* and flush production_calc_* keys | V2, V16 |
+| T36 | x      | Unit tests for BuildingDetails.php: normal path (clock_speed 100%), even-rows branch (building_delta > 1), verify energy_per_item and total_energy recalculate from updated clock_speed (V15/B18 regression guard) | V15, V19 |
+| T37 | x      | Unit tests for PowerPlanner generators: CoalGenerator, FuelGenerator, NuclearPowerPlant, BiomassBurner — assert fuel_per_min, power_output, and byproduct quantities at given MW target | V19 |
+| T38 | x      | Feature tests for ProductionController::show() — guest request, auth user request, invalid product returns 404/redirect, favorites encoded in cache key (regression V16) | V16, V19 |
+| T39 | x      | Feature tests for FavoritesController — store/destroy as guest (Redis key), store/destroy as auth user (DB), and that guest favorites expire with session | V18, V19 |
+| T40 | x      | Unit tests for Multiplexer + MultiplexerFactory — verify output qty scaling, byproduct collection, and step merging for multi-product recipes | V2, V19 |
+| T41 | x      | Unit tests for ProductionTree + RawIngredientCalculator — assert tree structure for known recipe chain, assert raw totals match expected values | V2, V19 |
+| T42 | x      | Feature tests for RecipeController CRUD — index/show/store/update/destroy; assert auth guard, validation rules, and that save triggers observer (V17/B17) | V2, V19 |
+| T43 | x      | Unit tests for IngredientObserver + RecipeObserver — assert that saved/updated events forget the correct cache keys and enqueue flush of production_calc_* | V17, V19 |
+| T44 | .      | Vitest unit tests for SatisfactoryStore.js — state shape, addFactory, removeFactory, updateFactory, serialization round-trip | V20 |
+| T45 | .      | Vitest unit tests for ProductPicker.vue + RecipePicker.vue — product/recipe list renders, selection emits correct event, filter narrows list | V20 |
+| T46 | .      | Vitest unit tests for Factory.vue + MultiFactory.vue — renders step rows, quantity prop drives display, edit/remove events fire | V20 |
+| T47 | .      | Vitest unit tests for Parser.vue — valid import string parses to correct factory state, malformed input shows error, no mutation of prop | V20 |
 
 ## §B — Bug Log
 
