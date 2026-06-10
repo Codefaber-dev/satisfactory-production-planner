@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Building;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,7 +54,7 @@ class RecipeControllerTest extends TestCase
     public function store_creates_recipe_and_returns_201(): void
     {
         $ingredient = Ingredient::factory()->create();
-        $building = \App\Models\Building::factory()->create();
+        $building = Building::factory()->create();
 
         $payload = [
             'product_id' => $ingredient->id,
@@ -85,7 +86,7 @@ class RecipeControllerTest extends TestCase
     #[Test]
     public function store_validates_product_id_exists(): void
     {
-        $building = \App\Models\Building::factory()->create();
+        $building = Building::factory()->create();
 
         $response = $this->actingAsUser()->postJson(route('recipes.store'), [
             'product_id' => 99999,

@@ -65,9 +65,7 @@ describe('SatisfactoryStore', () => {
     it('filter with search and tag requires both to match', () => {
         const store = useSatisfactoryStore();
         // Find an item that has a known tag and name fragment
-        const electronics = store.checklist.filter(
-            (o) => o.tags.includes('electronics') && !o.hidden
-        );
+        const electronics = store.checklist.filter((o) => o.tags.includes('electronics') && !o.hidden);
         if (electronics.length === 0) return;
         const name = electronics[0].name.slice(0, 3);
         const result = store.filter(name, ['electronics'], [], false);
