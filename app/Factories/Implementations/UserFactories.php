@@ -23,9 +23,9 @@ class UserFactories implements FactoriesContract
             $atts = $factory->toArray();
             $description = $atts['recipe']->description ?? $factory->product->name;
             $params = http_build_query([
-                "factory" => $atts["id"],
-                "imports" => $atts["imports"],
-                "choices" => $atts["choices"] ?? [],
+                'factory' => $atts['id'],
+                'imports' => $atts['imports'],
+                'choices' => $atts['choices'] ?? [],
             ]);
             $atts['url'] = "/dashboard/{$factory->product->name}/{$atts['yield']}/{$description}/?{$params}";
 
@@ -48,12 +48,12 @@ class UserFactories implements FactoriesContract
             return new ProductionLine;
         }
 
-        $line->name = (isset($attributes['name']) && ! ! $attributes['name']) ? $attributes['name'] : $line->name;
-        $line->ingredient_id = (isset($attributes['ingredient_id']) && ! ! $attributes['ingredient_id']) ?
+        $line->name = (isset($attributes['name']) && (bool) $attributes['name']) ? $attributes['name'] : $line->name;
+        $line->ingredient_id = (isset($attributes['ingredient_id']) && (bool) $attributes['ingredient_id']) ?
             $attributes['ingredient_id'] : $line->ingredient_id;
-        $line->recipe_id = (isset($attributes['recipe_id']) && ! ! $attributes['recipe_id']) ?
+        $line->recipe_id = (isset($attributes['recipe_id']) && (bool) $attributes['recipe_id']) ?
             $attributes['recipe_id'] : $line->recipe_id;
-        $line->yield = (isset($attributes['yield']) && ! ! $attributes['yield']) ? $attributes['yield'] : $line->yield;
+        $line->yield = (isset($attributes['yield']) && (bool) $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
         $line->choices = (isset($attributes['choices'])) ? $attributes['choices'] : $line->choices;

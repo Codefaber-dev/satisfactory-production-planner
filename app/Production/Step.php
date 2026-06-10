@@ -10,7 +10,7 @@ use App\Production\Concerns\Setters;
 
 class Step
 {
-    use Setters, Getters, CalculatesSteps, CastsToArray, Assertions;
+    use Assertions, CalculatesSteps, CastsToArray, Getters, Setters;
 
     public static function make($product, $qty, ProductionGlobals|array $globals, $recipe = null, $parent = null, $chain = []): static
     {

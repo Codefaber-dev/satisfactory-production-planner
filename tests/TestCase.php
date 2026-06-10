@@ -2,9 +2,7 @@
 
 namespace Tests;
 
-use App\Models\Recipe;
 use App\Models\User;
-use App\Production\Step;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase

@@ -1,18 +1,16 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
+@import "tailwindcss";
 
-/*input, select, [type="number"] {*/
-/*    @apply dark:bg-gray-800 dark:text-gray-100;*/
-/*}*/
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 .btn-sm {
-    @apply py-1 px-2 text-sm rounded-lg shadow text-white disabled:cursor-not-allowed disabled:bg-opacity-30 disabled:hover:bg-opacity-30 disabled:focus:bg-opacity-30 whitespace-nowrap;
+    @apply py-1 px-2 text-sm rounded-lg shadow text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:opacity-30 disabled:focus:opacity-30 whitespace-nowrap;
 }
 
 .btn {
-    @apply px-4 py-2 rounded-lg shadow text-white disabled:cursor-not-allowed disabled:bg-opacity-30 disabled:hover:bg-opacity-30 disabled:focus:bg-opacity-30 whitespace-nowrap;
+    @apply px-4 py-2 rounded-lg shadow text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:opacity-30 disabled:focus:opacity-30 whitespace-nowrap;
 }
 
 .btn-emerald {

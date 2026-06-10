@@ -243,7 +243,7 @@ export default {
         },
 
         doSort(a, b) {
-            let aa = (a == +a ? +a : a) || 0,
+            const aa = (a == +a ? +a : a) || 0,
                 bb = (b == +b ? +b : b) || 0;
 
             if (aa < bb) {

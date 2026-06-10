@@ -4,77 +4,76 @@ namespace Tests\Unit;
 
 use App\Models\Building;
 use App\Models\BuildingVariant;
-use App\Models\Ingredient;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class BuildingTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_has_a_name()
     {
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'name' => null
+            'name' => null,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_inputs()
     {
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'inputs' => null
+            'inputs' => null,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_outputs()
     {
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'outputs' => null
+            'outputs' => null,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_height()
     {
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'height' => null
+            'height' => null,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_width()
     {
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'width' => null
+            'width' => null,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_a_length()
     {
         $this->expectException(QueryException::class);
 
         Building::factory()->create([
-            'length' => null
+            'length' => null,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_variants()
     {
         $building = Building::factory()->create();
@@ -85,6 +84,4 @@ class BuildingTest extends TestCase
         $this->assertTrue($building->variants()->skip(1)->first()->is($variants[1]));
         $this->assertTrue($building->variants()->skip(2)->first()->is($variants[2]));
     }
-
-
 }

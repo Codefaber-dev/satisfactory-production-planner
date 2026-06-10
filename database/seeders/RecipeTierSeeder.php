@@ -14,10 +14,10 @@ class RecipeTierSeeder extends Seeder
      */
     public function run()
     {
-        Recipe::where('alt_recipe',true)
+        Recipe::where('alt_recipe', true)
             ->get()
-            ->each(function($recipe){
-                $recipe->alt_tier = $recipe->ingredients->max('tier')+1;
+            ->each(function ($recipe) {
+                $recipe->alt_tier = $recipe->ingredients->max('tier') + 1;
                 $recipe->save();
             });
     }

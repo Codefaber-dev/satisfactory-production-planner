@@ -146,7 +146,7 @@ export default {
         },
 
         levelStepMap() {
-            let ret = {};
+            const ret = {};
 
             this.resultsArray.forEach((level, levelIndex) => {
                 Object.keys(level).forEach((mat) => {

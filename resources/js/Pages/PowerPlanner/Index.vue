@@ -46,20 +46,20 @@ export default {
     name: 'Index',
 
     components: {
-        AppLayout
+        AppLayout,
     },
 
     data() {
         return {
             output: 100,
-        }
+        };
     },
 
     methods: {
         fetch() {
-            this.$inertia.get(`/power/${this.output}`)
-        }
-    }
+            this.$inertia.get(`/power/${this.output}`);
+        },
+    },
 };
 </script>
 

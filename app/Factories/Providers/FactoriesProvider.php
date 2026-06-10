@@ -16,7 +16,7 @@ class FactoriesProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Factories', function() {
+        $this->app->singleton('Factories', function () {
             if (auth()->guest()) {
                 return new FactoriesRepository(new GuestFactories);
             }

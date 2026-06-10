@@ -87,58 +87,58 @@
 </template>
 
 <script>
-    import JetActionMessage from '@/Jetstream/ActionMessage'
-    import JetActionSection from '@/Jetstream/ActionSection'
-    import JetButton from '@/Jetstream/Button'
-    import JetDialogModal from '@/Jetstream/DialogModal'
-    import JetInput from '@/Jetstream/Input'
-    import JetInputError from '@/Jetstream/InputError'
-    import JetSecondaryButton from '@/Jetstream/SecondaryButton'
+import JetActionMessage from '@/Jetstream/ActionMessage';
+import JetActionSection from '@/Jetstream/ActionSection';
+import JetButton from '@/Jetstream/Button';
+import JetDialogModal from '@/Jetstream/DialogModal';
+import JetInput from '@/Jetstream/Input';
+import JetInputError from '@/Jetstream/InputError';
+import JetSecondaryButton from '@/Jetstream/SecondaryButton';
 
-    export default {
-        props: ['sessions'],
+export default {
+    props: ['sessions'],
 
-        components: {
-            JetActionMessage,
-            JetActionSection,
-            JetButton,
-            JetDialogModal,
-            JetInput,
-            JetInputError,
-            JetSecondaryButton,
+    components: {
+        JetActionMessage,
+        JetActionSection,
+        JetButton,
+        JetDialogModal,
+        JetInput,
+        JetInputError,
+        JetSecondaryButton,
+    },
+
+    data() {
+        return {
+            confirmingLogout: false,
+
+            form: this.$inertia.form({
+                password: '',
+            }),
+        };
+    },
+
+    methods: {
+        confirmLogout() {
+            this.confirmingLogout = true;
+
+            setTimeout(() => this.$refs.password.focus(), 250);
         },
 
-        data() {
-            return {
-                confirmingLogout: false,
-
-                form: this.$inertia.form({
-                    password: '',
-                })
-            }
+        logoutOtherBrowserSessions() {
+            this.form.delete(route('other-browser-sessions.destroy'), {
+                preserveScroll: true,
+                onSuccess: () => this.closeModal(),
+                onError: () => this.$refs.password.focus(),
+                onFinish: () => this.form.reset(),
+            });
         },
 
-        methods: {
-            confirmLogout() {
-                this.confirmingLogout = true
+        closeModal() {
+            this.confirmingLogout = false;
 
-                setTimeout(() => this.$refs.password.focus(), 250)
-            },
-
-            logoutOtherBrowserSessions() {
-                this.form.delete(route('other-browser-sessions.destroy'), {
-                    preserveScroll: true,
-                    onSuccess: () => this.closeModal(),
-                    onError: () => this.$refs.password.focus(),
-                    onFinish: () => this.form.reset(),
-                })
-            },
-
-            closeModal() {
-                this.confirmingLogout = false
-
-                this.form.reset()
-            },
+            this.form.reset();
         },
-    }
+    },
+};
 </script>

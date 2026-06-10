@@ -59,11 +59,10 @@ export default {
     },
 
     mounted() {
-        if (this.recipes?.length === 1 && this.selected.dummy)
-            this.selected = this.recipes[0];
+        if (this.recipes?.length === 1 && this.selected.dummy) this.selected = this.recipes[0];
 
-        if ( ! this.selected?.product?.name.length ) {
-            this.select({recipe: this.defaultRecipe});
+        if (!this.selected?.product?.name.length) {
+            this.select({ recipe: this.defaultRecipe });
         }
     },
 
@@ -86,8 +85,8 @@ export default {
             type: Object,
             default() {
                 return {};
-            }
-        }
+            },
+        },
     },
 
     data() {
@@ -112,16 +111,18 @@ export default {
 
     computed: {
         selectedChosen() {
-            return Object.values(this.choices).some(o => (o === this.selected.description || o === this.selected.product.name));
+            return Object.values(this.choices).some(
+                (o) => o === this.selected.description || o === this.selected.product.name
+            );
         },
 
         defaultRecipe() {
-            if (this.recipes.some(o => o.favorite)) {
-                return this.recipes.find(o => o.favorite);
+            if (this.recipes.some((o) => o.favorite)) {
+                return this.recipes.find((o) => o.favorite);
             }
 
-            return this.recipes.filter(o => !o.description)[0];
-        }
+            return this.recipes.filter((o) => !o.description)[0];
+        },
     },
 
     methods: {
@@ -138,9 +139,7 @@ export default {
         },
 
         handler(event) {
-            console.log(
-                'Clicked outside (Using config), middleware returned true :)'
-            );
+            console.log('Clicked outside (Using config), middleware returned true :)');
         },
         // Note: The middleware will be executed if the event was fired outside the element.
         //       It should have only sync functionality and it should return a boolean to

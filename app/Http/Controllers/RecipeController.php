@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Recipe;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class RecipeController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -20,7 +21,7 @@ class RecipeController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -30,8 +31,7 @@ class RecipeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -41,8 +41,7 @@ class RecipeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Recipe  $recipe
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Recipe $recipe)
     {
@@ -52,8 +51,7 @@ class RecipeController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Recipe  $recipe
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Recipe $recipe)
     {
@@ -63,9 +61,7 @@ class RecipeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Recipe  $recipe
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Recipe $recipe)
     {
@@ -75,8 +71,7 @@ class RecipeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Recipe  $recipe
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Recipe $recipe)
     {

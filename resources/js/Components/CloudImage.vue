@@ -21,7 +21,7 @@ export default {
 
     computed: {
         url() {
-            let opts = {},
+            const opts = {},
                 publicId = this.publicId
                     .replace(/ /gi, '')
                     .replace(/Packaged/gi, '')

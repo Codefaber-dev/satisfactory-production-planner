@@ -9,12 +9,10 @@ use App\Models\Recipe;
 use App\MultiFactories\Facades\MultiFactories;
 use App\Production\Multiplexer;
 use App\Production\ProductionCalculator;
-use App\Production\ProductionGlobals;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Laravel\Jetstream\Jetstream;
+
 use function http_build_query;
 
 class ProductionController extends Controller
@@ -22,33 +20,33 @@ class ProductionController extends Controller
     protected function baseData()
     {
         $products = Ingredient::processed()->orderBy('name')->get();
-        $recipes = Cache::remember('all_recipes', now()->addDay(), function() {
-            return Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
+        $recipes = Cache::remember('all_recipes', now()->addDay(), function () {
+            return Recipe::all()->groupBy(fn ($recipe) => $recipe->product->name);
         });
         $favorites = Favorites::all();
         $factory = Factories::find(request('factory'));
         $multiFactory = MultiFactories::find(request('multiFactory'));
-        $choices = !empty(request('choices',[])) ? collect(request('choices',(object) []))->reject(fn($name) => r($name)->isDefault())->all() : null;
+        $choices = ! empty(request('choices', [])) ? collect(request('choices', (object) []))->reject(fn ($name) => r($name)->isDefault())->all() : null;
         $even = request('even') ? 1 : 0;
         $speedLimit = request('speedLimit', 'both');
 
-        return compact('products','recipes','favorites','factory','multiFactory','choices','even','speedLimit');
+        return compact('products', 'recipes', 'favorites', 'factory', 'multiFactory', 'choices', 'even', 'speedLimit');
     }
 
     public function index()
     {
-        return Inertia::render('Production/Index',$this->baseData());
+        return Inertia::render('Production/Index', $this->baseData());
     }
 
-    public function show($ingredient, $qty, $recipe, $variant="mk1")
+    public function show($ingredient, $qty, $recipe, $variant = 'mk1')
     {
-        $choices = collect(request('choices'))->map(fn($name) => r($name));
+        $choices = collect(request('choices'))->map(fn ($name) => r($name));
 
         $calc = ProductionCalculator::make(
             product: $product = i($ingredient),
             qty: $yield = $qty,
             recipe: $recipe,
-            imports: request()->has('imports') ? explode(",",request("imports")) : [],
+            imports: request()->has('imports') ? explode(',', request('imports')) : [],
             variant: $variant,
             choices: $choices
         );
@@ -63,52 +61,52 @@ class ProductionController extends Controller
             'recipe' => $calc->getSteps()->getRecipe(),
             'overrides' => $calc->getSteps()->getOverrides(),
             'byproducts' => $calc->getByproducts(),
-            'overviews' => $calc->getOverviews()
+            'overviews' => $calc->getOverviews(),
         ];
 
-        //dd($calc->getOverviews());
+        // dd($calc->getOverviews());
 
         $imports = request('imports');
 
-        $belt_speed = request('belt_speed',780);
+        $belt_speed = request('belt_speed', 780);
 
-        return Inertia::render('Production/Show',compact('production','product','yield','recipe','variant','belt_speed','imports') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports') + $this->baseData());
     }
 
     public function multi()
     {
-        $products = collect(request('product'))->map(fn($name) => i($name));
+        $products = collect(request('product'))->map(fn ($name) => i($name));
         $yields = request('yield');
-        $recipes = collect(request('recipe'))->map(fn($name) => r($name));
+        $recipes = collect(request('recipe'))->map(fn ($name) => r($name));
         $variant = request('variant');
-        $choices = collect(request('choices'))->map(fn($name) => r($name));
-        $multi = compact('products','yields','recipes');
+        $choices = collect(request('choices'))->map(fn ($name) => r($name));
+        $multi = compact('products', 'yields', 'recipes');
         $even = request('even') ? 1 : 0;
         $speedLimit = request('speedLimit', 'both');
-        $belt_speed = request('belt_speed',780);
+        $belt_speed = request('belt_speed', 780);
         $imports = request('imports');
 
         // add request vars to cache key
         $requestVars = request()->all();
 
-        $cacheKey = "multi_production_"
-            . md5(collect(compact('products','yields','recipes','variant','choices','even','speedLimit','belt_speed','imports'))->toJson())
-            . md5(collect($requestVars)->toJson());
+        $cacheKey = 'multi_production_'
+            .md5(collect(compact('products', 'yields', 'recipes', 'variant', 'choices', 'even', 'speedLimit', 'belt_speed', 'imports'))->toJson())
+            .md5(collect($requestVars)->toJson());
 
-        $production = Cache::rememberForever($cacheKey, function() use ($products, $yields, $recipes, $variant,$choices) {
+        $production = Cache::rememberForever($cacheKey, function () use ($products, $yields, $recipes, $variant, $choices) {
 
             $m = new Multiplexer;
 
-            foreach($products as $key => $product) {
+            foreach ($products as $key => $product) {
                 $qty = $yields[$key];
                 $recipe = $recipes[$key];
                 $calc = ProductionCalculator::make(
                     product: $product,
                     qty: $qty,
                     recipe: $recipe,
-                    imports: request()->has('imports') ? explode(",",request("imports")) : [],
+                    imports: request()->has('imports') ? explode(',', request('imports')) : [],
                     variant: $variant,
-                    choices: $recipes->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse()->merge($choices)
+                    choices: $recipes->map(fn ($recipe) => [$recipe->product->name => $recipe])->collapse()->merge($choices)
                 );
                 $m->add($calc);
             }
@@ -118,7 +116,6 @@ class ProductionController extends Controller
             $m->recalculateUsingByproducts();
             $m->recalculateUsingByproducts();
             $m->recalculateUsingByproducts();
-
 
             return $production = [
                 'results' => $m->getResults(),
@@ -130,14 +127,14 @@ class ProductionController extends Controller
                 'recipe' => $m->getRecipes(),
                 'overrides' => $m->getOverrides(),
                 'byproducts' => $m->getByproducts(),
-                'overviews' => $m->getOverviews()
+                'overviews' => $m->getOverviews(),
             ];
         });
 
-        return Inertia::render('Production/Show',compact('production','variant','belt_speed','imports','multi') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi') + $this->baseData());
     }
 
-    public function newYield($ingredient, $qty, $recipe, $variant="mk1")
+    public function newYield($ingredient, $qty, $recipe, $variant = 'mk1')
     {
         $choices = request('choices');
 
@@ -145,14 +142,14 @@ class ProductionController extends Controller
             product: $product = i($ingredient),
             qty: $yield = $qty,
             recipe: $recipe,
-            imports: $imports = request()->has('imports') ? explode(",",request("imports")) : [],
+            imports: $imports = request()->has('imports') ? explode(',', request('imports')) : [],
             favorites: Favorites::all(),
             variant: $variant,
-            choices: collect($choices)->map(fn($name) => r($name))
+            choices: collect($choices)->map(fn ($name) => r($name))
         );
 
         $newQty = $calc->getAdjustedQty();
-        $belt_speed = request('belt_speed',780);
+        $belt_speed = request('belt_speed', 780);
         $factory = request('factory');
         $imports = request('imports');
         $choices = http_build_query(compact('choices'));
@@ -160,54 +157,53 @@ class ProductionController extends Controller
         return redirect()->to("/dashboard/$ingredient/{$newQty}/$recipe/$variant?belt_speed={$belt_speed}&factory={$factory}&imports={$imports}&{$choices}");
     }
 
-
     public function newYieldMulti()
     {
         $choices = request('choices');
-        $products = collect(request('product'))->map(fn($name) => i($name));
+        $products = collect(request('product'))->map(fn ($name) => i($name));
         $yields = request('yield');
-        $recipes = collect(request('recipe'))->map(fn($name) => r($name));
+        $recipes = collect(request('recipe'))->map(fn ($name) => r($name));
         $variant = request('variant');
 
         $m = new Multiplexer;
 
-        foreach($products as $key => $product) {
+        foreach ($products as $key => $product) {
             $qty = $yields[$key];
             $recipe = $recipes[$key];
             $calc = ProductionCalculator::make(
                 product: $product,
                 qty: $qty,
                 recipe: $recipe,
-                imports: request()->has('imports') ? explode(",",request("imports")) : [],
+                imports: request()->has('imports') ? explode(',', request('imports')) : [],
                 variant: $variant,
-                choices: collect($choices)->map(fn($name) => r($name))->merge($recipes->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse())
+                choices: collect($choices)->map(fn ($name) => r($name))->merge($recipes->map(fn ($recipe) => [$recipe->product->name => $recipe])->collapse())
             );
             $m->add($calc);
         }
 
         $ratio = $m->ratioOfAvailableRawMaterials();
 
-        foreach($yields as $key => $value) {
+        foreach ($yields as $key => $value) {
             $yields[$key] = floor(10000 * $value * $ratio) / 10000;
         }
 
-        $belt_speed = request('belt_speed',780);
+        $belt_speed = request('belt_speed', 780);
         $factory = request('factory');
         $imports = request('imports');
 
-        return redirect()->to("/dashboard/multi?belt_speed={$belt_speed}&factory={$factory}&imports={$imports}&variant={$variant}&" .
-            http_build_query(["choices" => $choices, "product" => request('product'), "yield" => $yields, "recipe" => $recipes->map(fn($recipe) => $recipe->description ?? $recipe->product->name)->all()]));
+        return redirect()->to("/dashboard/multi?belt_speed={$belt_speed}&factory={$factory}&imports={$imports}&variant={$variant}&".
+            http_build_query(['choices' => $choices, 'product' => request('product'), 'yield' => $yields, 'recipe' => $recipes->map(fn ($recipe) => $recipe->description ?? $recipe->product->name)->all()]));
     }
 
     public function addFavorite(Recipe $recipe)
     {
         $product = $recipe->product;
-        //$yield = 10;
-        //$production = ProductionCalculator::calc($product,$yield,$recipe);
+        // $yield = 10;
+        // $production = ProductionCalculator::calc($product,$yield,$recipe);
 
-        Favorites::set($product,$recipe);
+        Favorites::set($product, $recipe);
 
-        //return Inertia::render('Production/Show',compact('production','product','yield','recipe') + $this->baseData());
+        // return Inertia::render('Production/Show',compact('production','product','yield','recipe') + $this->baseData());
 
         return redirect()->back();
     }

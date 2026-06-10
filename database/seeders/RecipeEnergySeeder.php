@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Recipe;
 use Illuminate\Database\Seeder;
 
 class RecipeEnergySeeder extends Seeder
@@ -12,8 +11,5 @@ class RecipeEnergySeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
-
-    }
+    public function run() {}
 }

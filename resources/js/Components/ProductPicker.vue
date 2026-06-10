@@ -123,7 +123,7 @@ export default {
         selectSingleResult() {
             if (this.filteredProducts.length === 1) {
                 console.log('Only one result. Selecting it.');
-                let o = {
+                const o = {
                     product: Object.assign({}, this.filteredProducts[0]),
                 };
 
@@ -133,7 +133,7 @@ export default {
 
             // see if there is an exact match
             if (this.filteredProducts.some((o) => o.name.toLowerCase() === this.filter.toLowerCase())) {
-                let o = {
+                const o = {
                     product: this.filteredProducts.filter((o) => o.name.toLowerCase() === this.filter.toLowerCase())[0],
                 };
                 this.$emit('select', o);

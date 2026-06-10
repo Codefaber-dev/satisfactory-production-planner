@@ -6,8 +6,8 @@ use App\Favorites\Contracts\FavoritesContract;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+
 use function get_class;
 use function guest_token;
 use function is_object;
@@ -21,7 +21,7 @@ class GuestFavorites implements FavoritesContract
     {
         $id = (int) Redis::hGet($this->getCacheTag(), $this->getCacheKey($ingredient));
 
-        if ( $id && $recipe = Recipe::find($id) ) {
+        if ($id && $recipe = Recipe::find($id)) {
             return $recipe;
         }
 
@@ -31,6 +31,7 @@ class GuestFavorites implements FavoritesContract
     public function set(Ingredient $ingredient, Recipe $recipe): void
     {
         Redis::hSet($this->getCacheTag(), $this->getCacheKey($ingredient), $recipe->id);
+        Redis::expire($this->getCacheTag(), config('session.lifetime') * 60);
     }
 
     public function setDefault(Ingredient $ingredient): void
@@ -40,9 +41,9 @@ class GuestFavorites implements FavoritesContract
 
     public function setByName(Ingredient $ingredient, string $name): void
     {
-        if ( ! $recipe = Recipe::ofName($name) ) {
-             return;
-         }
+        if (! $recipe = Recipe::ofName($name)) {
+            return;
+        }
 
         $this->set($ingredient, $recipe);
     }
@@ -52,14 +53,14 @@ class GuestFavorites implements FavoritesContract
         return $recipe->id === ((int) Redis::hGet($this->getCacheTag(), $this->getCacheKey($recipe->product)));
     }
 
-    protected function getCacheKey(Ingredient $ingredient) : string
+    protected function getCacheKey(Ingredient $ingredient): string
     {
         $guestToken = guest_token();
 
         return "favorites.{$guestToken}.ingredient.{$ingredient->id}";
     }
 
-    public function getCacheTag() : string
+    public function getCacheTag(): string
     {
         $guestToken = guest_token();
 
@@ -75,11 +76,11 @@ class GuestFavorites implements FavoritesContract
 
     public function getMappedFavorites(null|array|Collection $favorites): Collection
     {
-        switch(true) {
-            case is_null($favorites) :
-            case is_array($favorites) && empty($favorites) :
-            case is_object($favorites) && get_class($favorites) === Collection::class && $favorites->isEmpty() :
-                return $this->all()->map(fn($recipe) => [$recipe->product->name => $recipe])->collapse();
+        switch (true) {
+            case is_null($favorites):
+            case is_array($favorites) && empty($favorites):
+            case is_object($favorites) && get_class($favorites) === Collection::class && $favorites->isEmpty():
+                return $this->all()->map(fn ($recipe) => [$recipe->product->name => $recipe])->collapse();
         }
 
         return collect($favorites);

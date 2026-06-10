@@ -23,11 +23,11 @@ class BuildingFactory extends Factory
     {
         return [
             'name' => $this->faker->unique()->name(),
-            'inputs' => $this->faker->numberBetween(1,4),
-            'outputs' => $this->faker->numberBetween(1,2),
-            'width' => $this->faker->numberBetween(8,24),
-            'length' => $this->faker->numberBetween(8,24),
-            'height' => $this->faker->numberBetween(8,24),
+            'inputs' => $this->faker->numberBetween(1, 4),
+            'outputs' => $this->faker->numberBetween(1, 2),
+            'width' => $this->faker->numberBetween(8, 24),
+            'length' => $this->faker->numberBetween(8, 24),
+            'height' => $this->faker->numberBetween(8, 24),
 
         ];
     }

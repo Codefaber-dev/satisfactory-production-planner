@@ -8,29 +8,29 @@ use Illuminate\Database\Seeder;
 class FicsmasIngredientSeeder extends Seeder
 {
     protected $tier1 = [
-        'FICSMAS Gift' //image
+        'FICSMAS Gift', // image
     ];
 
     protected $tier2 = [
-        'Actual Snow', //image
-        'Blue FICSMAS Ornament', //image
-        'Red FICSMAS Ornament', //image
-        'Candy Cane', //image
-        'FICSMAS Bow', //image
-        'FICSMAS Tree Branch', //image
+        'Actual Snow', // image
+        'Blue FICSMAS Ornament', // image
+        'Red FICSMAS Ornament', // image
+        'Candy Cane', // image
+        'FICSMAS Bow', // image
+        'FICSMAS Tree Branch', // image
     ];
 
     protected $tier3 = [
-        'Copper FICSMAS Ornament',//image
-        'Iron FICSMAS Ornament',//image
-        'Fancy Fireworks',//image
-        'Snowball', //image
-        'Sparkly Fireworks',//image
-        'Sweet Fireworks',//image
+        'Copper FICSMAS Ornament', // image
+        'Iron FICSMAS Ornament', // image
+        'Fancy Fireworks', // image
+        'Snowball', // image
+        'Sparkly Fireworks', // image
+        'Sweet Fireworks', // image
     ];
 
     protected $tier4 = [
-        'FICSMAS Ornament Bundle', //image
+        'FICSMAS Ornament Bundle', // image
     ];
 
     protected $tier5 = [
@@ -38,9 +38,8 @@ class FicsmasIngredientSeeder extends Seeder
     ];
 
     protected $tier6 = [
-        'FICSMAS Wonder Star'
+        'FICSMAS Wonder Star',
     ];
-
 
     /**
      * Run the database seeds.
@@ -50,13 +49,13 @@ class FicsmasIngredientSeeder extends Seeder
     public function run()
     {
         collect($this->tier1)
-            ->each(fn($name) => Ingredient::forceCreate(['name' => $name, 'raw' => true, 'tier' => 1, 'is_ficsmas' => true]));
+            ->each(fn ($name) => Ingredient::forceCreate(['name' => $name, 'raw' => true, 'tier' => 1, 'is_ficsmas' => true]));
 
-        collect(range(2,6))
-            ->each(function($num) {
+        collect(range(2, 6))
+            ->each(function ($num) {
                 $tier = "tier{$num}";
                 collect($this->$tier)
-                    ->each(fn($name) => Ingredient::forceCreate(['name' => $name, 'raw' => false, 'tier' => $num, 'is_ficsmas' => true]));
+                    ->each(fn ($name) => Ingredient::forceCreate(['name' => $name, 'raw' => false, 'tier' => $num, 'is_ficsmas' => true]));
             });
 
     }

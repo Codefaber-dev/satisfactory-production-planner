@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\MultiFactories\Facades\MultiFactories;
-use Illuminate\Http\Request;
 
 class MultiProductionLineController extends Controller
 {
@@ -12,9 +11,9 @@ class MultiProductionLineController extends Controller
         $attributes = [
             'name' => request('name'),
             'outputs' => request('outputs'),
-            'notes' => request()->has('notes') ? request('notes',"") : null,
-            'imports' => request()->has('imports') ? request('imports',"") : null,
-            'choices' => request()->has('choices') ? request('choices',[]) : []
+            'notes' => request()->has('notes') ? request('notes', '') : null,
+            'imports' => request()->has('imports') ? request('imports', '') : null,
+            'choices' => request()->has('choices') ? request('choices', []) : [],
         ];
 
         MultiFactories::create($attributes);
@@ -27,9 +26,9 @@ class MultiProductionLineController extends Controller
         $attributes = [
             'name' => request('name'),
             'outputs' => request('outputs'),
-            'notes' => request()->has('notes') ? request('notes',"") : null,
-            'imports' => request()->has('imports') ? request('imports',"") : null,
-            'choices' => request()->has('choices') ? request('choices',[]) : []
+            'notes' => request()->has('notes') ? request('notes', '') : null,
+            'imports' => request()->has('imports') ? request('imports', '') : null,
+            'choices' => request()->has('choices') ? request('choices', []) : [],
         ];
 
         MultiFactories::update($id, $attributes);

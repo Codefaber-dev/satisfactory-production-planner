@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Recipe;
 use App\Enums\Recipe as Enum;
+use App\Models\Recipe;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -25,12 +25,10 @@ class FindMissingRecipes extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
-        $this->warn("Missing Recipes");
+        $this->warn('Missing Recipes');
         collect(Enum::cases())->each(function (Enum $recipe) {
             if (! Recipe::ofName($recipe->value)?->exists()) {
                 $this->info($recipe->value);

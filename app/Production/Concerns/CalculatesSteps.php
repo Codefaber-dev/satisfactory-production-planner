@@ -18,11 +18,12 @@ trait CalculatesSteps
     protected function calculate(): void
     {
         // determine if the current ingredient is a byproduct of another step
-        if($this->isByproduct()) {
+        if ($this->isByproduct()) {
             $this->recycleByproducts();
 
-            if($this->getQty() === 0) {
+            if ($this->getQty() === 0) {
                 $this->all_byproduct = true;
+
                 return;
             }
         }
@@ -33,17 +34,18 @@ trait CalculatesSteps
         }
 
         // determine if the current ingredient is imported
-        if($this->isImported()) {
+        if ($this->isImported()) {
             $this->imported = true;
+
             return;
         }
 
-        //$this->setOverview(BuildingOverview::make(
+        // $this->setOverview(BuildingOverview::make(
         //    recipe: $this->getRecipe(),
         //    qty: $this->getQty(),
         //    belt_speed: $this->getBeltSpeed(),
         //    variant: $this->getVariant()
-        //));
+        // ));
 
         $this->ingredients = $this->getRecipe()->ingredients;
 
@@ -71,19 +73,19 @@ trait CalculatesSteps
     protected function check(): bool
     {
         // check the dependencies
-        return $this->getChain()->filter(fn($val) => $val === $this->getName())->count() === 1;
+        return $this->getChain()->filter(fn ($val) => $val === $this->getName())->count() === 1;
     }
 
     protected function useCompatibleRecipe(): void
     {
-        $recipe = $this->getProduct()->recipes->filter(function(Recipe $recipe) {
+        $recipe = $this->getProduct()->recipes->filter(function (Recipe $recipe) {
             return $recipe->ingredients
-                ->map(fn($ingredient)=>$ingredient->name)
+                ->map(fn ($ingredient) => $ingredient->name)
                 ->intersect($this->getChain())
                 ->isEmpty();
         })->first();
 
-        $description = $recipe->description ?? "default";
+        $description = $recipe->description ?? 'default';
 
         $this->setWarning("Using {$description} recipe for {$this->getName()} to avoid circular dependency.");
 

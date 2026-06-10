@@ -23,19 +23,19 @@
 </template>
 
 <script>
-    import JetSectionTitle from './SectionTitle'
+import JetSectionTitle from './SectionTitle';
 
-    export default {
-        emits: ['submitted'],
+export default {
+    emits: ['submitted'],
 
-        components: {
-            JetSectionTitle,
+    components: {
+        JetSectionTitle,
+    },
+
+    computed: {
+        hasActions() {
+            return !!this.$slots.actions;
         },
-
-        computed: {
-            hasActions() {
-                return !! this.$slots.actions
-            }
-        }
-    }
+    },
+};
 </script>

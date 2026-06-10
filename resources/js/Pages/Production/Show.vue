@@ -269,7 +269,7 @@ export default {
     ],
 
     data() {
-        let outputs = this.multi
+        const outputs = this.multi
             ? this.multi.products.map((o, i) => {
                   return {
                       yield: this.multi.yields[i],
@@ -339,7 +339,7 @@ export default {
             // }
 
             return Object.values(this.overviews).map((o) => {
-                let clock = o.clock,
+                const clock = o.clock,
                     variant_name = o.selected_variant_name;
                 return {
                     clock,
@@ -369,12 +369,12 @@ export default {
         },
 
         production__building_summary() {
-            let deets = this.production__building_details.groupBy('variant_name'),
+            const deets = this.production__building_details.groupBy('variant_name'),
                 ret = {
                     variants: {},
                 };
 
-            for (let prop in deets) {
+            for (const prop in deets) {
                 ret.variants[prop] = {
                     build_cost: deets[prop].mapAndSumProperties('build_cost'),
                     num_buildings: deets[prop].sum('num_buildings'),
@@ -443,14 +443,14 @@ export default {
                 return 'multi';
             }
 
-            let p = this.form.outputs[0],
+            const p = this.form.outputs[0],
                 parts = [p.product.name, p.yield, p.recipe.description || p.product.name, this.form.variant];
 
             return parts.join('/');
         },
 
         params() {
-            let params = {
+            const params = {
                 imports: Object.keys(this.newImports)
                     .filter((o) => this.newImports[o])
                     .join(','),
@@ -507,9 +507,9 @@ export default {
 
             this.working = true;
 
-            let raw = [];
+            const raw = [];
 
-            for (let prop in this.rawMaterials) {
+            for (const prop in this.rawMaterials) {
                 if (!this.disabledRawMaterials[prop]) {
                     raw.push(`${prop}:${this.rawMaterials[prop]}`);
                 }
@@ -539,7 +539,7 @@ export default {
 
         pushOutput({ qty, product, recipe }) {
             if (product && this.form.outputs.some((o) => o.product.name === product.name)) {
-                let old_yield = +this.form.outputs.find((o) => o.product.name === product.name).yield;
+                const old_yield = +this.form.outputs.find((o) => o.product.name === product.name).yield;
                 this.updateYield(product.name, old_yield + qty);
                 return;
             }

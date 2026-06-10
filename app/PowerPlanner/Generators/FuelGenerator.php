@@ -3,11 +3,10 @@
 namespace App\PowerPlanner\Generators;
 
 use App\Enums\Ingredient;
-use voku\helper\ASCII;
 
 class FuelGenerator extends Base
 {
-    protected $name = "Fuel Generator";
+    protected $name = 'Fuel Generator';
 
     protected $gross_output = 250; // 250 MW = 15000 MJ / min
 

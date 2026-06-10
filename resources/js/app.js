@@ -1,33 +1,29 @@
-require('./bootstrap');
+import './bootstrap';
 
-// Import modules...
 import { createApp, h } from 'vue';
 import mitt from 'mitt';
-import { App as InertiaApp, plugin as InertiaPlugin, InertiaLink } from '@inertiajs/inertia-vue3';
-import { InertiaProgress } from '@inertiajs/progress';
+import { createInertiaApp, Link } from '@inertiajs/vue3';
 import CloudImage from '@/Components/CloudImage';
-import {createPinia} from 'pinia';
-
-const el = document.getElementById('app');
+import { createPinia } from 'pinia';
 
 const Bus = mitt();
 const Pinia = createPinia();
 
-const app = createApp({
-    render: () =>
-        h(InertiaApp, {
-            initialPage: JSON.parse(el.dataset.page),
-            resolveComponent: (name) => require(`./Pages/${name}`).default,
-        }),
-    });
+const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
 
-    app.mixin({ methods: { route } })
-        .use(Pinia)
-        .use(InertiaPlugin)
-        .component('CloudImage',CloudImage)
-        .component('InertiaLink',InertiaLink)
-        .mount(el);
-
-app.config.globalProperties.Bus = Bus;
-
-InertiaProgress.init({ color: '#6ee7b7', showSpinner: true });
+createInertiaApp({
+    resolve: (name) => pages[`./Pages/${name}.vue`],
+    setup({ el, App, props, plugin }) {
+        const app = createApp({ render: () => h(App, props) });
+        app.config.globalProperties.Bus = Bus;
+        app.use(plugin)
+            .use(Pinia)
+            .mixin({ methods: { route } })
+            .component('CloudImage', CloudImage)
+            .component('InertiaLink', Link)
+            .mount(el);
+    },
+    progress: {
+        color: '#6ee7b7',
+    },
+});

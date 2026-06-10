@@ -7,7 +7,6 @@ use App\Models\Recipe;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 
-
 /**
  * @method static Collection all()
  * @method static Recipe get(Ingredient $ingredient)
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void setDefault(Ingredient $ingredient)
  * @method static bool isFavorite(Recipe $recipe)
  * @method static Collection getMappedFavorites(null|array|Collection $favorites)
-*/
+ */
 class Favorites extends Facade
 {
     /**

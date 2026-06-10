@@ -10,8 +10,9 @@ class RawIngredientCalculator
 
     public static function calc(Recipe $recipe, $use_alts = false, $qty = 1)
     {
-        if ( auth()->guest() )
+        if (auth()->guest()) {
             auth()->loginUsingId(1);
+        }
 
         $c = new static;
         $c->calculate($recipe, $use_alts, $qty);
@@ -23,17 +24,18 @@ class RawIngredientCalculator
 
     public function calculate($recipe, $use_alts, $qty = 1)
     {
-        if ( ! $recipe->ingredients )
-            dd("recipe has no ingredients",$recipe);
+        if (! $recipe->ingredients) {
+            dd('recipe has no ingredients', $recipe);
+        }
 
         return $recipe
             ->ingredients
-            ->map(function($ingredient) use ($recipe, $qty, $use_alts){
-                $amount_needed = $ingredient->pivot->base_qty * $qty/$recipe->base_per_min;
+            ->map(function ($ingredient) use ($recipe, $qty, $use_alts) {
+                $amount_needed = $ingredient->pivot->base_qty * $qty / $recipe->base_per_min;
 
-                if ($ingredient->isRaw())
+                if ($ingredient->isRaw()) {
                     return $this->addRaw($ingredient->name, $amount_needed);
-                elseif ($use_alts) {
+                } elseif ($use_alts) {
                     return $this->calculate($ingredient->defaultRecipe(), $use_alts, $amount_needed);
                 }
 
@@ -44,9 +46,10 @@ class RawIngredientCalculator
 
     protected function addRaw($name, $qty)
     {
-        if (isset($this->raw[$name]))
+        if (isset($this->raw[$name])) {
             $this->raw[$name] += $qty;
-        else
+        } else {
             $this->raw[$name] = $qty;
+        }
     }
 }

@@ -11,22 +11,33 @@ use Illuminate\Support\Collection;
 trait Setters
 {
     protected Ingredient $product;
+
     protected ?Recipe $recipe = null;
+
     protected $qty;
-    //protected $overrides;
-    //protected $favorites;
-    //protected $imports;
+
+    // protected $overrides;
+    // protected $favorites;
+    // protected $imports;
     public ProductionGlobals $globals;
 
     // derived parameters
     protected $name;
+
     protected $parent;
+
     protected $chain;
+
     protected $ingredients;
+
     protected $byproducts;
+
     protected $warning;
+
     protected $imported = false;
+
     protected $all_byproduct = false;
+
     protected ?BuildingOverview $overview = null;
 
     public function setProduct($product): static
@@ -37,9 +48,9 @@ trait Setters
         return $this;
     }
 
-    public function setRecipe($recipe=null): static
+    public function setRecipe($recipe = null): static
     {
-        if ( $this->product->isRaw() ) {
+        if ($this->product->isRaw()) {
             return $this;
         }
 
@@ -52,7 +63,7 @@ trait Setters
         return $this;
     }
 
-    public function setQty($qty=100): static
+    public function setQty($qty = 100): static
     {
         $this->qty = $qty;
 
@@ -66,7 +77,7 @@ trait Setters
         return $this;
     }
 
-    public function setChain($chain=[]): static
+    public function setChain($chain = []): static
     {
         $this->chain = collect($chain);
         $this->chain->push($this->name);
@@ -81,14 +92,14 @@ trait Setters
         return $this;
     }
 
-    //public function setFavorites(Collection|array $favorites): static
-    //{
+    // public function setFavorites(Collection|array $favorites): static
+    // {
     //    $this->favorites = collect($favorites);
     //
     //    $this->overrideFavoritesIfNecessary();
     //
     //    return $this;
-    //}
+    // }
 
     public function setWarning(string $message): static
     {
@@ -123,21 +134,21 @@ trait Setters
         $favorites = $this->getFavorites()->values()->pluck('description');
 
         // scenario 1, recycled rubber and recycled plastic
-        if ($favorites->contains("Recycled Rubber") && $favorites->contains("Recycled Plastic")) {
-            $this->addOverride("Rubber", r("Rubber"));
+        if ($favorites->contains('Recycled Rubber') && $favorites->contains('Recycled Plastic')) {
+            $this->addOverride('Rubber', r('Rubber'));
         }
 
-        if ($favorites->contains("Recycled Rubber") && $this->getRecipe()->is(r("Recycled Plastic"))) {
-            $this->addOverride("Rubber", r("Rubber"));
+        if ($favorites->contains('Recycled Rubber') && $this->getRecipe()->is(r('Recycled Plastic'))) {
+            $this->addOverride('Rubber', r('Rubber'));
         }
 
-        if ($favorites->contains("Recycled Plastic") && $this->getRecipe()->is(r("Recycled Rubber"))) {
-            $this->addOverride("Plastic", r("Plastic"));
+        if ($favorites->contains('Recycled Plastic') && $this->getRecipe()->is(r('Recycled Rubber'))) {
+            $this->addOverride('Plastic', r('Plastic'));
         }
 
         // scenario 2, packaged fuel
-        if ($this->getIntermediateRecipe(i("Fuel"))->is(r("Unpackage Fuel")) && $this->getIntermediateRecipe(i("Packaged Fuel"))->is(r("Packaged Fuel"))) {
-            $this->addOverride("Packaged Fuel",r("Diluted Packaged Fuel"));
+        if ($this->getIntermediateRecipe(i('Fuel'))->is(r('Unpackage Fuel')) && $this->getIntermediateRecipe(i('Packaged Fuel'))->is(r('Packaged Fuel'))) {
+            $this->addOverride('Packaged Fuel', r('Diluted Packaged Fuel'));
         }
     }
 }

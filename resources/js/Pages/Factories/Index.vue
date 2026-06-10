@@ -43,7 +43,7 @@ export default {
     components: {
         AppLayout,
         Factory,
-        MultiFactory
+        MultiFactory,
     },
 
     props: {

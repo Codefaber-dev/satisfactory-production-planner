@@ -38,7 +38,7 @@ class IngredientSeeder extends Seeder
         'Alien Carapace',
         'Green Power Slug',
         'Yellow Power Slug',
-        'Purple Power Slug'
+        'Purple Power Slug',
     ];
 
     protected $tier2 = [
@@ -60,7 +60,7 @@ class IngredientSeeder extends Seeder
         'Biomass',
         'Compacted Coal',
         'Color Cartridge',
-        'Power Shard'
+        'Power Shard',
     ];
 
     protected $tier3 = [
@@ -104,7 +104,7 @@ class IngredientSeeder extends Seeder
         'AI Limiter',
         'Nobelisk',
         'Gas Filter',
-        'Spiked Rebar'
+        'Spiked Rebar',
     ];
 
     protected $tier5 = [
@@ -117,7 +117,7 @@ class IngredientSeeder extends Seeder
         'High-Speed Connector',
         'Electromagnetic Control Rod',
         'Beacon',
-        'Automated Wiring'
+        'Automated Wiring',
     ];
 
     protected $tier6 = [
@@ -131,7 +131,7 @@ class IngredientSeeder extends Seeder
         'Uranium Fuel Rod',
         'Rifle Cartridge',
         'Iodine Infused Filter',
-        'Smart Plating'
+        'Smart Plating',
     ];
 
     protected $tier7 = [
@@ -139,7 +139,7 @@ class IngredientSeeder extends Seeder
         'Cooling System',
         'Uranium Waste',
         'Versatile Framework',
-        'Modular Engine'
+        'Modular Engine',
     ];
 
     protected $tier8 = [
@@ -148,19 +148,19 @@ class IngredientSeeder extends Seeder
         'Non-fissile Uranium',
         'Adaptive Control Unit',
         'Magnetic Field Generator',
-        'Quantum Server' // from MK++ Mod
+        'Quantum Server', // from MK++ Mod
     ];
 
     protected $tier9 = [
         'Pressure Conversion Cube',
         'Plutonium Pellet',
         'Assembly Director System',
-        'Thermal Propulsion Rocket'
+        'Thermal Propulsion Rocket',
     ];
 
     protected $tier10 = [
         'Encased Plutonium Cell',
-        'Nuclear Pasta'
+        'Nuclear Pasta',
     ];
 
     protected $tier11 = [
@@ -168,9 +168,8 @@ class IngredientSeeder extends Seeder
     ];
 
     protected $tier12 = [
-        'Plutonium Waste'
+        'Plutonium Waste',
     ];
-
 
     /**
      * Run the database seeds.
@@ -180,13 +179,13 @@ class IngredientSeeder extends Seeder
     public function run()
     {
         collect($this->tier1)
-            ->each(fn($name) => Ingredient::forceCreate(['name' => $name, 'raw' => true, 'tier' => 1]));
+            ->each(fn ($name) => Ingredient::forceCreate(['name' => $name, 'raw' => true, 'tier' => 1]));
 
-        collect(range(2,12))
-            ->each(function($num) {
+        collect(range(2, 12))
+            ->each(function ($num) {
                 $tier = "tier{$num}";
                 collect($this->$tier)
-                    ->each(fn($name) => Ingredient::forceCreate(['name' => $name, 'raw' => false, 'tier' => $num]));
+                    ->each(fn ($name) => Ingredient::forceCreate(['name' => $name, 'raw' => false, 'tier' => $num]));
             });
 
     }

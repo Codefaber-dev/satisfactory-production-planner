@@ -25,8 +25,6 @@ class RebuildCache extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -37,15 +35,15 @@ class RebuildCache extends Command
         });
 
         collect(Recipe::cases())->each(function ($recipe) {
-           $this->info("Caching $recipe->value");
+            $this->info("Caching $recipe->value");
 
-           r($recipe->value, force: true);
+            r($recipe->value, force: true);
         });
 
-        $this->info("Caching all recipes");
+        $this->info('Caching all recipes');
         Cache::forget('all_recipes');
-        Cache::remember('all_recipes', now()->addDay(), function() {
-            return \App\Models\Recipe::all()->groupBy(fn($recipe) => $recipe->product->name);
+        Cache::remember('all_recipes', now()->addDay(), function () {
+            return \App\Models\Recipe::all()->groupBy(fn ($recipe) => $recipe->product->name);
         });
 
         return static::SUCCESS;

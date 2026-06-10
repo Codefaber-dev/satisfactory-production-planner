@@ -14,25 +14,26 @@ class MultiProductionLine extends Model
     protected $guarded = [];
 
     protected $casts = [
-        "outputs" => "array",
-        "choices" => "array",
+        'outputs' => 'array',
+        'choices' => 'array',
     ];
 
     protected $appends = [
-        "hash_id"
+        'hash_id',
     ];
 
     public function getHashIdAttribute()
     {
-        return "ml_" . app('Hashids')->encode($this->id);
+        return 'ml_'.app('Hashids')->encode($this->id);
     }
 
     public function scopeOfHashId(Builder $query, $hashId)
     {
-        $id = app('Hashids')->decode((string) Str::of($hashId)->after("ml_"));
+        $id = app('Hashids')->decode((string) Str::of($hashId)->after('ml_'));
 
-        if (empty($id))
+        if (empty($id)) {
             return null;
+        }
 
         return static::find($id[0]);
     }
@@ -41,18 +42,16 @@ class MultiProductionLine extends Model
     {
         $atts = $this->toArray();
         $outputs = collect($atts['outputs']);
-        $product = $outputs->map(fn($output) => $output['product']['name'])->all();
-        $yield = $outputs->map(fn($output) => $output['yield'])->all();
-        $recipe = $outputs->map(fn($output) => $output['recipe']['description'] ?? $output['product']['name'])->all();
+        $product = $outputs->map(fn ($output) => $output['product']['name'])->all();
+        $yield = $outputs->map(fn ($output) => $output['yield'])->all();
+        $recipe = $outputs->map(fn ($output) => $output['recipe']['description'] ?? $output['product']['name'])->all();
         $choices = $atts['choices'] ?? [];
 
-        return "/dashboard/multi?imports={$atts['imports']}&variant=mk1&" . http_build_query(compact('product','yield','recipe','choices'));
+        return "/dashboard/multi?imports={$atts['imports']}&variant=mk1&".http_build_query(compact('product', 'yield', 'recipe', 'choices'));
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-
 }

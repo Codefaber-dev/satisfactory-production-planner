@@ -3,12 +3,10 @@
 namespace App\PowerPlanner\Generators;
 
 use App\Enums\Ingredient;
-use Illuminate\Validation\Rules\In;
-use IntlGregorianCalendar;
 
 class NuclearPowerPlant extends Base
 {
-    protected $name = "Nuclear Power Plant";
+    protected $name = 'Nuclear Power Plant';
 
     protected $gross_output = 2500; // 2500 MW = 150000 MJ / min
 
@@ -20,7 +18,7 @@ class NuclearPowerPlant extends Base
     ];
 
     protected $inputs = [
-        Ingredient::WATER->value => 240
+        Ingredient::WATER->value => 240,
     ];
 
     protected $waste = [

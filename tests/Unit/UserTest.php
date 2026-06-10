@@ -6,20 +6,20 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_have_favorite_recipes()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $product = Ingredient::factory()->create();
-
 
         $default = Recipe::factory()->create(['product_id' => $product->id, 'alt_recipe' => false]);
         $recipe1 = Recipe::factory()->create(['product_id' => $product->id, 'alt_recipe' => true]);
@@ -45,8 +45,7 @@ class UserTest extends TestCase
         $this->assertTrue($product->defaultRecipe()->is($default));
     }
 
-
-    /** @test */
+    #[Test]
     public function it_can_have_favorite_recipes_by_description()
     {
         $user = User::factory()->create();

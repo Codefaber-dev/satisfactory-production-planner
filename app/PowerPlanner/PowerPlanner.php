@@ -21,7 +21,6 @@ class PowerPlanner
 
     /**
      * How much MW to produce
-     * @param int $output
      */
     public function __construct(int $output)
     {
@@ -36,6 +35,6 @@ class PowerPlanner
     public function calculate(): Collection
     {
         return collect($this->options)
-            ->map(fn($option) => $option::make($this->output)->calculate());
+            ->map(fn ($option) => $option::make($this->output)->calculate());
     }
 }

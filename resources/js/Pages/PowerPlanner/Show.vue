@@ -109,7 +109,7 @@ export default {
 
     props: {
         plans: Array,
-        output: Number
+        output: Number,
     },
 
     components: {
@@ -120,14 +120,14 @@ export default {
     data() {
         return {
             newOutput: this.output,
-        }
+        };
     },
 
     methods: {
         fetch() {
-            this.$inertia.get(`/power/${this.newOutput}`)
-        }
-    }
+            this.$inertia.get(`/power/${this.newOutput}`);
+        },
+    },
 };
 </script>
 

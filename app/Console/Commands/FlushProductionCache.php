@@ -3,68 +3,52 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Redis;
 
 class FlushProductionCache extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'flush-production-cache';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Flush the cached production lines';
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle(): int
     {
-        Redis::select(1);
+        $connection = Redis::connection('cache');
 
-        $keys = collect(Redis::keys('*production_calc*'));
+        $flushed = 0;
+        $flushed += $this->scanAndDelete($connection, '*production_calc*');
+        $flushed += $this->scanAndDelete($connection, '*multi_production*');
 
-        $this->info("Flushing {$keys->count()} keys");
-
-        $prefix = config('cache.prefix');
-
-        $keys->each(function ($item) use ($prefix) {
-            $key = str($item)->after($prefix . ":");
-
-            if (Cache::forget($key)) {
-                $this->info("Flushed $key");
-            }
-            else {
-                $this->warn("$key is not a valid cache key");
-            }
-        });
-
-        $keys = collect(Redis::keys('*multi_production*'));
-
-        $this->info("Flushing {$keys->count()} keys");
-
-        $prefix = config('cache.prefix');
-
-        $keys->each(function ($item) use ($prefix) {
-            $key = str($item)->after($prefix . ":");
-
-            if (Cache::forget($key)) {
-                $this->info("Flushed $key");
-            }
-            else {
-                $this->warn("$key is not a valid cache key");
-            }
-        });
+        $this->info("Flushed {$flushed} keys total");
 
         return static::SUCCESS;
+    }
+
+    private function scanAndDelete(Connection $connection, string $pattern): int
+    {
+        $cursor = null;
+        $count = 0;
+
+        do {
+            $result = $connection->scan($cursor, ['match' => $pattern, 'count' => 100]);
+
+            if ($result === false) {
+                break;
+            }
+
+            [$cursor, $batch] = $result;
+
+            if ($batch) {
+                $deleted = $connection->client()->rawCommand('DEL', ...$batch);
+                $count += (int) $deleted;
+
+                foreach ($batch as $key) {
+                    $this->info("Flushed $key");
+                }
+            }
+        } while ($cursor != 0);
+
+        return $count;
     }
 }

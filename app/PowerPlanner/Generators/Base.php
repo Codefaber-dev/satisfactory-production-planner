@@ -20,16 +20,16 @@ abstract class Base implements GeneratorContract
     protected $waste = [];
 
     protected $buildable_fuels = [
-        "Biomass",
-        "Solid Biofuel",
-        "Packaged Liquid Biofuel",
-        "Compacted Coal",
-        "Petroleum Coke",
-        "Fuel",
-        "Liquid Biofuel",
-        "Turbofuel",
-        "Uranium Fuel Rod",
-        "Plutonium Fuel Rod"
+        'Biomass',
+        'Solid Biofuel',
+        'Packaged Liquid Biofuel',
+        'Compacted Coal',
+        'Petroleum Coke',
+        'Fuel',
+        'Liquid Biofuel',
+        'Turbofuel',
+        'Uranium Fuel Rod',
+        'Plutonium Fuel Rod',
     ];
 
     protected int $output;
@@ -41,8 +41,6 @@ abstract class Base implements GeneratorContract
 
     /**
      * The desired output in MW
-     *
-     * @param int $output
      */
     public function __construct(int $output)
     {
@@ -58,28 +56,28 @@ abstract class Base implements GeneratorContract
     {
         $numRequired = $this->getNumRequired();
 
-        return collect($this->fuel)->map(fn($qty) => $qty * $numRequired);
+        return collect($this->fuel)->map(fn ($qty) => $qty * $numRequired);
     }
 
     public function getInputRequirements(): Collection
     {
         $numRequired = $this->getNumRequired();
 
-        return collect($this->inputs)->map(fn($qty) => $qty * $numRequired);
+        return collect($this->inputs)->map(fn ($qty) => $qty * $numRequired);
     }
 
     public function getWaste(): Collection
     {
         $numRequired = $this->getNumRequired();
 
-        return collect($this->waste)->map(fn($waste) => collect($waste)->map(fn($qty) => $qty * $numRequired));
+        return collect($this->waste)->map(fn ($waste) => collect($waste)->map(fn ($qty) => $qty * $numRequired));
     }
 
     public function getBuildCost(): Collection
     {
         $numRequired = $this->getNumRequired();
 
-        return collect($this->build_cost)->map(fn($qty) => $qty * $numRequired);
+        return collect($this->build_cost)->map(fn ($qty) => $qty * $numRequired);
     }
 
     public function calculate(): array
@@ -87,15 +85,15 @@ abstract class Base implements GeneratorContract
         $numRequired = $this->getNumRequired();
 
         return [
-            "num" => $numRequired,
-            "name" => $this->name,
-            "output" => $this->gross_output * $numRequired,
-            "fuel" => $this->getFuelRequirements()->all(),
-            "other" => $this->getInputRequirements()->all(),
-            "waste" => $this->getWaste()->all(),
-            "build_cost" => $this->getBuildCost()->all(),
-            "image" => (string) Str::of($this->name)->studly()->append(".png"),
-            "buildable_fuels" => $this->buildable_fuels
+            'num' => $numRequired,
+            'name' => $this->name,
+            'output' => $this->gross_output * $numRequired,
+            'fuel' => $this->getFuelRequirements()->all(),
+            'other' => $this->getInputRequirements()->all(),
+            'waste' => $this->getWaste()->all(),
+            'build_cost' => $this->getBuildCost()->all(),
+            'image' => (string) Str::of($this->name)->studly()->append('.png'),
+            'buildable_fuels' => $this->buildable_fuels,
         ];
     }
 }

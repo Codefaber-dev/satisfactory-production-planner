@@ -32,41 +32,41 @@
 </template>
 
 <script>
-    import JetAuthenticationCard from '@/Jetstream/AuthenticationCard'
-    import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo'
-    import JetButton from '@/Jetstream/Button'
-    import JetInput from '@/Jetstream/Input'
-    import JetLabel from '@/Jetstream/Label'
-    import JetValidationErrors from '@/Jetstream/ValidationErrors'
-    import store from '@/store';
+import JetAuthenticationCard from '@/Jetstream/AuthenticationCard';
+import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo';
+import JetButton from '@/Jetstream/Button';
+import JetInput from '@/Jetstream/Input';
+import JetLabel from '@/Jetstream/Label';
+import JetValidationErrors from '@/Jetstream/ValidationErrors';
+import store from '@/store';
 
-    export default {
-        components: {
-            JetAuthenticationCard,
-            JetAuthenticationCardLogo,
-            JetButton,
-            JetInput,
-            JetLabel,
-            JetValidationErrors
+export default {
+    components: {
+        JetAuthenticationCard,
+        JetAuthenticationCardLogo,
+        JetButton,
+        JetInput,
+        JetLabel,
+        JetValidationErrors,
+    },
+
+    props: {
+        status: String,
+    },
+
+    data() {
+        return {
+            form: this.$inertia.form({
+                email: '',
+            }),
+            dark: store.getItem('dark'),
+        };
+    },
+
+    methods: {
+        submit() {
+            this.form.post(this.route('password.email'));
         },
-
-        props: {
-            status: String
-        },
-
-        data() {
-            return {
-                form: this.$inertia.form({
-                    email: ''
-                }),
-                dark: store.getItem('dark'),
-            }
-        },
-
-        methods: {
-            submit() {
-                this.form.post(this.route('password.email'))
-            }
-        }
-    }
+    },
+};
 </script>

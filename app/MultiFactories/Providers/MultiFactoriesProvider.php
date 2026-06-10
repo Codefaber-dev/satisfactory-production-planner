@@ -2,9 +2,9 @@
 
 namespace App\MultiFactories\Providers;
 
-use App\MultiFactories\MultiFactoriesRepository;
 use App\MultiFactories\Implementations\GuestMultiFactories;
 use App\MultiFactories\Implementations\UserMultiFactories;
+use App\MultiFactories\MultiFactoriesRepository;
 use Illuminate\Support\ServiceProvider;
 
 class MultiFactoriesProvider extends ServiceProvider
@@ -16,7 +16,7 @@ class MultiFactoriesProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('MultiFactories', function() {
+        $this->app->singleton('MultiFactories', function () {
             if (auth()->guest()) {
                 return new MultiFactoriesRepository(new GuestMultiFactories);
             }

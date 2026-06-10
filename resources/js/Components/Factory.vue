@@ -146,8 +146,9 @@
 
 <script>
 import RecipePicker from '@/Components/RecipePicker';
+import MarkdownIt from 'markdown-it';
 
-const Markdown = require('markdown-it')();
+const Markdown = new MarkdownIt();
 
 export default {
     name: 'Factory',
@@ -207,7 +208,7 @@ export default {
         },
 
         deletePrompt() {
-            let conf = confirm('Are you sure you want to delete the factory?');
+            const conf = confirm('Are you sure you want to delete the factory?');
 
             if (!conf) return;
 

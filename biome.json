@@ -1,0 +1,45 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "organizeImports": {
+        "enabled": false
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120
+    },
+    "javascript": {
+        "formatter": {
+            "trailingCommas": "es5",
+            "semicolons": "always",
+            "quoteStyle": "single"
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "suspicious": {
+                "noAssignInExpressions": "warn",
+                "noPrototypeBuiltins": "warn",
+                "noDoubleEquals": "warn"
+            },
+            "complexity": {
+                "noForEach": "warn"
+            },
+            "style": {
+                "noUselessElse": "warn",
+                "useSingleVarDeclarator": "warn",
+                "useTemplate": "warn",
+                "useDefaultParameterLast": "warn"
+            },
+            "performance": {
+                "noDelete": "warn"
+            }
+        }
+    },
+    "files": {
+        "ignore": ["vendor/**", "node_modules/**", "public/**", "*.blade.php", ".claude/**"]
+    }
+}
