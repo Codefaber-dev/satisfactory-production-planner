@@ -2,43 +2,44 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Ingredient as IngredientEnum;
 use App\Models\Ingredient;
 use Illuminate\Database\Seeder;
 
 class FicsmasIngredientSeeder extends Seeder
 {
     protected $tier1 = [
-        'FICSMAS Gift', // image
+        IngredientEnum::FICSMAS_GIFT->value, // image
     ];
 
     protected $tier2 = [
-        'Actual Snow', // image
-        'Blue FICSMAS Ornament', // image
-        'Red FICSMAS Ornament', // image
-        'Candy Cane', // image
-        'FICSMAS Bow', // image
-        'FICSMAS Tree Branch', // image
+        IngredientEnum::ACTUAL_SNOW->value, // image
+        IngredientEnum::BLUE_FICSMAS_ORNAMENT->value, // image
+        IngredientEnum::RED_FICSMAS_ORNAMENT->value, // image
+        IngredientEnum::CANDY_CANE->value, // image
+        IngredientEnum::FICSMAS_BOW->value, // image
+        IngredientEnum::FICSMAS_TREE_BRANCH->value, // image
     ];
 
     protected $tier3 = [
-        'Copper FICSMAS Ornament', // image
-        'Iron FICSMAS Ornament', // image
-        'Fancy Fireworks', // image
-        'Snowball', // image
-        'Sparkly Fireworks', // image
-        'Sweet Fireworks', // image
+        IngredientEnum::COPPER_FICSMAS_ORNAMENT->value, // image
+        IngredientEnum::IRON_FICSMAS_ORNAMENT->value, // image
+        IngredientEnum::FANCY_FIREWORKS->value, // image
+        IngredientEnum::SNOWBALL->value, // image
+        IngredientEnum::SPARKLY_FIREWORKS->value, // image
+        IngredientEnum::SWEET_FIREWORKS->value, // image
     ];
 
     protected $tier4 = [
-        'FICSMAS Ornament Bundle', // image
+        IngredientEnum::FICSMAS_ORNAMENT_BUNDLE->value,
     ];
 
     protected $tier5 = [
-        'FICSMAS Decoration',
+        IngredientEnum::FICSMAS_DECORATION->value,
     ];
 
     protected $tier6 = [
-        'FICSMAS Wonder Star',
+        IngredientEnum::FICSMAS_WONDER_STAR->value,
     ];
 
     /**

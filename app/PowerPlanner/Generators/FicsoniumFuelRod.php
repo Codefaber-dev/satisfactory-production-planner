@@ -2,11 +2,12 @@
 
 namespace App\PowerPlanner\Generators;
 
+use App\Enums\Building;
 use App\Enums\Ingredient;
 
 class FicsoniumFuelRod extends Base
 {
-    protected $name = 'Nuclear Power Plant';
+    protected $name = Building::NUCLEAR_POWER_PLANT->value;
 
     protected $gross_output = 2500;
 

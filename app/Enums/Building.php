@@ -18,7 +18,9 @@ enum Building: string
 
     // power generators
     case BIOMASS_BURNER = 'Biomass Burner';
+    case COAL_GENERATOR = 'Coal Generator';
     case COAL_POWERED_GENERATOR = 'Coal-Powered Generator';
+    case FUEL_GENERATOR = 'Fuel Generator';
     case FUEL_POWERED_GENERATOR = 'Fuel-Powered Generator';
     case GEOTHERMAL_GENERATOR = 'Geothermal Generator';
     case NUCLEAR_POWER_PLANT = 'Nuclear Power Plant';

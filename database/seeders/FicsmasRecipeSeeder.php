@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Building as BuildingEnum;
+use App\Enums\Ingredient as IngredientEnum;
 use App\Models\Building;
 use App\Models\Ingredient;
 use App\Models\Recipe;
@@ -13,20 +15,20 @@ class FicsmasRecipeSeeder extends Seeder
     protected $recipes = [
         // alts done
         // no byproducts
-        'Smelter' => [
-            'Blue FICSMAS Ornament' => [
+        BuildingEnum::SMELTER->value => [
+            IngredientEnum::BLUE_FICSMAS_ORNAMENT->value => [
                 'base_yield' => 2,
                 'base_per_min' => 10,
                 'ingredients' => [
-                    'FICSMAS Gift' => 5,
+                    IngredientEnum::FICSMAS_GIFT->value => 5,
                 ],
             ],
 
-            'Red FICSMAS Ornament' => [
+            IngredientEnum::RED_FICSMAS_ORNAMENT->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'FICSMAS Gift' => 5,
+                    IngredientEnum::FICSMAS_GIFT->value => 5,
                 ],
             ],
 
@@ -34,93 +36,93 @@ class FicsmasRecipeSeeder extends Seeder
 
         // alts done
         // no byproducts
-        'Constructor' => [
-            'Actual Snow' => [
+        BuildingEnum::CONSTRUCTOR->value => [
+            IngredientEnum::ACTUAL_SNOW->value => [
                 'base_yield' => 2,
                 'base_per_min' => 10,
                 'ingredients' => [
-                    'FICSMAS Gift' => 25,
+                    IngredientEnum::FICSMAS_GIFT->value => 25,
                 ],
             ],
-            'Candy Cane' => [
+            IngredientEnum::CANDY_CANE->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'FICSMAS Gift' => 15,
+                    IngredientEnum::FICSMAS_GIFT->value => 15,
                 ],
             ],
-            'FICSMAS Bow' => [
+            IngredientEnum::FICSMAS_BOW->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'FICSMAS Gift' => 10,
+                    IngredientEnum::FICSMAS_GIFT->value => 10,
                 ],
             ],
-            'FICSMAS Tree Branch' => [
+            IngredientEnum::FICSMAS_TREE_BRANCH->value => [
                 'base_yield' => 1,
                 'base_per_min' => 10,
                 'ingredients' => [
-                    'FICSMAS Gift' => 10,
+                    IngredientEnum::FICSMAS_GIFT->value => 10,
                 ],
             ],
-            'Snowball' => [
+            IngredientEnum::SNOWBALL->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'Actual Snow' => 15,
+                    IngredientEnum::ACTUAL_SNOW->value => 15,
                 ],
             ],
         ],
 
         // alts done
         // no byproducts
-        'Assembler' => [
-            'Fancy Fireworks' => [
+        BuildingEnum::ASSEMBLER->value => [
+            IngredientEnum::FANCY_FIREWORKS->value => [
                 'base_yield' => 1,
                 'base_per_min' => 2.5,
                 'ingredients' => [
-                    'FICSMAS Tree Branch' => 10,
-                    'FICSMAS Bow' => 7.5,
+                    IngredientEnum::FICSMAS_TREE_BRANCH->value => 10,
+                    IngredientEnum::FICSMAS_BOW->value => 7.5,
                 ],
             ],
-            'Sparkly Fireworks' => [
+            IngredientEnum::SPARKLY_FIREWORKS->value => [
                 'base_yield' => 1,
                 'base_per_min' => 2.5,
                 'ingredients' => [
-                    'FICSMAS Tree Branch' => 7.5,
-                    'Actual Snow' => 5,
+                    IngredientEnum::FICSMAS_TREE_BRANCH->value => 7.5,
+                    IngredientEnum::ACTUAL_SNOW->value => 5,
                 ],
             ],
-            'Sweet Fireworks' => [
+            IngredientEnum::SWEET_FIREWORKS->value => [
                 'base_yield' => 1,
                 'base_per_min' => 2.5,
                 'ingredients' => [
-                    'FICSMAS Tree Branch' => 15,
-                    'Candy Cane' => 7.5,
+                    IngredientEnum::FICSMAS_TREE_BRANCH->value => 15,
+                    IngredientEnum::CANDY_CANE->value => 7.5,
                 ],
             ],
-            'FICSMAS Decoration' => [
+            IngredientEnum::FICSMAS_DECORATION->value => [
                 'base_yield' => 2,
                 'base_per_min' => 2,
                 'ingredients' => [
-                    'FICSMAS Tree Branch' => 15,
-                    'FICSMAS Ornament Bundle' => 6,
+                    IngredientEnum::FICSMAS_TREE_BRANCH->value => 15,
+                    IngredientEnum::FICSMAS_ORNAMENT_BUNDLE->value => 6,
                 ],
             ],
-            'FICSMAS Ornament Bundle' => [
+            IngredientEnum::FICSMAS_ORNAMENT_BUNDLE->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'Copper FICSMAS Ornament' => 5,
-                    'Iron FICSMAS Ornament' => 5,
+                    IngredientEnum::COPPER_FICSMAS_ORNAMENT->value => 5,
+                    IngredientEnum::IRON_FICSMAS_ORNAMENT->value => 5,
                 ],
             ],
-            'FICSMAS Wonder Star' => [
+            IngredientEnum::FICSMAS_WONDER_STAR->value => [
                 'base_yield' => 1,
                 'base_per_min' => 1,
                 'ingredients' => [
-                    'FICSMAS Decoration' => 5,
-                    'Candy Cane' => 20,
+                    IngredientEnum::FICSMAS_DECORATION->value => 5,
+                    IngredientEnum::CANDY_CANE->value => 20,
                 ],
             ],
 
@@ -128,21 +130,21 @@ class FicsmasRecipeSeeder extends Seeder
 
         // alts done
         // no byproducts
-        'Foundry' => [
-            'Copper FICSMAS Ornament' => [
+        BuildingEnum::FOUNDRY->value => [
+            IngredientEnum::COPPER_FICSMAS_ORNAMENT->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'Red FICSMAS Ornament' => 10,
-                    'Copper Ingot' => 10,
+                    IngredientEnum::RED_FICSMAS_ORNAMENT->value => 10,
+                    IngredientEnum::COPPER_INGOT->value => 10,
                 ],
             ],
-            'Iron FICSMAS Ornament' => [
+            IngredientEnum::IRON_FICSMAS_ORNAMENT->value => [
                 'base_yield' => 1,
                 'base_per_min' => 5,
                 'ingredients' => [
-                    'Blue FICSMAS Ornament' => 15,
-                    'Iron Ingot' => 15,
+                    IngredientEnum::BLUE_FICSMAS_ORNAMENT->value => 15,
+                    IngredientEnum::IRON_INGOT->value => 15,
                 ],
             ],
         ],

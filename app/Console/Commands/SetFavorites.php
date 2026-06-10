@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\Recipe as RecipeEnum;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Console\Command;
@@ -43,23 +44,23 @@ class SetFavorites extends Command
         auth()->loginUsingId(1);
 
         $defaults = [
-            'Pure Aluminum Ingot',
-            'Biomass (Leaves)',
-            'Biocoal',
-            'Steel Screw',
-            'Caterium Wire',
-            'Insulated Cable',
-            'Caterium Circuit Board',
-            'Encased Industrial Pipe',
+            RecipeEnum::PURE_ALUMINUM_INGOT->value,
+            RecipeEnum::BIOMASS_LEAVES->value,
+            RecipeEnum::BIOCOAL->value,
+            RecipeEnum::STEEL_SCREW->value,
+            RecipeEnum::CATERIUM_WIRE->value,
+            RecipeEnum::INSULATED_CABLE->value,
+            RecipeEnum::CATERIUM_CIRCUIT_BOARD->value,
+            RecipeEnum::ENCASED_INDUSTRIAL_PIPE->value,
             'Steel Coated Plate',
-            'Steeled Frame',
-            'Stitched Iron Plate',
-            'Solid Steel Ingot',
-            'Sloppy Alumina',
-            'Wet Concrete',
-            'Caterium Computer',
-            'Heavy Encased Frame',
-            'Diluted Fuel',
+            RecipeEnum::STEELED_FRAME->value,
+            RecipeEnum::STITCHED_IRON_PLATE->value,
+            RecipeEnum::SOLID_STEEL_INGOT->value,
+            RecipeEnum::SLOPPY_ALUMINA->value,
+            RecipeEnum::WET_CONCRETE->value,
+            RecipeEnum::CATERIUM_COMPUTER->value,
+            RecipeEnum::HEAVY_ENCASED_FRAME->value,
+            RecipeEnum::DILUTED_FUEL->value,
         ];
 
         collect($defaults)

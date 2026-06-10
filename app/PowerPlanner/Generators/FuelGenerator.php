@@ -2,11 +2,12 @@
 
 namespace App\PowerPlanner\Generators;
 
+use App\Enums\Building;
 use App\Enums\Ingredient;
 
 class FuelGenerator extends Base
 {
-    protected $name = 'Fuel Generator';
+    protected $name = Building::FUEL_GENERATOR->value;
 
     protected $gross_output = 250; // 250 MW = 15000 MJ / min
 

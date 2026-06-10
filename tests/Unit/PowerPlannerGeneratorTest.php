@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Enums\Building;
 use App\Enums\Ingredient;
 use App\PowerPlanner\Generators\BiomassBurner;
 use App\PowerPlanner\Generators\CoalGenerator;
@@ -93,10 +94,10 @@ class PowerPlannerGeneratorTest extends TestCase
 
         $this->assertCount(4, $results);
         $names = $results->pluck('name');
-        $this->assertTrue($names->contains('Biomass Burner'));
-        $this->assertTrue($names->contains('Coal Generator'));
-        $this->assertTrue($names->contains('Fuel Generator'));
-        $this->assertTrue($names->contains('Nuclear Power Plant'));
+        $this->assertTrue($names->contains(Building::BIOMASS_BURNER->value));
+        $this->assertTrue($names->contains(Building::COAL_GENERATOR->value));
+        $this->assertTrue($names->contains(Building::FUEL_GENERATOR->value));
+        $this->assertTrue($names->contains(Building::NUCLEAR_POWER_PLANT->value));
     }
 
     #[Test]

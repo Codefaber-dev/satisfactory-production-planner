@@ -2,26 +2,29 @@
 
 namespace App\PowerPlanner\Generators;
 
+use App\Enums\Building;
+use App\Enums\Ingredient;
+
 class CoalGenerator extends Base
 {
-    protected $name = 'Coal Generator';
+    protected $name = Building::COAL_GENERATOR->value;
 
     protected $gross_output = 75; // 75 MW = 4500 MJ / min
 
     // fuel per min
     protected $fuel = [
-        'Coal' => 4500 / 300,
-        'Compacted Coal' => 4500 / 630,
-        'Petroleum Coke' => 4500 / 180,
+        Ingredient::COAL->value => 4500 / 300,
+        Ingredient::COMPACTED_COAL->value => 4500 / 630,
+        Ingredient::PETROLEUM_COKE->value => 4500 / 180,
     ];
 
     protected $inputs = [
-        'Water' => 45,
+        Ingredient::WATER->value => 45,
     ];
 
     protected $build_cost = [
-        'Reinforced Iron Plate' => 20,
-        'Rotor' => 10,
-        'Cable' => 30,
+        Ingredient::REINFORCED_IRON_PLATE->value => 20,
+        Ingredient::ROTOR->value => 10,
+        Ingredient::CABLE->value => 30,
     ];
 }
