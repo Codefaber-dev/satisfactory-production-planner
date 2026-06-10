@@ -80,6 +80,10 @@ function energyStage(Recipe|string $recipe)
 {
     if (is_string($recipe)) {
         $name = $recipe;
+        $ingredient = \App\Models\Ingredient::ofName($name);
+        if ($ingredient?->isRaw()) {
+            return config("raw_materials.energy cost.{$name}");
+        }
         try {
             $model = r($recipe);
 

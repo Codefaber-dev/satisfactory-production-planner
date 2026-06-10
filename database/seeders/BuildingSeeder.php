@@ -466,6 +466,51 @@ class BuildingSeeder extends Seeder
             ],
         ],
 
+        // Converter
+        [
+            'name' => 'Converter',
+            'inputs' => 2,
+            'outputs' => 2,
+            'width' => 24,
+            'length' => 24,
+            'height' => 32,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 500,
+                    'recipe' => [
+                        ['ingredient' => 'Fused Modular Frame', 'qty' => 10],
+                        ['ingredient' => 'Cooling System', 'qty' => 25],
+                        ['ingredient' => 'Radio Control Unit', 'qty' => 50],
+                        ['ingredient' => 'SAM Fluctuator', 'qty' => 100],
+                    ],
+                ],
+            ],
+        ],
+
+        // Quantum Encoder
+        [
+            'name' => 'Quantum Encoder',
+            'inputs' => 4,
+            'outputs' => 2,
+            'width' => 24,
+            'length' => 38,
+            'height' => 32,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 500,
+                    'recipe' => [
+                        ['ingredient' => 'Turbo Motor', 'qty' => 20],
+                        ['ingredient' => 'Supercomputer', 'qty' => 20],
+                        ['ingredient' => 'Time Crystal', 'qty' => 50],
+                        ['ingredient' => 'Cooling System', 'qty' => 50],
+                        ['ingredient' => 'Ficsite Trigon', 'qty' => 100],
+                    ],
+                ],
+            ],
+        ],
+
         // Nuclear Power Plant
         [
             'name' => BuildingEnum::NUCLEAR_POWER_PLANT,

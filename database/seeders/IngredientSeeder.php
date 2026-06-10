@@ -18,7 +18,7 @@ class IngredientSeeder extends Seeder
         'Iron Ore',
         'Copper Ore',
         'Caterium Ore',
-        'SAM Ore',
+        'SAM',
         'Bauxite',
         'Uranium',
 
@@ -35,10 +35,13 @@ class IngredientSeeder extends Seeder
         'Flower Petals',
         'Mycelia',
         'Alien Organs',
-        'Alien Carapace',
-        'Green Power Slug',
+        'Blue Power Slug',
         'Yellow Power Slug',
         'Purple Power Slug',
+        'Hog Remains',
+        'Plasma Spitter Remains',
+        'Hatcher Remains',
+        'Stinger Remains',
     ];
 
     protected $tier2 = [
@@ -59,8 +62,16 @@ class IngredientSeeder extends Seeder
         'Rubber',
         'Biomass',
         'Compacted Coal',
-        'Color Cartridge',
         'Power Shard',
+        'Alien Protein',
+        'Organic Data Capsule',
+        'Gas Nobelisk',
+        'Pulse Nobelisk',
+        'Smokeless Powder',
+        'Alien DNA Capsule',
+        'Diamonds',
+        'Excited Photonic Matter',
+        'Reanimated SAM',
     ];
 
     protected $tier3 = [
@@ -79,6 +90,8 @@ class IngredientSeeder extends Seeder
         'Fabric',
         'Quickwire',
         'Encased Uranium Cell',
+        'Nuke Nobelisk',
+        'Time Crystal',
     ];
 
     protected $tier4 = [
@@ -104,7 +117,12 @@ class IngredientSeeder extends Seeder
         'AI Limiter',
         'Nobelisk',
         'Gas Filter',
-        'Spiked Rebar',
+        'Iron Rebar',
+        'Stun Rebar',
+        'Shatter Rebar',
+        'Explosive Rebar',
+        'Cluster Nobelisk',
+        'SAM Fluctuator',
     ];
 
     protected $tier5 = [
@@ -116,8 +134,11 @@ class IngredientSeeder extends Seeder
         'Computer',
         'High-Speed Connector',
         'Electromagnetic Control Rod',
-        'Beacon',
         'Automated Wiring',
+        'Dissolved Silica',
+        'Ficsite Ingot',
+        'Rocket Fuel',
+        'Packaged Rocket Fuel',
     ];
 
     protected $tier6 = [
@@ -129,9 +150,14 @@ class IngredientSeeder extends Seeder
         'Heat Sink',
         'Radio Control Unit',
         'Uranium Fuel Rod',
-        'Rifle Cartridge',
         'Iodine Infused Filter',
         'Smart Plating',
+        'Rifle Ammo',
+        'Turbo Rifle Ammo',
+        'Homing Rifle Ammo',
+        'Ficsite Trigon',
+        'Ionized Fuel',
+        'Packaged Ionized Fuel',
     ];
 
     protected $tier7 = [
@@ -140,6 +166,7 @@ class IngredientSeeder extends Seeder
         'Uranium Waste',
         'Versatile Framework',
         'Modular Engine',
+        'Neural-Quantum Processor',
     ];
 
     protected $tier8 = [
@@ -161,6 +188,7 @@ class IngredientSeeder extends Seeder
     protected $tier10 = [
         'Encased Plutonium Cell',
         'Nuclear Pasta',
+        'Biochemical Sculptor',
     ];
 
     protected $tier11 = [
@@ -169,6 +197,33 @@ class IngredientSeeder extends Seeder
 
     protected $tier12 = [
         'Plutonium Waste',
+    ];
+
+    protected $tier13 = [
+        'Ficsonium',
+    ];
+
+    protected $tier14 = [
+        'Ficsonium Fuel Rod',
+    ];
+
+    protected $tier15 = [
+        'Dark Matter Residue',
+    ];
+
+    protected $tier16 = [
+        'Dark Matter Crystal',
+    ];
+
+    protected $tier17 = [
+        'Superposition Oscillator',
+        'Singularity Cell',
+    ];
+
+    protected $tier18 = [
+        'Alien Power Matrix',
+        'AI Expansion Server',
+        'Ballistic Warp Drive',
     ];
 
     /**
@@ -181,7 +236,7 @@ class IngredientSeeder extends Seeder
         collect($this->tier1)
             ->each(fn ($name) => Ingredient::forceCreate(['name' => $name, 'raw' => true, 'tier' => 1]));
 
-        collect(range(2, 12))
+        collect(range(2, 18))
             ->each(function ($num) {
                 $tier = "tier{$num}";
                 collect($this->$tier)

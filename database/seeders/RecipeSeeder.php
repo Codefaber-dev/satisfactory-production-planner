@@ -63,15 +63,6 @@ class RecipeSeeder extends Seeder
 
             'Biomass' => [
                 [
-                    'description' => 'Biomass (Alien Carapace)',
-                    'base_yield' => 100,
-                    'base_per_min' => 1500,
-                    'ingredients' => [
-                        'Alien Carapace' => 15,
-                    ],
-                    'alt_recipe' => true,
-                ],
-                [
                     'description' => 'Biomass (Alien Organs)',
                     'base_yield' => 200,
                     'base_per_min' => 1500,
@@ -107,6 +98,15 @@ class RecipeSeeder extends Seeder
                     ],
                     'alt_recipe' => true,
                 ],
+                [
+                    'description' => 'Biomass (Alien Protein)',
+                    'base_yield' => 100,
+                    'base_per_min' => 1500,
+                    'ingredients' => [
+                        'Alien Protein' => 15,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Cable' => [
                 'base_yield' => 1,
@@ -133,13 +133,6 @@ class RecipeSeeder extends Seeder
                         'Wood' => 15,
                     ],
                     'alt_recipe' => true,
-                ],
-            ],
-            'Color Cartridge' => [
-                'base_yield' => 10,
-                'base_per_min' => 75,
-                'ingredients' => [
-                    'Flower Petals' => 37.5,
                 ],
             ],
             'Concrete' => [
@@ -212,12 +205,50 @@ class RecipeSeeder extends Seeder
                     ],
                     'alt_recipe' => true,
                 ],
+                [
+                    'description' => 'Aluminum Rod',
+                    'base_yield' => 7,
+                    'base_per_min' => 52.5,
+                    'ingredients' => [
+                        'Aluminum Ingot' => 7.5,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Power Shard' => [
-                'base_yield' => 1,
-                'base_per_min' => 7.5,
-                'ingredients' => [
-                    'Green Power Slug' => 7.5,
+                [
+                    'base_yield' => 1,
+                    'base_per_min' => 7.5,
+                    'ingredients' => [
+                        'Blue Power Slug' => 7.5,
+                    ],
+                ],
+                [
+                    'description' => 'Power Shard (1)',
+                    'base_yield' => 1,
+                    'base_per_min' => 7.5,
+                    'ingredients' => [
+                        'Blue Power Slug' => 7.5,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Power Shard (2)',
+                    'base_yield' => 2,
+                    'base_per_min' => 10,
+                    'ingredients' => [
+                        'Yellow Power Slug' => 5,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Power Shard (5)',
+                    'base_yield' => 5,
+                    'base_per_min' => 12.5,
+                    'ingredients' => [
+                        'Purple Power Slug' => 2.5,
+                    ],
+                    'alt_recipe' => true,
                 ],
             ],
             'Quartz Crystal' => [
@@ -275,25 +306,40 @@ class RecipeSeeder extends Seeder
                     'Biomass' => 120,
                 ],
             ],
-            'Spiked Rebar' => [
-                'base_yield' => 1,
-                'base_per_min' => 15,
-                'ingredients' => [
-                    'Iron Rod' => 15,
-                ],
-            ],
             'Steel Beam' => [
-                'base_yield' => 1,
-                'base_per_min' => 15,
-                'ingredients' => [
-                    'Steel Ingot' => 60,
+                [
+                    'base_yield' => 1,
+                    'base_per_min' => 15,
+                    'ingredients' => [
+                        'Steel Ingot' => 60,
+                    ],
+                ],
+                [
+                    'description' => 'Aluminum Beam',
+                    'base_yield' => 3,
+                    'base_per_min' => 22.5,
+                    'ingredients' => [
+                        'Aluminum Ingot' => 22.5,
+                    ],
+                    'alt_recipe' => true,
                 ],
             ],
             'Steel Pipe' => [
-                'base_yield' => 2,
-                'base_per_min' => 20,
-                'ingredients' => [
-                    'Steel Ingot' => 30,
+                [
+                    'base_yield' => 2,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Steel Ingot' => 30,
+                    ],
+                ],
+                [
+                    'description' => 'Iron Pipe',
+                    'base_yield' => 5,
+                    'base_per_min' => 25,
+                    'ingredients' => [
+                        'Iron Ingot' => 100,
+                    ],
+                    'alt_recipe' => true,
                 ],
             ],
             'Wire' => [
@@ -323,19 +369,86 @@ class RecipeSeeder extends Seeder
                     'alt_recipe' => true,
                 ],
             ],
+            // UpdateSix combat items
+            'Alien Protein' => [
+                [
+                    'description' => 'Hog Protein',
+                    'base_yield' => 1,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Hog Remains' => 20,
+                    ],
+                    'alt_recipe' => false,
+                ],
+                [
+                    'description' => 'Spitter Protein',
+                    'base_yield' => 1,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Plasma Spitter Remains' => 20,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Hatcher Protein',
+                    'base_yield' => 1,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Hatcher Remains' => 20,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Stinger Protein',
+                    'base_yield' => 1,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Stinger Remains' => 20,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Organic Data Capsule' => [
+                'base_yield' => 1,
+                'base_per_min' => 10,
+                'ingredients' => [
+                    'Alien Protein' => 10,
+                ],
+            ],
+            'Iron Rebar' => [
+                'base_yield' => 1,
+                'base_per_min' => 15,
+                'ingredients' => [
+                    'Iron Rod' => 15,
+                ],
+            ],
+            // UpdateOneZero new Constructor items
+            'Alien DNA Capsule' => [
+                'base_yield' => 1,
+                'base_per_min' => 10,
+                'ingredients' => [
+                    'Alien Protein' => 10,
+                ],
+            ],
+            'Ficsite Trigon' => [
+                'base_yield' => 3,
+                'base_per_min' => 30,
+                'ingredients' => [
+                    'Ficsite Ingot' => 10,
+                ],
+            ],
+            'Reanimated SAM' => [
+                'base_yield' => 1,
+                'base_per_min' => 30,
+                'ingredients' => [
+                    'SAM' => 120,
+                ],
+            ],
         ],
 
         // alts done
         // no byproducts
         'Assembler' => [
-            'AI Limiter' => [
-                'base_yield' => 1,
-                'base_per_min' => 5,
-                'ingredients' => [
-                    'Copper Sheet' => 25,
-                    'Quickwire' => 100,
-                ],
-            ],
             'Alclad Aluminum Sheet' => [
                 'base_yield' => 3,
                 'base_per_min' => 30,
@@ -373,19 +486,19 @@ class RecipeSeeder extends Seeder
             'Black Powder' => [
                 [
                     'base_yield' => 1,
-                    'base_per_min' => 7.5,
+                    'base_per_min' => 30,
                     'ingredients' => [
-                        'Coal' => 7.5,
+                        'Coal' => 15,
                         'Sulfur' => 15,
                     ],
                 ],
                 [
                     'description' => 'Fine Black Powder',
-                    'base_yield' => 4,
-                    'base_per_min' => 15,
+                    'base_yield' => 6,
+                    'base_per_min' => 45,
                     'ingredients' => [
-                        'Compacted Coal' => 3.75,
                         'Sulfur' => 7.5,
+                        'Compacted Coal' => 15,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -466,11 +579,11 @@ class RecipeSeeder extends Seeder
             'Computer' => [
                 [
                     'description' => 'Crystal Computer',
-                    'base_yield' => 3,
-                    'base_per_min' => 2.8125,
+                    'base_yield' => 2,
+                    'base_per_min' => 3.3333,
                     'ingredients' => [
-                        'Circuit Board' => 7.5,
-                        'Crystal Oscillator' => 2.8125,
+                        'Circuit Board' => 5,
+                        'Crystal Oscillator' => 1.6667,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -479,20 +592,20 @@ class RecipeSeeder extends Seeder
                 [
                     'description' => 'Fine Concrete',
                     'base_yield' => 10,
-                    'base_per_min' => 25,
+                    'base_per_min' => 50,
                     'ingredients' => [
-                        'Silica' => 7.5,
-                        'Limestone' => 30,
+                        'Silica' => 15,
+                        'Limestone' => 60,
                     ],
                     'alt_recipe' => true,
                 ],
                 [
                     'description' => 'Rubber Concrete',
                     'base_yield' => 9,
-                    'base_per_min' => 45,
+                    'base_per_min' => 90,
                     'ingredients' => [
-                        'Rubber' => 10,
-                        'Limestone' => 50,
+                        'Limestone' => 100,
+                        'Rubber' => 20,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -532,8 +645,8 @@ class RecipeSeeder extends Seeder
                     'base_yield' => 1,
                     'base_per_min' => 6,
                     'ingredients' => [
-                        'Steel Beam' => 24,
-                        'Concrete' => 30,
+                        'Steel Beam' => 18,
+                        'Concrete' => 36,
                     ],
                 ],
                 [
@@ -541,7 +654,7 @@ class RecipeSeeder extends Seeder
                     'base_yield' => 1,
                     'base_per_min' => 4,
                     'ingredients' => [
-                        'Steel Pipe' => 28,
+                        'Steel Pipe' => 24,
                         'Concrete' => 20,
                     ],
                     'alt_recipe' => true,
@@ -591,16 +704,6 @@ class RecipeSeeder extends Seeder
                     'ingredients' => [
                         'Iron Ingot' => 50,
                         'Plastic' => 10,
-                    ],
-                    'alt_recipe' => true,
-                ],
-                [
-                    'description' => 'Steel Coated Plate',
-                    'base_yield' => 18,
-                    'base_per_min' => 45,
-                    'ingredients' => [
-                        'Steel Ingot' => 7.5,
-                        'Plastic' => 5,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -657,10 +760,10 @@ class RecipeSeeder extends Seeder
             ],
             'Nobelisk' => [
                 'base_yield' => 1,
-                'base_per_min' => 3,
+                'base_per_min' => 10,
                 'ingredients' => [
-                    'Black Powder' => 15,
-                    'Steel Pipe' => 30,
+                    'Black Powder' => 20,
+                    'Steel Pipe' => 20,
                 ],
             ],
             'Plutonium Fuel Rod' => [
@@ -703,7 +806,7 @@ class RecipeSeeder extends Seeder
                 [
                     'description' => 'Adhered Iron Plate',
                     'base_yield' => 1,
-                    'base_per_min' => 3.8,
+                    'base_per_min' => 3.75,
                     'ingredients' => [
                         'Iron Plate' => 11.25,
                         'Rubber' => 3.75,
@@ -743,7 +846,7 @@ class RecipeSeeder extends Seeder
                 [
                     'description' => 'Copper Rotor',
                     'base_yield' => 3,
-                    'base_per_min' => 11.3,
+                    'base_per_min' => 11.25,
                     'ingredients' => [
                         'Copper Sheet' => 22.5,
                         'Screw' => 195,
@@ -764,10 +867,10 @@ class RecipeSeeder extends Seeder
             'Silica' => [
                 'description' => 'Cheap Silica',
                 'base_yield' => 7,
-                'base_per_min' => 26.3,
+                'base_per_min' => 52.5,
                 'ingredients' => [
-                    'Raw Quartz' => 11.25,
-                    'Limestone' => 18.75,
+                    'Raw Quartz' => 22.5,
+                    'Limestone' => 37.5,
                 ],
                 'alt_recipe' => true,
             ],
@@ -804,8 +907,8 @@ class RecipeSeeder extends Seeder
                 'base_yield' => 1,
                 'base_per_min' => 3,
                 'ingredients' => [
-                    'Radio Control Unit' => 9,
-                    'Cooling System' => 9,
+                    'Radio Control Unit' => 6,
+                    'Cooling System' => 6,
                 ],
                 'alt_recipe' => true,
             ],
@@ -827,6 +930,92 @@ class RecipeSeeder extends Seeder
                 ],
                 'alt_recipe' => true,
             ],
+            // UpdateSix Assembler additions
+            'Gas Nobelisk' => [
+                'base_yield' => 1,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Nobelisk' => 5,
+                    'Biomass' => 50,
+                ],
+            ],
+            'Pulse Nobelisk' => [
+                'base_yield' => 5,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Nobelisk' => 5,
+                    'Crystal Oscillator' => 1,
+                ],
+            ],
+            'Cluster Nobelisk' => [
+                'base_yield' => 1,
+                'base_per_min' => 2.5,
+                'ingredients' => [
+                    'Nobelisk' => 7.5,
+                    'Smokeless Powder' => 10,
+                ],
+            ],
+            'Rifle Ammo' => [
+                'base_yield' => 15,
+                'base_per_min' => 75,
+                'ingredients' => [
+                    'Copper Sheet' => 15,
+                    'Smokeless Powder' => 10,
+                ],
+            ],
+            'Stun Rebar' => [
+                'base_yield' => 1,
+                'base_per_min' => 10,
+                'ingredients' => [
+                    'Iron Rebar' => 10,
+                    'Quickwire' => 50,
+                ],
+            ],
+            'Shatter Rebar' => [
+                'base_yield' => 1,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Iron Rebar' => 10,
+                    'Quartz Crystal' => 15,
+                ],
+            ],
+            'Homing Rifle Ammo' => [
+                'base_yield' => 10,
+                'base_per_min' => 25,
+                'ingredients' => [
+                    'Rifle Ammo' => 50,
+                    'High-Speed Connector' => 2.5,
+                ],
+            ],
+            // UpdateOneZero Assembler additions
+            'AI Limiter' => [
+                [
+                    'base_yield' => 1,
+                    'base_per_min' => 5,
+                    'ingredients' => [
+                        'Copper Sheet' => 25,
+                        'Quickwire' => 100,
+                    ],
+                ],
+                [
+                    'description' => 'Plastic AI Limiter',
+                    'base_yield' => 2,
+                    'base_per_min' => 8,
+                    'ingredients' => [
+                        'Quickwire' => 120,
+                        'Plastic' => 28,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Magnetic Field Generator' => [
+                'base_yield' => 2,
+                'base_per_min' => 1,
+                'ingredients' => [
+                    'Versatile Framework' => 2.5,
+                    'Electromagnetic Control Rod' => 1,
+                ],
+            ],
         ],
 
         // alts done
@@ -840,25 +1029,27 @@ class RecipeSeeder extends Seeder
                     'Silica' => 75,
                 ],
             ],
-            'Copper Ingot' => [
-                'description' => 'Copper Alloy Ingot',
-                'base_yield' => 20,
-                'base_per_min' => 100,
-                'ingredients' => [
-                    'Copper Ore' => 50,
-                    'Iron Ore' => 25,
-                ],
-                'alt_recipe' => true,
-            ],
             'Iron Ingot' => [
-                'description' => 'Iron Alloy Ingot',
-                'base_yield' => 5,
-                'base_per_min' => 50,
-                'ingredients' => [
-                    'Copper Ore' => 20,
-                    'Iron Ore' => 20,
+                [
+                    'description' => 'Iron Alloy Ingot',
+                    'base_yield' => 15,
+                    'base_per_min' => 75,
+                    'ingredients' => [
+                        'Copper Ore' => 10,
+                        'Iron Ore' => 40,
+                    ],
+                    'alt_recipe' => true,
                 ],
-                'alt_recipe' => true,
+                [
+                    'description' => 'Basic Iron Ingot',
+                    'base_yield' => 10,
+                    'base_per_min' => 50,
+                    'ingredients' => [
+                        'Iron Ore' => 25,
+                        'Limestone' => 40,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Steel Ingot' => [
                 [
@@ -881,11 +1072,11 @@ class RecipeSeeder extends Seeder
                 ],
                 [
                     'description' => 'Compacted Steel Ingot',
-                    'base_yield' => 10,
-                    'base_per_min' => 37.5,
+                    'base_yield' => 4,
+                    'base_per_min' => 10,
                     'ingredients' => [
-                        'Iron Ore' => 22.5,
-                        'Compacted Coal' => 11.25,
+                        'Iron Ore' => 5,
+                        'Compacted Coal' => 2.5,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -896,6 +1087,78 @@ class RecipeSeeder extends Seeder
                     'ingredients' => [
                         'Iron Ingot' => 40,
                         'Coal' => 40,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Quartz Crystal' => [
+                'description' => 'Fused Quartz Crystal',
+                'base_yield' => 18,
+                'base_per_min' => 54,
+                'ingredients' => [
+                    'Raw Quartz' => 75,
+                    'Coal' => 36,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Steel Beam' => [
+                'description' => 'Molded Beam',
+                'base_yield' => 9,
+                'base_per_min' => 45,
+                'ingredients' => [
+                    'Steel Ingot' => 120,
+                    'Concrete' => 80,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Steel Pipe' => [
+                'description' => 'Molded Steel Pipe',
+                'base_yield' => 5,
+                'base_per_min' => 50,
+                'ingredients' => [
+                    'Steel Ingot' => 50,
+                    'Concrete' => 30,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Iron Plate' => [
+                'description' => 'Steel Cast Plate',
+                'base_yield' => 3,
+                'base_per_min' => 45,
+                'ingredients' => [
+                    'Iron Ingot' => 15,
+                    'Steel Ingot' => 15,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Caterium Ingot' => [
+                'description' => 'Tempered Caterium Ingot',
+                'base_yield' => 3,
+                'base_per_min' => 22.5,
+                'ingredients' => [
+                    'Caterium Ore' => 45,
+                    'Petroleum Coke' => 15,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Copper Ingot' => [
+                [
+                    'description' => 'Copper Alloy Ingot',
+                    'base_yield' => 10,
+                    'base_per_min' => 100,
+                    'ingredients' => [
+                        'Copper Ore' => 50,
+                        'Iron Ore' => 50,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Tempered Copper Ingot',
+                    'base_yield' => 12,
+                    'base_per_min' => 60,
+                    'ingredients' => [
+                        'Copper Ore' => 25,
+                        'Petroleum Coke' => 40,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -965,14 +1228,26 @@ class RecipeSeeder extends Seeder
                 'alt_recipe' => true,
             ],
             'Caterium Ingot' => [
-                'description' => 'Pure Caterium Ingot',
-                'base_yield' => 1,
-                'base_per_min' => 12,
-                'ingredients' => [
-                    'Caterium Ore' => 24,
-                    'Water' => 24,
+                [
+                    'description' => 'Pure Caterium Ingot',
+                    'base_yield' => 1,
+                    'base_per_min' => 12,
+                    'ingredients' => [
+                        'Caterium Ore' => 24,
+                        'Water' => 24,
+                    ],
+                    'alt_recipe' => true,
                 ],
-                'alt_recipe' => true,
+                [
+                    'description' => 'Leached Caterium Ingot',
+                    'base_yield' => 6,
+                    'base_per_min' => 36,
+                    'ingredients' => [
+                        'Caterium Ore' => 54,
+                        'Sulfuric Acid' => 30,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Concrete' => [
                 'description' => 'Wet Concrete',
@@ -985,14 +1260,26 @@ class RecipeSeeder extends Seeder
                 'alt_recipe' => true,
             ],
             'Copper Ingot' => [
-                'description' => 'Pure Copper Ingot',
-                'base_yield' => 15,
-                'base_per_min' => 37.5,
-                'ingredients' => [
-                    'Copper Ore' => 15,
-                    'Water' => 10,
+                [
+                    'description' => 'Pure Copper Ingot',
+                    'base_yield' => 15,
+                    'base_per_min' => 37.5,
+                    'ingredients' => [
+                        'Copper Ore' => 15,
+                        'Water' => 10,
+                    ],
+                    'alt_recipe' => true,
                 ],
-                'alt_recipe' => true,
+                [
+                    'description' => 'Leached Copper Ingot',
+                    'base_yield' => 22,
+                    'base_per_min' => 110,
+                    'ingredients' => [
+                        'Copper Ore' => 45,
+                        'Sulfuric Acid' => 25,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Copper Sheet' => [
                 'description' => 'Steamed Copper Sheet',
@@ -1047,14 +1334,26 @@ class RecipeSeeder extends Seeder
                 'alt_recipe' => true,
             ],
             'Iron Ingot' => [
-                'description' => 'Pure Iron Ingot',
-                'base_yield' => 13,
-                'base_per_min' => 65,
-                'ingredients' => [
-                    'Iron Ore' => 35,
-                    'Water' => 20,
+                [
+                    'description' => 'Pure Iron Ingot',
+                    'base_yield' => 13,
+                    'base_per_min' => 65,
+                    'ingredients' => [
+                        'Iron Ore' => 35,
+                        'Water' => 20,
+                    ],
+                    'alt_recipe' => true,
                 ],
-                'alt_recipe' => true,
+                [
+                    'description' => 'Leached Iron ingot',
+                    'base_yield' => 10,
+                    'base_per_min' => 100,
+                    'ingredients' => [
+                        'Iron Ore' => 50,
+                        'Sulfuric Acid' => 10,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Liquid Biofuel' => [
                 'base_yield' => 4,
@@ -1124,15 +1423,41 @@ class RecipeSeeder extends Seeder
                 ],
                 'alt_recipe' => true,
             ],
-            'Quartz Crystal' => [
-                'description' => 'Pure Quartz Crystal',
-                'base_yield' => 7,
-                'base_per_min' => 52.5,
+            'Ionized Fuel' => [
+                'base_yield' => 16,
+                'base_per_min' => 40,
                 'ingredients' => [
-                    'Raw Quartz' => 67.5,
-                    'Water' => 37.5,
+                    'Rocket Fuel' => 40,
+                    'Power Shard' => 2.5,
                 ],
-                'alt_recipe' => true,
+                'byproducts' => [
+                    'Compacted Coal' => 5,
+                ],
+            ],
+            'Quartz Crystal' => [
+                [
+                    'description' => 'Pure Quartz Crystal',
+                    'base_yield' => 7,
+                    'base_per_min' => 52.5,
+                    'ingredients' => [
+                        'Raw Quartz' => 67.5,
+                        'Water' => 37.5,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Quartz Purification',
+                    'base_yield' => 15,
+                    'base_per_min' => 75,
+                    'ingredients' => [
+                        'Raw Quartz' => 120,
+                        'Nitric Acid' => 10,
+                    ],
+                    'byproducts' => [
+                        'Dissolved Silica' => 60,
+                    ],
+                    'alt_recipe' => true,
+                ],
             ],
             'Rubber' => [
                 [
@@ -1164,6 +1489,25 @@ class RecipeSeeder extends Seeder
                         'Water' => 20,
                     ],
                     'alt_recipe' => true,
+                ],
+            ],
+            'Dissolved Silica' => [
+                'base_yield' => 12,
+                'base_per_min' => 60,
+                'ingredients' => [
+                    'Raw Quartz' => 120,
+                    'Nitric Acid' => 10,
+                ],
+                'byproducts' => [
+                    'Quartz Crystal' => 75,
+                ],
+            ],
+            'Smokeless Powder' => [
+                'base_yield' => 2,
+                'base_per_min' => 20,
+                'ingredients' => [
+                    'Black Powder' => 20,
+                    'Heavy Oil Residue' => 10,
                 ],
             ],
             'Sulfuric Acid' => [
@@ -1400,23 +1744,63 @@ class RecipeSeeder extends Seeder
                     'Empty Canister' => 60,
                 ],
             ],
+            'Packaged Ionized Fuel' => [
+                'base_yield' => 2,
+                'base_per_min' => 40,
+                'ingredients' => [
+                    'Ionized Fuel' => 80,
+                    'Empty Fluid Tank' => 40,
+                ],
+            ],
+            'Packaged Rocket Fuel' => [
+                'base_yield' => 1,
+                'base_per_min' => 60,
+                'ingredients' => [
+                    'Rocket Fuel' => 120,
+                    'Empty Fluid Tank' => 60,
+                ],
+            ],
+            'Ionized Fuel' => [
+                'description' => 'Unpackage Ionized Fuel',
+                'base_yield' => 4,
+                'base_per_min' => 80,
+                'ingredients' => [
+                    'Packaged Ionized Fuel' => 40,
+                ],
+                'byproducts' => [
+                    'Empty Fluid Tank' => 40,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Rocket Fuel' => [
+                'description' => 'Unpackage Rocket Fuel',
+                'base_yield' => 2,
+                'base_per_min' => 120,
+                'ingredients' => [
+                    'Packaged Rocket Fuel' => 60,
+                ],
+                'byproducts' => [
+                    'Empty Fluid Tank' => 60,
+                ],
+                'alt_recipe' => true,
+            ],
         ],
 
         // alts done
         // no byproducts
         'Manufacturer' => [
             'Adaptive Control Unit' => [
-                'base_yield' => 2,
+                'base_yield' => 1,
                 'base_per_min' => 1,
                 'ingredients' => [
-                    'Automated Wiring' => 7.5,
+                    'Automated Wiring' => 5,
                     'Circuit Board' => 5,
                     'Heavy Modular Frame' => 1,
-                    'Computer' => 1,
+                    'Computer' => 2,
                 ],
             ],
             'Automated Wiring' => [
-                'description' => 'High-Speed Wiring',
+                'description' => 'Automated Speed Wiring',
                 'base_yield' => 4,
                 'base_per_min' => 7.5,
                 'ingredients' => [
@@ -1425,29 +1809,6 @@ class RecipeSeeder extends Seeder
                     'High-Speed Connector' => 1.875,
                 ],
                 'alt_recipe' => true,
-            ],
-            'Beacon' => [
-                [
-                    'base_yield' => 1,
-                    'base_per_min' => 7.5,
-                    'ingredients' => [
-                        'Iron Plate' => 22.5,
-                        'Iron Rod' => 7.5,
-                        'Wire' => 112.5,
-                        'Cable' => 15,
-                    ],
-                ],
-                [
-                    'description' => 'Crystal Beacon',
-                    'base_yield' => 20,
-                    'base_per_min' => 10,
-                    'ingredients' => [
-                        'Steel Beam' => 2,
-                        'Steel Pipe' => 8,
-                        'Crystal Oscillator' => 0.5,
-                    ],
-                    'alt_recipe' => true,
-                ],
             ],
             'Battery' => [
                 'description' => 'Classic Battery',
@@ -1466,10 +1827,9 @@ class RecipeSeeder extends Seeder
                     'base_yield' => 1,
                     'base_per_min' => 2.5,
                     'ingredients' => [
-                        'Circuit Board' => 25,
-                        'Cable' => 22.5,
-                        'Plastic' => 45,
-                        'Screw' => 130,
+                        'Circuit Board' => 10,
+                        'Cable' => 20,
+                        'Plastic' => 40,
                     ],
                 ],
                 [
@@ -1477,9 +1837,9 @@ class RecipeSeeder extends Seeder
                     'base_yield' => 1,
                     'base_per_min' => 3.75,
                     'ingredients' => [
-                        'Circuit Board' => 26.25,
-                        'Quickwire' => 105,
-                        'Rubber' => 45,
+                        'Circuit Board' => 15,
+                        'Quickwire' => 52.5,
+                        'Rubber' => 22.5,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -1522,9 +1882,9 @@ class RecipeSeeder extends Seeder
                 'base_yield' => 1,
                 'base_per_min' => 7.5,
                 'ingredients' => [
-                    'Coal' => 37.5,
-                    'Rubber' => 15,
                     'Fabric' => 15,
+                    'Coal' => 30,
+                    'Iron Plate' => 15,
                 ],
             ],
             'Heavy Modular Frame' => [
@@ -1533,15 +1893,15 @@ class RecipeSeeder extends Seeder
                     'base_per_min' => 2,
                     'ingredients' => [
                         'Modular Frame' => 10,
-                        'Steel Pipe' => 30,
+                        'Steel Pipe' => 40,
                         'Encased Industrial Beam' => 10,
-                        'Screw' => 200,
+                        'Screw' => 240,
                     ],
                 ],
                 [
                     'description' => 'Heavy Flexible Frame',
                     'base_yield' => 1,
-                    'base_per_min' => 3.8,
+                    'base_per_min' => 3.75,
                     'ingredients' => [
                         'Modular Frame' => 18.75,
                         'Encased Industrial Beam' => 11.25,
@@ -1553,7 +1913,7 @@ class RecipeSeeder extends Seeder
                 [
                     'description' => 'Heavy Encased Frame',
                     'base_yield' => 3,
-                    'base_per_min' => 2.8,
+                    'base_per_min' => 2.8125,
                     'ingredients' => [
                         'Modular Frame' => 7.5,
                         'Encased Industrial Beam' => 9.375,
@@ -1587,20 +1947,11 @@ class RecipeSeeder extends Seeder
             ],
             'Iodine Infused Filter' => [
                 'base_yield' => 1,
-                'base_per_min' => 3.8,
+                'base_per_min' => 3.75,
                 'ingredients' => [
                     'Gas Filter' => 3.75,
                     'Quickwire' => 30,
                     'Aluminum Casing' => 3.75,
-                ],
-            ],
-            'Magnetic Field Generator' => [
-                'base_yield' => 2,
-                'base_per_min' => 1,
-                'ingredients' => [
-                    'Versatile Framework' => 2.5,
-                    'Electromagnetic Control Rod' => 1,
-                    'Battery' => 5,
                 ],
             ],
             'Modular Engine' => [
@@ -1613,7 +1964,7 @@ class RecipeSeeder extends Seeder
                 ],
             ],
             'Motor' => [
-                'description' => 'Rigour Motor',
+                'description' => 'Rigor Motor',
                 'base_yield' => 6,
                 'base_per_min' => 7.5,
                 'ingredients' => [
@@ -1662,13 +2013,13 @@ class RecipeSeeder extends Seeder
                     'ingredients' => [
                         'Aluminum Casing' => 40,
                         'Crystal Oscillator' => 1.25,
-                        'Computer' => 1.25,
+                        'Computer' => 2.5,
                     ],
                 ],
                 [
                     'description' => 'Radio Connection Unit',
                     'base_yield' => 1,
-                    'base_per_min' => 3.8,
+                    'base_per_min' => 3.75,
                     'ingredients' => [
                         'Heat Sink' => 15,
                         'High-Speed Connector' => 7.5,
@@ -1689,22 +2040,12 @@ class RecipeSeeder extends Seeder
                     'alt_recipe' => true,
                 ],
             ],
-            'Rifle Cartridge' => [
-                'base_yield' => 5,
-                'base_per_min' => 15,
-                'ingredients' => [
-                    'Beacon' => 3,
-                    'Steel Pipe' => 30,
-                    'Black Powder' => 30,
-                    'Rubber' => 30,
-                ],
-            ],
             'Supercomputer' => [
                 [
                     'base_yield' => 1,
-                    'base_per_min' => 1.9,
+                    'base_per_min' => 1.875,
                     'ingredients' => [
-                        'Computer' => 3.75,
+                        'Computer' => 7.5,
                         'AI Limiter' => 3.75,
                         'High-Speed Connector' => 5.625,
                         'Plastic' => 52.5,
@@ -1715,10 +2056,10 @@ class RecipeSeeder extends Seeder
                     'base_yield' => 1,
                     'base_per_min' => 2.4,
                     'ingredients' => [
-                        'Computer' => 3.6,
+                        'Computer' => 7.2,
                         'Electromagnetic Control Rod' => 2.4,
                         'Battery' => 24,
-                        'Wire' => 54,
+                        'Wire' => 60,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -1807,7 +2148,7 @@ class RecipeSeeder extends Seeder
                         'Encased Uranium Cell' => 20,
                         'Electromagnetic Control Rod' => 2,
                         'Crystal Oscillator' => 0.6,
-                        'Beacon' => 1.2,
+                        'Rotor' => 2,
                     ],
                     'alt_recipe' => true,
                 ],
@@ -1822,6 +2163,74 @@ class RecipeSeeder extends Seeder
                     'Rubber' => 30,
                 ],
                 'alt_recipe' => true,
+            ],
+            'Ballistic Warp Drive' => [
+                'base_yield' => 1,
+                'base_per_min' => 1,
+                'ingredients' => [
+                    'Thermal Propulsion Rocket' => 1,
+                    'Singularity Cell' => 5,
+                    'Superposition Oscillator' => 2,
+                    'Dark Matter Crystal' => 40,
+                ],
+            ],
+            'SAM Fluctuator' => [
+                'base_yield' => 1,
+                'base_per_min' => 10,
+                'ingredients' => [
+                    'Reanimated SAM' => 60,
+                    'Wire' => 50,
+                    'Steel Pipe' => 30,
+                ],
+            ],
+            'Singularity Cell' => [
+                'base_yield' => 10,
+                'base_per_min' => 10,
+                'ingredients' => [
+                    'Nuclear Pasta' => 1,
+                    'Dark Matter Crystal' => 20,
+                    'Iron Plate' => 100,
+                    'Concrete' => 200,
+                ],
+            ],
+            'Cooling System' => [
+                'description' => 'Cooling Device',
+                'base_yield' => 2,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Heat Sink' => 10,
+                    'Motor' => 2.5,
+                    'Nitrogen Gas' => 60,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Explosive Rebar' => [
+                'base_yield' => 1,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Iron Rebar' => 10,
+                    'Smokeless Powder' => 10,
+                    'Steel Pipe' => 10,
+                ],
+            ],
+            'Nuke Nobelisk' => [
+                'base_yield' => 1,
+                'base_per_min' => 0.5,
+                'ingredients' => [
+                    'Encased Uranium Cell' => 10,
+                    'Nobelisk' => 2.5,
+                    'Smokeless Powder' => 5,
+                    'AI Limiter' => 3,
+                ],
+            ],
+            'Turbo Rifle Ammo' => [
+                'base_yield' => 50,
+                'base_per_min' => 250,
+                'ingredients' => [
+                    'Rifle Ammo' => 125,
+                    'Aluminum Casing' => 15,
+                    'Packaged Turbofuel' => 15,
+                ],
             ],
         ],
 
@@ -1974,6 +2383,66 @@ class RecipeSeeder extends Seeder
                 ],
                 'alt_recipe' => true,
             ],
+            'Biochemical Sculptor' => [
+                'base_yield' => 4,
+                'base_per_min' => 2,
+                'ingredients' => [
+                    'Assembly Director System' => 0.5,
+                    'Ficsite Trigon' => 40,
+                    'Water' => 10,
+                ],
+            ],
+            'Silica' => [
+                'description' => 'Distilled Silica',
+                'base_yield' => 27,
+                'base_per_min' => 270,
+                'ingredients' => [
+                    'Dissolved Silica' => 120,
+                    'Limestone' => 50,
+                    'Water' => 100,
+                ],
+                'byproducts' => [
+                    'Water' => 80,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Rocket Fuel' => [
+                [
+                    'base_yield' => 10,
+                    'base_per_min' => 100,
+                    'ingredients' => [
+                        'Turbofuel' => 60,
+                        'Nitric Acid' => 10,
+                    ],
+                    'byproducts' => [
+                        'Compacted Coal' => 10,
+                    ],
+                ],
+                [
+                    'description' => 'Nitro Rocket Fuel',
+                    'base_yield' => 6,
+                    'base_per_min' => 150,
+                    'ingredients' => [
+                        'Fuel' => 100,
+                        'Nitrogen Gas' => 75,
+                        'Sulfur' => 100,
+                        'Coal' => 50,
+                    ],
+                    'byproducts' => [
+                        'Compacted Coal' => 25,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Turbo Rifle Ammo' => [
+                'base_yield' => 50,
+                'base_per_min' => 250,
+                'ingredients' => [
+                    'Rifle Ammo' => 125,
+                    'Aluminum Casing' => 15,
+                    'Turbofuel' => 15,
+                ],
+            ],
         ],
 
         // alts done
@@ -2005,6 +2474,91 @@ class RecipeSeeder extends Seeder
                     'Pressure Conversion Cube' => 0.5,
                 ],
             ],
+            'Diamonds' => [
+                [
+                    'base_yield' => 1,
+                    'base_per_min' => 30,
+                    'ingredients' => [
+                        'Coal' => 600,
+                    ],
+                ],
+                [
+                    'description' => 'Cloudy Diamonds',
+                    'base_yield' => 1,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Coal' => 240,
+                        'Limestone' => 480,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Oil-Based Diamonds',
+                    'base_yield' => 2,
+                    'base_per_min' => 40,
+                    'ingredients' => [
+                        'Crude Oil' => 200,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Petroleum Diamonds',
+                    'base_yield' => 1,
+                    'base_per_min' => 30,
+                    'ingredients' => [
+                        'Petroleum Coke' => 720,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Turbo Diamonds',
+                    'base_yield' => 3,
+                    'base_per_min' => 60,
+                    'ingredients' => [
+                        'Coal' => 600,
+                        'Packaged Turbofuel' => 40,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Dark Matter Crystal' => [
+                [
+                    'base_yield' => 1,
+                    'base_per_min' => 30,
+                    'ingredients' => [
+                        'Diamonds' => 30,
+                        'Dark Matter Residue' => 150,
+                    ],
+                ],
+                [
+                    'description' => 'Dark Matter Crystallization',
+                    'base_yield' => 1,
+                    'base_per_min' => 20,
+                    'ingredients' => [
+                        'Dark Matter Residue' => 200,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Dark Matter Trap',
+                    'base_yield' => 2,
+                    'base_per_min' => 60,
+                    'ingredients' => [
+                        'Time Crystal' => 30,
+                        'Dark Matter Residue' => 150,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Ficsonium' => [
+                'base_yield' => 1,
+                'base_per_min' => 10,
+                'ingredients' => [
+                    'Plutonium Waste' => 10,
+                    'Singularity Cell' => 10,
+                    'Dark Matter Residue' => 200,
+                ],
+            ],
         ],
 
         // no alts
@@ -2024,6 +2578,350 @@ class RecipeSeeder extends Seeder
                     'Plutonium Fuel Rod' => 0.1,
                     'Water' => 300,
                 ],
+            ],
+        ],
+
+        'Quantum Encoder' => [
+            'AI Expansion Server' => [
+                'base_yield' => 1,
+                'base_per_min' => 4,
+                'ingredients' => [
+                    'Magnetic Field Generator' => 4,
+                    'Neural-Quantum Processor' => 4,
+                    'Superposition Oscillator' => 4,
+                    'Excited Photonic Matter' => 100,
+                ],
+                'byproducts' => [
+                    'Dark Matter Residue' => 100,
+                ],
+            ],
+            'Alien Power Matrix' => [
+                'base_yield' => 1,
+                'base_per_min' => 2.5,
+                'ingredients' => [
+                    'SAM Fluctuator' => 12.5,
+                    'Power Shard' => 7.5,
+                    'Superposition Oscillator' => 7.5,
+                    'Excited Photonic Matter' => 60,
+                ],
+                'byproducts' => [
+                    'Dark Matter Residue' => 60,
+                ],
+            ],
+            'Ficsonium Fuel Rod' => [
+                'base_yield' => 1,
+                'base_per_min' => 2.5,
+                'ingredients' => [
+                    'Ficsonium' => 5,
+                    'Electromagnetic Control Rod' => 5,
+                    'Ficsite Trigon' => 100,
+                    'Excited Photonic Matter' => 50,
+                ],
+                'byproducts' => [
+                    'Dark Matter Residue' => 50,
+                ],
+            ],
+            'Neural-Quantum Processor' => [
+                'base_yield' => 1,
+                'base_per_min' => 3,
+                'ingredients' => [
+                    'Time Crystal' => 15,
+                    'Supercomputer' => 3,
+                    'Ficsite Trigon' => 45,
+                    'Excited Photonic Matter' => 75,
+                ],
+                'byproducts' => [
+                    'Dark Matter Residue' => 75,
+                ],
+            ],
+            'Superposition Oscillator' => [
+                'base_yield' => 1,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Dark Matter Crystal' => 30,
+                    'Crystal Oscillator' => 5,
+                    'Alclad Aluminum Sheet' => 45,
+                    'Excited Photonic Matter' => 125,
+                ],
+                'byproducts' => [
+                    'Dark Matter Residue' => 125,
+                ],
+            ],
+            'Power Shard' => [
+                'description' => 'Synthetic Power Shard',
+                'base_yield' => 1,
+                'base_per_min' => 5,
+                'ingredients' => [
+                    'Time Crystal' => 10,
+                    'Dark Matter Crystal' => 10,
+                    'Quartz Crystal' => 60,
+                    'Excited Photonic Matter' => 60,
+                ],
+                'byproducts' => [
+                    'Dark Matter Residue' => 60,
+                ],
+                'alt_recipe' => true,
+            ],
+        ],
+
+        'Converter' => [
+            'Bauxite' => [
+                [
+                    'description' => 'Bauxite (Caterium)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Caterium Ore' => 150,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Bauxite (Copper)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Copper Ore' => 180,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Caterium Ore' => [
+                [
+                    'description' => 'Caterium Ore (Copper)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Copper Ore' => 150,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Caterium Ore (Quartz)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Raw Quartz' => 120,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Coal' => [
+                [
+                    'description' => 'Coal (Iron)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Iron Ore' => 180,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Coal (Limestone)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Limestone' => 360,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Copper Ore' => [
+                [
+                    'description' => 'Copper Ore (Quartz)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Raw Quartz' => 100,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Copper Ore (Sulfur)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Sulfur' => 120,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Dark Matter Residue' => [
+                'base_yield' => 10,
+                'base_per_min' => 100,
+                'ingredients' => [
+                    'Reanimated SAM' => 50,
+                ],
+            ],
+            'Ionized Fuel' => [
+                'description' => 'Dark-Ion Fuel',
+                'base_yield' => 10,
+                'base_per_min' => 200,
+                'ingredients' => [
+                    'Packaged Rocket Fuel' => 240,
+                    'Dark Matter Crystal' => 80,
+                ],
+                'byproducts' => [
+                    'Compacted Coal' => 40,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Excited Photonic Matter' => [
+                'base_yield' => 10,
+                'base_per_min' => 200,
+                'ingredients' => [],
+            ],
+            'Ficsite Ingot' => [
+                [
+                    'description' => 'Ficsite Ingot (Aluminum)',
+                    'base_yield' => 1,
+                    'base_per_min' => 30,
+                    'ingredients' => [
+                        'Reanimated SAM' => 60,
+                        'Aluminum Ingot' => 120,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Ficsite Ingot (Caterium)',
+                    'base_yield' => 1,
+                    'base_per_min' => 15,
+                    'ingredients' => [
+                        'Reanimated SAM' => 45,
+                        'Caterium Ingot' => 60,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Ficsite Ingot (Iron)',
+                    'base_yield' => 1,
+                    'base_per_min' => 10,
+                    'ingredients' => [
+                        'Reanimated SAM' => 40,
+                        'Iron Ingot' => 240,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Iron Ore' => [
+                'description' => 'Iron Ore (Limestone)',
+                'base_yield' => 12,
+                'base_per_min' => 120,
+                'ingredients' => [
+                    'Reanimated SAM' => 10,
+                    'Limestone' => 240,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Limestone' => [
+                'description' => 'Limestone (Sulfur)',
+                'base_yield' => 12,
+                'base_per_min' => 120,
+                'ingredients' => [
+                    'Reanimated SAM' => 10,
+                    'Sulfur' => 20,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Nitrogen Gas' => [
+                [
+                    'description' => 'Nitrogen Gas (Bauxite)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Bauxite' => 100,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Nitrogen Gas (Caterium)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Caterium Ore' => 120,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Diamonds' => [
+                'description' => 'Pink Diamonds',
+                'base_yield' => 1,
+                'base_per_min' => 15,
+                'ingredients' => [
+                    'Coal' => 120,
+                    'Quartz Crystal' => 45,
+                ],
+                'alt_recipe' => true,
+            ],
+            'Raw Quartz' => [
+                [
+                    'description' => 'Raw Quartz (Bauxite)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Bauxite' => 100,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Raw Quartz (Coal)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Coal' => 240,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Sulfur' => [
+                [
+                    'description' => 'Sulfur (Coal)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Coal' => 200,
+                    ],
+                    'alt_recipe' => true,
+                ],
+                [
+                    'description' => 'Sulfur (Iron)',
+                    'base_yield' => 12,
+                    'base_per_min' => 120,
+                    'ingredients' => [
+                        'Reanimated SAM' => 10,
+                        'Iron Ore' => 300,
+                    ],
+                    'alt_recipe' => true,
+                ],
+            ],
+            'Time Crystal' => [
+                'base_yield' => 1,
+                'base_per_min' => 6,
+                'ingredients' => [
+                    'Diamonds' => 12,
+                ],
+            ],
+            'Uranium' => [
+                'description' => 'Uranium Ore (Bauxite)',
+                'base_yield' => 12,
+                'base_per_min' => 120,
+                'ingredients' => [
+                    'Reanimated SAM' => 10,
+                    'Bauxite' => 480,
+                ],
+                'alt_recipe' => true,
             ],
         ],
 
