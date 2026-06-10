@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Ingredient;
+use App\Models\Recipe;
+use App\Observers\IngredientObserver;
+use App\Observers\RecipeObserver;
 use Hashids\Hashids;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Recipe::observe(RecipeObserver::class);
+        Ingredient::observe(IngredientObserver::class);
+
         // seo stuff
         seo()->title(config('app.name'))
             ->description(config('app.description'))
