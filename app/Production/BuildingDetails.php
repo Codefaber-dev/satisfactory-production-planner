@@ -39,7 +39,9 @@ class BuildingDetails extends Collection
 
     protected $somersloop_slots = 0;
 
-    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0): static
+    protected $cost_multiplier = 1.0;
+
+    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0, $cost_multiplier = 1.0): static
     {
         return (new static)
             ->setRecipe($recipe)
@@ -47,6 +49,7 @@ class BuildingDetails extends Collection
             ->setBeltSpeed($belt_speed)
             ->setBaseClock($base_clock)
             ->setSomersloopSlots($somersloop_slots)
+            ->setCostMultiplier($cost_multiplier)
             ->setEven(request('even', false))
             ->getBuildingDetails();
     }
@@ -55,6 +58,13 @@ class BuildingDetails extends Collection
     {
         $max = self::SLOTS[$this->recipe->building->name] ?? 0;
         $this->somersloop_slots = max(0, min($slots, $max));
+
+        return $this;
+    }
+
+    protected function setCostMultiplier(float $multiplier): static
+    {
+        $this->cost_multiplier = max(0.1, min(10.0, $multiplier));
 
         return $this;
     }
@@ -147,10 +157,10 @@ class BuildingDetails extends Collection
                 return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
             })->collapse();
 
-            // calculate the max belt load
+            // calculate the max belt load (cost_multiplier scales ingredient consumption)
             $belt_load_in = $this->recipe->ingredients->reject(fn ($ing) => $ing->is_liquid)
                 ->map(function ($ingredient) use ($num_buildings, $clock_speed, $variant) {
-                    return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100;
+                    return $ingredient->pivot->base_qty * $num_buildings * $clock_speed * $variant->multiplier / 100 * $this->cost_multiplier;
                 })->max();
 
             // calc the number of rows needed

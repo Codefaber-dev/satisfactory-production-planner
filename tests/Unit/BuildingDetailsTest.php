@@ -135,6 +135,44 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function cost_multiplier_scales_belt_load_in_without_changing_building_count(): void
+    {
+        // Assembler — has solid ingredients; Iron Plate base recipe uses Iron Ore (solid)
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 2;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0)->first();
+        $doubled = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 2.0)->first();
+
+        // Building count and output unchanged
+        $this->assertSame($base['num_buildings'], $doubled['num_buildings']);
+        $this->assertSame($base['clock_speed'], $doubled['clock_speed']);
+
+        // Belt load in should double
+        $this->assertEqualsWithDelta(
+            $base['footprint']['belt_load_in'] * 2,
+            $doubled['footprint']['belt_load_in'],
+            1e-6
+        );
+    }
+
+    #[Test]
+    public function cost_multiplier_clamped_to_valid_range(): void
+    {
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min;
+
+        $tooLow = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 0.0)->first();
+        $tooHigh = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 100.0)->first();
+        $atMin = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 0.1)->first();
+        $atMax = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 10.0)->first();
+
+        // Clamped values match boundary values
+        $this->assertSame($atMin['footprint']['belt_load_in'], $tooLow['footprint']['belt_load_in']);
+        $this->assertSame($atMax['footprint']['belt_load_in'], $tooHigh['footprint']['belt_load_in']);
+    }
+
+    #[Test]
     public function energy_per_item_is_consistent_across_qty_scales(): void
     {
         // energy_per_item should remain stable at small qty (no even-rows);

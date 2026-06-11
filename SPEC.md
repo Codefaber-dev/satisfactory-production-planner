@@ -28,6 +28,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - `I.raw-materials` — `config/raw_materials.php`
 - `I.power-planner` — `app/PowerPlanner/` (FicsoniumFuelRod generator class)
 - `I.tests` — `tests/` (RecipeEnergyTest, seeder smoke tests)
+- `I.plan-params` — per-plan params object passed to `ProductionCalculator` (clock_speed, somersloop_slots, recipe choices, etc.)
 
 ## §V — Invariants
 
@@ -46,6 +47,10 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - **V33** Clicking Update on a multi-output plan with N outputs that each have a valid `product` and `recipe` returns a plan containing those same N outputs. No valid output is silently dropped after the Inertia round-trip.
 - **V34** Somersloop slots stored per building type: Smelter=1, Constructor=1, Foundry=2, Assembler=2, Refinery=2, Blender=4, Particle Accelerator=4, Packager=0. Each filled slot adds proportional output boost up to 2× at max slots. Power consumption scales up to 4× at max amplification. UI allows per-building-instance slot selection (0 to max_slots) on each production step.
 - **V35** `php artisan satis:export-game-data` (or equivalent) produces a portable JSON/SQL dump of all game-data tables (ingredients, recipes, buildings, raw_materials) suitable for seeding a fresh Docker install without running all migration helpers.
+- **V36** Recipe cost multiplier is a numeric plan param (default 1.0, range 0.1–10.0). When set, all ingredient consumption quantities in `BuildingDetails` are multiplied by it (output qty and building count unchanged). Setting persists in plan params across fetch/save. UI exposes it as a numeric input (or preset buttons) alongside clock_speed controls.
+- **V37** Power cost multiplier is a numeric plan param (default 1.0, range 0.1–10.0, step 0.1). When set, all building power consumption values in the plan output are multiplied by it (ingredient qty and building count unchanged). Persists in plan params. UI exposes it alongside other plan-level power controls.
+- **V38** UI renders usably on mobile viewports (≥320px): no horizontal overflow on any plan page; recipe selectors, building steps, and output controls are legible and tappable (min 44px touch targets) at 375px width.
+- **V39** Per-building-type count-multiple: each building type can have a user-configured step value (positive integer, default 1). Building count in plan output rounds up to nearest multiple of that step. Config persists in plan params. UI allows setting per-type multiples in a building settings panel.
 
 ## §T — Tasks
 
@@ -81,6 +86,11 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T75 | ~      | ~~Per-output Scale Up~~ — not practical; all outputs in multi plan are interconnected; issue #6 closed as won't-fix | — |
 | T76 | x      | Somersloop support: per-building-instance slot selector (0…max_slots) on each production step; max_slots from V34 table; amplified output = base_per_min × (1 + slots/max_slots); power cost scales up to 4× at max; slot state persists in plan params across fetch — resolves issue #2 remaining item | V34 |
 | T77 | x      | Create `php artisan satis:export-game-data` command that dumps ingredients/recipes/buildings/raw_materials to JSON; add README note for Docker self-hosters to run after seed — resolves issue #9 | V35 |
+| T78 | x      | Recipe cost multiplier: add `cost_multiplier` plan param (float, default 1.0); apply in `BuildingDetails::calc()` to ingredient pivot quantities; thread param through `ProductionCalculator` → `CalculatesSteps` → `BuildingOverview`; persist in plan params via existing save/fetch flow; add UI control | I.plan-params, V36 |
+| T79 | .      | Power cost multiplier: add `power_multiplier` plan param (float, default 1.0, range 0.1–10.0 step 0.1); apply to all power consumption values at display layer in `BuildingOverview`/plan summary; persist in plan params; add UI control (slider or numeric input) alongside clock_speed/somersloop controls | I.plan-params, V37 |
+| T80 | .      | Responsive design pass: audit all plan pages at 375px; fix horizontal overflow (tables → cards or scroll-x); ensure recipe selectors are touch-friendly; stack multi-column layouts to single column below `md` breakpoint; verify on real mobile viewport | V38 |
+| T81 | .      | Update checklist feature for v1.2: add new buildings (Converter, Quantum Encoder), new tier-9 ingredients and recipes from §T60–T68 to any checklist/milestone tracker; remove deprecated items (Alien Carapace, Color Cartridge, Spiked Rebar, Beacon, Rifle Cartridge) from checklists | V21, V24 |
+| T82 | .      | Per-building count multiples: add `building_multiples` plan param (map of building_name → step int, default empty = all 1); apply in building-count rounding in `BuildingDetails`; expose in a "Building Settings" panel in the UI with per-type numeric inputs; persist via existing save/fetch flow | I.plan-params, V39 |
 
 ## §B — Bug Log
 

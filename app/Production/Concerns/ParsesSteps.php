@@ -159,21 +159,27 @@ trait ParsesSteps
 
                                     $product_key = $group->dataGet('0.name').'|'.($group->dataGet('0.description') ?? $group->dataGet('0.name'));
                                     $somersloop_slots = (int) (request('somersloops', [])[$product_key] ?? 0);
+                                    $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
 
-                                    $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 100, $somersloop_slots) : null;
-                                    $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150, $somersloop_slots) : null;
-                                    $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200, $somersloop_slots) : null;
-                                    $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250, $somersloop_slots) : null;
+                                    $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 100, $somersloop_slots, $cost_multiplier) : null;
+                                    $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150, $somersloop_slots, $cost_multiplier) : null;
+                                    $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200, $somersloop_slots, $cost_multiplier) : null;
+                                    $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250, $somersloop_slots, $cost_multiplier) : null;
 
                                     $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
 
                                     $total_energy = $overview ? $overview->details->pluck('total_energy') : null;
 
+                                    $rawIngredients = $group->crossSumByKey('ingredients');
+                                    $scaledIngredients = $cost_multiplier !== 1.0
+                                        ? collect($rawIngredients)->map(fn ($q) => $q * $cost_multiplier)->all()
+                                        : $rawIngredients;
+
                                     return [
                                         'byproducts' => $group->crossSumByKey('byproducts'),
                                         'description' => $group->dataGet('0.description'),
                                         'imported' => $group->dataGet('0.imported'),
-                                        'ingredients' => $group->crossSumByKey('ingredients'),
+                                        'ingredients' => $scaledIngredients,
                                         'name' => $group->dataGet('0.name'),
                                         'outputs' => $group->pluck('outputs'),
                                         'overridden' => $group->dataGet('0.overridden'),

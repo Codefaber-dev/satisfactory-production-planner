@@ -81,6 +81,18 @@
                             <option value="780">Belts mk5</option>
                             <option value="1200">Belts mk6</option>
                         </select>
+                        <div class="flex items-center space-x-1">
+                            <label class="whitespace-nowrap text-sm">Cost ×</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                max="10"
+                                v-model.number="costMultiplier"
+                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
+                                title="Recipe cost multiplier (1.0 = default)"
+                            />
+                        </div>
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
                     <template v-else>
@@ -273,6 +285,7 @@ export default {
         'even',
         'speedLimit',
         'somersloops',
+        'cost_multiplier',
     ],
 
     data() {
@@ -323,6 +336,7 @@ export default {
             newEven: !!this.even,
             somersloopSlots: this.somersloops || {},
             newSpeedLimit: this.speedLimit || 'both',
+            costMultiplier: this.cost_multiplier || 1.0,
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
         };
@@ -469,6 +483,7 @@ export default {
                 even: this.newEven ? 1 : 0,
                 speedLimit: this.newSpeedLimit,
                 somersloops: this.somersloopSlots,
+                cost_multiplier: this.costMultiplier,
             };
 
             if (this.form.outputs.length > 1) {
