@@ -123,6 +123,31 @@
                     </button>
                     <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
                     <inertia-link class="btn btn-gray" href="/dashboard"> Start Over </inertia-link>
+                    <button
+                        v-if="uniqueBuildings.length"
+                        type="button"
+                        @click="showBuildingSettings = !showBuildingSettings"
+                        class="btn btn-gray text-sm"
+                    >
+                        Building Settings
+                    </button>
+                </div>
+
+                <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
+                    <p class="text-xs mb-2 font-medium text-gray-400">Building count multiple — rounds up to nearest multiple of N</p>
+                    <div class="flex flex-wrap gap-3">
+                        <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
+                            <label class="text-xs whitespace-nowrap">{{ building }}</label>
+                            <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                :value="buildingMultiples[building] || 1"
+                                @change="setBuildingMultiple(building, $event.target.value)"
+                                class="w-14 rounded py-1 px-1 text-sm shadow dark:bg-sky-800"
+                            />
+                        </div>
+                    </div>
                 </div>
                 <!--            <div class="mt-4 flex flex-col">-->
                 <!--                <hr class="mb-4" />-->
@@ -308,6 +333,7 @@ export default {
         'somersloops',
         'cost_multiplier',
         'power_multiplier',
+        'building_multiples',
     ],
 
     data() {
@@ -360,6 +386,8 @@ export default {
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,
+            buildingMultiples: this.building_multiples || {},
+            showBuildingSettings: false,
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
         };
@@ -378,6 +406,10 @@ export default {
             );
         },
 
+        uniqueBuildings() {
+            return [...new Set(this.production__building_details.map((d) => d.building))].filter(Boolean).sort();
+        },
+
         production__building_details() {
             // if (! this.$refs.productionSteps) {
             //     return [];
@@ -389,6 +421,7 @@ export default {
                 return {
                     clock,
                     variant_name,
+                    building: o.overviews[clock]?.building,
                     ...o.overviews[clock].details[variant_name],
                 };
             });
@@ -508,6 +541,7 @@ export default {
                 somersloops: this.somersloopSlots,
                 cost_multiplier: this.costMultiplier,
                 power_multiplier: this.powerMultiplier,
+                building_multiples: this.buildingMultiples,
             };
 
             if (this.form.outputs.length > 1) {
@@ -744,6 +778,12 @@ export default {
 
         selectNewSubRecipe({ recipe }) {
             this.setNewSubFavorite(recipe);
+        },
+
+        setBuildingMultiple(name, val) {
+            const step = Math.max(1, parseInt(val) || 1);
+            this.buildingMultiples = { ...this.buildingMultiples, [name]: step };
+            this.fetch({ preserveScroll: true });
         },
 
         savePrefs() {

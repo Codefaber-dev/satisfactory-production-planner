@@ -43,7 +43,9 @@ class BuildingDetails extends Collection
 
     protected $plan_power_multiplier = 1.0;
 
-    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0, $cost_multiplier = 1.0, $power_multiplier = 1.0): static
+    protected $building_multiples = [];
+
+    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0, $cost_multiplier = 1.0, $power_multiplier = 1.0, $building_multiples = []): static
     {
         return (new static)
             ->setRecipe($recipe)
@@ -53,6 +55,7 @@ class BuildingDetails extends Collection
             ->setSomersloopSlots($somersloop_slots)
             ->setCostMultiplier($cost_multiplier)
             ->setPlanPowerMultiplier($power_multiplier)
+            ->setBuildingMultiples($building_multiples)
             ->setEven(request('even', false))
             ->getBuildingDetails();
     }
@@ -75,6 +78,13 @@ class BuildingDetails extends Collection
     protected function setPlanPowerMultiplier(float $multiplier): static
     {
         $this->plan_power_multiplier = max(0.1, min(10.0, $multiplier));
+
+        return $this;
+    }
+
+    protected function setBuildingMultiples(array $multiples): static
+    {
+        $this->building_multiples = $multiples;
 
         return $this;
     }
@@ -123,10 +133,14 @@ class BuildingDetails extends Collection
         $somersloop_power_amp = $max_slots > 0 ? (1 + 3 * $slots / $max_slots) : 1.0;
         $effective_base_per_min = $this->recipe->base_per_min * $amplifier;
         $plan_power_multiplier = $this->plan_power_multiplier;
+        $multiple = max(1, (int) ($this->building_multiples[$building_name] ?? 1));
 
-        $this->items = $this->recipe->building->variants->map(function ($variant) use ($max_slots, $slots, $effective_base_per_min, $somersloop_power_amp, $plan_power_multiplier) {
+        $this->items = $this->recipe->building->variants->map(function ($variant) use ($max_slots, $slots, $effective_base_per_min, $somersloop_power_amp, $plan_power_multiplier, $multiple) {
             // calc number of buildings needed, assuming belts can handle it
             $num_buildings = 1 * ceil($this->qty / $effective_base_per_min / $variant->multiplier / ($this->base_clock / 100));
+            if ($multiple > 1) {
+                $num_buildings = (int) ceil($num_buildings / $multiple) * $multiple;
+            }
 
             // calc the clock speed for the buildings
             $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $effective_base_per_min / $variant->multiplier, 4);
@@ -258,7 +272,7 @@ class BuildingDetails extends Collection
 
             return [
                 "{$this->recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed', 'max_slots', 'slots'),
+                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed', 'max_slots', 'slots', 'multiple'),
             ];
         })->collapse()->all();
 

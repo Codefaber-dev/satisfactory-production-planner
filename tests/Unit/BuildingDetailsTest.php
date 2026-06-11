@@ -205,6 +205,46 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function building_multiple_rounds_up_num_buildings(): void
+    {
+        // Iron Rod: Constructor, base_per_min=15; qty=45 → needs exactly 3 buildings at 100%
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 3;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $multiple4 = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+
+        $this->assertEquals(3, $base['num_buildings']);
+        $this->assertEquals(4, $multiple4['num_buildings']);
+        $this->assertEquals(0, $multiple4['num_buildings'] % 4, 'num_buildings must be divisible by 4');
+    }
+
+    #[Test]
+    public function building_multiple_one_is_no_op(): void
+    {
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 3;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0)->first();
+        $multiple1 = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 1])->first();
+
+        $this->assertSame($base['num_buildings'], $multiple1['num_buildings']);
+    }
+
+    #[Test]
+    public function building_multiple_only_applies_to_matching_building(): void
+    {
+        // Iron Rod uses Constructor; Smelter multiple has no effect
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 3;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0)->first();
+        $mismatch = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Smelter' => 4])->first();
+
+        $this->assertSame($base['num_buildings'], $mismatch['num_buildings']);
+    }
+
+    #[Test]
     public function energy_per_item_is_consistent_across_qty_scales(): void
     {
         // energy_per_item should remain stable at small qty (no even-rows);
