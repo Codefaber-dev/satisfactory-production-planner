@@ -3,7 +3,7 @@
 
 ### 🗄️ v1.2 Data Update
 
-- Full Satisfactory v1.0 endgame and Update 6 content now available in the planner
+- Updated for Satisfactory v1.2.
 
 ## v1.2.0 - v1.2 Game Data
 [Release Notes](#release-notes)
@@ -34,11 +34,12 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 
 ### v1.2.0
 
-- 🗄️ All Satisfactory v1.0 endgame and Update 6 content was already in the game but missing from the planner's database. This update backports it all.
+- 🗄️ All Satisfactory v1.0 endgame and Update 6 content was already in the game but missing from the database seeder. This update backports it all.
 - 🏭 New buildings: **Converter** and **Quantum Encoder** now available in the Production Planner.
 - ⚗️ New recipe chains: SAM processing, Dark Matter, Diamonds, Ficsonium, Time Crystal, Ficsite Ingots, Quantum Encoder recipes, ore-conversion alts, Ionized Fuel, Rocket Fuel, and all Update 6 combat recipes.
 - 🔋 Power Planner: **Ficsonium Fuel Rod** added to Nuclear Power Plant. **Rocket Fuel** and **Ionized Fuel** now available as Fuel Generator options.
 - 🪲 Recipe corrections: Iron Alloy Ingot and Copper Alloy Ingot rates updated to v1.1 values.
+- 🪲 Bug fix: Nuclear Power Plant now correctly generates power instead of consuming it. Net power output is now correct.
 - 🏷️ Renamed ingredients to canonical names: SAM Ore → SAM, Green Power Slug → Blue Power Slug.
 - 🗑️ Removed deprecated items and recipes: Alien Carapace, Beacon, Color Cartridge, Rifle Cartridge, Spiked Rebar, Steel Coated Plate.
 
