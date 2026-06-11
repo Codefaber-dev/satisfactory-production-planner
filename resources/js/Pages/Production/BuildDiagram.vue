@@ -192,7 +192,7 @@
                             }"
                             :class="
                                 1 + col + row * footprint.buildings_per_row <= footprint.num_buildings
-                                    ? ['border-blue-800', 'bg-blue-800']
+                                    ? ['border-blue-800', 'bg-blue-300']
                                     : ['border-transparent', 'text-transparent', 'bg-transparent']
                             "
                             style="box-sizing: border-box"
