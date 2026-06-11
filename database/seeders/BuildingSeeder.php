@@ -523,6 +523,7 @@ class BuildingSeeder extends Seeder
                 'mk1' => [
                     'multiplier' => 1,
                     'base_power' => 2500,
+                    'is_generator' => true,
                     'recipe' => [
                         ['ingredient' => IngredientEnum::SUPERCOMPUTER->value, 'qty' => 10],
                         ['ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME->value, 'qty' => 25],
@@ -560,6 +561,7 @@ class BuildingSeeder extends Seeder
                         'name' => $variant_name,
                         'multiplier' => $variant_atts['multiplier'],
                         'base_power' => $variant_atts['base_power'],
+                        'is_generator' => $variant_atts['is_generator'] ?? false,
                     ]);
 
                     $variant->setRecipe($variant_atts['recipe']);
