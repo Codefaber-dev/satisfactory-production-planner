@@ -157,10 +157,13 @@ trait ParsesSteps
 
                                     }
 
-                                    $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant) : null;
-                                    $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150) : null;
-                                    $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200) : null;
-                                    $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250) : null;
+                                    $product_key = $group->dataGet('0.name').'|'.($group->dataGet('0.description') ?? $group->dataGet('0.name'));
+                                    $somersloop_slots = (int) (request('somersloops', [])[$product_key] ?? 0);
+
+                                    $overview = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 100, $somersloop_slots) : null;
+                                    $overview_150 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 150, $somersloop_slots) : null;
+                                    $overview_200 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 200, $somersloop_slots) : null;
+                                    $overview_250 = $recipe ? BuildingOverview::make($recipe, $qty, $belt_speed, $variant, 250, $somersloop_slots) : null;
 
                                     $power_usage = $overview ? $overview->details->pluck('power_usage') : null;
 

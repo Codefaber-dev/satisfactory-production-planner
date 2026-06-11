@@ -77,6 +77,7 @@
                         :all-materials="production.all_materials"
                         :byproducts-used="production.byproducts_used"
                         :overviews="overviews"
+                        :somersloop-slots="somersloopSlots"
                         @toggle="toggle"
                         @setNewSubFavorite="setNewSubFavorite"
                     />
@@ -103,6 +104,9 @@ export default {
         choices: {},
         even: {},
         overviews: {},
+        somersloopSlots: {
+            default: () => ({}),
+        },
         speedLimit: {
             type: String,
             default: 'both',

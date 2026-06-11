@@ -79,7 +79,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T73 | x      | Fix `saveMyFactory` PATCH: capture full recipe-choice state (all `newChoices` + current sub-recipe choices from the production tree) before sending to `/factories/:id`; verify reload restores identical selections — resolves issue #4 | V32 |
 | T74 | x      | Fix multi-output line-disappears bug: trace Inertia component lifecycle on `fetch()` call after second output added; ensure all outputs with valid product+recipe survive the round-trip and are present in re-initialized `data()` `outputs` array — resolves issue #3 | V33 |
 | T75 | ~      | ~~Per-output Scale Up~~ — not practical; all outputs in multi plan are interconnected; issue #6 closed as won't-fix | — |
-| T76 | .      | Somersloop support: per-building-instance slot selector (0…max_slots) on each production step; max_slots from V34 table; amplified output = base_per_min × (1 + slots/max_slots); power cost scales up to 4× at max; slot state persists in plan params across fetch — resolves issue #2 remaining item | V34 |
+| T76 | x      | Somersloop support: per-building-instance slot selector (0…max_slots) on each production step; max_slots from V34 table; amplified output = base_per_min × (1 + slots/max_slots); power cost scales up to 4× at max; slot state persists in plan params across fetch — resolves issue #2 remaining item | V34 |
 | T77 | .      | Create `php artisan satis:export-game-data` command that dumps ingredients/recipes/buildings/raw_materials to JSON; add README note for Docker self-hosters to run after seed — resolves issue #9 | V35 |
 
 ## §B — Bug Log

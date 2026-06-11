@@ -262,6 +262,18 @@
                             Scale Up Factory
                         </button>
                     </div>
+                    <div v-if="maxSlots > 0" class="mt-2 flex items-center justify-end space-x-2">
+                        <span>Somersloops</span>
+                        <button
+                            v-for="n in maxSlots + 1"
+                            :key="n - 1"
+                            @click="setSomersloopSlots(n - 1)"
+                            :class="[currentSomersloopSlots === n - 1 ? 'btn-gray' : 'btn-emerald']"
+                            class="btn-sm"
+                        >
+                            {{ n - 1 }}
+                        </button>
+                    </div>
                 </template>
             </td>
         </tr>
@@ -295,6 +307,9 @@ export default {
         levelIndex: {},
         levelStepMap: {},
         finished: {},
+        somersloopSlots: {
+            default: () => ({}),
+        },
     },
 
     mounted() {
@@ -355,9 +370,22 @@ export default {
         canMaximize() {
             return this.overview.selected_variant.clock_speed < this.overview.selected_variant.max_clock_speed;
         },
+
+        maxSlots() {
+            const first = Object.values(this.overview.details)[0];
+            return first ? (first.max_slots ?? 0) : 0;
+        },
+
+        currentSomersloopSlots() {
+            return this.somersloopSlots[this.key] ?? 0;
+        },
     },
 
     methods: {
+        setSomersloopSlots(slots) {
+            this.Bus.emit('UpdateSomersloopSlots', { key: this.key, slots });
+        },
+
         maximizeOutput(scale) {
             const qty = this.overview.qty;
             const num_buildings = this.overview.selected_variant.num_buildings;

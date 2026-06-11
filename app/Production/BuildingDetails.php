@@ -8,6 +8,21 @@ use Illuminate\Support\Facades\Log;
 
 class BuildingDetails extends Collection
 {
+    // Somersloop max slots per building type (wiki: satisfactory.wiki.gg/wiki/Somersloop)
+    const SLOTS = [
+        'Smelter' => 1,
+        'Constructor' => 1,
+        'Foundry' => 2,
+        'Assembler' => 2,
+        'Refinery' => 2,
+        'Manufacturer' => 4,
+        'Blender' => 4,
+        'Particle Accelerator' => 4,
+        'Quantum Encoder' => 4,
+        'Converter' => 2,
+        // Packager => 0 (no slots)
+    ];
+
     /**
      * @var Recipe
      */
@@ -22,15 +37,26 @@ class BuildingDetails extends Collection
 
     protected $base_clock = 100;
 
-    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100): static
+    protected $somersloop_slots = 0;
+
+    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0): static
     {
         return (new static)
             ->setRecipe($recipe)
             ->setQty($qty)
             ->setBeltSpeed($belt_speed)
             ->setBaseClock($base_clock)
+            ->setSomersloopSlots($somersloop_slots)
             ->setEven(request('even', false))
             ->getBuildingDetails();
+    }
+
+    protected function setSomersloopSlots(int $slots): static
+    {
+        $max = self::SLOTS[$this->recipe->building->name] ?? 0;
+        $this->somersloop_slots = max(0, min($slots, $max));
+
+        return $this;
     }
 
     protected function setRecipe(Recipe $recipe): static
@@ -70,12 +96,19 @@ class BuildingDetails extends Collection
 
     protected function getBuildingDetails(): static
     {
-        $this->items = $this->recipe->building->variants->map(function ($variant) {
+        $building_name = $this->recipe->building->name;
+        $max_slots = self::SLOTS[$building_name] ?? 0;
+        $slots = $this->somersloop_slots;
+        $amplifier = $max_slots > 0 ? (1 + $slots / $max_slots) : 1.0;
+        $power_multiplier = $max_slots > 0 ? (1 + 3 * $slots / $max_slots) : 1.0;
+        $effective_base_per_min = $this->recipe->base_per_min * $amplifier;
+
+        $this->items = $this->recipe->building->variants->map(function ($variant) use ($max_slots, $slots, $effective_base_per_min, $power_multiplier) {
             // calc number of buildings needed, assuming belts can handle it
-            $num_buildings = 1 * ceil($this->qty / $this->recipe->base_per_min / $variant->multiplier / ($this->base_clock / 100));
+            $num_buildings = 1 * ceil($this->qty / $effective_base_per_min / $variant->multiplier / ($this->base_clock / 100));
 
             // calc the clock speed for the buildings
-            $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
+            $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $effective_base_per_min / $variant->multiplier, 4);
 
             // calc shards per building
             $shards_per_building = match (true) {
@@ -96,8 +129,8 @@ class BuildingDetails extends Collection
             // calc the number of power shards
             $power_shards = $num_buildings * $shards_per_building;
 
-            // calc the power_usage for the buildings
-            $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
+            // calc the power_usage for the buildings (somersloop amplifies power up to 4× at max slots)
+            $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100) * $power_multiplier, 6);
 
             // calc the energy used per item
             $mj_per_s = $variant->calculatePowerUsage($clock_speed / 100);
@@ -144,7 +177,7 @@ class BuildingDetails extends Collection
             if ($this->even || $building_delta > 1) {
                 // Log::debug("Building delta: $building_delta");
                 $num_buildings = $rows * $buildings_per_row;
-                $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $this->recipe->base_per_min / $variant->multiplier, 4);
+                $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $effective_base_per_min / $variant->multiplier, 4);
                 $shards_per_building = match (true) {
                     $clock_speed > 200 => 3,
                     $clock_speed > 150 => 2,
@@ -159,7 +192,7 @@ class BuildingDetails extends Collection
                     default => 100
                 };
                 $power_shards = $num_buildings * $shards_per_building;
-                $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100), 6);
+                $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100) * $power_multiplier, 6);
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
                     return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
                 })->collapse();
@@ -204,7 +237,7 @@ class BuildingDetails extends Collection
 
             return [
                 "{$this->recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed'),
+                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed', 'max_slots', 'slots'),
             ];
         })->collapse()->all();
 

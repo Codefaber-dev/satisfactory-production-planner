@@ -76,6 +76,65 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function somersloop_slots_reduce_num_buildings(): void
+    {
+        // Assembler has 2 slots; 1 slot → 1.5× amplifier → fewer buildings needed
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 3;
+
+        $noSlots = BuildingDetails::calc($recipe, $qty, 780, 100, 0)->first();
+        $oneSlot = BuildingDetails::calc($recipe, $qty, 780, 100, 1)->first();
+
+        $this->assertLessThanOrEqual($noSlots['num_buildings'], $oneSlot['num_buildings'],
+            'Somersloop should not require more buildings than base');
+        $this->assertSame(2, $noSlots['max_slots']);
+        $this->assertSame(1, $oneSlot['slots']);
+    }
+
+    #[Test]
+    public function somersloop_max_slots_increases_power_usage(): void
+    {
+        // Assembler 2 slots at max → power_multiplier = 4×; power per building is higher
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min;
+
+        $noSlots = BuildingDetails::calc($recipe, $qty, 780, 100, 0)->first();
+        $maxSlots = BuildingDetails::calc($recipe, $qty, 780, 100, 2)->first();
+
+        $this->assertGreaterThan($noSlots['power_usage'], $maxSlots['power_usage'],
+            'Max somersloop slots must increase power_usage');
+    }
+
+    #[Test]
+    public function somersloop_slots_clamped_to_max(): void
+    {
+        // Requesting 10 slots on Assembler (max=2) should clamp to 2
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min;
+
+        $clamped = BuildingDetails::calc($recipe, $qty, 780, 100, 10)->first();
+        $maxed = BuildingDetails::calc($recipe, $qty, 780, 100, 2)->first();
+
+        $this->assertSame($maxed['num_buildings'], $clamped['num_buildings']);
+        $this->assertSame($maxed['power_usage'], $clamped['power_usage']);
+    }
+
+    #[Test]
+    public function somersloop_zero_slots_on_unsupported_building_has_no_effect(): void
+    {
+        // Packager has no slots; requesting slots should have no effect
+        $recipe = r('Packaged Water');
+        $qty = $recipe->base_per_min;
+
+        $noSlots = BuildingDetails::calc($recipe, $qty, 780, 100, 0)->first();
+        $attempted = BuildingDetails::calc($recipe, $qty, 780, 100, 2)->first();
+
+        $this->assertSame($noSlots['num_buildings'], $attempted['num_buildings']);
+        $this->assertSame($noSlots['power_usage'], $attempted['power_usage']);
+        $this->assertSame(0, $attempted['max_slots']);
+    }
+
+    #[Test]
     public function energy_per_item_is_consistent_across_qty_scales(): void
     {
         // energy_per_item should remain stable at small qty (no even-rows);

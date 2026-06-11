@@ -73,10 +73,10 @@ class ProductionController extends Controller
         // dd($calc->getOverviews());
 
         $imports = request('imports');
-
         $belt_speed = request('belt_speed', 780);
+        $somersloops = request('somersloops', []);
 
-        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops') + $this->baseData());
     }
 
     public function multi()
@@ -91,6 +91,7 @@ class ProductionController extends Controller
         $speedLimit = request('speedLimit', 'both');
         $belt_speed = request('belt_speed', 780);
         $imports = request('imports');
+        $somersloops = request('somersloops', []);
 
         // add request vars to cache key
         $requestVars = request()->all();
@@ -137,7 +138,7 @@ class ProductionController extends Controller
             ];
         });
 
-        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant = 'mk1')

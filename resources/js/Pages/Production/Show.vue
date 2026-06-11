@@ -180,6 +180,7 @@
                             :production-checks="productionChecks"
                             :recipes="recipes"
                             :choices="allChosenRecipes"
+                            :somersloop-slots="somersloopSlots"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
                             :speed-limit="newSpeedLimit"
@@ -225,6 +226,11 @@ export default {
             }
         });
 
+        this.Bus.on('UpdateSomersloopSlots', ({ key, slots }) => {
+            this.somersloopSlots = { ...this.somersloopSlots, [key]: slots };
+            this.fetch({ preserveScroll: true });
+        });
+
         this.Bus.on('AddOutput', ({ product, recipe, qty }) => {
             product = this.products.find((o) => o.name === product);
             recipe = this.recipes[product.name].find((o) => o.id === recipe.id);
@@ -266,6 +272,7 @@ export default {
         'choices',
         'even',
         'speedLimit',
+        'somersloops',
     ],
 
     data() {
@@ -314,6 +321,7 @@ export default {
             showWarnings: true,
             newChoices: this.choices || {},
             newEven: !!this.even,
+            somersloopSlots: this.somersloops || {},
             newSpeedLimit: this.speedLimit || 'both',
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
@@ -460,6 +468,7 @@ export default {
                 choices: this.newChoices,
                 even: this.newEven ? 1 : 0,
                 speedLimit: this.newSpeedLimit,
+                somersloops: this.somersloopSlots,
             };
 
             if (this.form.outputs.length > 1) {
