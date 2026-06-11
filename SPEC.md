@@ -42,6 +42,10 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - **V29** `RecipeEnergyTest` passes without regression after V22/V23 corrections.
 - **V30** `NuclearPowerPlant` fuel map includes `Ingredient::FICSONIUM_FUEL_ROD` at `fuel_per_min=1`; no standalone `FicsoniumFuelRod` generator class exists.
 - **V31** `FuelGenerator` fuel map has no duplicate keys; includes all 5 valid liquid fuels: Fuel (750 MJ), Turbofuel (2000 MJ), Liquid Biofuel (750 MJ), Rocket Fuel (3600 MJ), Ionized Fuel (5000 MJ). Packaged variants excluded (Fuel Generator is pipe-input only). `Base::buildable_fuels` includes `ROCKET_FUEL`, `IONIZED_FUEL`, `FICSONIUM_FUEL_ROD`.
+- **V32** Factory PATCH (`PATCH /factories/:id`) persists full recipe-choice state: re-loading the factory via its Plan link restores identical recipe selections (same recipe ids, same nested sub-choices) as when saved. No recipe reverts to default on reload.
+- **V33** Clicking Update on a multi-output plan with N outputs that each have a valid `product` and `recipe` returns a plan containing those same N outputs. No valid output is silently dropped after the Inertia round-trip.
+- **V34** Somersloop slots stored per building type: Smelter=1, Constructor=1, Foundry=2, Assembler=2, Refinery=2, Blender=4, Particle Accelerator=4, Packager=0. Each filled slot adds proportional output boost up to 2× at max slots. Power consumption scales up to 4× at max amplification. UI allows per-building-instance slot selection (0 to max_slots) on each production step.
+- **V35** `php artisan satis:export-game-data` (or equivalent) produces a portable JSON/SQL dump of all game-data tables (ingredients, recipes, buildings, raw_materials) suitable for seeding a fresh Docker install without running all migration helpers.
 
 ## §T — Tasks
 
@@ -72,6 +76,11 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T70 | x      | Run `php artisan db:seed` (fresh DB) and verify V28; log failures as §B entries | V28 |
 | T71 | x      | Verify/update RecipeEnergyTest after T48/T49 corrections; run full test suite; verify ≥ 80% coverage | I.tests, V29 |
 | T72 | x      | Fix `FuelGenerator`: remove duplicate `IONIZED_FUEL` key (second entry → `ROCKET_FUEL` at 3600 MJ); add `ROCKET_FUEL`, `IONIZED_FUEL`, `FICSONIUM_FUEL_ROD` to `Base::buildable_fuels` | I.power-planner, V31 |
+| T73 | x      | Fix `saveMyFactory` PATCH: capture full recipe-choice state (all `newChoices` + current sub-recipe choices from the production tree) before sending to `/factories/:id`; verify reload restores identical selections — resolves issue #4 | V32 |
+| T74 | x      | Fix multi-output line-disappears bug: trace Inertia component lifecycle on `fetch()` call after second output added; ensure all outputs with valid product+recipe survive the round-trip and are present in re-initialized `data()` `outputs` array — resolves issue #3 | V33 |
+| T75 | ~      | ~~Per-output Scale Up~~ — not practical; all outputs in multi plan are interconnected; issue #6 closed as won't-fix | — |
+| T76 | .      | Somersloop support: per-building-instance slot selector (0…max_slots) on each production step; max_slots from V34 table; amplified output = base_per_min × (1 + slots/max_slots); power cost scales up to 4× at max; slot state persists in plan params across fetch — resolves issue #2 remaining item | V34 |
+| T77 | .      | Create `php artisan satis:export-game-data` command that dumps ingredients/recipes/buildings/raw_materials to JSON; add README note for Docker self-hosters to run after seed — resolves issue #9 | V35 |
 
 ## §B — Bug Log
 
@@ -105,3 +114,6 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | B26 | 2026-06-10 | energyStage() finds Converter recipes for raw ores (Copper Ore, Iron Ore, etc.) after T68 backport and returns 500 MW Converter cost instead of config mining cost; fix: check isRaw() before recipe lookup | V15, T71 |
 | B27 | 2026-06-10 | FuelGenerator fuel map has duplicate key `IONIZED_FUEL` — second entry (15000/5000) silently shadows first; Rocket Fuel absent from generator; packaged liquid fuel variants not listed | V31, T72 |
 | B28 | 2026-06-10 | T69 created standalone `FicsoniumFuelRod` generator class — conceptually wrong (it's a fuel, not a building type) and never registered in `PowerPlanner::$options`; `NuclearPowerPlant` already has Ficsonium Fuel Rod as a fuel entry; orphaned class deleted | V30 |
+| B29 | 2026-06-10 | `saveMyFactory` PATCH sends only `newChoices` (overridden-from-default recipes) — sub-recipe choices set during the session that happen to match defaults are not persisted; factory reload reverts to default recipe tree — issue #4 | V32, T73 |
+| B30 | 2026-06-10 | Multi-output Update: second output added via "Add Output" and fully selected still disappears after fetch — Inertia full-page navigation recreates component; `data()` `outputs` initialized from server `multi` prop which may only include the first output if the fetch dropped the second | V33, T74 |
+| B31 | 2026-06-10 | Scale Up Factory scales all outputs proportionally — per-output independent scale not feasible (outputs share ingredient graph); issue #6 closed won't-fix | T75 |

@@ -583,7 +583,7 @@ export default {
                     ingredient_id: output.product.id,
                     recipe_id: output.recipe.id,
                     yield: output.yield,
-                    choices: this.newChoices,
+                    choices: this.allChosenRecipes,
                     imports,
                 });
             } else {
@@ -597,7 +597,7 @@ export default {
                 ingredient_id: output.product.id,
                 recipe_id: output.recipe.id,
                 yield: output.yield,
-                choices: this.newChoices,
+                choices: this.allChosenRecipes,
                 imports,
             });
         },
@@ -610,7 +610,7 @@ export default {
             if (this.newFactory) {
                 return this.$inertia.patch(`/factories/multi/${this.newFactory.id}`, {
                     outputs: this.form.outputs,
-                    choices: this.newChoices,
+                    choices: this.allChosenRecipes,
                     imports,
                 });
             }
@@ -619,7 +619,7 @@ export default {
             this.$inertia.post('/factories/multi', {
                 name,
                 outputs: this.form.outputs,
-                choices: this.newChoices,
+                choices: this.allChosenRecipes,
                 imports,
             });
         },
@@ -648,26 +648,26 @@ export default {
         // },
 
         setDefaultRecipe(row) {
-            // if there is only one recipe, use it
-            if (this.recipes[row.product.name].length === 1) {
-                this.setRecipe(this.recipes[row.product.name][0]);
+            const available = this.recipes[row.product.name];
+
+            if (available.length === 1) {
+                row.recipe = available[0];
                 return;
             }
 
-            // if there is a favorite recipe, use that
-            if (this.recipes[row.product.name].some((o) => this.isFavorite(o))) {
-                this.setRecipe(this.recipes[row.product.name].filter((o) => this.isFavorite(o))[0]);
+            const favorite = available.find((o) => this.isFavorite(o));
+            if (favorite) {
+                row.recipe = favorite;
                 return;
             }
 
-            // if there is a base recipe, use that
-            if (this.recipes[row.product.name].some((o) => !o.alt_recipe)) {
-                this.setRecipe(this.recipes[row.product.name].filter((o) => !o.alt_recipe)[0]);
+            const base = available.find((o) => !o.alt_recipe);
+            if (base) {
+                row.recipe = base;
                 return;
             }
 
-            // else, use the first recipe available
-            this.setRecipe(this.recipes[row.product.name][0]);
+            row.recipe = available[0];
         },
 
         isFavorite(recipe) {
@@ -685,7 +685,13 @@ export default {
         },
 
         selectNewRecipe({ recipe }) {
-            this.setRecipe(recipe);
+            const row = this.form.outputs.find((o) => o.recipe && o.recipe.product_id === recipe.product_id);
+            if (row) {
+                row.recipe = recipe;
+            } else {
+                this.form.outputs[0].recipe = recipe;
+            }
+            this.fetch({ preserveScroll: true });
         },
 
         selectNewSubRecipe({ recipe }) {
