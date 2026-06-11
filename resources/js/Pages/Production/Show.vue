@@ -112,7 +112,7 @@
                     </template>
                 </div>
 
-                <div class="my-4 space-x-4">
+                <div class="my-4 flex flex-wrap gap-2">
                     <button
                         v-if="$page.props?.user?.name"
                         :disabled="working"
@@ -158,17 +158,24 @@
                 <div v-if="done && production" class="relative flex flex-1 flex-col space-y-2 p-2 dark:text-gray-100">
                     <production-warning :overrides="production.overrides" :show-warnings="showWarnings" />
 
-                    <!-- Tabs -->
+                    <!-- Tabs (mobile/tablet only) -->
                     <div class="xl:hidden">
-                        <ul class="flex space-x-4">
+                        <ul class="flex flex-wrap gap-2">
                             <li>
-                                <button @click="selectedTab = 'productionSteps'">Production Steps</button>
+                                <button
+                                    @click="selectedTab = 'productionSteps'"
+                                    :class="selectedTab === 'productionSteps' ? 'btn btn-gray' : 'btn btn-emerald'"
+                                >
+                                    Production Steps
+                                </button>
                             </li>
                             <li>
-                                <button @click="selectedTab = 'productionSummary'">Production Summary</button>
-                            </li>
-                            <li>
-                                <button @click="selectedTab = 'buildingSummary'">Building Summary</button>
+                                <button
+                                    @click="selectedTab = 'productionSummary'"
+                                    :class="selectedTab === 'productionSummary' ? 'btn btn-gray' : 'btn btn-emerald'"
+                                >
+                                    Summary
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -176,6 +183,7 @@
                     <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-4">
                         <!-- Left Side -->
                         <production-summary
+                            :class="{ 'hidden': selectedTab !== 'productionSummary', 'xl:block': true }"
                             :building-checks="buildingChecks"
                             :disabled-raw-materials="disabledRawMaterials"
                             @fetch="fetch"
@@ -195,6 +203,7 @@
 
                         <!-- middle -->
                         <production-steps
+                            :class="{ 'hidden': selectedTab !== 'productionSteps', 'xl:flex': true }"
                             ref="productionSteps"
                             :diagrams="diagrams"
                             :hide-completed="hideCompleted"

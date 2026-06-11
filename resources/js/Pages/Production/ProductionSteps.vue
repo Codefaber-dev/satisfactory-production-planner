@@ -3,9 +3,9 @@
         class="flex flex-1 flex-col rounded-lg border border-gray-500 bg-white text-sm shadow-lg dark:border-sky-700 dark:bg-slate-900"
     >
         <div
-            class="flex items-center justify-center space-x-4 rounded-t-lg bg-gray-900 p-4 text-xl font-semibold text-white dark:bg-sky-700"
+            class="flex flex-wrap items-center justify-center gap-2 rounded-t-lg bg-gray-900 p-4 text-xl font-semibold text-white dark:bg-sky-700"
         >
-            <span>Production Steps</span>
+            <span class="w-full text-center sm:w-auto">Production Steps</span>
             <button @click="$emit('toggleDiagrams')" class="btn btn-emerald">
                 {{ diagrams ? '✅' : '⬜' }}
                 Toggle Diagrams
@@ -24,6 +24,7 @@
                 class="btn btn-emerald"
             ></button>
         </div>
+        <div class="overflow-x-auto">
         <table class="table-auto">
             <tr>
                 <th></th>
@@ -84,6 +85,7 @@
                 </template>
             </template>
         </table>
+        </div>
     </div>
 </template>
 <script>

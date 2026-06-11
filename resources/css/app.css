@@ -7,6 +7,7 @@
 
 .btn-sm {
     @apply py-1 px-2 text-sm rounded-lg shadow text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:opacity-30 disabled:focus:opacity-30 whitespace-nowrap;
+    min-height: 44px;
 }
 
 .btn {
