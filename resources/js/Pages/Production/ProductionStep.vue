@@ -304,7 +304,9 @@ export default {
             if (dest === this.identifier) {
                 console.log('flashing now');
                 this.shouldFlash = true;
-                setTimeout(() => (this.shouldFlash = false), 1200);
+                setTimeout(() => {
+                    this.shouldFlash = false;
+                }, 1200);
             }
         });
 
@@ -316,10 +318,10 @@ export default {
 
     data() {
         const key = `${this.production.recipe.product.name}|${
-                this.production.recipe.description || this.production.recipe.product.name
-            }`,
-            clock = store.getItem(`${key}.clock`, this.overviews?.[key]?.clock),
-            variant = store.getItem(`${key}.selected_variant_name`, this.overviews?.[key]?.selected_variant_name);
+            this.production.recipe.description || this.production.recipe.product.name
+        }`;
+        const clock = store.getItem(`${key}.clock`, this.overviews?.[key]?.clock);
+        const variant = store.getItem(`${key}.selected_variant_name`, this.overviews?.[key]?.selected_variant_name);
 
         return {
             key,
@@ -347,7 +349,7 @@ export default {
         },
 
         identifier() {
-            return this.levelIndex + '.' + this.stepLetter;
+            return `${this.levelIndex}.${this.stepLetter}`;
         },
 
         canMaximize() {
@@ -357,13 +359,13 @@ export default {
 
     methods: {
         maximizeOutput(scale) {
-            const qty = this.overview.qty,
-                num_buildings = this.overview.selected_variant.num_buildings,
-                max_clock_speed = this.overview.selected_variant.max_clock_speed,
-                base_per_min = this.recipe.base_per_min,
-                newQty = ((base_per_min * num_buildings * max_clock_speed) / 100).$round4(),
-                ratio = newQty / qty,
-                delta = newQty - qty;
+            const qty = this.overview.qty;
+            const num_buildings = this.overview.selected_variant.num_buildings;
+            const max_clock_speed = this.overview.selected_variant.max_clock_speed;
+            const base_per_min = this.recipe.base_per_min;
+            const newQty = ((base_per_min * num_buildings * max_clock_speed) / 100).$round4();
+            const ratio = newQty / qty;
+            const delta = newQty - qty;
 
             console.log({
                 qty,
@@ -402,7 +404,7 @@ export default {
         },
 
         usesByproduct(ingr) {
-            return this.byproductsUsed.hasOwnProperty(ingr) && this.byproductsUsed[ingr].hasOwnProperty(this.name);
+            return Object.hasOwn(this.byproductsUsed, ingr) && Object.hasOwn(this.byproductsUsed[ingr], this.name);
         },
 
         getByproductUsed(ingr) {
@@ -450,11 +452,11 @@ export default {
         },
 
         formatQtyWithPercentage(num, den) {
-            return this.formatQty(num) + ' (' + this.formatPercentage(num, den) + '%)';
+            return `${this.formatQty(num)} (${this.formatPercentage(num, den)}%)`;
         },
 
         formatQty(num) {
-            return +num.$round4() + ' per min';
+            return `${+num.$round4()} per min`;
         },
     },
 };

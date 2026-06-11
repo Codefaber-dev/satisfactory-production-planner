@@ -211,7 +211,7 @@ export default {
         },
 
         isFavorite(recipe) {
-            return !!recipe && recipe.hasOwnProperty('favorite') && recipe.favorite;
+            return !!recipe && Object.hasOwn(recipe, 'favorite') && recipe.favorite;
         },
 
         setRecipe(recipe) {

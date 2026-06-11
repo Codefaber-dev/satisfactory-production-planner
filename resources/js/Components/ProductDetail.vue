@@ -32,7 +32,7 @@ export default {
     computed: {
         name() {
             if (this.product?.is_ficsmas) {
-                return this.product.name.replace('FICSMAS', '').trim() + ' (FICSMAS)';
+                return `${this.product.name.replace('FICSMAS', '').trim()} (FICSMAS)`;
             }
             return this.product.name;
         },

@@ -21,12 +21,12 @@ export default {
 
     computed: {
         url() {
-            const opts = {},
-                publicId = this.publicId
-                    .replace(/ /gi, '')
-                    .replace(/Packaged/gi, '')
-                    .replace(/-/gi, '')
-                    .replace(/.png/, '');
+            const opts = {};
+            const publicId = this.publicId
+                .replace(/ /gi, '')
+                .replace(/Packaged/gi, '')
+                .replace(/-/gi, '')
+                .replace(/.png/, '');
             if (this.crop) {
                 opts.crop = this.crop;
             }
@@ -39,7 +39,7 @@ export default {
 
             opts.quality = this.quality || 80;
 
-            return cl.url('/' + publicId + '.webp', opts);
+            return cl.url(`/${publicId}.webp`, opts);
         },
     },
 };

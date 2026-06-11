@@ -2,6 +2,7 @@
 
 namespace App\PowerPlanner\Generators;
 
+use App\Enums\Ingredient;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -20,16 +21,19 @@ abstract class Base implements GeneratorContract
     protected $waste = [];
 
     protected $buildable_fuels = [
-        'Biomass',
-        'Solid Biofuel',
-        'Packaged Liquid Biofuel',
-        'Compacted Coal',
-        'Petroleum Coke',
-        'Fuel',
-        'Liquid Biofuel',
-        'Turbofuel',
-        'Uranium Fuel Rod',
-        'Plutonium Fuel Rod',
+        Ingredient::BIOMASS->value,
+        Ingredient::SOLID_BIOFUEL->value,
+        Ingredient::PACKAGED_LIQUID_BIOFUEL->value,
+        Ingredient::COMPACTED_COAL->value,
+        Ingredient::PETROLEUM_COKE->value,
+        Ingredient::FUEL->value,
+        Ingredient::LIQUID_BIOFUEL->value,
+        Ingredient::TURBOFUEL->value,
+        Ingredient::ROCKET_FUEL->value,
+        Ingredient::IONIZED_FUEL->value,
+        Ingredient::URANIUM_FUEL_ROD->value,
+        Ingredient::PLUTONIUM_FUEL_ROD->value,
+        Ingredient::FICSONIUM_FUEL_ROD->value,
     ];
 
     protected int $output;

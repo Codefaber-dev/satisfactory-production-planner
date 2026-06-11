@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\Ingredient;
 use App\Production\Multiplexer;
 use App\Production\MultiplexerFactory;
 use App\Production\ProductionCalculator;
@@ -136,7 +137,7 @@ class MultiplexerTest extends TestCase
     public function multiplexer_factory_builds_synthetic_recipe(): void
     {
         // MultiplexerFactory needs 'Factory Output' ingredient to exist
-        \App\Models\Ingredient::factory()->create(['name' => 'Factory Output', 'raw' => false, 'tier' => 1]);
+        Ingredient::factory()->create(['name' => 'Factory Output', 'raw' => false, 'tier' => 1]);
 
         $products = ['Iron Ore', 'Copper Ore'];
         $yields = [10, 20];

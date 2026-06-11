@@ -196,7 +196,9 @@ export default {
             copyToClipboard(`https://satisfactoryproductionplanner.com/shared/${this.hash_id}`);
 
             this.shareBtnText = 'Copied...';
-            setTimeout(() => (this.shareBtnText = 'Share Link'), 1200);
+            setTimeout(() => {
+                this.shareBtnText = 'Share Link';
+            }, 1200);
         },
 
         parse(el) {

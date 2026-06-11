@@ -23,7 +23,9 @@ async function factory(slotContent) {
 
 describe('Parser', () => {
     it('mounts without error', async () => {
-        expect(async () => { wrapper = await factory(); }).not.toThrow();
+        expect(async () => {
+            wrapper = await factory();
+        }).not.toThrow();
     });
 
     it('renders empty output when no slot content', async () => {

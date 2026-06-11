@@ -17,6 +17,7 @@ return [
         'Water' => 20 * 60 / 120,           // 10 MJ/item — water extractor @ 100% (20MW)
         'Crude Oil' => 40 * 60 / 120,       // 20 MJ/item — oil extractor @ 100% (40MW), normal node
         'Nitrogen Gas' => 150 * 60 / 120,   // 75 MJ/item — resource well pressurizer @ 100% (150MW), normal node
+        'SAM' => 15 * 60 / 120,             // 7.5 MJ/item — Mk.2 miner @ 100% (15MW), 120/min
     ],
 
     // rarity of raw materials derived from standard yield per min / max yield per min with mk.3 miners @100%

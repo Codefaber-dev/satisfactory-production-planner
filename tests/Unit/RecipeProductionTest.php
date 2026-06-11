@@ -136,20 +136,20 @@ class RecipeProductionTest extends TestCase
         $this->assertNull($production->get('1.Caterium Ore.total'));
         $this->assertNull($production->get('1.Copper Ore.total'));
 
-        $this->assertEquals(765, $production->get('1.Crude Oil.total'));
-        $this->assertEquals(150, $production->get('1.Water.total'));
-        $this->assertEquals(145, $production->get('2.Caterium Ingot.total'));
-        $this->assertEquals(725, $production->get('2.Copper Ingot.total'));
+        $this->assertEqualsWithDelta(398.571, $production->get('1.Crude Oil.total'), 0.001);
+        $this->assertEqualsWithDelta(85.714, $production->get('1.Water.total'), 0.001);
+        $this->assertEqualsWithDelta(77.857, $production->get('2.Caterium Ingot.total'), 0.001);
+        $this->assertEqualsWithDelta(389.286, $production->get('2.Copper Ingot.total'), 0.001);
         $this->assertEquals(0, $production->get('2.Heavy Oil Residue.total'));
-        $this->assertEquals(510, $production->get('2.Rubber.total'));
+        $this->assertEqualsWithDelta(265.714, $production->get('2.Rubber.total'), 0.001);
         $this->assertEquals(0, $production->get('2.Plastic.total'));
-        $this->assertEquals(1740, $production->get('3.Quickwire.total'));
-        $this->assertEquals(300, $production->get('3.Plastic.total'));
+        $this->assertEqualsWithDelta(934.286, $production->get('3.Quickwire.total'), 0.001);
+        $this->assertEqualsWithDelta(171.429, $production->get('3.Plastic.total'), 0.001);
         $this->assertEquals(0, $production->get('3.Empty Canister.total'));
-        $this->assertEquals(150, $production->get('4.Packaged Water.total'));
-        $this->assertEquals(210, $production->get('4.Circuit Board.total'));
-        $this->assertEquals(150, $production->get('5.Fuel.total'));
-        $this->assertEquals(150, $production->get('5.Packaged Fuel.total'));
+        $this->assertEqualsWithDelta(85.714, $production->get('4.Packaged Water.total'), 0.001);
+        $this->assertEquals(120, $production->get('4.Circuit Board.total'));
+        $this->assertEqualsWithDelta(85.714, $production->get('5.Fuel.total'), 0.001);
+        $this->assertEqualsWithDelta(85.714, $production->get('5.Packaged Fuel.total'), 0.001);
         $this->assertEquals(30, $production->get('5.Computer.total'));
     }
 
@@ -191,17 +191,17 @@ class RecipeProductionTest extends TestCase
             ['Heavy Modular Frame', 5, '7.Heavy Modular Frame.total', 5],
             ['Heavy Modular Frame', 5, '6.Modular Frame.total', 25],
             ['Heavy Modular Frame', 5, '5.Reinforced Iron Plate.total', 37.5],
-            ['Heavy Modular Frame', 5, '4.Screw.total', 950],
+            ['Heavy Modular Frame', 5, '4.Screw.total', 1050],
             ['Heavy Modular Frame', 5, '4.Encased Industrial Beam.total', 25],
-            ['Heavy Modular Frame', 5, '3.Iron Rod.total', 387.5],
-            ['Heavy Modular Frame', 5, '3.Steel Pipe.total', 75],
+            ['Heavy Modular Frame', 5, '3.Iron Rod.total', 412.5],
+            ['Heavy Modular Frame', 5, '3.Steel Pipe.total', 100],
             ['Heavy Modular Frame', 5, '3.Iron Plate.total', 225],
-            ['Heavy Modular Frame', 5, '2.Iron Ingot.total', 725],
-            ['Heavy Modular Frame', 5, '2.Concrete.total', 125],
-            ['Heavy Modular Frame', 5, '2.Steel Ingot.total', 512.5],
-            ['Heavy Modular Frame', 5, '1.Iron Ore.total', 1237.5],
-            ['Heavy Modular Frame', 5, '1.Limestone.total', 375],
-            ['Heavy Modular Frame', 5, '1.Coal.total', 512.5],
+            ['Heavy Modular Frame', 5, '2.Iron Ingot.total', 750],
+            ['Heavy Modular Frame', 5, '2.Concrete.total', 150],
+            ['Heavy Modular Frame', 5, '2.Steel Ingot.total', 450],
+            ['Heavy Modular Frame', 5, '1.Iron Ore.total', 1200],
+            ['Heavy Modular Frame', 5, '1.Limestone.total', 450],
+            ['Heavy Modular Frame', 5, '1.Coal.total', 450],
         ];
     }
 }
