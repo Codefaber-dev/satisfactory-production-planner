@@ -25,7 +25,7 @@ class BuildingOverview
 
     public $selected_variant;
 
-    public function __construct(Recipe $recipe, $qty, $belt_speed, $variant = 'mk1', $clock_speed = 100, $somersloop_slots = 0, $cost_multiplier = 1.0)
+    public function __construct(Recipe $recipe, $qty, $belt_speed, $variant = 'mk1', $clock_speed = 100, $somersloop_slots = 0, $cost_multiplier = 1.0, $power_multiplier = 1.0)
     {
         if (! $qty) {
             // qty is 0, so skip it
@@ -37,7 +37,7 @@ class BuildingOverview
         $this->belt_speed = $belt_speed;
         $this->clock_speed = $clock_speed;
 
-        $this->details = BuildingDetails::calc($recipe, $qty, $belt_speed, $clock_speed, $somersloop_slots, $cost_multiplier);
+        $this->details = BuildingDetails::calc($recipe, $qty, $belt_speed, $clock_speed, $somersloop_slots, $cost_multiplier, $power_multiplier);
 
         $this->overview = $this->details->map(function ($details, $building) {
             return [$building => "[x{$details['num_buildings']} {$details['clock_speed']}%] [{$details['power_usage']} MW]"];
@@ -47,9 +47,9 @@ class BuildingOverview
          ?? $this->details->keys()->first();
     }
 
-    public static function make(Recipe $recipe, $qty, $belt_speed, $variant = 'mk1', $clock_speed = 100, $somersloop_slots = 0, $cost_multiplier = 1.0): static
+    public static function make(Recipe $recipe, $qty, $belt_speed, $variant = 'mk1', $clock_speed = 100, $somersloop_slots = 0, $cost_multiplier = 1.0, $power_multiplier = 1.0): static
     {
-        return new static($recipe, $qty, $belt_speed, $variant, $clock_speed, $somersloop_slots, $cost_multiplier);
+        return new static($recipe, $qty, $belt_speed, $variant, $clock_speed, $somersloop_slots, $cost_multiplier, $power_multiplier);
     }
 
     public function toArray(): array

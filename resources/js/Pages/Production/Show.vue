@@ -93,6 +93,18 @@
                                 title="Recipe cost multiplier (1.0 = default)"
                             />
                         </div>
+                        <div class="flex items-center space-x-1">
+                            <label class="whitespace-nowrap text-sm">Power ×</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                max="10"
+                                v-model.number="powerMultiplier"
+                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
+                                title="Power cost multiplier (1.0 = default)"
+                            />
+                        </div>
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
                     <template v-else>
@@ -286,6 +298,7 @@ export default {
         'speedLimit',
         'somersloops',
         'cost_multiplier',
+        'power_multiplier',
     ],
 
     data() {
@@ -337,6 +350,7 @@ export default {
             somersloopSlots: this.somersloops || {},
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
+            powerMultiplier: this.power_multiplier || 1.0,
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
         };
@@ -484,6 +498,7 @@ export default {
                 speedLimit: this.newSpeedLimit,
                 somersloops: this.somersloopSlots,
                 cost_multiplier: this.costMultiplier,
+                power_multiplier: this.powerMultiplier,
             };
 
             if (this.form.outputs.length > 1) {

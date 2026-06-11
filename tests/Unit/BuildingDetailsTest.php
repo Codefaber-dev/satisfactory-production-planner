@@ -173,6 +173,38 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function power_multiplier_scales_power_usage_without_changing_building_count(): void
+    {
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 2;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0)->first();
+        $doubled = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 2.0)->first();
+
+        $this->assertSame($base['num_buildings'], $doubled['num_buildings']);
+        $this->assertSame($base['clock_speed'], $doubled['clock_speed']);
+
+        $this->assertEqualsWithDelta($base['power_usage'] * 2, $doubled['power_usage'], 1e-6);
+        $this->assertEqualsWithDelta($base['energy_per_item'] * 2, $doubled['energy_per_item'], 1e-9);
+        $this->assertEqualsWithDelta($base['total_energy'] * 2, $doubled['total_energy'], 1e-9);
+    }
+
+    #[Test]
+    public function power_multiplier_clamped_to_valid_range(): void
+    {
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min;
+
+        $tooLow = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 0.0)->first();
+        $tooHigh = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 100.0)->first();
+        $atMin = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 0.1)->first();
+        $atMax = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 10.0)->first();
+
+        $this->assertSame($atMin['power_usage'], $tooLow['power_usage']);
+        $this->assertSame($atMax['power_usage'], $tooHigh['power_usage']);
+    }
+
+    #[Test]
     public function energy_per_item_is_consistent_across_qty_scales(): void
     {
         // energy_per_item should remain stable at small qty (no even-rows);
