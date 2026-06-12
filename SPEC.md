@@ -103,7 +103,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T84 | x      | Diagram grouping: when type grouping enabled, BuildDiagram renders count/X blueprint tiles at designer dims with `<monogram>x<X>` label; individual building outlines hidden; footprint stats (foundations/walls/offsets/rows) recomputed against blueprint tile dims; toggle off = current render path untouched | I.build-diagram, V41, V43 |
 | T85 | .      | Designer mk selector (Mk.1/2/3, global LS, default Mk.1); clamp blueprint size to 1–40 (input min/max + clamp on LS read); no fit warning | I.building-settings, I.local-storage, V43 |
 | T86 | .      | Tests: LS persistence round-trip (sizes global, toggles per-factory), effective-multiple derivation, grouped tile count/label, size clamp 1–40, even-rows superseded when multiple > 1; backend `building_multiples` rounding already covered by T82 tests | V41, V42, V43, V44 |
-| T87 | .      | Backend: skip even-rows branch in `BuildingDetails::getBuildingDetails()` when `$multiple > 1` (both `even` param and `building_delta` auto-trigger paths); recompute rows/buildings_per_row against grouped count instead | I.plan-params, V44 |
+| T87 | x      | Backend: skip even-rows branch in `BuildingDetails::getBuildingDetails()` when `$multiple > 1` (both `even` param and `building_delta` auto-trigger paths); recompute rows/buildings_per_row against grouped count instead | I.plan-params, V44 |
 
 ## §B — Bug Log
 

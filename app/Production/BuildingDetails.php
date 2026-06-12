@@ -208,8 +208,9 @@ class BuildingDetails extends Collection
             // building delta, check if belts are too slow for nominal building count
             $building_delta = ($rows * $buildings_per_row) - $num_buildings;
 
-            // force even rows
-            if ($this->even || $building_delta > 1) {
+            // force even rows — superseded by blueprint grouping: a grouped count must stay
+            // an exact multiple of the group size (V44)
+            if ($multiple === 1 && ($this->even || $building_delta > 1)) {
                 // Log::debug("Building delta: $building_delta");
                 $num_buildings = $rows * $buildings_per_row;
                 $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $effective_base_per_min / $variant->multiplier, 4);
@@ -250,6 +251,7 @@ class BuildingDetails extends Collection
                 'rows' => $rows,
                 'num_buildings' => $num_buildings,
                 'power_shards' => $power_shards,
+                'somersloops' => $num_buildings * $slots,
                 'buildings_per_row' => $buildings_per_row,
                 'building_length' => $building_length = $this->recipe->building->length,
                 'building_length_foundations' => $building_length_foundations = ceil($this->recipe->building->length / 8),

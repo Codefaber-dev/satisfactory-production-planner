@@ -245,6 +245,51 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function building_multiple_supersedes_even_rows_auto_trigger(): void
+    {
+        // Large qty → building_delta > 1 would fire the even-rows branch and inflate
+        // num_buildings to rows × buildings_per_row, breaking the multiple (V44)
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min * 1000;
+
+        $grouped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 7])->first();
+
+        $this->assertEquals(0, $grouped['num_buildings'] % 7,
+            'Grouped num_buildings must stay an exact multiple of the group size');
+    }
+
+    #[Test]
+    public function building_multiple_supersedes_explicit_even_setting(): void
+    {
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min * 1000;
+
+        request()->merge(['even' => 1]);
+        $grouped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 7])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(0, $grouped['num_buildings'] % 7,
+            'Explicit even setting must not break the group multiple');
+    }
+
+    #[Test]
+    public function even_rows_still_applies_to_ungrouped_buildings(): void
+    {
+        // Same large qty without a multiple: even-rows auto-trigger fills the grid
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min * 1000;
+
+        $details = BuildingDetails::calc($recipe, $qty, 780)->first();
+        $footprint = $details['footprint'];
+
+        $this->assertSame(
+            $footprint['rows'] * $footprint['buildings_per_row'],
+            $details['num_buildings'],
+            'Ungrouped even-rows behavior must remain: grid fully filled'
+        );
+    }
+
+    #[Test]
     public function energy_per_item_is_consistent_across_qty_scales(): void
     {
         // energy_per_item should remain stable at small qty (no even-rows);
