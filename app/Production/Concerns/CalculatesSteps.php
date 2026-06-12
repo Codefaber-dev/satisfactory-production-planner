@@ -4,6 +4,7 @@ namespace App\Production\Concerns;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\BuildingDetails;
 use App\Production\BuildingOverview;
 use App\Production\Step;
 
@@ -51,9 +52,14 @@ trait CalculatesSteps
 
         $this->byproducts = $this->getRecipe()->byproducts;
 
-        $this->children = $this->ingredients->map(function ($ingredient) {
-            // how many times per minute we need to make the recipe
-            $multiplier = $this->qty / $this->recipe->base_per_min;
+        $somersloop_slots = (int) (request('somersloops', [])[$this->getProductKey()] ?? 0);
+        $building_name = $this->recipe->building->name;
+        $max_slots = BuildingDetails::SLOTS[$building_name] ?? 0;
+        $amplifier = $max_slots > 0 ? (1 + $somersloop_slots / $max_slots) : 1.0;
+
+        $this->children = $this->ingredients->map(function ($ingredient) use ($amplifier) {
+            // how many times per minute we need to make the recipe (somersloops amplify output)
+            $multiplier = $this->qty / ($this->recipe->base_per_min * $amplifier);
 
             // how much of the ingredient we need to make per minute
             $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty * $this->globals->getCostMultiplier();

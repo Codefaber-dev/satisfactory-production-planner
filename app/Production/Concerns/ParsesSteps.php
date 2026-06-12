@@ -157,7 +157,10 @@ trait ParsesSteps
 
                                     }
 
-                                    $product_key = $group->dataGet('0.name').'|'.($group->dataGet('0.description') ?? $group->dataGet('0.name'));
+                                    // Frontend key convention: recipe.description || product.name.
+                                    // Step 'description' is getDescription()'s 'default' fallback — never null,
+                                    // so use the raw recipe description here instead.
+                                    $product_key = $group->dataGet('0.name').'|'.($recipe?->description ?? $group->dataGet('0.name'));
                                     $somersloop_slots = (int) (request('somersloops', [])[$product_key] ?? 0);
                                     $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
                                     $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));

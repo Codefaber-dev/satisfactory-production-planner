@@ -62,6 +62,13 @@ trait Getters
         return $this->recipe->description ?? 'default';
     }
 
+    // Matches the frontend key convention: recipe.description || product.name
+    // (NOT getDescription(), whose 'default' fallback never appears in request params)
+    public function getProductKey(): string
+    {
+        return $this->getName() . '|' . ($this->recipe?->description ?? $this->getName());
+    }
+
     public function getQty(): float
     {
         return $this->qty;
@@ -107,11 +114,14 @@ trait Getters
             return null;
         }
 
-        return $this->ingredients->map(function ($ingredient) {
-            // how many times per minute we need to make the recipe
-            $multiplier = $this->qty / $this->recipe->base_per_min;
+        $somersloop_slots = (int) (request('somersloops', [])[$this->getProductKey()] ?? 0);
+        $building_name = $this->recipe->building->name;
+        $max_slots = \App\Production\BuildingDetails::SLOTS[$building_name] ?? 0;
+        $amplifier = $max_slots > 0 ? (1 + $somersloop_slots / $max_slots) : 1.0;
 
-            // how much of the ingredient we need to make per minute
+        return $this->ingredients->map(function ($ingredient) use ($amplifier) {
+            $multiplier = $this->qty / ($this->recipe->base_per_min * $amplifier);
+
             $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty * $this->globals->getCostMultiplier();
 
             return [$ingredient->name => $sub_qty];

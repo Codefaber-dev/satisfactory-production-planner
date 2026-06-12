@@ -51,6 +51,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - **V37** Power cost multiplier is a numeric plan param (default 1.0, range 0.1–10.0, step 0.1). When set, all building power consumption values in the plan output are multiplied by it (ingredient qty and building count unchanged). Persists in plan params. UI exposes it alongside other plan-level power controls.
 - **V38** UI renders usably on mobile viewports (≥320px): no horizontal overflow on any plan page; recipe selectors, building steps, and output controls are legible and tappable (min 44px touch targets) at 375px width.
 - **V39** Per-building-type count-multiple: each building type can have a user-configured step value (positive integer, default 1). Building count in plan output rounds up to nearest multiple of that step. Config persists in plan params. UI allows setting per-type multiples in a building settings panel.
+- **V40** ∀ backend lookup keyed by product+recipe into request params (`somersloops`, future per-step params): key = `name|(recipe->description ?? name)` — frontend convention (`recipe.description || product.name`, ProductionStep.vue). `getDescription()` 'default' fallback ⊥ forbidden in request-param keys. Single source: `Step::getProductKey()`. Test must use frontend-shaped key (`Iron Ingot|Iron Ingot`, not `Iron Ingot|default`).
 
 ## §T — Tasks
 
@@ -127,3 +128,4 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | B29 | 2026-06-10 | `saveMyFactory` PATCH sends only `newChoices` (overridden-from-default recipes) — sub-recipe choices set during the session that happen to match defaults are not persisted; factory reload reverts to default recipe tree — issue #4 | V32, T73 |
 | B30 | 2026-06-10 | Multi-output Update: second output added via "Add Output" and fully selected still disappears after fetch — Inertia full-page navigation recreates component; `data()` `outputs` initialized from server `multi` prop which may only include the first output if the fetch dropped the second | V33, T74 |
 | B31 | 2026-06-10 | Scale Up Factory scales all outputs proportionally — per-output independent scale not feasible (outputs share ingredient graph); issue #6 closed won't-fix | T75 |
+| B32 | 2026-06-12 | Somersloops inert on default recipes: backend keyed `request('somersloops')` lookups via `getDescription()` ('default' fallback) in CalculatesSteps/Getters/ParsesSteps; frontend sends `name\|name`. Test was green because it used backend-shaped key `Iron Ingot\|default` that frontend never emits | V40 |
