@@ -288,6 +288,30 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
         expect(beltSelect(wrapper).length).toBe(1);
     });
 
+    it('T92/V52: each plan setting renders as card with icon + label + control', async () => {
+        const wrapper = makeHeaderWrapper();
+        wrapper.vm.showBuildingSettings = true;
+        await wrapper.vm.$nextTick();
+
+        const cards = wrapper.findAll('[data-test="plan-setting-card"]');
+        expect(cards.length).toBe(4);
+
+        const expected = [
+            { src: '/images/ConveyorBeltMk5.png', label: 'Belt Speed', control: 'select' },
+            { src: '/images/FicsitCoupon.png', label: 'Recipe Cost ×', control: 'input[type="number"]' },
+            { src: '/images/Constructor.png', label: 'Building Cost ×', control: 'input[type="number"]' },
+            { src: '/images/PowerShard.png', label: 'Power Cost ×', control: 'input[type="number"]' },
+        ];
+
+        cards.forEach((card, i) => {
+            const img = card.find('img');
+            expect(img.exists()).toBe(true);
+            expect(img.attributes('src')).toBe(expected[i].src);
+            expect(card.find('label').text()).toBe(expected[i].label);
+            expect(card.find(expected[i].control).exists()).toBe(true);
+        });
+    });
+
     it('fetch payload unchanged: panel-bound values sent as same params', () => {
         const wrapper = makeHeaderWrapper();
 

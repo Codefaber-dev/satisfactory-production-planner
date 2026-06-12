@@ -101,53 +101,96 @@
                     <h2 class="mb-1 font-bold text-xl">
                         Plan Settings
                     </h2>
-                    <div class="mb-4 flex flex-wrap items-center gap-3">
-                        <select
-                            v-model="form.belt_speed"
-                            class="rounded py-2 px-1 shadow dark:bg-sky-800"
+                    <div class="mb-4 flex flex-wrap gap-3">
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
                         >
-                            <option value="60">Belts mk1</option>
-                            <option value="120">Belts mk2</option>
-                            <option value="270">Belts mk3</option>
-                            <option value="480">Belts mk4</option>
-                            <option value="780">Belts mk5</option>
-                            <option value="1200">Belts mk6</option>
-                        </select>
-                        <div class="flex items-center space-x-1">
-                            <label class="whitespace-nowrap text-sm">Cost ×</label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                min="0.1"
-                                max="10"
-                                v-model.number="costMultiplier"
-                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
-                                title="Recipe cost multiplier (1.0 = default)"
+                            <img
+                                src="/images/ConveyorBeltMk5.png"
+                                alt="Belt Speed"
+                                class="h-10 w-10 shrink-0 object-contain"
                             />
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-sm font-medium">Belt Speed</label>
+                                <select
+                                    v-model="form.belt_speed"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                >
+                                    <option value="60">Belts mk1</option>
+                                    <option value="120">Belts mk2</option>
+                                    <option value="270">Belts mk3</option>
+                                    <option value="480">Belts mk4</option>
+                                    <option value="780">Belts mk5</option>
+                                    <option value="1200">Belts mk6</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-1">
-                            <label class="whitespace-nowrap text-sm">Bldg ×</label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                min="0.1"
-                                max="10"
-                                v-model.number="buildingCostMultiplier"
-                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
-                                title="Building cost multiplier (1.0 = default)"
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                        >
+                            <img
+                                src="/images/FicsitCoupon.png"
+                                alt="Recipe Cost"
+                                class="h-10 w-10 shrink-0 object-contain"
                             />
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-sm font-medium">Recipe Cost ×</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    max="10"
+                                    v-model.number="costMultiplier"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                    title="Recipe cost multiplier (1.0 = default)"
+                                />
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-1">
-                            <label class="whitespace-nowrap text-sm">Power ×</label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                min="0.1"
-                                max="10"
-                                v-model.number="powerMultiplier"
-                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
-                                title="Power cost multiplier (1.0 = default)"
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                        >
+                            <img
+                                src="/images/Constructor.png"
+                                alt="Building Cost"
+                                class="h-10 w-10 shrink-0 object-contain"
                             />
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-sm font-medium">Building Cost ×</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    max="10"
+                                    v-model.number="buildingCostMultiplier"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                    title="Building cost multiplier (1.0 = default)"
+                                />
+                            </div>
+                        </div>
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                        >
+                            <img
+                                src="/images/PowerShard.png"
+                                alt="Power Cost"
+                                class="h-10 w-10 shrink-0 object-contain"
+                            />
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-sm font-medium">Power Cost ×</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    max="10"
+                                    v-model.number="powerMultiplier"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                    title="Power cost multiplier (1.0 = default)"
+                                />
+                            </div>
                         </div>
                     </div>
                     <template v-if="uniqueBuildings.length">
@@ -157,7 +200,7 @@
                     <p class="mb-2 font-medium text-slate-700 dark:text-slate-100">
                         When enabled, production will be divided evenly into groups of the specified number of buildings
                     </p>
-                    <div class="mb-2 flex items-center space-x-2">
+                    <div class="mb-2 flex flex-wrap items-center gap-2">
                         <span class="font-medium text-slate-700 dark:text-slate-100">Blueprint Designer</span>
                         <button
                             v-for="(dim, mk) in designerDims"
