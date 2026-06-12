@@ -22,7 +22,7 @@ export default {
     computed: {
         url() {
             const opts = {};
-            const publicId = this.publicId
+            const publicId = String(this.publicId ?? '')
                 .replace(/ /gi, '')
                 .replace(/Packaged/gi, '')
                 .replace(/-/gi, '')

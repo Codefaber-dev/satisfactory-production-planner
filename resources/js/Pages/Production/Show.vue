@@ -61,15 +61,15 @@
                         </option>
                     </select>
                     <template v-if="index === 0">
-                        <select
-                            v-model="form.variant"
-                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
-                        >
-                            <option value="mk1">Production mk1 (base)</option>
-                            <option disabled value="mk2">Production mk2 (mk++ mod) (no mod support yet)</option>
-                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>
-                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>
-                        </select>
+<!--                        <select-->
+<!--                            v-model="form.variant"-->
+<!--                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"-->
+<!--                        >-->
+<!--                            <option value="mk1">Production mk1 (base)</option>-->
+<!--                            <option disabled value="mk2">Production mk2 (mk++ mod) (no mod support yet)</option>-->
+<!--                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>-->
+<!--                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>-->
+<!--                        </select>-->
                         <select
                             v-model="form.belt_speed"
                             class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
@@ -134,8 +134,11 @@
                 </div>
 
                 <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
+                    <h2 class="mb-1 font-bold text-xl">
+                        Blueprint Mode
+                    </h2>
                     <p class="mb-2 font-medium text-slate-700 dark:text-slate-100">
-                        Blueprint groups — when enabled, production will be divided evenly into groups of the specified number of buildings
+                        When enabled, production will be divided evenly into groups of the specified number of buildings
                     </p>
                     <div class="mb-2 flex items-center space-x-2">
                         <span class="font-medium text-slate-700 dark:text-slate-100">Blueprint Designer</span>

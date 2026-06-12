@@ -197,27 +197,31 @@
 
             <td class="block p-2 lg:table-cell">
                 <template v-if="recipe && recipes[name]">
-                    <select
-                        @change="updateVariant"
-                        v-model="selectedVariantName"
-                        class="w-full rounded py-2 text-right shadow dark:bg-sky-800"
-                    >
-                        <option class="text-right" :value="mk" v-for="(opt, mk) in overview.details">
-                            {{ opt.num_buildings }}x {{ mk }} @{{ opt.clock_speed }}% [{{ Math.round(opt.power_usage) }}
+                    <span class="flex flex-wrap items-center justify-end gap-2">
+                        {{ overview.details[selectedVariantName].num_buildings }}x {{ selectedVariantName }} @{{ overview.details[selectedVariantName].clock_speed }}% [{{ Math.round(overview.details[selectedVariantName].power_usage) }}
                             MW]
-                        </option>
-                    </select>
-                    <div class="mt-2 flex flex-wrap items-center justify-end gap-2">
-                        <span>Variant</span>
-                        <button
-                            v-for="(opt, mk) in overview.details"
-                            @click="updateVariant(mk)"
-                            :class="[selectedVariantName === mk ? 'btn-gray' : 'btn-emerald']"
-                            class="btn-sm"
-                        >
-                            {{ opt.variant }}
-                        </button>
-                    </div>
+                    </span>
+<!--                    <select-->
+<!--                        @change="updateVariant"-->
+<!--                        v-model="selectedVariantName"-->
+<!--                        class="w-full rounded py-2 text-right shadow dark:bg-sky-800"-->
+<!--                    >-->
+<!--                        <option class="text-right" :value="mk" v-for="(opt, mk) in overview.details">-->
+<!--                            {{ opt.num_buildings }}x {{ mk }} @{{ opt.clock_speed }}% [{{ Math.round(opt.power_usage) }}-->
+<!--                            MW]-->
+<!--                        </option>-->
+<!--                    </select>-->
+<!--                    <div class="mt-2 flex flex-wrap items-center justify-end gap-2">-->
+<!--                        <span>Variant</span>-->
+<!--                        <button-->
+<!--                            v-for="(opt, mk) in overview.details"-->
+<!--                            @click="updateVariant(mk)"-->
+<!--                            :class="[selectedVariantName === mk ? 'btn-gray' : 'btn-emerald']"-->
+<!--                            class="btn-sm"-->
+<!--                        >-->
+<!--                            {{ opt.variant }}-->
+<!--                        </button>-->
+<!--                    </div>-->
                     <div class="mt-2 flex flex-wrap items-center justify-end gap-2">
                         <span>Max Clock</span>
                         <button

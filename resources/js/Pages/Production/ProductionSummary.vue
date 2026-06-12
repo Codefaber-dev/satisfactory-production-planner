@@ -225,7 +225,7 @@
                 class="cursor-pointer"
                 v-for="(num, mat) in production__building_summary.total_build_cost"
             >
-                <td colspan="2" class="whitespace-nowrap p-2">
+                <td colspan="2" class="p-2 lg:whitespace-nowrap">
                     <cloud-image
                         class="mr-2 inline-flex"
                         :public-id="mat"
