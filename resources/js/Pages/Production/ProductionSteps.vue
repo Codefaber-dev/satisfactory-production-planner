@@ -25,8 +25,8 @@
             ></button>
         </div>
         <div class="overflow-x-auto">
-        <table class="table-auto">
-            <tr>
+        <table class="block w-full p-2 lg:table lg:table-auto lg:p-0">
+            <tr class="hidden lg:table-row">
                 <th></th>
                 <th class="font-semibold">Ingredient</th>
                 <th class="font-semibold">Inputs</th>
@@ -34,8 +34,8 @@
                 <th class="font-semibold">Recipe</th>
                 <th class="font-semibold">Production</th>
             </tr>
-            <tr v-show="Object.values(productionChecks).some((o) => o)">
-                <th class="bg-blue-200 p-2 text-center dark:bg-sky-600" colspan="100">
+            <tr class="block lg:table-row" v-show="Object.values(productionChecks).some((o) => o)">
+                <th class="block bg-blue-200 p-2 text-center dark:bg-sky-600 lg:table-cell" colspan="100">
                     {{ hideCompleted ? 'Hiding' : 'Showing' }}
                     {{ Object.values(productionChecks).filter((o) => o).length }}
                     completed rows
@@ -48,8 +48,8 @@
                 </th>
             </tr>
             <template v-for="(level, index) in resultsArray">
-                <tr>
-                    <th class="bg-blue-200 py-2 text-2xl dark:bg-slate-800" colspan="100">Level {{ index + 1 }}</th>
+                <tr class="block lg:table-row">
+                    <th class="block bg-blue-200 py-2 text-2xl dark:bg-slate-800 lg:table-cell" colspan="100">Level {{ index + 1 }}</th>
                 </tr>
 
                 <template v-for="(material, name) in level">
@@ -79,6 +79,8 @@
                         :byproducts-used="production.byproducts_used"
                         :overviews="overviews"
                         :somersloop-slots="somersloopSlots"
+                        :cost-multiplier="costMultiplier"
+                        :building-multiples="buildingMultiples"
                         @toggle="toggle"
                         @setNewSubFavorite="setNewSubFavorite"
                     />
@@ -107,6 +109,13 @@ export default {
         even: {},
         overviews: {},
         somersloopSlots: {
+            default: () => ({}),
+        },
+        costMultiplier: {
+            type: Number,
+            default: 1.0,
+        },
+        buildingMultiples: {
             default: () => ({}),
         },
         speedLimit: {

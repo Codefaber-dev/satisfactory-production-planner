@@ -1,6 +1,6 @@
 <template>
-    <div class="flex justify-end space-x-8">
-        <div class="w-48 text-left">
+    <div class="flex flex-col items-center gap-4 lg:flex-row lg:items-start lg:justify-end lg:gap-8">
+        <div class="w-full max-w-xs text-left lg:w-48">
             <ul>
                 <li class="flex border-b border-gray-300">
                     <span class="ml-2 font-semibold"> Foundations </span>
@@ -20,14 +20,23 @@
                         {{ 2 * (footprint.length_foundations + footprint.width_foundations) }})
                     </span>
                 </li>
+                <li v-if="footprint.grouped" class="flex border-b border-gray-300">
+                    <span class="ml-2 font-semibold"> Blueprints </span>
+                    <span class="flex-1 text-right">
+                        {{ footprint.blueprints }}
+                        ({{ footprint.group_size }} ea)
+                    </span>
+                </li>
                 <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold">Building Rows</span>
+                    <span class="ml-2 font-semibold">{{ footprint.grouped ? 'Blueprint Rows' : 'Building Rows' }}</span>
                     <span class="flex-1 text-right">
                         {{ footprint.rows }}
                     </span>
                 </li>
                 <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Buildings Per Row </span>
+                    <span class="ml-2 font-semibold">
+                        {{ footprint.grouped ? 'Blueprints Per Row' : 'Buildings Per Row' }}
+                    </span>
                     <span class="flex-1 text-right">
                         {{ footprint.buildings_per_row }}
                     </span>
@@ -70,9 +79,15 @@
                         {{ footprint.power_shards }}
                     </span>
                 </li>
+                <li class="flex border-b border-gray-300">
+                    <span class="ml-2 font-semibold"> Somersloops </span>
+                    <span class="flex-1 text-right">
+                        {{ footprint.somersloops }}
+                    </span>
+                </li>
             </ul>
         </div>
-        <div class="flex justify-center p-2">
+        <div class="flex max-w-full justify-start overflow-x-auto p-2 lg:justify-center">
             <div
                 style="box-sizing: content-box"
                 :style="{
@@ -192,7 +207,7 @@
                             }"
                             :class="
                                 1 + col + row * footprint.buildings_per_row <= footprint.num_buildings
-                                    ? ['border-blue-800', 'bg-blue-300']
+                                    ? ['border-blue-800', 'bg-blue-500']
                                     : ['border-transparent', 'text-transparent', 'bg-transparent']
                             "
                             style="box-sizing: border-box"

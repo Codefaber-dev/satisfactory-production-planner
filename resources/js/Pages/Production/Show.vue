@@ -254,6 +254,7 @@
                             :choices="allChosenRecipes"
                             :somersloop-slots="somersloopSlots"
                             :cost-multiplier="costMultiplier"
+                            :building-multiples="buildingMultiples"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
                             :speed-limit="newSpeedLimit"
