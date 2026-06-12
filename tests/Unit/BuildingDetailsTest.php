@@ -259,8 +259,10 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
-    public function building_multiple_supersedes_explicit_even_setting(): void
+    public function explicit_even_setting_preserves_group_multiple(): void
     {
+        // even with grouping may bump the stamp count to an even number (V46),
+        // but num_buildings must always stay an exact multiple of the group size (V44)
         $recipe = r('Iron Plate');
         $qty = $recipe->base_per_min * 1000;
 
@@ -270,6 +272,50 @@ class BuildingDetailsTest extends TestCase
 
         $this->assertEquals(0, $grouped['num_buildings'] % 7,
             'Explicit even setting must not break the group multiple');
+        $this->assertEquals(0, (int) ($grouped['num_buildings'] / 7) % 2,
+            'Explicit even setting must yield an even stamp count');
+    }
+
+    #[Test]
+    public function even_with_multiple_forces_even_stamp_count(): void
+    {
+        // Iron Rod: Constructor, base_per_min=15; qty=180 → 12 buildings = 3 stamps
+        // of 4 (odd). Explicit even must round the stamp count up to 4 stamps (V46).
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 12;
+
+        request()->merge(['even' => 1]);
+        $grouped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(16, $grouped['num_buildings'],
+            'Odd stamp count must round up to an even number of blueprint stamps');
+        $this->assertEquals(0, ($grouped['num_buildings'] / 4) % 2,
+            'Stamp count must be even');
+        $this->assertEquals(0, $grouped['num_buildings'] % 4,
+            'num_buildings must stay an exact multiple of the group size');
+        $this->assertEqualsWithDelta(75.0, $grouped['clock_speed'], 1e-9,
+            'Clock speed must be recomputed against the bumped count');
+
+        // energy must follow the recomputed clock (B10/B18 regression guard)
+        $variant = $recipe->building->variant('mk1');
+        $expected = 60 * $variant->calculatePowerUsage($grouped['clock_speed'] / 100)
+            / ($recipe->base_per_min * $grouped['clock_speed'] / 100);
+        $this->assertEqualsWithDelta($expected, $grouped['energy_per_item'], 1e-9);
+    }
+
+    #[Test]
+    public function even_with_multiple_keeps_already_even_stamp_count(): void
+    {
+        // qty=120 → 8 buildings = 2 stamps of 4 (already even) → no change
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 8;
+
+        request()->merge(['even' => 1]);
+        $grouped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(8, $grouped['num_buildings']);
     }
 
     #[Test]

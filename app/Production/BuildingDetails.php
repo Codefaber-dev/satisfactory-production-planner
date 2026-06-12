@@ -208,11 +208,22 @@ class BuildingDetails extends Collection
             // building delta, check if belts are too slow for nominal building count
             $building_delta = ($rows * $buildings_per_row) - $num_buildings;
 
-            // force even rows — superseded by blueprint grouping: a grouped count must stay
-            // an exact multiple of the group size (V44)
+            // force even rows — grid-fill auto-trigger superseded by blueprint grouping:
+            // a grouped count must stay an exact multiple of the group size (V44).
+            // explicit even with grouping rounds the stamp count up to an even number (V46)
+            $adjusted_buildings = null;
             if ($multiple === 1 && ($this->even || $building_delta > 1)) {
                 // Log::debug("Building delta: $building_delta");
-                $num_buildings = $rows * $buildings_per_row;
+                $adjusted_buildings = $rows * $buildings_per_row;
+            } elseif ($multiple > 1 && $this->even) {
+                $stamps = (int) round($num_buildings / $multiple);
+                if ($stamps % 2 === 1) {
+                    $adjusted_buildings = ($stamps + 1) * $multiple;
+                }
+            }
+            if ($adjusted_buildings !== null) {
+                $num_buildings = $adjusted_buildings;
+                $buildings_per_row = min($num_buildings, ceil($num_buildings / $rows));
                 $clock_speed = 1 * round(100 * $this->qty / $num_buildings / $effective_base_per_min / $variant->multiplier, 4);
                 $shards_per_building = match (true) {
                     $clock_speed > 200 => 3,

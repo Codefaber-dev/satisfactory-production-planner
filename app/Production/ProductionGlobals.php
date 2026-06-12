@@ -25,7 +25,7 @@ class ProductionGlobals
 
     protected int $belt_speed;
 
-    protected float $cost_multiplier;
+    protected float $cost_multiplier = 1.0;
 
     public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts)
     {
