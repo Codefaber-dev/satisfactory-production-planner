@@ -94,6 +94,18 @@
                             />
                         </div>
                         <div class="flex items-center space-x-1">
+                            <label class="whitespace-nowrap text-sm">Bldg ×</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                max="10"
+                                v-model.number="buildingCostMultiplier"
+                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
+                                title="Building cost multiplier (1.0 = default)"
+                            />
+                        </div>
+                        <div class="flex items-center space-x-1">
                             <label class="whitespace-nowrap text-sm">Power ×</label>
                             <input
                                 type="number"
@@ -379,6 +391,7 @@ export default {
         'cost_multiplier',
         'power_multiplier',
         'building_multiples',
+        'building_cost_multiplier',
     ],
 
     data() {
@@ -435,6 +448,7 @@ export default {
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,
+            buildingCostMultiplier: this.building_cost_multiplier || 1.0,
             bpSizes,
             bpEnabled,
             appliedMultiples: effectiveMultiples(bpSizes, bpEnabled),
@@ -598,6 +612,7 @@ export default {
                 somersloops: this.somersloopSlots,
                 cost_multiplier: this.costMultiplier,
                 power_multiplier: this.powerMultiplier,
+                building_cost_multiplier: this.buildingCostMultiplier,
                 building_multiples: this.buildingMultiples,
             };
 

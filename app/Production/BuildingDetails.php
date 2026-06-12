@@ -45,7 +45,9 @@ class BuildingDetails extends Collection
 
     protected $building_multiples = [];
 
-    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0, $cost_multiplier = 1.0, $power_multiplier = 1.0, $building_multiples = []): static
+    protected $building_cost_multiplier = 1.0;
+
+    public static function calc(Recipe $recipe, $qty, $belt_speed = 720, $base_clock = 100, $somersloop_slots = 0, $cost_multiplier = 1.0, $power_multiplier = 1.0, $building_multiples = [], $building_cost_multiplier = 1.0): static
     {
         return (new static)
             ->setRecipe($recipe)
@@ -56,6 +58,7 @@ class BuildingDetails extends Collection
             ->setCostMultiplier($cost_multiplier)
             ->setPlanPowerMultiplier($power_multiplier)
             ->setBuildingMultiples($building_multiples)
+            ->setBuildingCostMultiplier($building_cost_multiplier)
             ->setEven(request('even', false))
             ->getBuildingDetails();
     }
@@ -85,6 +88,13 @@ class BuildingDetails extends Collection
     protected function setBuildingMultiples(array $multiples): static
     {
         $this->building_multiples = $multiples;
+
+        return $this;
+    }
+
+    protected function setBuildingCostMultiplier(float $multiplier): static
+    {
+        $this->building_cost_multiplier = max(0.1, min(10.0, $multiplier));
 
         return $this;
     }
@@ -179,7 +189,7 @@ class BuildingDetails extends Collection
 
             // calc the build cost
             $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
-                return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
+                return [$ingredient->name => $ingredient->pivot->qty * $num_buildings * $this->building_cost_multiplier];
             })->collapse();
 
             // calculate the max belt load (cost_multiplier scales ingredient consumption)
@@ -250,7 +260,7 @@ class BuildingDetails extends Collection
                 $power_shards = $num_buildings * $shards_per_building;
                 $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100) * $somersloop_power_amp * $plan_power_multiplier, 6);
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
-                    return [$ingredient->name => $ingredient->pivot->qty * $num_buildings];
+                    return [$ingredient->name => $ingredient->pivot->qty * $num_buildings * $this->building_cost_multiplier];
                 })->collapse();
                 $mj_per_s = $variant->calculatePowerUsage($clock_speed / 100);
                 $mj_per_min = $mj_per_s * 60;

@@ -205,6 +205,79 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function building_cost_multiplier_scales_build_cost_only(): void
+    {
+        // V48: building_cost_multiplier scales build_cost — never ingredient
+        // consumption, belt load, power, or building counts
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 2;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $doubled = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 2.0)->first();
+
+        foreach ($base['build_cost'] as $ingredient => $cost) {
+            $this->assertEqualsWithDelta($cost * 2, $doubled['build_cost'][$ingredient], 1e-9,
+                "build_cost for {$ingredient} must double");
+        }
+
+        $this->assertSame($base['num_buildings'], $doubled['num_buildings']);
+        $this->assertSame($base['clock_speed'], $doubled['clock_speed']);
+        $this->assertSame($base['power_usage'], $doubled['power_usage']);
+        $this->assertSame($base['footprint']['belt_load_in'], $doubled['footprint']['belt_load_in']);
+    }
+
+    #[Test]
+    public function building_cost_multiplier_clamped_to_valid_range(): void
+    {
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min;
+
+        $tooLow = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 0.0)->first();
+        $tooHigh = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 100.0)->first();
+        $atMin = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 0.1)->first();
+        $atMax = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 10.0)->first();
+
+        $this->assertEquals($atMin['build_cost'], $tooLow['build_cost']);
+        $this->assertEquals($atMax['build_cost'], $tooHigh['build_cost']);
+    }
+
+    #[Test]
+    public function building_cost_multiplier_applies_in_recompute_block(): void
+    {
+        // Large qty fires the even-rows/adjusted-count recompute block, which
+        // rebuilds build_cost — the multiplier must apply there too (V48)
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min * 1000;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $doubled = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 2.0)->first();
+
+        $this->assertSame($base['num_buildings'], $doubled['num_buildings']);
+        foreach ($base['build_cost'] as $ingredient => $cost) {
+            $this->assertEqualsWithDelta($cost * 2, $doubled['build_cost'][$ingredient], 1e-9,
+                "recompute-block build_cost for {$ingredient} must double");
+        }
+    }
+
+    #[Test]
+    public function cost_multiplier_and_building_cost_multiplier_are_disjoint(): void
+    {
+        // V48: cost_multiplier never touches build_cost;
+        // building_cost_multiplier never touches belt load
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 2;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $costOnly = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 2.0, 1.0, [])->first();
+        $buildingOnly = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 2.0)->first();
+
+        $this->assertEquals($base['build_cost'], $costOnly['build_cost'],
+            'cost_multiplier must not scale build_cost');
+        $this->assertSame($base['footprint']['belt_load_in'], $buildingOnly['footprint']['belt_load_in'],
+            'building_cost_multiplier must not scale belt load');
+    }
+
+    #[Test]
     public function building_multiple_rounds_up_num_buildings(): void
     {
         // Iron Rod: Constructor, base_per_min=15; qty=45 → needs exactly 3 buildings at 100%
