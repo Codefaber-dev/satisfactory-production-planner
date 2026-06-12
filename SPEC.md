@@ -104,6 +104,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T85 | x      | Designer mk selector (Mk.1/2/3, global LS, default Mk.1); clamp blueprint size to 1–40 (input min/max + clamp on LS read); no fit warning | I.building-settings, I.local-storage, V43 |
 | T86 | x      | Tests: LS persistence round-trip (sizes global, toggles per-factory), effective-multiple derivation, grouped tile count/label, size clamp 1–40, even-rows superseded when multiple > 1; backend `building_multiples` rounding already covered by T82 tests | V41, V42, V43, V44 |
 | T87 | x      | Backend: skip even-rows branch in `BuildingDetails::getBuildingDetails()` when `$multiple > 1` (both `even` param and `building_delta` auto-trigger paths); recompute rows/buildings_per_row against grouped count instead | I.plan-params, V44 |
+| T88 | x      | Building Settings apply button: toggle/size edits persist to LS + local state only — no auto-fetch per input; Update button inside panel triggers fetch; diagrams regroup from last-applied multiples (snapshot taken on every fetch) so panel edits stay invisible until applied; designer mk stays instant (render-only) | I.building-settings, V41, V42 |
 
 ## §B — Bug Log
 

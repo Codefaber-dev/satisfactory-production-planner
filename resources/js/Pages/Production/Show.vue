@@ -175,6 +175,11 @@
                             />
                         </div>
                     </div>
+                    <div class="mt-3">
+                        <button :disabled="working" @click="fetch({ preserveScroll: true })" class="btn btn-emerald">
+                            Update
+                        </button>
+                    </div>
                 </div>
                 <!--            <div class="mt-4 flex flex-col">-->
                 <!--                <hr class="mb-4" />-->
@@ -267,7 +272,7 @@
                             :choices="allChosenRecipes"
                             :somersloop-slots="somersloopSlots"
                             :cost-multiplier="costMultiplier"
-                            :building-multiples="buildingMultiples"
+                            :building-multiples="appliedMultiples"
                             :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
@@ -376,6 +381,8 @@ export default {
     ],
 
     data() {
+        const bpSizes = loadSizes(store);
+        const bpEnabled = loadEnabled(store, (this.multi ? this.multiFactory : this.factory)?.id);
         const outputs = this.multi
             ? this.multi.products.map((o, i) => {
                   return {
@@ -425,8 +432,9 @@ export default {
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,
-            bpSizes: loadSizes(store),
-            bpEnabled: loadEnabled(store, (this.multi ? this.multiFactory : this.factory)?.id),
+            bpSizes,
+            bpEnabled,
+            appliedMultiples: effectiveMultiples(bpSizes, bpEnabled),
             bpDesigner: loadDesignerMk(store),
             designerDims: DESIGNER_DIMS,
             showBuildingSettings: false,
@@ -632,6 +640,7 @@ export default {
             if (this.yield < 1) return false;
 
             this.working = true;
+            this.appliedMultiples = this.buildingMultiples;
 
             this.$inertia.get(`/dashboard/${this.endpoint}`, this.params, options);
         },
@@ -835,16 +844,11 @@ export default {
         setBlueprintSize(name, val) {
             this.bpSizes = { ...this.bpSizes, [name]: clampSize(val) };
             saveSizes(store, this.bpSizes);
-
-            if (this.bpEnabled[name]) {
-                this.fetch({ preserveScroll: true });
-            }
         },
 
         toggleBlueprintEnabled(name) {
             this.bpEnabled = { ...this.bpEnabled, [name]: !this.bpEnabled[name] };
             saveEnabled(store, this.newFactory?.id, this.bpEnabled);
-            this.fetch({ preserveScroll: true });
         },
 
         setDesignerMk(mk) {

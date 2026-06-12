@@ -168,3 +168,43 @@ describe('Show — T74: setDefaultRecipe assigns row.recipe directly', () => {
         expect(row.recipe).not.toBeNull();
     });
 });
+
+describe('Show — T88: building settings deferred apply', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        window.localStorage.clear();
+    });
+
+    it('panel edits do not trigger a fetch', () => {
+        const wrapper = makeWrapper();
+
+        wrapper.vm.toggleBlueprintEnabled('Constructor');
+        wrapper.vm.setBlueprintSize('Constructor', 8);
+
+        expect(mockInertia.get).not.toHaveBeenCalled();
+    });
+
+    it('panel edits persist to localStorage immediately', () => {
+        const wrapper = makeWrapper();
+
+        wrapper.vm.toggleBlueprintEnabled('Constructor');
+        wrapper.vm.setBlueprintSize('Constructor', 8);
+
+        expect(JSON.parse(window.localStorage.getItem('satisfactory.bp_sizes'))).toEqual({ Constructor: 8 });
+        expect(JSON.parse(window.localStorage.getItem('satisfactory.bp_enabled:new'))).toEqual({ Constructor: true });
+    });
+
+    it('diagrams keep last-applied multiples until Update is clicked', () => {
+        const wrapper = makeWrapper();
+
+        wrapper.vm.toggleBlueprintEnabled('Constructor');
+        wrapper.vm.setBlueprintSize('Constructor', 8);
+
+        expect(wrapper.vm.appliedMultiples).toEqual({});
+
+        wrapper.vm.fetch();
+
+        expect(wrapper.vm.appliedMultiples).toEqual({ Constructor: 8 });
+        expect(mockInertia.get.mock.calls[0][1].building_multiples).toEqual({ Constructor: 8 });
+    });
+});
