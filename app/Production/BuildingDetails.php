@@ -216,6 +216,9 @@ class BuildingDetails extends Collection
                 // Log::debug("Building delta: $building_delta");
                 $adjusted_buildings = $rows * $buildings_per_row;
             } elseif ($multiple > 1 && $this->even) {
+                // rows stays belt-derived: the bump keeps total throughput
+                // constant (clock drops as count rises), so belt load per row
+                // is unchanged and footprint.rows remains the belt minimum (V47)
                 $stamps = (int) round($num_buildings / $multiple);
                 if ($stamps % 2 === 1) {
                     $adjusted_buildings = ($stamps + 1) * $multiple;

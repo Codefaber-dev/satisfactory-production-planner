@@ -305,6 +305,30 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function even_stamp_bump_keeps_belt_derived_rows(): void
+    {
+        // V47: the V46 stamp bump changes num_buildings and clock_speed only —
+        // total throughput is constant, so the belt-required row count must not
+        // change. footprint.rows is the frontend's belt minimum (V45 contract);
+        // inflating it forces the grouped diagram into extra rows.
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 12; // 12 buildings = 3 stamps of 4 (odd)
+
+        $baseline = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+
+        request()->merge(['even' => 1]);
+        $bumped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(16, $bumped['num_buildings'],
+            'Stamp bump must still fire (V46 precondition)');
+        $this->assertSame($baseline['footprint']['rows'], $bumped['footprint']['rows'],
+            'Stamp bump must not change the belt-derived row count');
+        $this->assertSame(1, $bumped['footprint']['rows'],
+            'qty=180 on a 780 belt needs exactly one row');
+    }
+
+    #[Test]
     public function even_with_multiple_keeps_already_even_stamp_count(): void
     {
         // qty=120 → 8 buildings = 2 stamps of 4 (already even) → no change
