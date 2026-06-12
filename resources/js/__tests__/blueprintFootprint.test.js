@@ -187,3 +187,72 @@ describe('groupedFootprint dimensions (V43 — designer dims)', () => {
         expect(fp.somersloops).toBe(16);
     });
 });
+
+describe('groupedFootprint with force-even (V49 — uniform stamp rows)', () => {
+    it('picks a row count that divides the tiles exactly', () => {
+        // 8 tiles, belt needs 1 row: near-square alone gives 3 rows (3+3+2 ragged);
+        // even must pick a divisor of 8 → 2 rows of 4
+        const fp = groupedFootprint({ ...baseFootprint(), rows: 1, belt_load_out: 240 }, 2, 32, true);
+
+        expect(fp.blueprints).toBe(8);
+        expect(fp.rows).toBe(2);
+        expect(fp.buildings_per_row).toBe(4);
+        expect(fp.rows * fp.buildings_per_row).toBe(fp.blueprints);
+    });
+
+    it('leaves near-square layout untouched when even is off', () => {
+        const fp = groupedFootprint({ ...baseFootprint(), rows: 1, belt_load_out: 240 }, 2, 32, false);
+
+        expect(fp.rows).toBe(3);
+        expect(fp.buildings_per_row).toBe(3);
+    });
+
+    it('still respects belt-required rows (V45) when even is on', () => {
+        // 8 tiles, backend needs 3 belt rows: smallest suitable divisor ≥ 3 is 4
+        const fp = groupedFootprint({ ...baseFootprint(), rows: 3 }, 2, 32, true);
+
+        expect(fp.rows).toBe(4);
+        expect(fp.buildings_per_row).toBe(2);
+        expect(fp.rows * fp.buildings_per_row).toBe(fp.blueprints);
+    });
+
+    it.each([
+        [2, 1],
+        [4, 2],
+        [6, 2],
+        [10, 2],
+        [14, 2],
+        [18, 3],
+    ])('lays out %i tiles in %i uniform rows', (tiles, expectedRows) => {
+        const fp = groupedFootprint(
+            { ...baseFootprint(), num_buildings: tiles, rows: 1, belt_load_out: 100 },
+            1,
+            32,
+            true
+        );
+
+        expect(fp.rows).toBe(expectedRows);
+        expect(fp.blueprints % fp.rows).toBe(0);
+        expect(fp.rows * fp.buildings_per_row).toBe(fp.blueprints);
+    });
+
+    it('keeps the one-tile-per-row cap when belts exceed a single blueprint (V45)', () => {
+        const fp = groupedFootprint(
+            {
+                ...baseFootprint(),
+                num_buildings: 16,
+                rows: 5,
+                buildings_per_row: 4,
+                belt_load: 3600,
+                belt_load_in: 720,
+                belt_load_out: 720,
+            },
+            8,
+            32,
+            true
+        );
+
+        expect(fp.rows).toBe(2);
+        expect(fp.buildings_per_row).toBe(1);
+    });
+});

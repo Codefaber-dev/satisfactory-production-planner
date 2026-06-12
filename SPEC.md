@@ -62,6 +62,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - **V45** Grouped diagram respects belt rates: grouped row count = min(tiles, max(near-square rows, backend `footprint.rows`)) — backend rows already encode belt_speed + speedLimit, so per-row belt load ≤ belt_speed whenever tiles ≥ backend rows. When tiles < backend rows (single blueprint exceeds one belt), layout caps at one tile per row and the >100% utilization highlight flags it — never silently under-rowed.
 - **V46** Explicit `even` + grouping forces even stamp count: when multiple X > 1 and `even` plan param set, stamp count (`num_buildings / X`) rounds up to nearest even number — `num_buildings` stays exact multiple of X (V44 holds); clock_speed, shards, power_usage, build_cost, energy_per_item, total_energy recomputed against bumped count (V15 formulas). Already-even stamp count unchanged. `building_delta` auto-trigger never bumps stamps.
 - **V47** V46 stamp bump preserves belt-derived rows: `footprint.rows` = belt-required row count (belt_load/qty vs belt_speed + speedLimit) identical before/after bump — bump changes num_buildings + clock_speed only, total throughput constant, per-row belt load unchanged; `buildings_per_row` recomputed against unchanged rows. Honors V45 frontend contract (backend rows = belt minimum) ∧ rows stays int.
+- **V49** Force-even under grouping yields uniform stamp rows: when applied `even` plan param set ∧ type grouped, grouped diagram row count = divisor of tile count (every row same stamp count, no ragged last row), chosen closest to near-square target, subject to rows ≥ belt-required rows (V45 floor, capped at tile count); tie → fewer rows. Layout consumes the applied (server round-trip) `even` value, not the pending toggle (T88 snapshot pattern). `even` off → near-square layout unchanged.
 
 ## §T — Tasks
 
@@ -109,7 +110,6 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T87 | x      | Backend: skip even-rows branch in `BuildingDetails::getBuildingDetails()` when `$multiple > 1` (both `even` param and `building_delta` auto-trigger paths); recompute rows/buildings_per_row against grouped count instead | I.plan-params, V44 |
 | T88 | x      | Building Settings apply button: toggle/size edits persist to LS + local state only — no auto-fetch per input; Update button inside panel triggers fetch; diagrams regroup from last-applied multiples (snapshot taken on every fetch) so panel edits stay invisible until applied; designer mk stays instant (render-only) | I.building-settings, V41, V42 |
 | T89 | x      | Backend: explicit `even` + multiple > 1 in `BuildingDetails::getBuildingDetails()` rounds stamp count up to even (num_buildings = next even multiple of X); reuse recompute block (clock/shards/power/cost/energy); auto-trigger path unchanged | I.plan-params, V44, V46 |
-
 ## §B — Bug Log
 
 | id | date | cause | fix |
@@ -149,3 +149,4 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | B33 | 2026-06-12 | groupedFootprint near-square tile layout ignores belt-required rows — rows = ceil(tiles/ceil(√tiles)) can drop below backend `footprint.rows`, pushing per-row belt load over belt_speed | V45 |
 | B34 | 2026-06-12 | T87/V44 made force-even fully inert under blueprint grouping — explicit `even` plan param silently ignored; user intent: even number of blueprint stamps, not even building grid | V46 |
 | B35 | 2026-06-12 | V46 stamp bump overwrote belt-derived `$rows` with `ceil(adjusted/buildings_per_row)` (stale divisor, float) — inflated `footprint.rows`; frontend V45 trusts backend rows as belt minimum → grouped diagram forced into extra blueprint rows | V47 |
+| B36 | 2026-06-12 | `even` flag never threaded to `groupedFootprint` (prop chain stopped at ProductionSteps) — grouped layout always near-square; even stamp count (V46) still rendered ragged/odd rows, e.g. 8 stamps → 3 rows of 3+3+2 | V49 |

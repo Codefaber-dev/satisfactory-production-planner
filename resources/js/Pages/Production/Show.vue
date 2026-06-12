@@ -283,6 +283,7 @@
                             :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
+                            :applied-even="!!even"
                             :speed-limit="newSpeedLimit"
                             @toggle="toggleProductionCheck"
                             @toggleDiagrams="toggleDiagrams"
