@@ -29,6 +29,9 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - `I.power-planner` — `app/PowerPlanner/` (FicsoniumFuelRod generator class)
 - `I.tests` — `tests/` (RecipeEnergyTest, seeder smoke tests)
 - `I.plan-params` — per-plan params object passed to `ProductionCalculator` (clock_speed, somersloop_slots, recipe choices, etc.)
+- `I.build-diagram` — `resources/js/Pages/Production/BuildDiagram.vue` (footprint render: foundations grid, building tiles, monogram)
+- `I.building-settings` — Building Settings panel in `resources/js/Pages/Production/Show.vue` (per-type count-multiple inputs)
+- `I.local-storage` — browser localStorage keys (blueprint sizes global, per-factory toggles)
 
 ## §V — Invariants
 
@@ -52,6 +55,10 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 - **V38** UI renders usably on mobile viewports (≥320px): no horizontal overflow on any plan page; recipe selectors, building steps, and output controls are legible and tappable (min 44px touch targets) at 375px width.
 - **V39** Per-building-type count-multiple: each building type can have a user-configured step value (positive integer, default 1). Building count in plan output rounds up to nearest multiple of that step. Config persists in plan params. UI allows setting per-type multiples in a building settings panel.
 - **V40** ∀ backend lookup keyed by product+recipe into request params (`somersloops`, future per-step params): key = `name|(recipe->description ?? name)` — frontend convention (`recipe.description || product.name`, ProductionStep.vue). `getDescription()` 'default' fallback ⊥ forbidden in request-param keys. Single source: `Step::getProductKey()`. Test must use frontend-shaped key (`Iron Ingot|Iron Ingot`, not `Iron Ingot|default`).
+- **V41** Blueprint grouping toggleable per building type per factory. Blueprint size X = the V39 count-multiple (same number, one param — not a second value). Toggle ON for a type: building count rounds up to multiple of X (V39 mechanism active with multiple=X), build diagram renders count/X blueprint tiles instead of individual building outlines, each tile labeled `<monogram>x<X>` (e.g. `Cx8`, `Sx10`). Toggle OFF: effective multiple = 1, diagram renders individual building tiles unchanged from current behavior.
+- **V42** Persistence split: blueprint sizes per building type → global localStorage (shared across all factories — blueprints reusable in-game); per-type enable toggles → localStorage keyed by factory id. Backend contract unchanged: effective multiples (size if enabled, else 1) still sent via `building_multiples` plan param; no server schema change. Fresh browser/no LS = all toggles off, all sizes 1.
+- **V43** Blueprint designer mark selectable: Mk.1 = 32×32 m (4×4 foundations), Mk.2 = 40×40 m (5×5), Mk.3 = 48×48 m (6×6). Grouped diagram tile drawn at selected designer footprint dims. No fit validation/warning — in-game workarounds exist (clipping, vertical stacking). Blueprint size hard-clamped to 1–40 buildings per group (input max + clamp on LS read).
+- **V44** Grouping supersedes force-even-rows: when effective multiple X > 1 for a building type, the even-rows adjustment (`BuildingDetails.php` even branch — `even` plan param OR `building_delta > 1` auto-trigger) must not alter `num_buildings`; count stays exact multiple of X. Even setting applies only to ungrouped types.
 
 ## §T — Tasks
 
@@ -92,6 +99,11 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T80 | x      | Responsive design pass: audit all plan pages at 375px; fix horizontal overflow (tables → cards or scroll-x); ensure recipe selectors are touch-friendly; stack multi-column layouts to single column below `md` breakpoint; verify on real mobile viewport | V38 |
 | T81 | x      | Update checklist feature for v1.2: add new buildings (Converter, Quantum Encoder), new tier-9 ingredients and recipes from §T60–T68 to any checklist/milestone tracker; remove deprecated items (Alien Carapace, Color Cartridge, Spiked Rebar, Beacon, Rifle Cartridge) from checklists | V21, V24 |
 | T82 | x      | Per-building count multiples: add `building_multiples` plan param (map of building_name → step int, default empty = all 1); apply in building-count rounding in `BuildingDetails`; expose in a "Building Settings" panel in the UI with per-type numeric inputs; persist via existing save/fetch flow | I.plan-params, V39 |
+| T83 | x      | Rework Building Settings panel (Show.vue): per-type row = blueprint size input + enable toggle; sizes read/write global LS key (e.g. `bp_sizes`); toggles read/write per-factory LS key (e.g. `bp_enabled:<factory_id>`); derive effective `building_multiples` plan param (enabled → size, else 1) on change + on mount; immutably update state | I.building-settings, I.local-storage, I.plan-params, V41, V42 |
+| T84 | .      | Diagram grouping: when type grouping enabled, BuildDiagram renders count/X blueprint tiles at designer dims with `<monogram>x<X>` label; individual building outlines hidden; footprint stats (foundations/walls/offsets/rows) recomputed against blueprint tile dims; toggle off = current render path untouched | I.build-diagram, V41, V43 |
+| T85 | .      | Designer mk selector (Mk.1/2/3, global LS, default Mk.1); clamp blueprint size to 1–40 (input min/max + clamp on LS read); no fit warning | I.building-settings, I.local-storage, V43 |
+| T86 | .      | Tests: LS persistence round-trip (sizes global, toggles per-factory), effective-multiple derivation, grouped tile count/label, size clamp 1–40, even-rows superseded when multiple > 1; backend `building_multiples` rounding already covered by T82 tests | V41, V42, V43, V44 |
+| T87 | .      | Backend: skip even-rows branch in `BuildingDetails::getBuildingDetails()` when `$multiple > 1` (both `even` param and `building_delta` auto-trigger paths); recompute rows/buildings_per_row against grouped count instead | I.plan-params, V44 |
 
 ## §B — Bug Log
 

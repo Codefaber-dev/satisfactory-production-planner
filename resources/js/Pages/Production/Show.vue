@@ -127,24 +127,38 @@
                         v-if="uniqueBuildings.length"
                         type="button"
                         @click="showBuildingSettings = !showBuildingSettings"
-                        class="btn btn-gray text-sm"
+                        class="btn btn-gray"
                     >
                         Building Settings
                     </button>
                 </div>
 
                 <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
-                    <p class="text-xs mb-2 font-medium text-gray-400">Building count multiple — rounds up to nearest multiple of N</p>
+                    <p class="text-xs mb-2 font-medium text-gray-400">
+                        Blueprint groups — when enabled, building count rounds up to a multiple of the group size and
+                        the build diagram shows blueprint footprints
+                    </p>
                     <div class="flex flex-wrap gap-3">
                         <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
-                            <label class="text-xs whitespace-nowrap">{{ building }}</label>
+                            <input
+                                type="checkbox"
+                                :id="`bp-toggle-${building}`"
+                                :checked="!!bpEnabled[building]"
+                                @change="toggleBlueprintEnabled(building)"
+                                class="rounded"
+                            />
+                            <label :for="`bp-toggle-${building}`" class="text-xs whitespace-nowrap">
+                                {{ building }}
+                            </label>
                             <input
                                 type="number"
                                 min="1"
+                                max="40"
                                 step="1"
-                                :value="buildingMultiples[building] || 1"
-                                @change="setBuildingMultiple(building, $event.target.value)"
-                                class="w-14 rounded py-1 px-1 text-sm shadow dark:bg-sky-800"
+                                :value="bpSizes[building] || 1"
+                                :disabled="!bpEnabled[building]"
+                                @change="setBlueprintSize(building, $event.target.value)"
+                                class="w-14 rounded py-1 px-1 text-sm shadow disabled:opacity-40 dark:bg-sky-800"
                             />
                         </div>
                     </div>
@@ -239,6 +253,7 @@
                             :recipes="recipes"
                             :choices="allChosenRecipes"
                             :somersloop-slots="somersloopSlots"
+                            :cost-multiplier="costMultiplier"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
                             :speed-limit="newSpeedLimit"
@@ -257,6 +272,14 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
+import {
+    clampSize,
+    effectiveMultiples,
+    loadEnabled,
+    loadSizes,
+    saveEnabled,
+    saveSizes,
+} from '@/blueprintSettings';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
@@ -382,11 +405,12 @@ export default {
             showWarnings: true,
             newChoices: this.choices || {},
             newEven: !!this.even,
-            somersloopSlots: this.somersloops || {},
+            somersloopSlots: Object.fromEntries(Object.entries(this.somersloops || {}).map(([k, v]) => [k, parseInt(v) || 0])),
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,
-            buildingMultiples: this.building_multiples || {},
+            bpSizes: loadSizes(store),
+            bpEnabled: loadEnabled(store, (this.multi ? this.multiFactory : this.factory)?.id),
             showBuildingSettings: false,
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
@@ -408,6 +432,10 @@ export default {
 
         uniqueBuildings() {
             return [...new Set(this.production__building_details.map((d) => d.building))].filter(Boolean).sort();
+        },
+
+        buildingMultiples() {
+            return effectiveMultiples(this.bpSizes, this.bpEnabled);
         },
 
         production__building_details() {
@@ -555,6 +583,12 @@ export default {
             }
 
             return params;
+        },
+    },
+
+    watch: {
+        production(newProd) {
+            this.overviews = newProd.overviews;
         },
     },
 
@@ -780,9 +814,18 @@ export default {
             this.setNewSubFavorite(recipe);
         },
 
-        setBuildingMultiple(name, val) {
-            const step = Math.max(1, parseInt(val) || 1);
-            this.buildingMultiples = { ...this.buildingMultiples, [name]: step };
+        setBlueprintSize(name, val) {
+            this.bpSizes = { ...this.bpSizes, [name]: clampSize(val) };
+            saveSizes(store, this.bpSizes);
+
+            if (this.bpEnabled[name]) {
+                this.fetch({ preserveScroll: true });
+            }
+        },
+
+        toggleBlueprintEnabled(name) {
+            this.bpEnabled = { ...this.bpEnabled, [name]: !this.bpEnabled[name] };
+            saveEnabled(store, this.newFactory?.id, this.bpEnabled);
             this.fetch({ preserveScroll: true });
         },
 
