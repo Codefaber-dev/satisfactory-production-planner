@@ -138,6 +138,19 @@
                         Blueprint groups — when enabled, building count rounds up to a multiple of the group size and
                         the build diagram shows blueprint footprints
                     </p>
+                    <div class="mb-2 flex items-center space-x-2">
+                        <span class="text-xs font-medium text-gray-400">Blueprint Designer</span>
+                        <button
+                            v-for="(dim, mk) in designerDims"
+                            :key="mk"
+                            type="button"
+                            @click="setDesignerMk(mk)"
+                            :class="[bpDesigner === mk ? 'btn-gray' : 'btn-emerald']"
+                            class="btn-sm"
+                        >
+                            Mk.{{ mk.slice(2) }} ({{ dim }}m)
+                        </button>
+                    </div>
                     <div class="flex flex-wrap gap-3">
                         <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
                             <input
@@ -255,6 +268,7 @@
                             :somersloop-slots="somersloopSlots"
                             :cost-multiplier="costMultiplier"
                             :building-multiples="buildingMultiples"
+                            :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
                             :speed-limit="newSpeedLimit"
@@ -281,6 +295,7 @@ import {
     saveEnabled,
     saveSizes,
 } from '@/blueprintSettings';
+import { DESIGNER_DIMS, loadDesignerMk, saveDesignerMk } from '@/blueprintFootprint';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
@@ -412,6 +427,8 @@ export default {
             powerMultiplier: this.power_multiplier || 1.0,
             bpSizes: loadSizes(store),
             bpEnabled: loadEnabled(store, (this.multi ? this.multiFactory : this.factory)?.id),
+            bpDesigner: loadDesignerMk(store),
+            designerDims: DESIGNER_DIMS,
             showBuildingSettings: false,
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
@@ -828,6 +845,11 @@ export default {
             this.bpEnabled = { ...this.bpEnabled, [name]: !this.bpEnabled[name] };
             saveEnabled(store, this.newFactory?.id, this.bpEnabled);
             this.fetch({ preserveScroll: true });
+        },
+
+        setDesignerMk(mk) {
+            this.bpDesigner = mk;
+            saveDesignerMk(store, mk);
         },
 
         savePrefs() {

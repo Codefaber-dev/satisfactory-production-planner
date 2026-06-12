@@ -81,6 +81,7 @@
                         :somersloop-slots="somersloopSlots"
                         :cost-multiplier="costMultiplier"
                         :building-multiples="buildingMultiples"
+                        :designer-mk="designerMk"
                         @toggle="toggle"
                         @setNewSubFavorite="setNewSubFavorite"
                     />
@@ -117,6 +118,10 @@ export default {
         },
         buildingMultiples: {
             default: () => ({}),
+        },
+        designerMk: {
+            type: String,
+            default: 'mk1',
         },
         speedLimit: {
             type: String,

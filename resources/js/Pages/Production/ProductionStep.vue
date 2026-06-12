@@ -309,7 +309,7 @@
 import BuildDiagram from '@/Pages/Production/BuildDiagram';
 import RecipePicker from '@/Components/RecipePicker';
 import store from '@/store';
-import { DESIGNER_DIMS, groupedFootprint, loadDesignerMk } from '@/blueprintFootprint';
+import { DESIGNER_DIMS, groupedFootprint } from '@/blueprintFootprint';
 
 export default {
     name: 'ProductionStep',
@@ -338,6 +338,10 @@ export default {
         },
         buildingMultiples: {
             default: () => ({}),
+        },
+        designerMk: {
+            type: String,
+            default: 'mk1',
         },
     },
 
@@ -395,7 +399,7 @@ export default {
                 return base;
             }
 
-            return groupedFootprint(base, groupSize, DESIGNER_DIMS[loadDesignerMk(store)]);
+            return groupedFootprint(base, groupSize, DESIGNER_DIMS[this.designerMk] ?? DESIGNER_DIMS.mk1);
         },
 
         stepLetter() {
