@@ -12,7 +12,7 @@
                             Power Shards
                         </div>
                     </td>
-                    <td colspan="2" class="p-2 text-right">
+                    <td class="p-2 text-right">
                         {{ powerShards }}
                     </td>
                 </tr>
@@ -23,7 +23,7 @@
                             Somersloops
                         </div>
                     </td>
-                    <td colspan="2" class="p-2 text-right">
+                    <td class="p-2 text-right">
                         {{ somersloops }}
                     </td>
                 </tr>
@@ -33,8 +33,10 @@
                 v-for="(o, bldg) in production__building_summary.variants"
             >
                 <tr>
-                    <td class="p-2">{{ o.num_buildings }}x {{ bldg }}</td>
-                    <td class="p-2 text-right">{{ Math.round(o.power_usage) }} MW</td>
+                    <td class="p-2">
+                        {{ o.num_buildings }}x {{ bldg }} <br>
+                        {{ Math.round(o.power_usage) }} MW
+                    </td>
                     <td nowrap="" class="p-2 text-right">
                         <div class="flex flex-col">
                             <div :key="mat" v-for="(num, mat) in o.build_cost">{{ mat }} {{ num }}</div>
@@ -44,8 +46,10 @@
             </tbody>
             <tbody class="rounded-b-lg bg-blue-200 font-bold dark:bg-gray-900">
                 <tr>
-                    <td class="p-2">Totals</td>
-                    <td class="p-2 text-right">{{ Math.round(production__total_power) }} MW</td>
+                    <td class="p-2">
+                        Totals <br>
+                        {{ Math.round(production__total_power) }} MW
+                    </td>
                     <td nowrap="" class="p-2 text-right">
                         <div class="flex flex-col">
                             <div :key="mat" v-for="(num, mat) in production__building_summary.total_build_cost">
@@ -59,8 +63,11 @@
     </div>
 </template>
 <script>
+import CloudImage from '../../Components/CloudImage.vue';
+
 export default {
     name: 'building-summary',
+    components: { CloudImage },
     props: {
         production__building_summary: {},
         production__building_details: {},
