@@ -134,12 +134,11 @@
                 </div>
 
                 <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
-                    <p class="text-xs mb-2 font-medium text-gray-400">
-                        Blueprint groups — when enabled, building count rounds up to a multiple of the group size and
-                        the build diagram shows blueprint footprints
+                    <p class="mb-2 font-medium text-slate-700 dark:text-slate-100">
+                        Blueprint groups — when enabled, production will be divided evenly into groups of the specified number of buildings
                     </p>
                     <div class="mb-2 flex items-center space-x-2">
-                        <span class="text-xs font-medium text-gray-400">Blueprint Designer</span>
+                        <span class="font-medium text-slate-700 dark:text-slate-100">Blueprint Designer</span>
                         <button
                             v-for="(dim, mk) in designerDims"
                             :key="mk"
@@ -153,14 +152,19 @@
                     </div>
                     <div class="flex flex-wrap gap-3">
                         <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
-                            <input
-                                type="checkbox"
-                                :id="`bp-toggle-${building}`"
-                                :checked="!!bpEnabled[building]"
-                                @change="toggleBlueprintEnabled(building)"
-                                class="rounded"
-                            />
-                            <label :for="`bp-toggle-${building}`" class="text-xs whitespace-nowrap">
+                            <label class="relative inline-flex cursor-pointer items-center">
+                                <input
+                                    type="checkbox"
+                                    :id="`bp-toggle-${building}`"
+                                    :checked="!!bpEnabled[building]"
+                                    @change="toggleBlueprintEnabled(building)"
+                                    class="peer sr-only"
+                                />
+                                <span
+                                    class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
+                                ></span>
+                            </label>
+                            <label :for="`bp-toggle-${building}`" class="cursor-pointer whitespace-nowrap">
                                 {{ building }}
                             </label>
                             <input
