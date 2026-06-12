@@ -210,4 +210,33 @@ class ProductionStepTest extends TestCase
         $step->assertOverride('Packaged Fuel', 'Diluted Packaged Fuel');
         $step->assertRecipe('Unpackage Fuel');
     }
+
+    #[Test]
+    public function somersloops_reduce_upstream_ingredient_demand(): void
+    {
+        // Smelter max=1 slot → amplifier 2× at full. Iron Ingot recipe: 30 ore → 30 ingots/min.
+        // For qty=60 ingots: without slots sub_qty=60 ore; with 1 slot sub_qty=30 ore.
+        $qty = 60;
+
+        $stepBase = Step::make(
+            product: 'Iron Ingot',
+            qty: $qty,
+            globals: ['overrides' => [], 'favorites' => []],
+        );
+        $baseOreQty = collect($stepBase->getIngredients())->get('Iron Ore');
+
+        // Frontend keys default recipes as "name|name" (recipe.description || product.name),
+        // never "name|default" — backend lookup must match that convention.
+        request()->merge(['somersloops' => ['Iron Ingot|Iron Ingot' => '1']]);
+
+        $stepSlot = Step::make(
+            product: 'Iron Ingot',
+            qty: $qty,
+            globals: ['overrides' => [], 'favorites' => []],
+        );
+        $slotOreQty = collect($stepSlot->getIngredients())->get('Iron Ore');
+
+        $this->assertEqualsWithDelta(60.0, $baseOreQty, 0.01, 'Without somersloops: 60 ore/min expected');
+        $this->assertEqualsWithDelta(30.0, $slotOreQty, 0.01, 'With 1 somersloop slot (2× amplifier): 30 ore/min expected');
+    }
 }

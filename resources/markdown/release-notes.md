@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### 🗄️ v1.2 Data Update
+### 📐 Blueprint Planning & Quality of Life
 
-- Updated for Satisfactory v1.2.
+- Plan your factory with blueprints, fine-tune costs, and enjoy a better mobile experience.
 
-## v1.2.0 - v1.2 Game Data
+## v1.2.1 - Blueprint Planning Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -31,6 +31,22 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.2.1
+
+- 📐 **Blueprint Grouping** — Build diagrams can now group buildings into blueprint-sized tiles. Set a blueprint size for each building type and the diagram will show how many blueprint stamps you need instead of individual buildings. Footprint stats (foundations, walls, offsets) update to match.
+- 📏 **Blueprint Designer Tiers** — Choose your Blueprint Designer mark (Mk.1, Mk.2, or Mk.3) and tiles will reflect the correct dimensions. Your choice is remembered across visits.
+- 🏗️ **Building Settings Panel** — New panel for configuring blueprint sizes and toggles. Sizes are saved globally so they carry over between factories, while on/off toggles are remembered per factory. Make all your changes, then hit **Update** to apply them at once — no more waiting for the page to refresh after every input.
+- 🔢 **Building Count Multiples** — Round building counts up to multiples of your choosing (e.g. always plan in groups of 4 constructors) so your plans match how you actually build.
+- 💲 **Recipe Cost Multiplier** — Scale ingredient costs up or down for a whole plan. Useful for modded playthroughs or what-if scenarios.
+- ⚡ **Power Cost Multiplier** — Adjust power consumption across your plan the same way.
+- ☑️ **Checklist Updated** — The Production Checklist now includes all the new v1.2 buildings and recipes, with deprecated items removed.
+- 📱 **Mobile Improvements** — A responsive design pass across the planner: no more horizontal scrolling on phones, touch-friendlier recipe selectors, and layouts that stack properly on small screens.
+- 🪲 Bug fix: Somersloop settings now apply correctly to production steps.
+- 🪲 Bug fix: Cost multipliers now carry through the entire production chain correctly.
+- 🪲 Bug fix: Grouped diagrams now account for rows added due to belt speed limits.
+
+---
 
 ### v1.2.0
 

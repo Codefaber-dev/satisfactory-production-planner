@@ -13,6 +13,6 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
-/public/build/assets/
+/public/build
 /coverage/
 /.phpunit.cache/test-results

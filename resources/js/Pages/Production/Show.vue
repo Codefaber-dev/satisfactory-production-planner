@@ -61,15 +61,15 @@
                         </option>
                     </select>
                     <template v-if="index === 0">
-                        <select
-                            v-model="form.variant"
-                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
-                        >
-                            <option value="mk1">Production mk1 (base)</option>
-                            <option disabled value="mk2">Production mk2 (mk++ mod) (no mod support yet)</option>
-                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>
-                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>
-                        </select>
+<!--                        <select-->
+<!--                            v-model="form.variant"-->
+<!--                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"-->
+<!--                        >-->
+<!--                            <option value="mk1">Production mk1 (base)</option>-->
+<!--                            <option disabled value="mk2">Production mk2 (mk++ mod) (no mod support yet)</option>-->
+<!--                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>-->
+<!--                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>-->
+<!--                        </select>-->
                         <select
                             v-model="form.belt_speed"
                             class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
@@ -81,6 +81,30 @@
                             <option value="780">Belts mk5</option>
                             <option value="1200">Belts mk6</option>
                         </select>
+                        <div class="flex items-center space-x-1">
+                            <label class="whitespace-nowrap text-sm">Cost ×</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                max="10"
+                                v-model.number="costMultiplier"
+                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
+                                title="Recipe cost multiplier (1.0 = default)"
+                            />
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <label class="whitespace-nowrap text-sm">Power ×</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                max="10"
+                                v-model.number="powerMultiplier"
+                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
+                                title="Power cost multiplier (1.0 = default)"
+                            />
+                        </div>
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
                     <template v-else>
@@ -88,7 +112,7 @@
                     </template>
                 </div>
 
-                <div class="my-4 space-x-4">
+                <div class="my-4 flex flex-wrap gap-2">
                     <button
                         v-if="$page.props?.user?.name"
                         :disabled="working"
@@ -99,6 +123,70 @@
                     </button>
                     <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
                     <inertia-link class="btn btn-gray" href="/dashboard"> Start Over </inertia-link>
+                    <button
+                        v-if="uniqueBuildings.length"
+                        type="button"
+                        @click="showBuildingSettings = !showBuildingSettings"
+                        class="btn btn-gray"
+                    >
+                        Building Settings
+                    </button>
+                </div>
+
+                <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
+                    <h2 class="mb-1 font-bold text-xl">
+                        Blueprint Mode
+                    </h2>
+                    <p class="mb-2 font-medium text-slate-700 dark:text-slate-100">
+                        When enabled, production will be divided evenly into groups of the specified number of buildings
+                    </p>
+                    <div class="mb-2 flex items-center space-x-2">
+                        <span class="font-medium text-slate-700 dark:text-slate-100">Blueprint Designer</span>
+                        <button
+                            v-for="(dim, mk) in designerDims"
+                            :key="mk"
+                            type="button"
+                            @click="setDesignerMk(mk)"
+                            :class="[bpDesigner === mk ? 'btn-gray' : 'btn-emerald']"
+                            class="btn-sm"
+                        >
+                            Mk.{{ mk.slice(2) }} ({{ dim }}m)
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
+                            <label class="relative inline-flex cursor-pointer items-center">
+                                <input
+                                    type="checkbox"
+                                    :id="`bp-toggle-${building}`"
+                                    :checked="!!bpEnabled[building]"
+                                    @change="toggleBlueprintEnabled(building)"
+                                    class="peer sr-only"
+                                />
+                                <span
+                                    class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
+                                ></span>
+                            </label>
+                            <label :for="`bp-toggle-${building}`" class="cursor-pointer whitespace-nowrap">
+                                {{ building }}
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="40"
+                                step="1"
+                                :value="bpSizes[building] || 1"
+                                :disabled="!bpEnabled[building]"
+                                @change="setBlueprintSize(building, $event.target.value)"
+                                class="w-14 rounded py-1 px-1 text-sm shadow disabled:opacity-40 dark:bg-sky-800"
+                            />
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button :disabled="working" @click="fetch({ preserveScroll: true })" class="btn btn-emerald">
+                            Update
+                        </button>
+                    </div>
                 </div>
                 <!--            <div class="mt-4 flex flex-col">-->
                 <!--                <hr class="mb-4" />-->
@@ -134,17 +222,24 @@
                 <div v-if="done && production" class="relative flex flex-1 flex-col space-y-2 p-2 dark:text-gray-100">
                     <production-warning :overrides="production.overrides" :show-warnings="showWarnings" />
 
-                    <!-- Tabs -->
+                    <!-- Tabs (mobile/tablet only) -->
                     <div class="xl:hidden">
-                        <ul class="flex space-x-4">
+                        <ul class="flex flex-wrap gap-2">
                             <li>
-                                <button @click="selectedTab = 'productionSteps'">Production Steps</button>
+                                <button
+                                    @click="selectedTab = 'productionSteps'"
+                                    :class="selectedTab === 'productionSteps' ? 'btn btn-gray' : 'btn btn-emerald'"
+                                >
+                                    Production Steps
+                                </button>
                             </li>
                             <li>
-                                <button @click="selectedTab = 'productionSummary'">Production Summary</button>
-                            </li>
-                            <li>
-                                <button @click="selectedTab = 'buildingSummary'">Building Summary</button>
+                                <button
+                                    @click="selectedTab = 'productionSummary'"
+                                    :class="selectedTab === 'productionSummary' ? 'btn btn-gray' : 'btn btn-emerald'"
+                                >
+                                    Summary
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -152,6 +247,7 @@
                     <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-4">
                         <!-- Left Side -->
                         <production-summary
+                            :class="{ 'hidden': selectedTab !== 'productionSummary', 'xl:block': true }"
                             :building-checks="buildingChecks"
                             :disabled-raw-materials="disabledRawMaterials"
                             @fetch="fetch"
@@ -171,6 +267,7 @@
 
                         <!-- middle -->
                         <production-steps
+                            :class="{ 'hidden': selectedTab !== 'productionSteps', 'xl:flex': true }"
                             ref="productionSteps"
                             :diagrams="diagrams"
                             :hide-completed="hideCompleted"
@@ -180,6 +277,10 @@
                             :production-checks="productionChecks"
                             :recipes="recipes"
                             :choices="allChosenRecipes"
+                            :somersloop-slots="somersloopSlots"
+                            :cost-multiplier="costMultiplier"
+                            :building-multiples="appliedMultiples"
+                            :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
                             :speed-limit="newSpeedLimit"
@@ -198,6 +299,8 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
+import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
+import { DESIGNER_DIMS, loadDesignerMk, saveDesignerMk } from '@/blueprintFootprint';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
@@ -223,6 +326,11 @@ export default {
                 this.overviews[key].selected_variant_name = selected_variant_name;
                 this.$forceUpdate();
             }
+        });
+
+        this.Bus.on('UpdateSomersloopSlots', ({ key, slots }) => {
+            this.somersloopSlots = { ...this.somersloopSlots, [key]: slots };
+            this.fetch({ preserveScroll: true });
         });
 
         this.Bus.on('AddOutput', ({ product, recipe, qty }) => {
@@ -266,9 +374,15 @@ export default {
         'choices',
         'even',
         'speedLimit',
+        'somersloops',
+        'cost_multiplier',
+        'power_multiplier',
+        'building_multiples',
     ],
 
     data() {
+        const bpSizes = loadSizes(store);
+        const bpEnabled = loadEnabled(store, (this.multi ? this.multiFactory : this.factory)?.id);
         const outputs = this.multi
             ? this.multi.products.map((o, i) => {
                   return {
@@ -314,7 +428,18 @@ export default {
             showWarnings: true,
             newChoices: this.choices || {},
             newEven: !!this.even,
+            somersloopSlots: Object.fromEntries(
+                Object.entries(this.somersloops || {}).map(([k, v]) => [k, Number.parseInt(v) || 0])
+            ),
             newSpeedLimit: this.speedLimit || 'both',
+            costMultiplier: this.cost_multiplier || 1.0,
+            powerMultiplier: this.power_multiplier || 1.0,
+            bpSizes,
+            bpEnabled,
+            appliedMultiples: effectiveMultiples(bpSizes, bpEnabled),
+            bpDesigner: loadDesignerMk(store),
+            designerDims: DESIGNER_DIMS,
+            showBuildingSettings: false,
             overviews: this.production.overviews,
             selectedTab: 'productionSteps',
         };
@@ -333,6 +458,14 @@ export default {
             );
         },
 
+        uniqueBuildings() {
+            return [...new Set(this.production__building_details.map((d) => d.building))].filter(Boolean).sort();
+        },
+
+        buildingMultiples() {
+            return effectiveMultiples(this.bpSizes, this.bpEnabled);
+        },
+
         production__building_details() {
             // if (! this.$refs.productionSteps) {
             //     return [];
@@ -344,6 +477,7 @@ export default {
                 return {
                     clock,
                     variant_name,
+                    building: o.overviews[clock]?.building,
                     ...o.overviews[clock].details[variant_name],
                 };
             });
@@ -460,6 +594,10 @@ export default {
                 choices: this.newChoices,
                 even: this.newEven ? 1 : 0,
                 speedLimit: this.newSpeedLimit,
+                somersloops: this.somersloopSlots,
+                cost_multiplier: this.costMultiplier,
+                power_multiplier: this.powerMultiplier,
+                building_multiples: this.buildingMultiples,
             };
 
             if (this.form.outputs.length > 1) {
@@ -473,6 +611,12 @@ export default {
             }
 
             return params;
+        },
+    },
+
+    watch: {
+        production(newProd) {
+            this.overviews = newProd.overviews;
         },
     },
 
@@ -498,6 +642,7 @@ export default {
             if (this.yield < 1) return false;
 
             this.working = true;
+            this.appliedMultiples = this.buildingMultiples;
 
             this.$inertia.get(`/dashboard/${this.endpoint}`, this.params, options);
         },
@@ -583,7 +728,7 @@ export default {
                     ingredient_id: output.product.id,
                     recipe_id: output.recipe.id,
                     yield: output.yield,
-                    choices: this.newChoices,
+                    choices: this.allChosenRecipes,
                     imports,
                 });
             } else {
@@ -597,7 +742,7 @@ export default {
                 ingredient_id: output.product.id,
                 recipe_id: output.recipe.id,
                 yield: output.yield,
-                choices: this.newChoices,
+                choices: this.allChosenRecipes,
                 imports,
             });
         },
@@ -610,7 +755,7 @@ export default {
             if (this.newFactory) {
                 return this.$inertia.patch(`/factories/multi/${this.newFactory.id}`, {
                     outputs: this.form.outputs,
-                    choices: this.newChoices,
+                    choices: this.allChosenRecipes,
                     imports,
                 });
             }
@@ -619,7 +764,7 @@ export default {
             this.$inertia.post('/factories/multi', {
                 name,
                 outputs: this.form.outputs,
-                choices: this.newChoices,
+                choices: this.allChosenRecipes,
                 imports,
             });
         },
@@ -648,26 +793,26 @@ export default {
         // },
 
         setDefaultRecipe(row) {
-            // if there is only one recipe, use it
-            if (this.recipes[row.product.name].length === 1) {
-                this.setRecipe(this.recipes[row.product.name][0]);
+            const available = this.recipes[row.product.name];
+
+            if (available.length === 1) {
+                row.recipe = available[0];
                 return;
             }
 
-            // if there is a favorite recipe, use that
-            if (this.recipes[row.product.name].some((o) => this.isFavorite(o))) {
-                this.setRecipe(this.recipes[row.product.name].filter((o) => this.isFavorite(o))[0]);
+            const favorite = available.find((o) => this.isFavorite(o));
+            if (favorite) {
+                row.recipe = favorite;
                 return;
             }
 
-            // if there is a base recipe, use that
-            if (this.recipes[row.product.name].some((o) => !o.alt_recipe)) {
-                this.setRecipe(this.recipes[row.product.name].filter((o) => !o.alt_recipe)[0]);
+            const base = available.find((o) => !o.alt_recipe);
+            if (base) {
+                row.recipe = base;
                 return;
             }
 
-            // else, use the first recipe available
-            this.setRecipe(this.recipes[row.product.name][0]);
+            row.recipe = available[0];
         },
 
         isFavorite(recipe) {
@@ -685,11 +830,32 @@ export default {
         },
 
         selectNewRecipe({ recipe }) {
-            this.setRecipe(recipe);
+            const row = this.form.outputs.find((o) => o.recipe && o.recipe.product_id === recipe.product_id);
+            if (row) {
+                row.recipe = recipe;
+            } else {
+                this.form.outputs[0].recipe = recipe;
+            }
+            this.fetch({ preserveScroll: true });
         },
 
         selectNewSubRecipe({ recipe }) {
             this.setNewSubFavorite(recipe);
+        },
+
+        setBlueprintSize(name, val) {
+            this.bpSizes = { ...this.bpSizes, [name]: clampSize(val) };
+            saveSizes(store, this.bpSizes);
+        },
+
+        toggleBlueprintEnabled(name) {
+            this.bpEnabled = { ...this.bpEnabled, [name]: !this.bpEnabled[name] };
+            saveEnabled(store, this.newFactory?.id, this.bpEnabled);
+        },
+
+        setDesignerMk(mk) {
+            this.bpDesigner = mk;
+            saveDesignerMk(store, mk);
         },
 
         savePrefs() {

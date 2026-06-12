@@ -73,10 +73,13 @@ class ProductionController extends Controller
         // dd($calc->getOverviews());
 
         $imports = request('imports');
-
         $belt_speed = request('belt_speed', 780);
+        $somersloops = request('somersloops', []);
+        $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
+        $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
+        $building_multiples = request('building_multiples', []);
 
-        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples') + $this->baseData());
     }
 
     public function multi()
@@ -91,6 +94,10 @@ class ProductionController extends Controller
         $speedLimit = request('speedLimit', 'both');
         $belt_speed = request('belt_speed', 780);
         $imports = request('imports');
+        $somersloops = request('somersloops', []);
+        $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
+        $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
+        $building_multiples = request('building_multiples', []);
 
         // add request vars to cache key
         $requestVars = request()->all();
@@ -137,7 +144,7 @@ class ProductionController extends Controller
             ];
         });
 
-        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant = 'mk1')

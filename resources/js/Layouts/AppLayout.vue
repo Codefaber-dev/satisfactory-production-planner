@@ -238,7 +238,23 @@
                 >
                     <div class="space-y-1 pt-2 pb-3">
                         <jet-responsive-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
+                            Production Planner
+                        </jet-responsive-nav-link>
+                        <jet-responsive-nav-link :href="route('power.index')" :active="route().current('power')">
+                            Power Planner
+                        </jet-responsive-nav-link>
+                        <jet-responsive-nav-link
+                            v-if="$page?.props?.user?.name"
+                            :href="route('factories')"
+                            :active="route().current('factories')"
+                        >
+                            My Factories
+                        </jet-responsive-nav-link>
+                        <jet-responsive-nav-link :href="route('favorites')" :active="route().current('favorites')">
+                            My Favorite Recipes
+                        </jet-responsive-nav-link>
+                        <jet-responsive-nav-link :href="route('checklist')" :active="route().current('checklist')">
+                            Checklist
                         </jet-responsive-nav-link>
                     </div>
 

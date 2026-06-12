@@ -25,6 +25,8 @@ class ProductionGlobals
 
     protected int $belt_speed;
 
+    protected float $cost_multiplier;
+
     public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts)
     {
         $this->choices = collect($choices);
@@ -34,6 +36,7 @@ class ProductionGlobals
         $this->byproducts = collect($byproducts);
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed', 780);
+        $this->cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
         $this->used_byproducts = collect($used_byproducts);
     }
 
@@ -53,6 +56,11 @@ class ProductionGlobals
             variant: $globals['variant'] ?? 'mk1',
             used_byproducts: $globals['used_byproducts'] ?? []
         );
+    }
+
+    public function getCostMultiplier(): float
+    {
+        return $this->cost_multiplier;
     }
 
     public function getVariant(): string

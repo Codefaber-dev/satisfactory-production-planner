@@ -79,16 +79,17 @@
                             v-if="yield"
                             class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                         >
-                            <span class="font-semibold">Select default building variant</span>
-                            <select
-                                v-model="variant"
-                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800"
-                            >
-                                <option>mk1</option>
-                                <option disabled value="mk2">mk2 (mk++ mod) (no mod support yet)</option>
-                                <option disabled value="mk3">mk3 (mk++ mod) (no mod support yet)</option>
-                                <option disabled value="mk4">mk4 (mk++ mod) (no mod support yet)</option>
-                            </select>
+                            <input type="hidden" v-model="variant" value="mk1">
+<!--                            <span class="font-semibold">Select default building variant</span>-->
+<!--                            <select-->
+<!--                                v-model="variant"-->
+<!--                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800"-->
+<!--                            >-->
+<!--                                <option>mk1</option>-->
+<!--                                <option disabled value="mk2">mk2 (mk++ mod) (no mod support yet)</option>-->
+<!--                                <option disabled value="mk3">mk3 (mk++ mod) (no mod support yet)</option>-->
+<!--                                <option disabled value="mk4">mk4 (mk++ mod) (no mod support yet)</option>-->
+<!--                            </select>-->
                         </div>
 
                         <div class="space-x-4">

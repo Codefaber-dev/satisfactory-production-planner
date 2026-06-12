@@ -16,6 +16,17 @@
                         {{ powerShards }}
                     </td>
                 </tr>
+                <tr v-if="somersloops > 0">
+                    <td class="p-2">
+                        <div class="flex items-center">
+                            <cloud-image public-id="Somersloop" height="36" width="36"></cloud-image>
+                            Somersloops
+                        </div>
+                    </td>
+                    <td colspan="2" class="p-2 text-right">
+                        {{ somersloops }}
+                    </td>
+                </tr>
             </tbody>
             <tbody
                 class="border-b border-gray-200 dark:border-slate-800"
@@ -59,6 +70,9 @@ export default {
     computed: {
         powerShards() {
             return this.production__building_details.map((o) => +o.footprint.power_shards).reduce((a, b) => a + b, 0);
+        },
+        somersloops() {
+            return this.production__building_details.map((o) => +o.footprint.somersloops).reduce((a, b) => a + b, 0);
         },
     },
 };
