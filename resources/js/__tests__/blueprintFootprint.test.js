@@ -108,7 +108,8 @@ describe('groupedFootprint dimensions (V43 — designer dims)', () => {
     });
 
     it('recomputes foundations, walls and offsets against tile dims (mk1, 2 tiles, 1 row)', () => {
-        const fp = groupedFootprint(baseFootprint(), 8, 32);
+        // backend rows = 1: belt allows a single row (480 in / 240 out ≤ 780)
+        const fp = groupedFootprint({ ...baseFootprint(), rows: 1, belt_load_out: 240 }, 8, 32);
 
         expect(fp.rows).toBe(1);
         expect(fp.buildings_per_row).toBe(2);
@@ -124,13 +125,59 @@ describe('groupedFootprint dimensions (V43 — designer dims)', () => {
     });
 
     it('recomputes per-row belt stats against the new row count', () => {
-        const fp = groupedFootprint(baseFootprint(), 8, 32);
+        const fp = groupedFootprint({ ...baseFootprint(), rows: 1, belt_load_out: 240 }, 8, 32);
 
-        // 1 row: full input load 480, full output 120 × 2 original rows = 240
+        // 1 row: full input load 480, full output 240
         expect(fp.belt_load_in).toBe(480);
         expect(fp.belt_load_out).toBe(240);
         expect(fp.belt_utilization_in).toBe(Math.round(48000 / 780));
         expect(fp.belt_utilization_out).toBe(Math.round(24000 / 780));
+    });
+
+    it('never drops below belt-required rows (V45)', () => {
+        // 100 smelters → 10 tiles of 10; backend needed 4 rows for belt throughput
+        // (output 3000/min at belt 780). Near-square alone would pick 3 rows
+        // (1000/min per row > 780) — belt-required rows must win.
+        const fp = groupedFootprint(
+            {
+                ...baseFootprint(),
+                num_buildings: 100,
+                rows: 4,
+                buildings_per_row: 25,
+                belt_load: 2000,
+                belt_load_in: 500,
+                belt_load_out: 750,
+            },
+            10,
+            32
+        );
+
+        expect(fp.rows).toBe(4);
+        expect(fp.buildings_per_row).toBe(3);
+        expect(fp.belt_load_out).toBeLessThanOrEqual(fp.belt_speed);
+        expect(fp.belt_utilization_out).toBeLessThanOrEqual(100);
+    });
+
+    it('caps rows at tile count when a single blueprint exceeds one belt (V45)', () => {
+        // 2 tiles but backend needed 5 belt rows: layout cannot split a blueprint —
+        // one tile per row, overload surfaces via utilization > 100
+        const fp = groupedFootprint(
+            {
+                ...baseFootprint(),
+                num_buildings: 16,
+                rows: 5,
+                buildings_per_row: 4,
+                belt_load: 3600,
+                belt_load_in: 720,
+                belt_load_out: 720,
+            },
+            8,
+            32
+        );
+
+        expect(fp.rows).toBe(2);
+        expect(fp.buildings_per_row).toBe(1);
+        expect(fp.belt_utilization_in).toBeGreaterThan(100);
     });
 
     it('keeps power shard and somersloop totals untouched', () => {

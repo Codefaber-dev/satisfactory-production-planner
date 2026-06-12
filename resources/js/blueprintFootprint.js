@@ -15,8 +15,11 @@ export const saveDesignerMk = (store, mk) => {
 export const groupedFootprint = (footprint, groupSize, designerM) => {
     const size = Math.max(1, parseInt(groupSize, 10) || 1);
     const tiles = Math.ceil(footprint.num_buildings / size);
-    const tilesPerRow = Math.ceil(Math.sqrt(tiles));
-    const rows = Math.ceil(tiles / tilesPerRow);
+    // backend footprint.rows encodes belt_speed + speedLimit — never lay out
+    // fewer rows than belts require (V45), capped at one tile per row
+    const nearSquareRows = Math.ceil(tiles / Math.ceil(Math.sqrt(tiles)));
+    const rows = Math.min(tiles, Math.max(nearSquareRows, footprint.rows));
+    const tilesPerRow = Math.ceil(tiles / rows);
 
     const tileFoundations = Math.ceil(designerM / 8);
     const foundationBorderY = rows > 1;
