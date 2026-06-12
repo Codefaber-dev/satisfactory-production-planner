@@ -70,9 +70,41 @@
 <!--                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>-->
 <!--                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>-->
 <!--                        </select>-->
+                        <button @click="addOutput" class="btn btn-emerald">Add Output</button>
+                    </template>
+                    <template v-else>
+                        <button class="btn-sm btn-gray" @click="removeOutput(index)">X</button>
+                    </template>
+                </div>
+
+                <div class="my-4 flex flex-wrap gap-2">
+                    <button
+                        v-if="$page.props?.user?.name"
+                        :disabled="working"
+                        @click="saveMyFactory"
+                        class="btn btn-emerald"
+                    >
+                        {{ newFactory ? 'Save Changes To Factory' : 'Save To My Factories' }}
+                    </button>
+                    <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
+                    <inertia-link class="btn btn-gray" href="/dashboard"> Start Over </inertia-link>
+                    <button
+                        type="button"
+                        @click="showBuildingSettings = !showBuildingSettings"
+                        class="btn btn-gray"
+                    >
+                        Settings
+                    </button>
+                </div>
+
+                <div v-if="showBuildingSettings" class="rounded border border-sky-700 p-3 mb-2">
+                    <h2 class="mb-1 font-bold text-xl">
+                        Plan Settings
+                    </h2>
+                    <div class="mb-4 flex flex-wrap items-center gap-3">
                         <select
                             v-model="form.belt_speed"
-                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
+                            class="rounded py-2 px-1 shadow dark:bg-sky-800"
                         >
                             <option value="60">Belts mk1</option>
                             <option value="120">Belts mk2</option>
@@ -117,35 +149,8 @@
                                 title="Power cost multiplier (1.0 = default)"
                             />
                         </div>
-                        <button @click="addOutput" class="btn btn-emerald">Add Output</button>
-                    </template>
-                    <template v-else>
-                        <button class="btn-sm btn-gray" @click="removeOutput(index)">X</button>
-                    </template>
-                </div>
-
-                <div class="my-4 flex flex-wrap gap-2">
-                    <button
-                        v-if="$page.props?.user?.name"
-                        :disabled="working"
-                        @click="saveMyFactory"
-                        class="btn btn-emerald"
-                    >
-                        {{ newFactory ? 'Save Changes To Factory' : 'Save To My Factories' }}
-                    </button>
-                    <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
-                    <inertia-link class="btn btn-gray" href="/dashboard"> Start Over </inertia-link>
-                    <button
-                        v-if="uniqueBuildings.length"
-                        type="button"
-                        @click="showBuildingSettings = !showBuildingSettings"
-                        class="btn btn-gray"
-                    >
-                        Building Settings
-                    </button>
-                </div>
-
-                <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
+                    </div>
+                    <template v-if="uniqueBuildings.length">
                     <h2 class="mb-1 font-bold text-xl">
                         Blueprint Mode
                     </h2>
@@ -194,6 +199,7 @@
                             />
                         </div>
                     </div>
+                    </template>
                     <div class="mt-3">
                         <button :disabled="working" @click="fetch({ preserveScroll: true })" class="btn btn-emerald">
                             Update

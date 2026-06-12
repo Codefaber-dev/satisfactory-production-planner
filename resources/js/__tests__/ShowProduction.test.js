@@ -222,3 +222,85 @@ describe('Show — T88: building settings deferred apply', () => {
         expect(mockInertia.get.mock.calls[0][1].building_multiples).toEqual({ Constructor: 8 });
     });
 });
+
+describe('Show — T91/V51: plan settings live in Building Settings panel', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        window.localStorage.clear();
+    });
+
+    function makeHeaderWrapper(propsOverride = {}) {
+        return shallowMount(Show, {
+            global: {
+                mocks: {
+                    $inertia: mockInertia,
+                    $page: { props: { user: { name: 'Test User' } } },
+                    Bus: mockBus,
+                },
+                stubs: {
+                    AppLayout: { template: '<div><slot name="header" /><slot /></div>' },
+                    ProductionSummary: true,
+                    ProductionSteps: true,
+                    BuildingSummary: true,
+                    ProductionWarning: true,
+                    ProductionQuickNav: true,
+                },
+            },
+            props: { ...defaultProps, ...propsOverride },
+        });
+    }
+
+    const beltSelect = (wrapper) =>
+        wrapper.findAll('select').filter((s) => s.html().includes('Belts mk6'));
+    const multiplierInputs = (wrapper) =>
+        ['Recipe cost multiplier (1.0 = default)', 'Building cost multiplier (1.0 = default)', 'Power cost multiplier (1.0 = default)'].map(
+            (title) => wrapper.find(`input[title="${title}"]`)
+        );
+
+    it('Settings button renders even with no buildings (uniqueBuildings empty)', () => {
+        const wrapper = makeHeaderWrapper();
+
+        expect(wrapper.vm.uniqueBuildings).toEqual([]);
+        const settingsBtn = wrapper.findAll('button').filter((b) => b.text() === 'Settings');
+        expect(settingsBtn.length).toBe(1);
+    });
+
+    it('belt/cost/building-cost/power controls absent from header row, present only in panel', async () => {
+        const wrapper = makeHeaderWrapper();
+
+        expect(beltSelect(wrapper).length).toBe(0);
+        for (const input of multiplierInputs(wrapper)) expect(input.exists()).toBe(false);
+
+        wrapper.vm.showBuildingSettings = true;
+        await wrapper.vm.$nextTick();
+
+        expect(beltSelect(wrapper).length).toBe(1);
+        for (const input of multiplierInputs(wrapper)) expect(input.exists()).toBe(true);
+    });
+
+    it('panel reachable pre-buildings: plan settings + Update shown, blueprint rows gated off', async () => {
+        const wrapper = makeHeaderWrapper();
+        wrapper.vm.showBuildingSettings = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.html()).toContain('Plan Settings');
+        expect(wrapper.html()).not.toContain('Blueprint Mode');
+        expect(beltSelect(wrapper).length).toBe(1);
+    });
+
+    it('fetch payload unchanged: panel-bound values sent as same params', () => {
+        const wrapper = makeHeaderWrapper();
+
+        wrapper.vm.form.belt_speed = 1200;
+        wrapper.vm.costMultiplier = 2;
+        wrapper.vm.buildingCostMultiplier = 3;
+        wrapper.vm.powerMultiplier = 0.5;
+        wrapper.vm.fetch();
+
+        const params = mockInertia.get.mock.calls[0][1];
+        expect(params.belt_speed).toBe(1200);
+        expect(params.cost_multiplier).toBe(2);
+        expect(params.building_cost_multiplier).toBe(3);
+        expect(params.power_multiplier).toBe(0.5);
+    });
+});
