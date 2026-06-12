@@ -172,16 +172,11 @@ trait ParsesSteps
 
                                     $total_energy = $overview ? $overview->details->pluck('total_energy') : null;
 
-                                    $rawIngredients = $group->crossSumByKey('ingredients');
-                                    $scaledIngredients = $cost_multiplier !== 1.0
-                                        ? collect($rawIngredients)->map(fn ($q) => $q * $cost_multiplier)->all()
-                                        : $rawIngredients;
-
                                     return [
                                         'byproducts' => $group->crossSumByKey('byproducts'),
                                         'description' => $group->dataGet('0.description'),
                                         'imported' => $group->dataGet('0.imported'),
-                                        'ingredients' => $scaledIngredients,
+                                        'ingredients' => $group->crossSumByKey('ingredients'),
                                         'name' => $group->dataGet('0.name'),
                                         'outputs' => $group->pluck('outputs'),
                                         'overridden' => $group->dataGet('0.overridden'),

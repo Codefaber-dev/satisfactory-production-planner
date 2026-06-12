@@ -56,7 +56,7 @@ trait CalculatesSteps
             $multiplier = $this->qty / $this->recipe->base_per_min;
 
             // how much of the ingredient we need to make per minute
-            $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty;
+            $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty * $this->globals->getCostMultiplier();
 
             // return a new production step
             return static::make(
