@@ -216,12 +216,18 @@ class BuildingDetails extends Collection
                 // Log::debug("Building delta: $building_delta");
                 $adjusted_buildings = $rows * $buildings_per_row;
             } elseif ($multiple > 1 && $this->even) {
+                // grid-fill for stamps (V50): bump the stamp count so the grouped
+                // layout rows — near-square floored by belt-required rows, the
+                // same rule the diagram uses — come out full, no ragged last row.
+                // A grid that is already full stays untouched.
                 // rows stays belt-derived: the bump keeps total throughput
                 // constant (clock drops as count rises), so belt load per row
                 // is unchanged and footprint.rows remains the belt minimum (V47)
                 $stamps = (int) round($num_buildings / $multiple);
-                if ($stamps % 2 === 1) {
-                    $adjusted_buildings = ($stamps + 1) * $multiple;
+                $layout_rows = (int) min($stamps, max(ceil($stamps / ceil(sqrt($stamps))), $rows));
+                $stamps_per_row = (int) ceil($stamps / $layout_rows);
+                if ($stamps !== $layout_rows * $stamps_per_row) {
+                    $adjusted_buildings = $layout_rows * $stamps_per_row * $multiple;
                 }
             }
             if ($adjusted_buildings !== null) {
