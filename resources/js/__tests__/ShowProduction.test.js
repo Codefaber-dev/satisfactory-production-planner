@@ -8,7 +8,14 @@ const mockBus = { on: vi.fn(), emit: vi.fn() };
 
 const ironPlate = { id: 1, name: 'Iron Plate', recipes: [] };
 const baseRecipe = { id: 10, description: null, alt_recipe: false, product: ironPlate, product_id: 1, favorite: false };
-const altRecipe = { id: 11, description: 'Solid Steel Ingot', alt_recipe: true, product: ironPlate, product_id: 1, favorite: false };
+const altRecipe = {
+    id: 11,
+    description: 'Solid Steel Ingot',
+    alt_recipe: true,
+    product: ironPlate,
+    product_id: 1,
+    favorite: false,
+};
 
 const minimalProduction = {
     raw_materials: {},
@@ -52,7 +59,7 @@ function makeWrapper(propsOverride = {}) {
                 Bus: mockBus,
             },
             stubs: {
-                AppLayout: { template: '<div><slot /><slot name="header" /></div>' },
+                AppLayout: { template: '<div><slot /><slot id="header" /></div>' },
                 ProductionSummary: true,
                 ProductionSteps: true,
                 BuildingSummary: true,
@@ -100,7 +107,14 @@ describe('Show — T73: saveMyFactory uses allChosenRecipes', () => {
 
     it('saveMultiFactory PATCH sends allChosenRecipes', () => {
         const wire = { id: 2, name: 'Wire', recipes: [] };
-        const wireRecipe = { id: 20, description: 'Fused Wire', alt_recipe: true, product: wire, product_id: 2, favorite: false };
+        const wireRecipe = {
+            id: 20,
+            description: 'Fused Wire',
+            alt_recipe: true,
+            product: wire,
+            product_id: 2,
+            favorite: false,
+        };
 
         const wrapper = makeWrapper({
             multiFactory: { id: 7, name: 'Multi' },

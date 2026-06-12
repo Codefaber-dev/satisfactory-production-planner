@@ -4,6 +4,7 @@ namespace App\Production\Concerns;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Production\BuildingDetails;
 use App\Production\BuildingOverview;
 use Illuminate\Support\Collection;
 
@@ -20,6 +21,8 @@ trait Getters
         if (method_exists($this->globals, $name)) {
             return $this->globals->$name(...$arguments);
         }
+
+        return null;
     }
 
     public function isRaw(): bool
@@ -66,7 +69,7 @@ trait Getters
     // (NOT getDescription(), whose 'default' fallback never appears in request params)
     public function getProductKey(): string
     {
-        return $this->getName() . '|' . ($this->recipe?->description ?? $this->getName());
+        return $this->getName().'|'.($this->recipe?->description ?? $this->getName());
     }
 
     public function getQty(): float
@@ -116,7 +119,7 @@ trait Getters
 
         $somersloop_slots = (int) (request('somersloops', [])[$this->getProductKey()] ?? 0);
         $building_name = $this->recipe->building->name;
-        $max_slots = \App\Production\BuildingDetails::SLOTS[$building_name] ?? 0;
+        $max_slots = BuildingDetails::SLOTS[$building_name] ?? 0;
         $amplifier = $max_slots > 0 ? (1 + $somersloop_slots / $max_slots) : 1.0;
 
         return $this->ingredients->map(function ($ingredient) use ($amplifier) {

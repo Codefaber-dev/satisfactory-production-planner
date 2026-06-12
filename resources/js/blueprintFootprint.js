@@ -13,7 +13,7 @@ export const saveDesignerMk = (store, mk) => {
 };
 
 export const groupedFootprint = (footprint, groupSize, designerM) => {
-    const size = Math.max(1, parseInt(groupSize, 10) || 1);
+    const size = Math.max(1, Number.parseInt(groupSize, 10) || 1);
     const tiles = Math.ceil(footprint.num_buildings / size);
     // backend footprint.rows encodes belt_speed + speedLimit — never lay out
     // fewer rows than belts require (V45), capped at one tile per row

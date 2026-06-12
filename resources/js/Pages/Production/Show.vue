@@ -299,14 +299,7 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
-import {
-    clampSize,
-    effectiveMultiples,
-    loadEnabled,
-    loadSizes,
-    saveEnabled,
-    saveSizes,
-} from '@/blueprintSettings';
+import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
 import { DESIGNER_DIMS, loadDesignerMk, saveDesignerMk } from '@/blueprintFootprint';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
@@ -435,7 +428,9 @@ export default {
             showWarnings: true,
             newChoices: this.choices || {},
             newEven: !!this.even,
-            somersloopSlots: Object.fromEntries(Object.entries(this.somersloops || {}).map(([k, v]) => [k, parseInt(v) || 0])),
+            somersloopSlots: Object.fromEntries(
+                Object.entries(this.somersloops || {}).map(([k, v]) => [k, Number.parseInt(v) || 0])
+            ),
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,

@@ -50,7 +50,8 @@
             "resources/js/bootstrap.js",
             "resources/js/Jetstream/**",
             "resources/js/Pages/API/ApiTokenManager.vue",
-            "resources/js/Pages/Profile/TwoFactorAuthenticationForm.vue"
+            "resources/js/Pages/Profile/TwoFactorAuthenticationForm.vue",
+            "storage/"
         ]
     }
 }

@@ -5,7 +5,7 @@ const SIZES_KEY = 'bp_sizes';
 const enabledKey = (factoryId) => `bp_enabled:${factoryId ?? 'new'}`;
 
 export const clampSize = (val) => {
-    const n = parseInt(val, 10);
+    const n = Number.parseInt(val, 10);
 
     if (Number.isNaN(n)) return SIZE_MIN;
 
@@ -35,7 +35,7 @@ export const saveEnabled = (store, factoryId, enabled) => {
 export const effectiveMultiples = (sizes, enabled) => {
     return Object.fromEntries(
         Object.entries(enabled)
-            .filter(([name, on]) => on)
+            .filter(([_, on]) => on)
             .map(([name]) => [name, clampSize(sizes[name] ?? SIZE_MIN)])
     );
 };

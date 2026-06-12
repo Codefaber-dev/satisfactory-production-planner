@@ -1172,5 +1172,4 @@ const product_list = [
     },
 ];
 
-
 export default product_list;

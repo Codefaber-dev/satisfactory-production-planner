@@ -11,12 +11,12 @@
             </th>
             <td class="block p-2 dark:text-slate-800 lg:table-cell lg:whitespace-nowrap">
                 <div
-                    class="flex flex-shrink-0 flex-grow flex-col items-center space-y-2 rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg lg:whitespace-nowrap"
+                    class="flex shrink-0 grow flex-col items-center space-y-2 rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg lg:whitespace-nowrap"
                 >
                     <div class="flex w-full">
                         <cloud-image class="mr-2" :public-id="name" width="48" crop="scale" :alt="name" />
 
-                        <div class="mr-2 flex flex-shrink-0 flex-grow flex-col space-y-2">
+                        <div class="mr-2 flex shrink-0 grow flex-col space-y-2">
                             <div class="flex items-center justify-between font-semibold">
                                 <span class="flex-1">{{ name }}</span>
                                 <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
@@ -34,11 +34,11 @@
                     </div>
 
                     <div
-                        class="flex w-full flex-shrink-0 flex-grow flex-col space-y-1 rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                        class="flex w-full shrink-0 grow flex-col space-y-1 rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
                     >
                         <span class="font-semibold"> Destination </span>
                         <div
-                            class="flex flex-shrink-0 flex-grow flex-col space-y-1"
+                            class="flex shrink-0 grow flex-col space-y-1"
                             v-for="(out_qty, mat) in material.outputs"
                         >
                             <div class="flex" v-if="mat !== 'final'">
@@ -72,17 +72,17 @@
                 </div>
             </td>
             <td class="block p-2 dark:text-slate-800 lg:table-cell lg:whitespace-nowrap">
-                <div class="flex w-full flex-shrink-0 flex-grow">
+                <div class="flex w-full shrink-0 grow">
                     <div
                         v-if="recipe && Object.keys(ingredients).length"
-                        class="flex flex-shrink-0 flex-grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg dark:text-slate-800 lg:whitespace-nowrap"
+                        class="flex shrink-0 grow flex-col rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg dark:text-slate-800 lg:whitespace-nowrap"
                     >
                         <div
-                            class="my-2 flex flex-shrink-0 flex-grow items-center"
+                            class="my-2 flex shrink-0 grow items-center"
                             v-for="(in_qty, ingr) in ingredients"
                         >
                             <cloud-image class="mr-2" :public-id="ingr" width="48" crop="scale" :alt="ingr" />
-                            <div class="flex flex-grow flex-col font-semibold lg:whitespace-nowrap">
+                            <div class="flex grow flex-col font-semibold lg:whitespace-nowrap">
                                 {{ ingr }}
                                 <template v-if="usesByproduct(ingr)"> (Used Byproduct) </template>
                                 <span v-if="newImports[ingr]" class="rounded-lg bg-green-300 px-2 py-1 text-xs">
@@ -121,18 +121,18 @@
             >
                 <div
                     v-if="Object.keys(production.byproducts).length"
-                    class="flex w-full flex-shrink-0 flex-grow flex-col rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg"
+                    class="flex w-full shrink-0 grow flex-col rounded-lg border border-teal-500 bg-teal-200 p-2 shadow-lg"
                 >
                     <span class="mb-1 font-semibold"> Byproducts </span>
 
                     <div
-                        class="flex flex-shrink-0 flex-grow flex-col"
+                        class="flex shrink-0 grow flex-col"
                         v-for="(qty, byproduct) in production.byproducts"
                     >
                         <div class="flex w-full">
                             <cloud-image class="mr-2" :public-id="byproduct" width="48" crop="scale" :alt="byproduct" />
 
-                            <div class="mr-2 flex flex-shrink-0 flex-grow flex-col space-y-2">
+                            <div class="mr-2 flex shrink-0 grow flex-col space-y-2">
                                 <span class="font-semibold">
                                     {{ byproduct }}
                                     <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
@@ -144,11 +144,11 @@
                         </div>
                         <div
                             v-if="Object.keys(byproductsUsed).includes(byproduct)"
-                            class="mt-2 flex w-full flex-shrink-0 flex-grow flex-col space-y-1 rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
+                            class="mt-2 flex w-full shrink-0 grow flex-col space-y-1 rounded-lg border border-yellow-500 bg-yellow-200 p-2 shadow-lg"
                         >
                             <span class="font-semibold"> Destination </span>
                             <div
-                                class="flex flex-shrink-0 flex-grow flex-col"
+                                class="flex shrink-0 grow flex-col"
                                 v-for="(out_qty, mat) in byproductsUsed[byproduct]"
                             >
                                 <div class="flex" v-if="mat !== 'final'">
@@ -314,10 +314,11 @@ import BuildDiagram from '@/Pages/Production/BuildDiagram';
 import RecipePicker from '@/Components/RecipePicker';
 import store from '@/store';
 import { DESIGNER_DIMS, groupedFootprint } from '@/blueprintFootprint';
+import CloudImage from '../../Components/CloudImage.vue';
 
 export default {
     name: 'ProductionStep',
-    components: { BuildDiagram, RecipePicker },
+    components: { CloudImage, BuildDiagram, RecipePicker },
     props: {
         choices: {},
         diagrams: {},
@@ -424,7 +425,7 @@ export default {
         },
 
         currentSomersloopSlots() {
-            return parseInt(this.somersloopSlots[this.key] ?? 0) || 0;
+            return Number.parseInt(this.somersloopSlots[this.key] ?? 0) || 0;
         },
 
         sloopFactor() {
