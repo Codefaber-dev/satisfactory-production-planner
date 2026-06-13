@@ -408,7 +408,12 @@ export default {
                 return base;
             }
 
-            return groupedFootprint(base, groupSize, DESIGNER_DIMS[this.designerMk] ?? DESIGNER_DIMS.mk1, this.appliedEven);
+            return groupedFootprint(
+                base,
+                groupSize,
+                DESIGNER_DIMS[this.designerMk] ?? DESIGNER_DIMS.mk1,
+                this.appliedEven
+            );
         },
 
         stepLetter() {

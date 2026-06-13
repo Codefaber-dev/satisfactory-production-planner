@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
+import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon } from '@heroicons/vue/24/outline';
 import '../bootstrap';
 import Show from '../Pages/Production/Show.vue';
 
@@ -238,7 +239,7 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
                     Bus: mockBus,
                 },
                 stubs: {
-                    AppLayout: { template: '<div><slot name="header" /><slot /></div>' },
+                    AppLayout: { template: '<div><slot id="header" /><slot /></div>' },
                     ProductionSummary: true,
                     ProductionSteps: true,
                     BuildingSummary: true,
@@ -250,12 +251,13 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
         });
     }
 
-    const beltSelect = (wrapper) =>
-        wrapper.findAll('select').filter((s) => s.html().includes('Belts mk6'));
+    const beltSelect = (wrapper) => wrapper.findAll('select').filter((s) => s.html().includes('1200 per min (mk6)'));
     const multiplierInputs = (wrapper) =>
-        ['Recipe cost multiplier (1.0 = default)', 'Building cost multiplier (1.0 = default)', 'Power cost multiplier (1.0 = default)'].map(
-            (title) => wrapper.find(`input[title="${title}"]`)
-        );
+        [
+            'Recipe cost multiplier (1.0 = default)',
+            'Building cost multiplier (1.0 = default)',
+            'Power cost multiplier (1.0 = default)',
+        ].map((title) => wrapper.find(`input[title="${title}"]`));
 
     it('Settings button renders even with no buildings (uniqueBuildings empty)', () => {
         const wrapper = makeHeaderWrapper();
@@ -297,16 +299,14 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
         expect(cards.length).toBe(4);
 
         const expected = [
-            { src: '/images/ConveyorBeltMk5.png', label: 'Belt Speed', control: 'select' },
-            { src: '/images/FicsitCoupon.png', label: 'Recipe Cost ×', control: 'input[type="number"]' },
-            { src: '/images/Constructor.png', label: 'Building Cost ×', control: 'input[type="number"]' },
-            { src: '/images/PowerShard.png', label: 'Power Cost ×', control: 'input[type="number"]' },
+            { icon: RocketLaunchIcon, label: 'Belt Speed', control: 'select' },
+            { icon: QueueListIcon, label: 'Recipe Cost ×', control: 'input[type="number"]' },
+            { icon: BuildingOffice2Icon, label: 'Building Cost ×', control: 'input[type="number"]' },
+            { icon: PowerIcon, label: 'Power Cost ×', control: 'input[type="number"]' },
         ];
 
         cards.forEach((card, i) => {
-            const img = card.find('img');
-            expect(img.exists()).toBe(true);
-            expect(img.attributes('src')).toBe(expected[i].src);
+            expect(card.findComponent(expected[i].icon).exists()).toBe(true);
             expect(card.find('label').text()).toBe(expected[i].label);
             expect(card.find(expected[i].control).exists()).toBe(true);
         });

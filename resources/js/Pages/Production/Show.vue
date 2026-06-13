@@ -352,7 +352,7 @@ import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
 import ProductionQuickNav from '@/Components/ProductionQuickNav.vue';
-import {RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon} from '@heroicons/vue/24/outline';
+import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon } from '@heroicons/vue/24/outline';
 
 export default {
     name: 'ShowNew',
@@ -367,7 +367,7 @@ export default {
         RocketLaunchIcon,
         QueueListIcon,
         BuildingOffice2Icon,
-        PowerIcon
+        PowerIcon,
     },
 
     mounted() {
