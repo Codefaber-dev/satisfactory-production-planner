@@ -348,6 +348,10 @@ export default {
             type: String,
             default: 'mk1',
         },
+        appliedEven: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     mounted() {
@@ -404,7 +408,12 @@ export default {
                 return base;
             }
 
-            return groupedFootprint(base, groupSize, DESIGNER_DIMS[this.designerMk] ?? DESIGNER_DIMS.mk1);
+            return groupedFootprint(
+                base,
+                groupSize,
+                DESIGNER_DIMS[this.designerMk] ?? DESIGNER_DIMS.mk1,
+                this.appliedEven
+            );
         },
 
         stepLetter() {

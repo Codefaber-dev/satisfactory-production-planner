@@ -78,8 +78,9 @@ class ProductionController extends Controller
         $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
         $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
         $building_multiples = request('building_multiples', []);
+        $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
 
-        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
     }
 
     public function multi()
@@ -98,6 +99,7 @@ class ProductionController extends Controller
         $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
         $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
         $building_multiples = request('building_multiples', []);
+        $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
 
         // add request vars to cache key
         $requestVars = request()->all();
@@ -144,7 +146,7 @@ class ProductionController extends Controller
             ];
         });
 
-        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant = 'mk1')

@@ -3,7 +3,7 @@
         <ProductionQuickNav v-bind="{ productionChecks }" />
 
         <!-- busy overlay -->
-        <div v-if="working" class="fixed inset-0 z-[1000] bg-slate-900 bg-opacity-30"></div>
+        <div v-if="working" class="fixed inset-0 z-1000 bg-slate-900 bg-opacity-30"></div>
 
         <template #header>
             <div class="flex flex-col justify-center space-y-4 text-xl font-semibold">
@@ -70,41 +70,6 @@
 <!--                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>-->
 <!--                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>-->
 <!--                        </select>-->
-                        <select
-                            v-model="form.belt_speed"
-                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"
-                        >
-                            <option value="60">Belts mk1</option>
-                            <option value="120">Belts mk2</option>
-                            <option value="270">Belts mk3</option>
-                            <option value="480">Belts mk4</option>
-                            <option value="780">Belts mk5</option>
-                            <option value="1200">Belts mk6</option>
-                        </select>
-                        <div class="flex items-center space-x-1">
-                            <label class="whitespace-nowrap text-sm">Cost ×</label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                min="0.1"
-                                max="10"
-                                v-model.number="costMultiplier"
-                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
-                                title="Recipe cost multiplier (1.0 = default)"
-                            />
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            <label class="whitespace-nowrap text-sm">Power ×</label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                min="0.1"
-                                max="10"
-                                v-model.number="powerMultiplier"
-                                class="w-20 rounded py-2 px-1 shadow dark:bg-sky-800"
-                                title="Power cost multiplier (1.0 = default)"
-                            />
-                        </div>
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
                     <template v-else>
@@ -124,23 +89,102 @@
                     <button :disabled="working" @click="fetch" class="btn btn-emerald">Update</button>
                     <inertia-link class="btn btn-gray" href="/dashboard"> Start Over </inertia-link>
                     <button
-                        v-if="uniqueBuildings.length"
                         type="button"
                         @click="showBuildingSettings = !showBuildingSettings"
                         class="btn btn-gray"
                     >
-                        Building Settings
+                        Settings
                     </button>
                 </div>
 
-                <div v-if="showBuildingSettings && uniqueBuildings.length" class="rounded border border-sky-700 p-3 mb-2">
+                <div v-if="showBuildingSettings" class="rounded border border-sky-700 p-3 mb-2">
+                    <h2 class="mb-1 font-bold text-xl">
+                        Plan Settings
+                    </h2>
+                    <div class="mb-4 flex flex-wrap gap-3">
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+                        >
+                            <RocketLaunchIcon alt="Belt Speed" class="h-10 w-10 shrink-0"/>
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-xl font-bold">Belt Speed</label>
+                                <select
+                                    v-model="form.belt_speed"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                >
+                                    <option value="60">60 per min (mk1)</option>
+                                    <option value="120">120 per min (mk2)</option>
+                                    <option value="270">270 per min (mk3)</option>
+                                    <option value="480">480 per min (mk4)</option>
+                                    <option value="780">780 per min (mk5)</option>
+                                    <option value="1200">1200 per min (mk6)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+                        >
+                            <QueueListIcon alt="Recipe Cost" class="h-10 w-10 shrink-0"/>
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-xl font-bold">Recipe Cost ×</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    max="10"
+                                    v-model.number="costMultiplier"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                    title="Recipe cost multiplier (1.0 = default)"
+                                />
+                            </div>
+                        </div>
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+                        >
+                            <BuildingOffice2Icon alt="Building Cost" class="h-10 w-10 shrink-0"/>
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-xl font-bold">Building Cost ×</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    max="10"
+                                    v-model.number="buildingCostMultiplier"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                    title="Building cost multiplier (1.0 = default)"
+                                />
+                            </div>
+                        </div>
+                        <div
+                            data-test="plan-setting-card"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+                        >
+                            <PowerIcon alt="Power Cost" class="h-10 w-10 shrink-0"/>
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-xl font-bold">Power Cost ×</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    max="10"
+                                    v-model.number="powerMultiplier"
+                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                                    title="Power cost multiplier (1.0 = default)"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <template v-if="uniqueBuildings.length">
                     <h2 class="mb-1 font-bold text-xl">
                         Blueprint Mode
                     </h2>
                     <p class="mb-2 font-medium text-slate-700 dark:text-slate-100">
                         When enabled, production will be divided evenly into groups of the specified number of buildings
                     </p>
-                    <div class="mb-2 flex items-center space-x-2">
+                    <div class="mb-2 flex flex-wrap items-center gap-2">
                         <span class="font-medium text-slate-700 dark:text-slate-100">Blueprint Designer</span>
                         <button
                             v-for="(dim, mk) in designerDims"
@@ -182,6 +226,7 @@
                             />
                         </div>
                     </div>
+                    </template>
                     <div class="mt-3">
                         <button :disabled="working" @click="fetch({ preserveScroll: true })" class="btn btn-emerald">
                             Update
@@ -283,6 +328,7 @@
                             :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
                             :even="newEven"
+                            :applied-even="!!even"
                             :speed-limit="newSpeedLimit"
                             @toggle="toggleProductionCheck"
                             @toggleDiagrams="toggleDiagrams"
@@ -306,6 +352,7 @@ import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
 import ProductionQuickNav from '@/Components/ProductionQuickNav.vue';
+import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon } from '@heroicons/vue/24/outline';
 
 export default {
     name: 'ShowNew',
@@ -317,6 +364,10 @@ export default {
         ProductionSummary,
         AppLayout,
         ProductionWarning,
+        RocketLaunchIcon,
+        QueueListIcon,
+        BuildingOffice2Icon,
+        PowerIcon,
     },
 
     mounted() {
@@ -378,6 +429,7 @@ export default {
         'cost_multiplier',
         'power_multiplier',
         'building_multiples',
+        'building_cost_multiplier',
     ],
 
     data() {
@@ -434,6 +486,7 @@ export default {
             newSpeedLimit: this.speedLimit || 'both',
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,
+            buildingCostMultiplier: this.building_cost_multiplier || 1.0,
             bpSizes,
             bpEnabled,
             appliedMultiples: effectiveMultiples(bpSizes, bpEnabled),
@@ -597,6 +650,7 @@ export default {
                 somersloops: this.somersloopSlots,
                 cost_multiplier: this.costMultiplier,
                 power_multiplier: this.powerMultiplier,
+                building_cost_multiplier: this.buildingCostMultiplier,
                 building_multiples: this.buildingMultiples,
             };
 

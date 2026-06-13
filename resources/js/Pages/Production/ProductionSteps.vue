@@ -82,6 +82,7 @@
                         :cost-multiplier="costMultiplier"
                         :building-multiples="buildingMultiples"
                         :designer-mk="designerMk"
+                        :applied-even="appliedEven"
                         @toggle="toggle"
                         @setNewSubFavorite="setNewSubFavorite"
                     />
@@ -108,6 +109,10 @@ export default {
         recipes: {},
         choices: {},
         even: {},
+        appliedEven: {
+            type: Boolean,
+            default: false,
+        },
         overviews: {},
         somersloopSlots: {
             default: () => ({}),

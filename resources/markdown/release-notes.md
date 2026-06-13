@@ -39,12 +39,16 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 - 🏗️ **Building Settings Panel** — New panel for configuring blueprint sizes and toggles. Sizes are saved globally so they carry over between factories, while on/off toggles are remembered per factory. Make all your changes, then hit **Update** to apply them at once — no more waiting for the page to refresh after every input.
 - 🔢 **Building Count Multiples** — Round building counts up to multiples of your choosing (e.g. always plan in groups of 4 constructors) so your plans match how you actually build.
 - 💲 **Recipe Cost Multiplier** — Scale ingredient costs up or down for a whole plan. Useful for modded playthroughs or what-if scenarios.
+- 🏗️ **Building Cost Multiplier** — Scale building construction costs independently of recipe costs.
 - ⚡ **Power Cost Multiplier** — Adjust power consumption across your plan the same way.
+- ⚙️ **Plan Settings Panel** — Belt speed and the cost/building/power multipliers now live in the Settings panel as easy-to-scan cards with icons, instead of crowding the header. The panel is available even before you've added any buildings.
 - ☑️ **Checklist Updated** — The Production Checklist now includes all the new v1.2 buildings and recipes, with deprecated items removed.
 - 📱 **Mobile Improvements** — A responsive design pass across the planner: no more horizontal scrolling on phones, touch-friendlier recipe selectors, and layouts that stack properly on small screens.
 - 🪲 Bug fix: Somersloop settings now apply correctly to production steps.
 - 🪲 Bug fix: Cost multipliers now carry through the entire production chain correctly.
 - 🪲 Bug fix: Grouped diagrams now account for rows added due to belt speed limits.
+- 🪲 Bug fix: Force-even rows now works with blueprint grouping — the stamp grid fills out evenly instead of leaving a ragged last row.
+- 🪲 Bug fix: Foundation/footprint stats no longer inflate when force-even rows is combined with blueprint grouping.
 
 ---
 

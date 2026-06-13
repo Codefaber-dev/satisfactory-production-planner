@@ -205,6 +205,79 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function building_cost_multiplier_scales_build_cost_only(): void
+    {
+        // V48: building_cost_multiplier scales build_cost — never ingredient
+        // consumption, belt load, power, or building counts
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 2;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $doubled = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 2.0)->first();
+
+        foreach ($base['build_cost'] as $ingredient => $cost) {
+            $this->assertEqualsWithDelta($cost * 2, $doubled['build_cost'][$ingredient], 1e-9,
+                "build_cost for {$ingredient} must double");
+        }
+
+        $this->assertSame($base['num_buildings'], $doubled['num_buildings']);
+        $this->assertSame($base['clock_speed'], $doubled['clock_speed']);
+        $this->assertSame($base['power_usage'], $doubled['power_usage']);
+        $this->assertSame($base['footprint']['belt_load_in'], $doubled['footprint']['belt_load_in']);
+    }
+
+    #[Test]
+    public function building_cost_multiplier_clamped_to_valid_range(): void
+    {
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min;
+
+        $tooLow = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 0.0)->first();
+        $tooHigh = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 100.0)->first();
+        $atMin = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 0.1)->first();
+        $atMax = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 10.0)->first();
+
+        $this->assertEquals($atMin['build_cost'], $tooLow['build_cost']);
+        $this->assertEquals($atMax['build_cost'], $tooHigh['build_cost']);
+    }
+
+    #[Test]
+    public function building_cost_multiplier_applies_in_recompute_block(): void
+    {
+        // Large qty fires the even-rows/adjusted-count recompute block, which
+        // rebuilds build_cost — the multiplier must apply there too (V48)
+        $recipe = r('Iron Plate');
+        $qty = $recipe->base_per_min * 1000;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $doubled = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 2.0)->first();
+
+        $this->assertSame($base['num_buildings'], $doubled['num_buildings']);
+        foreach ($base['build_cost'] as $ingredient => $cost) {
+            $this->assertEqualsWithDelta($cost * 2, $doubled['build_cost'][$ingredient], 1e-9,
+                "recompute-block build_cost for {$ingredient} must double");
+        }
+    }
+
+    #[Test]
+    public function cost_multiplier_and_building_cost_multiplier_are_disjoint(): void
+    {
+        // V48: cost_multiplier never touches build_cost;
+        // building_cost_multiplier never touches belt load
+        $recipe = r('Reinforced Iron Plate');
+        $qty = $recipe->base_per_min * 2;
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $costOnly = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 2.0, 1.0, [])->first();
+        $buildingOnly = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [], 2.0)->first();
+
+        $this->assertEquals($base['build_cost'], $costOnly['build_cost'],
+            'cost_multiplier must not scale build_cost');
+        $this->assertSame($base['footprint']['belt_load_in'], $buildingOnly['footprint']['belt_load_in'],
+            'building_cost_multiplier must not scale belt load');
+    }
+
+    #[Test]
     public function building_multiple_rounds_up_num_buildings(): void
     {
         // Iron Rod: Constructor, base_per_min=15; qty=45 → needs exactly 3 buildings at 100%
@@ -261,7 +334,7 @@ class BuildingDetailsTest extends TestCase
     #[Test]
     public function explicit_even_setting_preserves_group_multiple(): void
     {
-        // even with grouping may bump the stamp count to an even number (V46),
+        // even with grouping may bump the stamp count to fill the layout grid (V50),
         // but num_buildings must always stay an exact multiple of the group size (V44)
         $recipe = r('Iron Plate');
         $qty = $recipe->base_per_min * 1000;
@@ -272,15 +345,20 @@ class BuildingDetailsTest extends TestCase
 
         $this->assertEquals(0, $grouped['num_buildings'] % 7,
             'Explicit even setting must not break the group multiple');
-        $this->assertEquals(0, (int) ($grouped['num_buildings'] / 7) % 2,
-            'Explicit even setting must yield an even stamp count');
+
+        // stamps must fill the layout grid: rows = near-square floored by belt rows
+        $stamps = (int) ($grouped['num_buildings'] / 7);
+        $rows = (int) min($stamps, max(ceil($stamps / ceil(sqrt($stamps))), $grouped['footprint']['rows']));
+        $this->assertEquals(0, $stamps % $rows,
+            'Stamp count must divide evenly into the layout rows');
     }
 
     #[Test]
-    public function even_with_multiple_forces_even_stamp_count(): void
+    public function even_with_multiple_fills_stamp_grid(): void
     {
         // Iron Rod: Constructor, base_per_min=15; qty=180 → 12 buildings = 3 stamps
-        // of 4 (odd). Explicit even must round the stamp count up to 4 stamps (V46).
+        // of 4, near-square layout 2 rows → ragged (2+1). Grid-fill bumps to
+        // 4 stamps = 2×2 (V50).
         $recipe = r('Iron Rod');
         $qty = $recipe->base_per_min * 12;
 
@@ -289,9 +367,7 @@ class BuildingDetailsTest extends TestCase
         request()->merge(['even' => null]);
 
         $this->assertEquals(16, $grouped['num_buildings'],
-            'Odd stamp count must round up to an even number of blueprint stamps');
-        $this->assertEquals(0, ($grouped['num_buildings'] / 4) % 2,
-            'Stamp count must be even');
+            'Ragged stamp grid must round up to fill the layout rows');
         $this->assertEquals(0, $grouped['num_buildings'] % 4,
             'num_buildings must stay an exact multiple of the group size');
         $this->assertEqualsWithDelta(75.0, $grouped['clock_speed'], 1e-9,
@@ -305,9 +381,72 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function even_with_full_stamp_grid_is_a_noop(): void
+    {
+        // V50: qty=540 → 36 buildings = 9 stamps of 4, laid out 3×3 — already a
+        // full grid. Force-even must not change anything: bumping 9→10 stamps
+        // (old parity semantics) broke the layout into 5 rows of 2.
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 36;
+
+        request()->merge(['even' => 1]);
+        $grouped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(36, $grouped['num_buildings'],
+            'A full stamp grid must be left untouched by force-even');
+        $this->assertEqualsWithDelta(100.0, $grouped['clock_speed'], 1e-9);
+    }
+
+    #[Test]
+    public function even_with_ragged_stamp_grid_fills_the_last_row(): void
+    {
+        // V50: qty=480 → 32 buildings = 8 stamps of 4; near-square layout is
+        // 3 rows of 3 → ragged (3+3+2). Grid-fill bumps to 9 stamps = 36
+        // buildings so the 3×3 grid is full.
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 32;
+
+        request()->merge(['even' => 1]);
+        $grouped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(36, $grouped['num_buildings'],
+            'Ragged stamp grid must round up to fill the layout rows');
+        $this->assertEquals(0, $grouped['num_buildings'] % 4,
+            'num_buildings must stay an exact multiple of the group size');
+        $this->assertEqualsWithDelta(100 * $qty / (36 * $recipe->base_per_min), $grouped['clock_speed'], 1e-4,
+            'Clock speed must be recomputed against the bumped count');
+    }
+
+    #[Test]
+    public function even_stamp_bump_keeps_belt_derived_rows(): void
+    {
+        // V47: the V46 stamp bump changes num_buildings and clock_speed only —
+        // total throughput is constant, so the belt-required row count must not
+        // change. footprint.rows is the frontend's belt minimum (V45 contract);
+        // inflating it forces the grouped diagram into extra rows.
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 12; // 12 buildings = 3 stamps of 4 (odd)
+
+        $baseline = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+
+        request()->merge(['even' => 1]);
+        $bumped = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+        request()->merge(['even' => null]);
+
+        $this->assertEquals(16, $bumped['num_buildings'],
+            'Stamp bump must still fire (V46 precondition)');
+        $this->assertSame($baseline['footprint']['rows'], $bumped['footprint']['rows'],
+            'Stamp bump must not change the belt-derived row count');
+        $this->assertSame(1, $bumped['footprint']['rows'],
+            'qty=180 on a 780 belt needs exactly one row');
+    }
+
+    #[Test]
     public function even_with_multiple_keeps_already_even_stamp_count(): void
     {
-        // qty=120 → 8 buildings = 2 stamps of 4 (already even) → no change
+        // qty=120 → 8 buildings = 2 stamps of 4, laid out 1×2 (full grid) → no change
         $recipe = r('Iron Rod');
         $qty = $recipe->base_per_min * 8;
 

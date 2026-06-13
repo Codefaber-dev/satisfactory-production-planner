@@ -12,13 +12,24 @@ export const saveDesignerMk = (store, mk) => {
     store.setItem(DESIGNER_KEY, mk in DESIGNER_DIMS ? mk : 'mk1');
 };
 
-export const groupedFootprint = (footprint, groupSize, designerM) => {
+// force-even row count: smallest divisor of tiles that satisfies the belt
+// minimum and sits closest to the near-square target, so every stamp row is
+// uniform — no ragged last row (V49)
+const evenRowCount = (tiles, target, beltMin) => {
+    const divisors = Array.from({ length: tiles }, (_, i) => i + 1).filter((d) => tiles % d === 0);
+    const candidates = divisors.filter((d) => d >= beltMin);
+
+    return candidates.reduce((best, d) => (Math.abs(d - target) < Math.abs(best - target) ? d : best), candidates[0]);
+};
+
+export const groupedFootprint = (footprint, groupSize, designerM, even = false) => {
     const size = Math.max(1, Number.parseInt(groupSize, 10) || 1);
     const tiles = Math.ceil(footprint.num_buildings / size);
     // backend footprint.rows encodes belt_speed + speedLimit — never lay out
     // fewer rows than belts require (V45), capped at one tile per row
     const nearSquareRows = Math.ceil(tiles / Math.ceil(Math.sqrt(tiles)));
-    const rows = Math.min(tiles, Math.max(nearSquareRows, footprint.rows));
+    const nearestRows = Math.min(tiles, Math.max(nearSquareRows, footprint.rows));
+    const rows = even ? evenRowCount(tiles, nearestRows, Math.min(tiles, footprint.rows)) : nearestRows;
     const tilesPerRow = Math.ceil(tiles / rows);
 
     const tileFoundations = Math.ceil(designerM / 8);
