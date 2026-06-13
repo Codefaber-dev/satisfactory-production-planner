@@ -3,7 +3,7 @@
         <ProductionQuickNav v-bind="{ productionChecks }" />
 
         <!-- busy overlay -->
-        <div v-if="working" class="fixed inset-0 z-[1000] bg-slate-900 bg-opacity-30"></div>
+        <div v-if="working" class="fixed inset-0 z-1000 bg-slate-900 bg-opacity-30"></div>
 
         <template #header>
             <div class="flex flex-col justify-center space-y-4 text-xl font-semibold">
@@ -104,39 +104,31 @@
                     <div class="mb-4 flex flex-wrap gap-3">
                         <div
                             data-test="plan-setting-card"
-                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
                         >
-                            <img
-                                src="/images/ConveyorBeltMk5.png"
-                                alt="Belt Speed"
-                                class="h-10 w-10 shrink-0 object-contain"
-                            />
+                            <RocketLaunchIcon alt="Belt Speed" class="h-10 w-10 shrink-0"/>
                             <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-sm font-medium">Belt Speed</label>
+                                <label class="whitespace-nowrap text-xl font-bold">Belt Speed</label>
                                 <select
                                     v-model="form.belt_speed"
                                     class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
                                 >
-                                    <option value="60">Belts mk1</option>
-                                    <option value="120">Belts mk2</option>
-                                    <option value="270">Belts mk3</option>
-                                    <option value="480">Belts mk4</option>
-                                    <option value="780">Belts mk5</option>
-                                    <option value="1200">Belts mk6</option>
+                                    <option value="60">60 per min (mk1)</option>
+                                    <option value="120">120 per min (mk2)</option>
+                                    <option value="270">270 per min (mk3)</option>
+                                    <option value="480">480 per min (mk4)</option>
+                                    <option value="780">780 per min (mk5)</option>
+                                    <option value="1200">1200 per min (mk6)</option>
                                 </select>
                             </div>
                         </div>
                         <div
                             data-test="plan-setting-card"
-                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
                         >
-                            <img
-                                src="/images/FicsitCoupon.png"
-                                alt="Recipe Cost"
-                                class="h-10 w-10 shrink-0 object-contain"
-                            />
+                            <QueueListIcon alt="Recipe Cost" class="h-10 w-10 shrink-0"/>
                             <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-sm font-medium">Recipe Cost ×</label>
+                                <label class="whitespace-nowrap text-xl font-bold">Recipe Cost ×</label>
                                 <input
                                     type="number"
                                     step="0.1"
@@ -150,15 +142,11 @@
                         </div>
                         <div
                             data-test="plan-setting-card"
-                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
                         >
-                            <img
-                                src="/images/Constructor.png"
-                                alt="Building Cost"
-                                class="h-10 w-10 shrink-0 object-contain"
-                            />
+                            <BuildingOffice2Icon alt="Building Cost" class="h-10 w-10 shrink-0"/>
                             <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-sm font-medium">Building Cost ×</label>
+                                <label class="whitespace-nowrap text-xl font-bold">Building Cost ×</label>
                                 <input
                                     type="number"
                                     step="0.1"
@@ -172,15 +160,11 @@
                         </div>
                         <div
                             data-test="plan-setting-card"
-                            class="flex min-w-[10rem] flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-900/40"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
                         >
-                            <img
-                                src="/images/PowerShard.png"
-                                alt="Power Cost"
-                                class="h-10 w-10 shrink-0 object-contain"
-                            />
+                            <PowerIcon alt="Power Cost" class="h-10 w-10 shrink-0"/>
                             <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-sm font-medium">Power Cost ×</label>
+                                <label class="whitespace-nowrap text-xl font-bold">Power Cost ×</label>
                                 <input
                                     type="number"
                                     step="0.1"
@@ -368,6 +352,7 @@ import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
 import ProductionQuickNav from '@/Components/ProductionQuickNav.vue';
+import {RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon} from '@heroicons/vue/24/outline';
 
 export default {
     name: 'ShowNew',
@@ -379,6 +364,10 @@ export default {
         ProductionSummary,
         AppLayout,
         ProductionWarning,
+        RocketLaunchIcon,
+        QueueListIcon,
+        BuildingOffice2Icon,
+        PowerIcon
     },
 
     mounted() {
