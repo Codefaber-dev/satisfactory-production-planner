@@ -239,7 +239,7 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
                     Bus: mockBus,
                 },
                 stubs: {
-                    AppLayout: { template: '<div><slot id="header" /><slot /></div>' },
+                    AppLayout: { template: '<div><slot name="header" /><slot /></div>' },
                     ProductionSummary: true,
                     ProductionSteps: true,
                     BuildingSummary: true,
