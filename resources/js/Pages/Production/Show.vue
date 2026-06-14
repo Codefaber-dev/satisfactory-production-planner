@@ -405,6 +405,10 @@ export default {
 
             this.fetch();
         });
+
+        this.Bus.on('FillOutput', ({ product, qty }) => {
+            this.fillOutput(product, qty);
+        });
     },
 
     props: [
@@ -734,6 +738,14 @@ export default {
 
         updateYield(name, qty) {
             this.form.outputs.find((o) => o.product.name === name).yield = qty;
+        },
+
+        // set a single output's yield to its 100%-fill value, leaving all other outputs untouched (V55)
+        fillOutput(name, qty) {
+            if (!this.form.outputs.some((o) => o.product && o.product.name === name)) return;
+
+            this.updateYield(name, (+qty).$round4());
+            this.fetch();
         },
 
         pushOutput({ qty, product, recipe }) {

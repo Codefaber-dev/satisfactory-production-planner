@@ -328,3 +328,47 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
         expect(params.power_multiplier).toBe(0.5);
     });
 });
+
+describe('Show — T95/V55: per-output Fill to 100%', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    const wire = { id: 2, name: 'Wire', recipes: [] };
+    const wireRecipe = { id: 20, description: null, alt_recipe: false, product: wire, product_id: 2, favorite: false };
+
+    function makeMultiWrapper() {
+        return makeWrapper({
+            products: [ironPlate, wire],
+            recipes: { 'Iron Plate': [baseRecipe], Wire: [wireRecipe] },
+            multi: {
+                products: [ironPlate, wire],
+                yields: [25, 20],
+                recipes: [baseRecipe, wireRecipe],
+            },
+        });
+    }
+
+    it('fillOutput sets only the targeted output yield; other outputs untouched', () => {
+        const wrapper = makeMultiWrapper();
+
+        wrapper.vm.fillOutput('Iron Plate', 40);
+
+        const yieldOf = (name) => wrapper.vm.form.outputs.find((o) => o.product.name === name).yield;
+        expect(yieldOf('Iron Plate')).toBe(40);
+        expect(yieldOf('Wire')).toBe(20);
+    });
+
+    it('fillOutput triggers a fetch', () => {
+        const wrapper = makeMultiWrapper();
+
+        wrapper.vm.fillOutput('Iron Plate', 40);
+
+        expect(mockInertia.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('fillOutput on an unknown product is a no-op (no throw, no fetch)', () => {
+        const wrapper = makeMultiWrapper();
+
+        expect(() => wrapper.vm.fillOutput('Nonexistent', 99)).not.toThrow();
+        expect(mockInertia.get).not.toHaveBeenCalled();
+    });
+});
