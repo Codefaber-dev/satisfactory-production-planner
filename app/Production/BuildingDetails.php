@@ -189,7 +189,7 @@ class BuildingDetails extends Collection
 
             // calc the build cost
             $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
-                return [$ingredient->name => $ingredient->pivot->qty * $num_buildings * $this->building_cost_multiplier];
+                return [$ingredient->name => ceil($ingredient->pivot->qty * $num_buildings * $this->building_cost_multiplier)];
             })->collapse();
 
             // calculate the max belt load (cost_multiplier scales ingredient consumption)
@@ -260,7 +260,7 @@ class BuildingDetails extends Collection
                 $power_shards = $num_buildings * $shards_per_building;
                 $power_usage = 1 * round(1 * $num_buildings * $variant->calculatePowerUsage($clock_speed / 100) * $somersloop_power_amp * $plan_power_multiplier, 6);
                 $build_cost = $variant->recipe->map(function ($ingredient) use ($num_buildings) {
-                    return [$ingredient->name => $ingredient->pivot->qty * $num_buildings * $this->building_cost_multiplier];
+                    return [$ingredient->name => ceil($ingredient->pivot->qty * $num_buildings * $this->building_cost_multiplier)];
                 })->collapse();
                 $mj_per_s = $variant->calculatePowerUsage($clock_speed / 100);
                 $mj_per_min = $mj_per_s * 60;
