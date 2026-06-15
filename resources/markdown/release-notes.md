@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### 📐 Blueprint Planning & Quality of Life
+### 🔄 Circular Recipes, Solved
 
-- Plan your factory with blueprints, fine-tune costs, and enjoy a better mobile experience.
+- The planner now solves recipes that feed each other (recycled Plastic/Rubber loops) instead of dodging them — plus a per-output "Fill to 100%" and saved factories that keep your recipe choices.
 
-## v1.2.1 - Blueprint Planning Update
+## v1.2.2 - Circular Dependency Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -31,6 +31,16 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.2.2
+
+- 🔄 **Circular Recipes Solved** — Recipes that feed each other — like **Recycled Plastic ⇄ Recycled Rubber** — are now solved as a proper system of equations, keeping the recipes you chose. The planner works out exactly how much of each to make instead of silently swapping a recipe to dodge the loop.
+- 🎯 **Fill to 100%** — A new per-output button bumps an output up to the amount that runs its buildings at a clean 100% clock, without changing your other outputs.
+- 🧩 **Smarter Loop Handling** — When a loop genuinely can't be solved (e.g. packaging and immediately unpackaging the same fluid), the planner auto-sources it from a non-looping recipe and respects your intent: choosing **Unpackage Fuel** keeps that choice and sources Packaged Fuel elsewhere. You can also just **import** the looped item to break it yourself.
+- 🪲 Bug fix: Saved factories no longer revert their recipe choices on reload — sub-recipe selections now persist correctly.
+- 🛈 The alarming "Circular Dependencies Found" warning is now an informational **"Recipes auto-adjusted to resolve a loop"** note, with a hint to change the recipe or import the item.
+
+---
 
 ### v1.2.1
 
