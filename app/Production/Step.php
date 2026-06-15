@@ -37,13 +37,9 @@ class Step
             }
         }
 
-        // Forced-recipe fallback for cycles the solver does NOT own — degenerate /
-        // unsolvable loops (B43) and direct Step usage without loop detection. Skips
-        // products that are solved-loop members (handled by the solver instead).
-        if (! $parent) {
-            $step->overrideFavoritesIfNecessary();
-        }
-
+        // Last-resort terminator for cycles the solver/injection didn't resolve
+        // (V69 source injection is preemptive in ProductionCalculator; this remains
+        // for direct Step usage without loop detection). Swaps to a loop-free recipe.
         if (! $step->check()) {
             $step->useCompatibleRecipe();
         }

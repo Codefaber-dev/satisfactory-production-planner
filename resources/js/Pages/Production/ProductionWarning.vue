@@ -6,12 +6,13 @@
         @click="showWarnings = false"
     >
         <span class="flex items-center pb-2 font-semibold">
-            <span class="mr-2 flex-1">Circular Dependencies Found - Recipes Adjusted</span>
+            <span class="mr-2 flex-1">Recipes auto-adjusted to resolve a loop</span>
             <button @click="showWarnings = false" class="">⛔</button>
         </span>
         <div class="flex flex-col" v-for="(recipe, name) in overrides">
-            <span class="inline rounded-lg bg-rose-300 p-2 dark:bg-rose-800"> Recipe for {{ name }} overridden. </span>
-            <span class="inline rounded-lg bg-gray-200 p-2 dark:bg-gray-800"> </span>
+            <span class="inline rounded-lg bg-amber-200 p-2 dark:bg-amber-800">
+                {{ name }} auto-sourced to break a circular dependency (change it or import {{ name }} to override).
+            </span>
         </div>
     </div>
 </template>

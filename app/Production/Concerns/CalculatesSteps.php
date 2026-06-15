@@ -112,7 +112,7 @@ trait CalculatesSteps
                 ->map(fn ($ingredient) => $ingredient->name)
                 ->intersect($this->getChain())
                 ->isEmpty();
-        })->first();
+        })->sortBy('resource')->first();
 
         $description = $recipe->description ?? 'default';
 

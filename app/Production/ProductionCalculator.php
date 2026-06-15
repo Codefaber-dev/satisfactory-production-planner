@@ -185,15 +185,18 @@ class ProductionCalculator
 
     public function calculate(): void
     {
-        $loops = $this->activeLoops();
+        $detected = $this->detectLoops();
+        $loops = $detected['solvable'];
         $loopOf = $this->loopOfMap($loops);
+        $injectedOverrides = $detected['overrides']; // V69: product => Recipe (source injection)
+        $injectedImports = $detected['imports'];     // V69: products auto-imported to break a loop
 
         if (empty($loopOf)) {
-            // acyclic fast path — identical to pre-loop-solver behaviour
+            // acyclic fast path (+ any injected sources) — no solver iteration needed
             $this->steps = Step::make(
                 product: $this->product,
                 qty: $this->qty,
-                globals: $this->makeGlobals([], []),
+                globals: $this->makeGlobals([], [], $injectedOverrides, $injectedImports),
                 recipe: $this->recipe,
             );
 
@@ -206,7 +209,7 @@ class ProductionCalculator
         // contractive (B42: caterium's Plastic⇄Rubber feeds Fuel⇄Packaged Fuel).
         $gross = [];
         for ($iter = 0; $iter < self::MAX_LOOP_ITERATIONS; $iter++) {
-            $globals = $this->makeGlobals($loopOf, $gross);
+            $globals = $this->makeGlobals($loopOf, $gross, $injectedOverrides, $injectedImports);
 
             $this->steps = Step::make(
                 product: $this->product,
@@ -232,22 +235,28 @@ class ProductionCalculator
     }
 
     /**
-     * Active loops in this plan: SCCs of the selected-recipe subgraph (B41), gated
-     * by the precomputed candidate catalog. Byproduct-supplied products are treated
-     * as graph boundary (B43, Fix 1) so a spuriously-fused SCC — e.g. caterium's
-     * Empty Canister linking Plastic⇄Rubber to Fuel⇄Packaged Fuel — splits into the
-     * real, solvable loops. Each loop carries its members + selected-recipe data.
+     * Detect this plan's loops (SCCs of the selected-recipe subgraph, B41; byproduct-
+     * supplied products as boundary, B43) and partition them:
+     *  - solvable → handed to the linear solver (V58)
+     *  - unsolvable & sourceless → a source is *injected* (V69), replacing the old
+     *    hardcoded `overrideFavoritesIfNecessary`: swap the best non-user-chosen
+     *    member to its most-efficient loop-free alternate recipe, else auto-import.
+     *    A member already imported breaks the loop on its own → skip (B44).
+     *
+     * @return array{solvable: array, overrides: array<string, \App\Models\Recipe>, imports: array<int, string>}
      */
-    protected function activeLoops(): array
+    protected function detectLoops(): array
     {
+        $empty = ['solvable' => [], 'overrides' => [], 'imports' => []];
+
         if ($this->product->isRaw() || ! $this->recipe) {
-            return [];
+            return $empty;
         }
 
         $candidates = collect(LoopCatalog::all())->pluck('members')->flatten()->unique();
 
         if ($candidates->isEmpty()) {
-            return [];
+            return $empty;
         }
 
         $selection = $this->loopSelection();
@@ -269,8 +278,6 @@ class ProductionCalculator
                 'ingredients' => $recipe->ingredients->pluck('name')->all(),
             ];
 
-            // B43: products this recipe yields as a byproduct are supplied without
-            // running their own recipe — treat them as loop-graph boundary.
             foreach ($recipe->byproducts as $byproduct) {
                 $byproductSupplied[$byproduct->name] = true;
             }
@@ -278,7 +285,11 @@ class ProductionCalculator
 
         $clusters = LoopCatalog::detect($selectedRecipes, array_keys($byproductSupplied));
 
-        return collect($clusters)->map(function ($cluster) use ($recipeOf) {
+        $solvable = [];
+        $overrides = [];
+        $imports = [];
+
+        foreach ($clusters as $cluster) {
             $recipes = [];
             foreach ($cluster['members'] as $member) {
                 $recipes[$member] = [
@@ -289,15 +300,85 @@ class ProductionCalculator
                 ];
             }
 
-            return ['members' => $cluster['members'], 'recipes' => $recipes];
-        })->filter(function ($loop) {
-            // B43: keep only loops the linear solver can actually solve. Degenerate
-            // loops (e.g. singular 1:1 Fuel⇄Packaged Fuel) are dropped here and fall
-            // to the forced-recipe fallback (overrideFavoritesIfNecessary).
-            $probe = array_fill_keys($loop['members'], 1.0);
+            $probe = array_fill_keys($cluster['members'], 1.0);
+            if (LoopSolver::solve($cluster['members'], $recipes, $probe) !== null) {
+                $solvable[] = ['members' => $cluster['members'], 'recipes' => $recipes];
 
-            return LoopSolver::solve($loop['members'], $loop['recipes'], $probe) !== null;
-        })->values()->all();
+                continue;
+            }
+
+            // unsolvable: an imported member already breaks it (B44) → no injection
+            if (collect($cluster['members'])->contains(fn ($m) => collect($this->imports)->contains($m))) {
+                continue;
+            }
+
+            // V69: inject a source
+            $injection = $this->injectSource($cluster['members']);
+            if ($injection['recipe']) {
+                $overrides[$injection['product']] = $injection['recipe'];
+                $recipeName = $injection['recipe']->description ?? $injection['product'].' (base)';
+                $this->loop_warnings[] = "Auto-sourced {$injection['product']} via {$recipeName} to resolve loop: ".implode(' ⇄ ', $cluster['members']);
+            } elseif ($injection['import']) {
+                $imports[] = $injection['import'];
+                $this->loop_warnings[] = "Auto-imported {$injection['import']} to resolve loop: ".implode(' ⇄ ', $cluster['members']);
+            }
+        }
+
+        return compact('solvable', 'overrides', 'imports');
+    }
+
+    /**
+     * V69: choose how to inject a source into a sourceless loop. Prefer swapping a
+     * non-user-chosen member to its most-efficient loop-free alternate recipe (never
+     * silently swap an explicit user pick); else auto-import a member.
+     *
+     * @return array{product: ?string, recipe: ?\App\Models\Recipe, import: ?string}
+     */
+    protected function injectSource(array $members): array
+    {
+        $userPicked = $this->userPickedProducts();
+
+        // Prefer a self-contained recipe-swap (keeps producing) over auto-import.
+        // Among members with a loop-free alternate, pick the least-disruptive +
+        // cheapest: non-user-chosen first, then most resource-efficient swap.
+        $candidates = collect($members)
+            ->map(fn ($m) => ['product' => $m, 'recipe' => $this->loopFreeRecipe($m, $members)])
+            ->filter(fn ($c) => $c['recipe'] !== null)
+            ->sortBy([
+                fn ($c) => $userPicked->contains($c['product']) ? 1 : 0,
+                fn ($c) => (float) $c['recipe']->resource,
+            ])
+            ->values();
+
+        if ($candidates->isNotEmpty()) {
+            $best = $candidates->first();
+
+            return ['product' => $best['product'], 'recipe' => $best['recipe'], 'import' => null];
+        }
+
+        // no loop-free recipe for any member → auto-import (prefer a non-user-chosen one)
+        $importable = collect($members)->sortBy(fn ($m) => $userPicked->contains($m) ? 1 : 0)->first();
+
+        return ['product' => null, 'recipe' => null, 'import' => $importable];
+    }
+
+    /**
+     * Most resource-efficient recipe for $member whose ingredients don't re-enter the
+     * loop. Supersedes useCompatibleRecipe's arbitrary ->first().
+     */
+    protected function loopFreeRecipe(string $member, array $loopMembers): ?\App\Models\Recipe
+    {
+        return i($member)->recipes
+            ->filter(fn ($recipe) => $recipe->ingredients->pluck('name')->intersect($loopMembers)->isEmpty())
+            ->sortBy('resource')
+            ->first();
+    }
+
+    protected function userPickedProducts(): Collection
+    {
+        return collect($this->choices->keys())
+            ->merge(Favorites::getMappedFavorites($this->favorites)->keys())
+            ->unique();
     }
 
     protected function loopOfMap(array $loops): array
@@ -358,13 +439,13 @@ class ProductionCalculator
         return true;
     }
 
-    protected function makeGlobals(array $loopOf, array $gross): ProductionGlobals
+    protected function makeGlobals(array $loopOf, array $gross, array $extraOverrides = [], array $extraImports = []): ProductionGlobals
     {
         return ProductionGlobals::make(
             choices: $this->choices,
-            overrides: $this->overrides,
+            overrides: collect($this->overrides)->merge($extraOverrides),
             favorites: $this->favorites,
-            imports: $this->imports,
+            imports: collect($this->imports)->merge($extraImports)->values()->all(),
             byproducts: $this->byproducts,
             variant: $this->variant,
             used_byproducts: $this->used_byproducts,

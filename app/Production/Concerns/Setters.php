@@ -128,49 +128,4 @@ trait Setters
 
         $this->use_byproduct = $qty;
     }
-
-    /**
-     * Forced-recipe fallback (V58/B43) for degenerate loops the linear solver can't
-     * own — kept as a fallback, but SKIPPED for products that are solved-loop members
-     * (the solver handles those, keeping the user's recipes).
-     */
-    protected function overrideFavoritesIfNecessary(): void
-    {
-        $favorites = $this->getFavorites()->values()->pluck('description');
-
-        // The forced override only exists to break a loop. Skip it when the looped
-        // product is a solved-loop member (solver owns it) OR is imported (B44 — the
-        // import already breaks the loop; forcing a recipe would ignore the import
-        // and wrongly raise the "circular dependencies" banner).
-
-        // scenario 1, recycled rubber and recycled plastic
-        if ($favorites->contains('Recycled Rubber') && $favorites->contains('Recycled Plastic')
-            && ! $this->skipOverride('Rubber')) {
-            $this->addOverride('Rubber', r('Rubber'));
-        }
-
-        if ($favorites->contains('Recycled Rubber') && $this->getRecipe()->is(r('Recycled Plastic'))
-            && ! $this->skipOverride('Rubber')) {
-            $this->addOverride('Rubber', r('Rubber'));
-        }
-
-        if ($favorites->contains('Recycled Plastic') && $this->getRecipe()->is(r('Recycled Rubber'))
-            && ! $this->skipOverride('Plastic')) {
-            $this->addOverride('Plastic', r('Plastic'));
-        }
-
-        // scenario 2, packaged fuel (degenerate 1:1 Fuel⇄Packaged Fuel loop)
-        if (! $this->skipOverride('Packaged Fuel')
-            && $this->getIntermediateRecipe(i('Fuel'))->is(r('Unpackage Fuel'))
-            && $this->getIntermediateRecipe(i('Packaged Fuel'))->is(r('Packaged Fuel'))) {
-            $this->addOverride('Packaged Fuel', r('Diluted Packaged Fuel'));
-        }
-    }
-
-    // V58/B44: a forced loop-breaking override is unneeded (and wrong) when the
-    // product is a solved-loop member or is imported.
-    protected function skipOverride(string $product): bool
-    {
-        return $this->globals->isLoopMember($product) || $this->globals->isImported($product);
-    }
 }
