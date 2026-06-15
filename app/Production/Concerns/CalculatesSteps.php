@@ -58,6 +58,13 @@ trait CalculatesSteps
         $amplifier = $max_slots > 0 ? (1 + $somersloop_slots / $max_slots) : 1.0;
 
         $this->children = $this->ingredients->map(function ($ingredient) use ($amplifier) {
+            // V58: cut the back-edge into an already-visited loop member — the solver
+            // already accounts for this internal consumption, so recursing would
+            // double-count (and loop forever).
+            if ($this->globals->isLoopMember($ingredient->name) && $this->chain->contains($ingredient->name)) {
+                return null;
+            }
+
             // how many times per minute we need to make the recipe (somersloops amplify output)
             $multiplier = $this->qty / ($this->recipe->base_per_min * $amplifier);
 
@@ -73,7 +80,7 @@ trait CalculatesSteps
                 parent: $this->name,
                 chain: $this->chain
             );
-        });
+        })->filter();
     }
 
     protected function check(): bool

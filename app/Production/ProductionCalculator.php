@@ -189,10 +189,109 @@ class ProductionCalculator
                 imports: $this->imports,
                 byproducts: $this->byproducts,
                 variant: $this->variant,
-                used_byproducts: $this->used_byproducts
+                used_byproducts: $this->used_byproducts,
+                loop_gross: $this->rootLoopGross()
             ),
             recipe: $this->recipe,
         );
+    }
+
+    /**
+     * V58: when the output product itself sits in an active recipe loop, solve
+     * the loop for its members' gross output instead of forcing a substitute
+     * recipe. Returns [product => gross qty/min], or [] when not applicable.
+     */
+    protected function rootLoopGross(): array
+    {
+        if ($this->product->isRaw() || ! $this->recipe) {
+            return [];
+        }
+
+        // cheap gate: does the output product participate in any candidate loop?
+        $candidates = collect(LoopCatalog::all())->pluck('members')->flatten()->unique();
+
+        if (! $candidates->contains($this->product->name)) {
+            return [];
+        }
+
+        // detect the *active* loop by running SCC on the selected-recipe subgraph (B41):
+        // one effective recipe per candidate product, not the full catalog.
+        $selection = $this->loopSelection();
+        $selectedRecipes = [];
+        $recipeOf = [];
+
+        foreach ($candidates as $member) {
+            $recipe = isset($selection[$member]) ? r($selection[$member]) : i($member)->baseRecipe();
+
+            if (! $recipe) {
+                continue;
+            }
+
+            $recipeOf[$member] = $recipe;
+            $selectedRecipes[] = [
+                'product' => $member,
+                'recipe' => $recipe->description ?? $member,
+                'ingredients' => $recipe->ingredients->pluck('name')->all(),
+            ];
+        }
+
+        $cluster = collect(LoopCatalog::detect($selectedRecipes))
+            ->first(fn ($c) => in_array($this->product->name, $c['members'], true));
+
+        if (! $cluster) {
+            return [];
+        }
+
+        $recipes = [];
+        foreach ($cluster['members'] as $member) {
+            $recipes[$member] = [
+                'base_per_min' => (float) $recipeOf[$member]->base_per_min,
+                'inputs' => $recipeOf[$member]->ingredients->mapWithKeys(
+                    fn ($i) => [$i->name => (float) $i->pivot->base_qty]
+                )->all(),
+            ];
+        }
+
+        $demand = array_fill_keys($cluster['members'], 0.0);
+        $demand[$this->product->name] = (float) $this->qty;
+
+        $runRates = LoopSolver::solve($cluster['members'], $recipes, $demand);
+
+        if ($runRates === null) {
+            return [];
+        }
+
+        // solver returns run-rates (machine-equivalents); the Step engine wants
+        // gross output qty/min = run-rate × base_per_min.
+        $gross = [];
+        foreach ($runRates as $member => $rate) {
+            $gross[$member] = $rate * $recipes[$member]['base_per_min'];
+        }
+
+        return $gross;
+    }
+
+    /**
+     * Effective chosen recipe description per product (choice > favorite > root),
+     * used to decide which catalog loops are active.
+     */
+    protected function loopSelection(): array
+    {
+        $selection = [];
+
+        foreach (Favorites::getMappedFavorites($this->favorites) as $name => $recipe) {
+            $selection[$name] = $recipe->description ?? $name;
+        }
+
+        foreach ($this->choices as $name => $recipe) {
+            if ($recipe instanceof Recipe) {
+                $selection[$name] = $recipe->description ?? $name;
+            }
+        }
+
+        $selection[$this->product->name] = $this->recipe->description ?? $this->product->name;
+
+        return $selection;
     }
 
     public function getSteps(): Step

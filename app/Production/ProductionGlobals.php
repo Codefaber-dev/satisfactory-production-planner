@@ -27,7 +27,10 @@ class ProductionGlobals
 
     protected float $cost_multiplier = 1.0;
 
-    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts)
+    // V58: solver-computed gross output per loop member (product => qty/min). Empty unless a root loop was solved.
+    protected Collection $loop_gross;
+
+    public function __construct(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts, Collection|array $loop_gross = [])
     {
         $this->choices = collect($choices);
         $this->overrides = collect($overrides);
@@ -38,11 +41,12 @@ class ProductionGlobals
         $this->belt_speed = request('belt_speed', 780);
         $this->cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
         $this->used_byproducts = collect($used_byproducts);
+        $this->loop_gross = collect($loop_gross);
     }
 
-    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts): static
+    public static function make(Collection|array $choices, Collection|array $overrides, Collection|array|null $favorites, Collection|array $imports, Collection|array $byproducts, string $variant, Collection|array $used_byproducts, Collection|array $loop_gross = []): static
     {
-        return new static($choices, $overrides, $favorites, $imports, $byproducts, $variant, $used_byproducts);
+        return new static($choices, $overrides, $favorites, $imports, $byproducts, $variant, $used_byproducts, $loop_gross);
     }
 
     public static function fromArray(array $globals): static
@@ -54,8 +58,24 @@ class ProductionGlobals
             imports: $globals['imports'] ?? [],
             byproducts: $globals['byproducts'] ?? [],
             variant: $globals['variant'] ?? 'mk1',
-            used_byproducts: $globals['used_byproducts'] ?? []
+            used_byproducts: $globals['used_byproducts'] ?? [],
+            loop_gross: $globals['loop_gross'] ?? []
         );
+    }
+
+    public function isLoopMember(string $name): bool
+    {
+        return $this->loop_gross->has($name);
+    }
+
+    public function getLoopGross(string $name): float
+    {
+        return (float) $this->loop_gross->get($name);
+    }
+
+    public function hasSolvedLoop(): bool
+    {
+        return $this->loop_gross->isNotEmpty();
     }
 
     public function getCostMultiplier(): float

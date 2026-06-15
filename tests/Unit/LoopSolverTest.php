@@ -7,33 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class LoopSolverTest extends TestCase
 {
-    private array $catalog = [
-        [
-            'members' => ['Plastic', 'Rubber'],
-            'enabledBy' => [
-                ['product' => 'Plastic', 'recipe' => 'Recycled Plastic'],
-                ['product' => 'Rubber', 'recipe' => 'Recycled Rubber'],
-            ],
-        ],
-    ];
-
-    public function test_loop_active_when_selection_covers_enabling_set(): void
-    {
-        $selection = ['Plastic' => 'Recycled Plastic', 'Rubber' => 'Recycled Rubber'];
-
-        $active = LoopSolver::activeLoops($this->catalog, $selection);
-
-        $this->assertCount(1, $active);
-        $this->assertEqualsCanonicalizing(['Plastic', 'Rubber'], $active[0]['members']);
-    }
-
-    public function test_loop_inactive_when_only_one_alt_selected(): void
-    {
-        $selection = ['Plastic' => 'Recycled Plastic', 'Rubber' => 'Rubber'];
-
-        $this->assertSame([], LoopSolver::activeLoops($this->catalog, $selection));
-    }
-
     public function test_solves_2x2_plastic_rubber_run_rates(): void
     {
         $members = ['Plastic', 'Rubber'];

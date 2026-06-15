@@ -11,25 +11,6 @@ namespace App\Production;
 class LoopSolver
 {
     /**
-     * Loops whose enabling picks are all present in the selection.
-     *
-     * @param  array<int, array{members: array<int, string>, enabledBy: array<int, array{product: string, recipe: string}>}>  $catalog
-     * @param  array<string, string>  $selection  product => chosen recipe description
-     */
-    public static function activeLoops(array $catalog, array $selection): array
-    {
-        return array_values(array_filter($catalog, function ($cluster) use ($selection) {
-            foreach ($cluster['enabledBy'] as $pick) {
-                if (($selection[$pick['product']] ?? null) !== $pick['recipe']) {
-                    return false;
-                }
-            }
-
-            return true;
-        }));
-    }
-
-    /**
      * Solve the balance system A·x = demand for the cluster's recipe run-rates
      * (machine-equivalents at 100%). Each member is produced by exactly one
      * selected recipe. Returns product => run-rate, or null when the loop is

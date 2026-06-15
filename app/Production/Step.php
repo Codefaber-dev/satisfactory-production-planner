@@ -27,7 +27,15 @@ class Step
             ->setParent($parent)
             ->setChain($chain);
 
-        if (! $parent) {
+        // V58: a member of a solved loop produces at the solver-computed gross,
+        // not the parent-propagated demand.
+        if ($globals->isLoopMember($step->getName())) {
+            $step->setQty($globals->getLoopGross($step->getName()));
+        }
+
+        // When the root loop is solved, its recipes are kept as chosen — skip the
+        // legacy force-base override (Setters::overrideFavoritesIfNecessary).
+        if (! $parent && ! $globals->hasSolvedLoop()) {
             $step->overrideFavoritesIfNecessary();
         }
 

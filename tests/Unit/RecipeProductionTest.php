@@ -68,6 +68,10 @@ class RecipeProductionTest extends TestCase
     #[Test]
     public function it_can_handle_circular_dependencies()
     {
+        // V58: with both recycled recipes selected, the Plastic⇄Rubber loop is
+        // solved as a linear system (both recipes kept), not broken by forcing
+        // Plastic to its base recipe. 100 net Rubber needs 133.33 gross Rubber +
+        // 66.67 gross Plastic (the surplus is consumed internally by the loop).
         $production = ProductionCalculator::make(
             product: 'Rubber',
             qty: 100,
@@ -78,10 +82,10 @@ class RecipeProductionTest extends TestCase
             ]
         );
 
-        $this->assertEquals(100, $production->get('3.Rubber.total'));
-        $this->assertEquals(50, $production->get('2.Plastic.total'));
-        $this->assertEquals(50, $production->get('2.Fuel.total'));
-        $this->assertEquals(150, $production->get('1.Crude Oil.total'));
+        $this->assertEqualsWithDelta(133.3333, $production->get('3.Rubber.total'), 0.001);
+        $this->assertEqualsWithDelta(66.6667, $production->get('3.Plastic.total'), 0.001);
+        $this->assertEqualsWithDelta(100, $production->get('2.Fuel.total'), 0.001);
+        $this->assertEqualsWithDelta(150, $production->get('1.Crude Oil.total'), 0.001);
     }
 
     #[Test]
