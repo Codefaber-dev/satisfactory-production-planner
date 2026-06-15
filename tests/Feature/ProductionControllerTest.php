@@ -83,4 +83,62 @@ class ProductionControllerTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    #[Test]
+    public function show_restores_a_non_default_sub_recipe_choice_on_reload(): void
+    {
+        // V57 / issue #4: drive the controller exactly as a saved factory's Plan
+        // URL would (choices in the query), and assert the non-default sub-recipe
+        // pick survives the reload round-trip — not just the save payload (B39).
+        $url = '/dashboard/Computer/30/Computer?'.http_build_query([
+            'choices' => ['Circuit Board' => 'Caterium Circuit Board'],
+        ]);
+
+        $response = $this->get($url);
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Production/Show')
+            ->where('choices.Circuit Board', 'Caterium Circuit Board')
+        );
+    }
+
+    #[Test]
+    public function show_applies_the_restored_sub_recipe_to_the_production_tree(): void
+    {
+        // The reloaded plan must actually use the restored recipe: Caterium Circuit
+        // Board pulls Quickwire into the tree (the default Circuit Board does not).
+        $url = '/dashboard/Computer/30/Computer?'.http_build_query([
+            'choices' => ['Circuit Board' => 'Caterium Circuit Board'],
+        ]);
+
+        $response = $this->get($url);
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Production/Show')
+            ->where('production.all_materials.Quickwire', fn ($qty) => $qty > 0)
+        );
+    }
+
+    #[Test]
+    public function multi_restores_a_non_default_sub_recipe_choice_on_reload(): void
+    {
+        // Same restore guarantee on the multi-output route (shares baseData).
+        $url = '/dashboard/multi?'.http_build_query([
+            'product' => ['Computer'],
+            'yield' => [30],
+            'recipe' => ['Computer'],
+            'variant' => 'mk1',
+            'choices' => ['Circuit Board' => 'Caterium Circuit Board'],
+        ]);
+
+        $response = $this->get($url);
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Production/Show')
+            ->where('choices.Circuit Board', 'Caterium Circuit Board')
+        );
+    }
 }

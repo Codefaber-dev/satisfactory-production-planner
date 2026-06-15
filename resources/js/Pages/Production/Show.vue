@@ -504,8 +504,19 @@ export default {
 
     computed: {
         allChosenRecipes() {
+            // V57: capture every recipe actually in force in the production tree
+            // (incl. sub-recipes that match the current default), not just the
+            // user's explicit newChoices + top-level outputs — otherwise those
+            // picks are dropped on save and the factory reverts on reload (#4).
+            const treeRecipes = Object.fromEntries(
+                Object.values(this.overviews || {})
+                    .filter((o) => o.overview && o.overview.product && o.overview.recipe)
+                    .map((o) => [o.overview.product, o.overview.recipe])
+            );
+
             return Object.assign(
                 {},
+                treeRecipes,
                 this.newChoices,
                 Object.fromEntries(
                     this.form.outputs

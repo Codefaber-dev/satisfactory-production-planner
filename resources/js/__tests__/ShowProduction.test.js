@@ -372,3 +372,42 @@ describe('Show — T95/V55: per-output Fill to 100%', () => {
         expect(mockInertia.get).not.toHaveBeenCalled();
     });
 });
+
+describe('Show — T97/V57: allChosenRecipes captures in-force sub-recipes', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    const ov = (product, recipe, building) => ({
+        clock: 'c100',
+        selected_variant_name: 'mk1',
+        overviews: { c100: { building, details: { mk1: {} } } },
+        overview: { product, recipe, building },
+    });
+
+    const overviewsProp = {
+        'Iron Plate|Iron Plate': ov('Iron Plate', 'Iron Plate', 'Constructor'),
+        'Circuit Board|Caterium Circuit Board': ov('Circuit Board', 'Caterium Circuit Board', 'Assembler'),
+        'Screw|Cast Screw': ov('Screw', 'Cast Screw', 'Constructor'),
+    };
+
+    it('includes effective tree sub-recipes, not just newChoices + outputs', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: overviewsProp },
+        });
+
+        const chosen = wrapper.vm.allChosenRecipes;
+        // sub-recipes in force in the tree are captured even though the user
+        // never touched them via newChoices
+        expect(chosen['Circuit Board']).toBe('Caterium Circuit Board');
+        expect(chosen['Screw']).toBe('Cast Screw');
+    });
+
+    it('newChoices override tree recipes for the same product', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: overviewsProp },
+        });
+
+        wrapper.vm.newChoices = { 'Circuit Board': 'Circuit Board' };
+
+        expect(wrapper.vm.allChosenRecipes['Circuit Board']).toBe('Circuit Board');
+    });
+});
