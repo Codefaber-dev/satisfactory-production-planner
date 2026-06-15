@@ -23,6 +23,7 @@ class RecipeObserver
         Cache::forget("base_recipe.{$recipe->product_id}");
         Cache::forget("most_energy_efficient_recipe.{$recipe->product_id}");
         Cache::forget("most_resource_efficient_recipe.{$recipe->product_id}");
+        Cache::forget('loop_catalog');
 
         $this->flushProductionCalcKeys();
     }
