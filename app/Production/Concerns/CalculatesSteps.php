@@ -58,18 +58,29 @@ trait CalculatesSteps
         $amplifier = $max_slots > 0 ? (1 + $somersloop_slots / $max_slots) : 1.0;
 
         $this->children = $this->ingredients->map(function ($ingredient) use ($amplifier) {
-            // V58: cut the back-edge into an already-visited loop member — the solver
-            // already accounts for this internal consumption, so recursing would
-            // double-count (and loop forever).
-            if ($this->globals->isLoopMember($ingredient->name) && $this->chain->contains($ingredient->name)) {
-                return null;
-            }
+            $name = $ingredient->name;
 
             // how many times per minute we need to make the recipe (somersloops amplify output)
             $multiplier = $this->qty / ($this->recipe->base_per_min * $amplifier);
 
             // how much of the ingredient we need to make per minute
             $sub_qty = (float) $multiplier * $ingredient->pivot->base_qty * $this->globals->getCostMultiplier();
+
+            // V58: solved-loop members are handled by the linear solver.
+            if ($this->globals->isLoopMember($name)) {
+                // accumulate external demand — consumption by a step NOT in the same
+                // loop (the solver's input). Captured at the edge, so it holds even
+                // when the member is cut below.
+                if (! $this->globals->sameLoop($this->name, $name)) {
+                    $this->globals->addExternalDemand($name, $sub_qty);
+                }
+
+                // cut the back-edge (the solver accounts for internal consumption)
+                // and emit each member once at gross (later encounters cut).
+                if ($this->chain->contains($name) || $this->globals->wasEmitted($name)) {
+                    return null;
+                }
+            }
 
             // return a new production step
             return static::make(
@@ -85,10 +96,15 @@ trait CalculatesSteps
 
     protected function check(): bool
     {
-        // check the dependencies
+        // a cycle exists if this product already appears among its own ancestors
         return $this->getChain()->filter(fn ($val) => $val === $this->getName())->count() === 1;
     }
 
+    /**
+     * Fallback for cycles the linear solver does not handle (genuinely unsolvable /
+     * degenerate loops, e.g. the 1:1 Fuel⇄Packaged Fuel no-op, B43): swap to a
+     * recipe whose ingredients don't re-enter the chain.
+     */
     protected function useCompatibleRecipe(): void
     {
         $recipe = $this->getProduct()->recipes->filter(function (Recipe $recipe) {

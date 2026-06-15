@@ -130,31 +130,33 @@ class RecipeProductionTest extends TestCase
 
         $steps = $production->getSteps();
 
+        // V58/B43 hybrid: the Plastic⇄Rubber loop is SOLVED (both recipes kept, no
+        // forced override), while the degenerate 1:1 Fuel⇄Packaged Fuel loop is
+        // singular/unsolvable and falls back to the forced Diluted Packaged Fuel.
         $steps->assertImported('Caterium Ingot');
         $steps->assertImported('Copper Ingot');
-        $steps->assertOverride('Rubber', 'Rubber');
         $steps->assertOverride('Packaged Fuel', 'Diluted Packaged Fuel');
         $steps->assertIntermediateRecipe('Plastic', 'Recycled Plastic');
+        $steps->assertIntermediateRecipe('Rubber', 'Recycled Rubber');
         $steps->assertIntermediateRecipe('Quickwire', 'Fused Quickwire');
+
+        // no loops left unsolved (the degenerate one is handled by the fallback)
+        $this->assertSame([], $production->getLoopWarnings());
 
         $this->assertNull($production->get('1.Caterium Ore.total'));
         $this->assertNull($production->get('1.Copper Ore.total'));
+        $this->assertEquals(30, $production->get('5.Computer.total'));
 
-        $this->assertEqualsWithDelta(398.571, $production->get('1.Crude Oil.total'), 0.001);
-        $this->assertEqualsWithDelta(85.714, $production->get('1.Water.total'), 0.001);
+        $this->assertEqualsWithDelta(327.857, $production->get('1.Crude Oil.total'), 0.001);
+        $this->assertEqualsWithDelta(177.143, $production->get('1.Water.total'), 0.001);
         $this->assertEqualsWithDelta(77.857, $production->get('2.Caterium Ingot.total'), 0.001);
         $this->assertEqualsWithDelta(389.286, $production->get('2.Copper Ingot.total'), 0.001);
-        $this->assertEquals(0, $production->get('2.Heavy Oil Residue.total'));
-        $this->assertEqualsWithDelta(265.714, $production->get('2.Rubber.total'), 0.001);
-        $this->assertEquals(0, $production->get('2.Plastic.total'));
+        $this->assertEqualsWithDelta(88.571, $production->get('2.Heavy Oil Residue.total'), 0.001);
+        // Plastic⇄Rubber solved to gross (both recipes kept)
+        $this->assertEqualsWithDelta(348.571, $production->get('3.Plastic.total'), 0.001);
+        $this->assertEqualsWithDelta(354.286, $production->get('3.Rubber.total'), 0.001);
         $this->assertEqualsWithDelta(934.286, $production->get('3.Quickwire.total'), 0.001);
-        $this->assertEqualsWithDelta(171.429, $production->get('3.Plastic.total'), 0.001);
-        $this->assertEquals(0, $production->get('3.Empty Canister.total'));
-        $this->assertEqualsWithDelta(85.714, $production->get('4.Packaged Water.total'), 0.001);
         $this->assertEquals(120, $production->get('4.Circuit Board.total'));
-        $this->assertEqualsWithDelta(85.714, $production->get('5.Fuel.total'), 0.001);
-        $this->assertEqualsWithDelta(85.714, $production->get('5.Packaged Fuel.total'), 0.001);
-        $this->assertEquals(30, $production->get('5.Computer.total'));
     }
 
     public static function rawIngredientsData()

@@ -27,15 +27,20 @@ class Step
             ->setParent($parent)
             ->setChain($chain);
 
-        // V58: a member of a solved loop produces at the solver-computed gross,
-        // not the parent-propagated demand.
+        // V58: a solved-loop member is emitted once and produces at the solver's
+        // gross (once known); later encounters are cut in CalculatesSteps.
         if ($globals->isLoopMember($step->getName())) {
-            $step->setQty($globals->getLoopGross($step->getName()));
+            $globals->markEmitted($step->getName());
+
+            if ($globals->hasLoopGross($step->getName())) {
+                $step->setQty($globals->getLoopGross($step->getName()));
+            }
         }
 
-        // When the root loop is solved, its recipes are kept as chosen — skip the
-        // legacy force-base override (Setters::overrideFavoritesIfNecessary).
-        if (! $parent && ! $globals->hasSolvedLoop()) {
+        // Forced-recipe fallback for cycles the solver does NOT own — degenerate /
+        // unsolvable loops (B43) and direct Step usage without loop detection. Skips
+        // products that are solved-loop members (handled by the solver instead).
+        if (! $parent) {
             $step->overrideFavoritesIfNecessary();
         }
 

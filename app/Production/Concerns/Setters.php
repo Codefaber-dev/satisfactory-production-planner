@@ -129,25 +129,35 @@ trait Setters
         $this->use_byproduct = $qty;
     }
 
+    /**
+     * Forced-recipe fallback (V58/B43) for degenerate loops the linear solver can't
+     * own — kept as a fallback, but SKIPPED for products that are solved-loop members
+     * (the solver handles those, keeping the user's recipes).
+     */
     protected function overrideFavoritesIfNecessary(): void
     {
         $favorites = $this->getFavorites()->values()->pluck('description');
 
         // scenario 1, recycled rubber and recycled plastic
-        if ($favorites->contains('Recycled Rubber') && $favorites->contains('Recycled Plastic')) {
+        if ($favorites->contains('Recycled Rubber') && $favorites->contains('Recycled Plastic')
+            && ! $this->globals->isLoopMember('Rubber')) {
             $this->addOverride('Rubber', r('Rubber'));
         }
 
-        if ($favorites->contains('Recycled Rubber') && $this->getRecipe()->is(r('Recycled Plastic'))) {
+        if ($favorites->contains('Recycled Rubber') && $this->getRecipe()->is(r('Recycled Plastic'))
+            && ! $this->globals->isLoopMember('Rubber')) {
             $this->addOverride('Rubber', r('Rubber'));
         }
 
-        if ($favorites->contains('Recycled Plastic') && $this->getRecipe()->is(r('Recycled Rubber'))) {
+        if ($favorites->contains('Recycled Plastic') && $this->getRecipe()->is(r('Recycled Rubber'))
+            && ! $this->globals->isLoopMember('Plastic')) {
             $this->addOverride('Plastic', r('Plastic'));
         }
 
-        // scenario 2, packaged fuel
-        if ($this->getIntermediateRecipe(i('Fuel'))->is(r('Unpackage Fuel')) && $this->getIntermediateRecipe(i('Packaged Fuel'))->is(r('Packaged Fuel'))) {
+        // scenario 2, packaged fuel (degenerate 1:1 Fuel⇄Packaged Fuel loop)
+        if (! $this->globals->isLoopMember('Packaged Fuel')
+            && $this->getIntermediateRecipe(i('Fuel'))->is(r('Unpackage Fuel'))
+            && $this->getIntermediateRecipe(i('Packaged Fuel'))->is(r('Packaged Fuel'))) {
             $this->addOverride('Packaged Fuel', r('Diluted Packaged Fuel'));
         }
     }

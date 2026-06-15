@@ -159,23 +159,23 @@
         },
         "snapshot": {
             "totals": {
-                "1.Crude Oil": 398.5714,
-                "1.Water": 85.7143,
+                "1.Crude Oil": 327.8571,
+                "1.Water": 177.1429,
                 "2.Caterium Ingot": 77.8571,
                 "2.Copper Ingot": 389.2857,
-                "2.Heavy Oil Residue": 0,
-                "2.Plastic": 0,
-                "2.Rubber": 265.7143,
+                "2.Fuel": 174.2857,
+                "2.Heavy Oil Residue": 88.5714,
                 "3.Empty Canister": 0,
-                "3.Plastic": 171.4286,
+                "3.Plastic": 348.5714,
                 "3.Quickwire": 934.2857,
+                "3.Rubber": 354.2857,
                 "4.Circuit Board": 120,
-                "4.Packaged Water": 85.7143,
+                "4.Packaged Water": 177.1429,
                 "5.Computer": 30,
-                "5.Fuel": 85.7143,
-                "5.Packaged Fuel": 85.7143
+                "5.Fuel": 177.1429,
+                "5.Packaged Fuel": 177.1429
             },
-            "power": 945.6652
+            "power": 1292.7693
         }
     }
 }

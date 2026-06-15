@@ -13,6 +13,12 @@ class ProductionCalculator
 {
     use ParsesSteps;
 
+    // V58: cap on loop steady-state iterations (productive loops converge in a few)
+    protected const MAX_LOOP_ITERATIONS = 15;
+
+    // V58: warnings for loops that could not be solved (fell back to propagated demand)
+    protected array $loop_warnings = [];
+
     // supplied params
     protected Ingredient $product;
 
@@ -179,46 +185,75 @@ class ProductionCalculator
 
     public function calculate(): void
     {
-        $this->steps = Step::make(
-            product: $this->product,
-            qty: $this->qty,
-            globals: ProductionGlobals::make(
-                choices: $this->choices,
-                overrides: $this->overrides,
-                favorites: $this->favorites,
-                imports: $this->imports,
-                byproducts: $this->byproducts,
-                variant: $this->variant,
-                used_byproducts: $this->used_byproducts,
-                loop_gross: $this->rootLoopGross()
-            ),
-            recipe: $this->recipe,
-        );
+        $loops = $this->activeLoops();
+        $loopOf = $this->loopOfMap($loops);
+
+        if (empty($loopOf)) {
+            // acyclic fast path — identical to pre-loop-solver behaviour
+            $this->steps = Step::make(
+                product: $this->product,
+                qty: $this->qty,
+                globals: $this->makeGlobals([], []),
+                recipe: $this->recipe,
+            );
+
+            return;
+        }
+
+        // V58: iterate to steady state. Each pass measures external demand on loop
+        // members (incl. nested-loop demand once an upstream loop's gross is known),
+        // re-solves, and rebuilds — converging because productive loops are
+        // contractive (B42: caterium's Plastic⇄Rubber feeds Fuel⇄Packaged Fuel).
+        $gross = [];
+        for ($iter = 0; $iter < self::MAX_LOOP_ITERATIONS; $iter++) {
+            $globals = $this->makeGlobals($loopOf, $gross);
+
+            $this->steps = Step::make(
+                product: $this->product,
+                qty: $this->qty,
+                globals: $globals,
+                recipe: $this->recipe,
+            );
+
+            $external = $globals->getExternalDemand()->all();
+            if (isset($loopOf[$this->product->name])) {
+                // the requested output is itself external demand on the root member
+                $external[$this->product->name] = ($external[$this->product->name] ?? 0) + (float) $this->qty;
+            }
+
+            $next = $this->solveLoops($loops, $external);
+
+            if ($this->grossConverged($gross, $next)) {
+                return; // current tree was built with $gross ≈ $next
+            }
+
+            $gross = $next;
+        }
     }
 
     /**
-     * V58: when the output product itself sits in an active recipe loop, solve
-     * the loop for its members' gross output instead of forcing a substitute
-     * recipe. Returns [product => gross qty/min], or [] when not applicable.
+     * Active loops in this plan: SCCs of the selected-recipe subgraph (B41), gated
+     * by the precomputed candidate catalog. Byproduct-supplied products are treated
+     * as graph boundary (B43, Fix 1) so a spuriously-fused SCC — e.g. caterium's
+     * Empty Canister linking Plastic⇄Rubber to Fuel⇄Packaged Fuel — splits into the
+     * real, solvable loops. Each loop carries its members + selected-recipe data.
      */
-    protected function rootLoopGross(): array
+    protected function activeLoops(): array
     {
         if ($this->product->isRaw() || ! $this->recipe) {
             return [];
         }
 
-        // cheap gate: does the output product participate in any candidate loop?
         $candidates = collect(LoopCatalog::all())->pluck('members')->flatten()->unique();
 
-        if (! $candidates->contains($this->product->name)) {
+        if ($candidates->isEmpty()) {
             return [];
         }
 
-        // detect the *active* loop by running SCC on the selected-recipe subgraph (B41):
-        // one effective recipe per candidate product, not the full catalog.
         $selection = $this->loopSelection();
         $selectedRecipes = [];
         $recipeOf = [];
+        $byproductSupplied = [];
 
         foreach ($candidates as $member) {
             $recipe = isset($selection[$member]) ? r($selection[$member]) : i($member)->baseRecipe();
@@ -233,42 +268,114 @@ class ProductionCalculator
                 'recipe' => $recipe->description ?? $member,
                 'ingredients' => $recipe->ingredients->pluck('name')->all(),
             ];
+
+            // B43: products this recipe yields as a byproduct are supplied without
+            // running their own recipe — treat them as loop-graph boundary.
+            foreach ($recipe->byproducts as $byproduct) {
+                $byproductSupplied[$byproduct->name] = true;
+            }
         }
 
-        $cluster = collect(LoopCatalog::detect($selectedRecipes))
-            ->first(fn ($c) => in_array($this->product->name, $c['members'], true));
+        $clusters = LoopCatalog::detect($selectedRecipes, array_keys($byproductSupplied));
 
-        if (! $cluster) {
-            return [];
+        return collect($clusters)->map(function ($cluster) use ($recipeOf) {
+            $recipes = [];
+            foreach ($cluster['members'] as $member) {
+                $recipes[$member] = [
+                    'base_per_min' => (float) $recipeOf[$member]->base_per_min,
+                    'inputs' => $recipeOf[$member]->ingredients->mapWithKeys(
+                        fn ($i) => [$i->name => (float) $i->pivot->base_qty]
+                    )->all(),
+                ];
+            }
+
+            return ['members' => $cluster['members'], 'recipes' => $recipes];
+        })->filter(function ($loop) {
+            // B43: keep only loops the linear solver can actually solve. Degenerate
+            // loops (e.g. singular 1:1 Fuel⇄Packaged Fuel) are dropped here and fall
+            // to the forced-recipe fallback (overrideFavoritesIfNecessary).
+            $probe = array_fill_keys($loop['members'], 1.0);
+
+            return LoopSolver::solve($loop['members'], $loop['recipes'], $probe) !== null;
+        })->values()->all();
+    }
+
+    protected function loopOfMap(array $loops): array
+    {
+        $map = [];
+        foreach ($loops as $id => $loop) {
+            foreach ($loop['members'] as $member) {
+                $map[$member] = $id;
+            }
         }
 
-        $recipes = [];
-        foreach ($cluster['members'] as $member) {
-            $recipes[$member] = [
-                'base_per_min' => (float) $recipeOf[$member]->base_per_min,
-                'inputs' => $recipeOf[$member]->ingredients->mapWithKeys(
-                    fn ($i) => [$i->name => (float) $i->pivot->base_qty]
-                )->all(),
-            ];
-        }
+        return $map;
+    }
 
-        $demand = array_fill_keys($cluster['members'], 0.0);
-        $demand[$this->product->name] = (float) $this->qty;
-
-        $runRates = LoopSolver::solve($cluster['members'], $recipes, $demand);
-
-        if ($runRates === null) {
-            return [];
-        }
-
-        // solver returns run-rates (machine-equivalents); the Step engine wants
-        // gross output qty/min = run-rate × base_per_min.
+    /**
+     * Solve each loop for member gross output (run-rate × base_per_min) given the
+     * measured external demand. Unsolvable loops (singular / non-productive) are
+     * skipped with a warning — those members fall back to propagated demand.
+     */
+    protected function solveLoops(array $loops, array $external): array
+    {
         $gross = [];
-        foreach ($runRates as $member => $rate) {
-            $gross[$member] = $rate * $recipes[$member]['base_per_min'];
+
+        foreach ($loops as $loop) {
+            $demand = [];
+            foreach ($loop['members'] as $member) {
+                $demand[$member] = (float) ($external[$member] ?? 0);
+            }
+
+            $runRates = LoopSolver::solve($loop['members'], $loop['recipes'], $demand);
+
+            if ($runRates === null) {
+                $this->loop_warnings[] = 'Unsolvable loop, using fallback: '.implode(' / ', $loop['members']);
+
+                continue;
+            }
+
+            foreach ($runRates as $member => $rate) {
+                $gross[$member] = $rate * $loop['recipes'][$member]['base_per_min'];
+            }
         }
 
         return $gross;
+    }
+
+    protected function grossConverged(array $previous, array $next): bool
+    {
+        if (count($previous) !== count($next)) {
+            return false;
+        }
+
+        foreach ($next as $member => $value) {
+            if (! isset($previous[$member]) || abs($previous[$member] - $value) > 1e-6) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function makeGlobals(array $loopOf, array $gross): ProductionGlobals
+    {
+        return ProductionGlobals::make(
+            choices: $this->choices,
+            overrides: $this->overrides,
+            favorites: $this->favorites,
+            imports: $this->imports,
+            byproducts: $this->byproducts,
+            variant: $this->variant,
+            used_byproducts: $this->used_byproducts,
+            loop_of: $loopOf,
+            loop_gross: $gross,
+        );
+    }
+
+    public function getLoopWarnings(): array
+    {
+        return $this->loop_warnings;
     }
 
     /**
