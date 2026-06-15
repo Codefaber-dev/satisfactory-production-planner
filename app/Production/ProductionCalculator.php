@@ -313,7 +313,7 @@ class ProductionCalculator
             }
 
             // V69: inject a source
-            $injection = $this->injectSource($cluster['members']);
+            $injection = $this->injectSource($cluster['members'], $recipeOf);
             if ($injection['recipe']) {
                 $overrides[$injection['product']] = $injection['recipe'];
                 $recipeName = $injection['recipe']->description ?? $injection['product'].' (base)';
@@ -334,20 +334,22 @@ class ProductionCalculator
      *
      * @return array{product: ?string, recipe: ?\App\Models\Recipe, import: ?string}
      */
-    protected function injectSource(array $members): array
+    protected function injectSource(array $members, array $recipeOf): array
     {
         $userPicked = $this->userPickedProducts();
 
         // Prefer a self-contained recipe-swap (keeps producing) over auto-import.
-        // Among members with a loop-free alternate, pick the least-disruptive +
-        // cheapest: non-user-chosen first, then most resource-efficient swap.
+        // Among members with a loop-free alternate, pick the least-disruptive + cheapest:
+        //  1. preserve an unpackage choice — choosing "Unpackage X" deliberately sources
+        //     X from its packaged form, so re-source the PACKAGED member instead;
+        //  2. prefer non-user-chosen members;
+        //  3. then the most resource-efficient swap.
         $candidates = collect($members)
             ->map(fn ($m) => ['product' => $m, 'recipe' => $this->loopFreeRecipe($m, $members)])
             ->filter(fn ($c) => $c['recipe'] !== null)
-            ->sortBy([
-                fn ($c) => $userPicked->contains($c['product']) ? 1 : 0,
-                fn ($c) => (float) $c['recipe']->resource,
-            ])
+            ->sortBy(fn ($c) => ($this->unpackagesItself($c['product'], $recipeOf) ? 1e12 : 0)
+                + ($userPicked->contains($c['product']) ? 1e9 : 0)
+                + (float) $c['recipe']->resource)
             ->values();
 
         if ($candidates->isNotEmpty()) {
@@ -372,6 +374,19 @@ class ProductionCalculator
             ->filter(fn ($recipe) => $recipe->ingredients->pluck('name')->intersect($loopMembers)->isEmpty())
             ->sortBy('resource')
             ->first();
+    }
+
+    /**
+     * Is $member sourced by unpackaging its own packaged form (recipe consumes
+     * "Packaged <member>")? Such a pick deliberately externalizes the packaged
+     * form, so the loop should be broken on the packaged side, not here.
+     */
+    protected function unpackagesItself(string $member, array $recipeOf): bool
+    {
+        $recipe = $recipeOf[$member] ?? null;
+
+        return $recipe !== null
+            && $recipe->ingredients->contains(fn ($i) => $i->name === "Packaged {$member}");
     }
 
     protected function userPickedProducts(): Collection
