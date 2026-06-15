@@ -243,7 +243,7 @@ class ProductionCalculator
      *    member to its most-efficient loop-free alternate recipe, else auto-import.
      *    A member already imported breaks the loop on its own → skip (B44).
      *
-     * @return array{solvable: array, overrides: array<string, \App\Models\Recipe>, imports: array<int, string>}
+     * @return array{solvable: array, overrides: array<string, Recipe>, imports: array<int, string>}
      */
     protected function detectLoops(): array
     {
@@ -332,7 +332,7 @@ class ProductionCalculator
      * non-user-chosen member to its most-efficient loop-free alternate recipe (never
      * silently swap an explicit user pick); else auto-import a member.
      *
-     * @return array{product: ?string, recipe: ?\App\Models\Recipe, import: ?string}
+     * @return array{product: ?string, recipe: ?Recipe, import: ?string}
      */
     protected function injectSource(array $members, array $recipeOf): array
     {
@@ -368,7 +368,7 @@ class ProductionCalculator
      * Most resource-efficient recipe for $member whose ingredients don't re-enter the
      * loop. Supersedes useCompatibleRecipe's arbitrary ->first().
      */
-    protected function loopFreeRecipe(string $member, array $loopMembers): ?\App\Models\Recipe
+    protected function loopFreeRecipe(string $member, array $loopMembers): ?Recipe
     {
         return i($member)->recipes
             ->filter(fn ($recipe) => $recipe->ingredients->pluck('name')->intersect($loopMembers)->isEmpty())

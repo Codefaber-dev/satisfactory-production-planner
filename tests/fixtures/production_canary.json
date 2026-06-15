@@ -152,10 +152,7 @@
                 "Packaged Fuel": "Packaged Fuel",
                 "Quickwire": "Fused Quickwire"
             },
-            "imports": [
-                "Caterium Ingot",
-                "Copper Ingot"
-            ]
+            "imports": ["Caterium Ingot", "Copper Ingot"]
         },
         "snapshot": {
             "totals": {

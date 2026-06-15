@@ -510,7 +510,7 @@ export default {
             // picks are dropped on save and the factory reverts on reload (#4).
             const treeRecipes = Object.fromEntries(
                 Object.values(this.overviews || {})
-                    .filter((o) => o.overview && o.overview.product && o.overview.recipe)
+                    .filter((o) => o.overview?.product && o.overview.recipe)
                     .map((o) => [o.overview.product, o.overview.recipe])
             );
 

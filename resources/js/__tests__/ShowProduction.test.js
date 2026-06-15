@@ -398,7 +398,7 @@ describe('Show — T97/V57: allChosenRecipes captures in-force sub-recipes', () 
         // sub-recipes in force in the tree are captured even though the user
         // never touched them via newChoices
         expect(chosen['Circuit Board']).toBe('Caterium Circuit Board');
-        expect(chosen['Screw']).toBe('Cast Screw');
+        expect(chosen.Screw).toBe('Cast Screw');
     });
 
     it('newChoices override tree recipes for the same product', () => {
