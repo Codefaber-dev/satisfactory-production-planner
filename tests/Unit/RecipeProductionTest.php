@@ -159,6 +159,42 @@ class RecipeProductionTest extends TestCase
         $this->assertEquals(120, $production->get('4.Circuit Board.total'));
     }
 
+    #[Test]
+    public function importing_a_looped_product_suppresses_the_forced_override()
+    {
+        // B44: importing Packaged Fuel breaks the degenerate Fuel⇄Packaged Fuel loop,
+        // so the forced Diluted Packaged Fuel override must NOT fire — otherwise the
+        // import is ignored and the "Circular Dependencies Found" banner shows wrongly.
+        $production = ProductionCalculator::make(
+            product: 'Plastic',
+            qty: 60,
+            recipe: 'Recycled Plastic',
+            overrides: [],
+            favorites: [
+                'Fuel' => r('Unpackage Fuel'),
+                'Rubber' => r('Rubber'),
+            ],
+            imports: ['Packaged Fuel'],
+        );
+
+        $this->assertSame([], $production->getSteps()->getOverrides()->keys()->all());
+
+        // sanity: without the import, the fallback override still fires
+        $forced = ProductionCalculator::make(
+            product: 'Plastic',
+            qty: 60,
+            recipe: 'Recycled Plastic',
+            overrides: [],
+            favorites: [
+                'Fuel' => r('Unpackage Fuel'),
+                'Rubber' => r('Rubber'),
+            ],
+            imports: [],
+        );
+
+        $this->assertContains('Packaged Fuel', $forced->getSteps()->getOverrides()->keys()->all());
+    }
+
     public static function rawIngredientsData()
     {
         return [
