@@ -16,6 +16,7 @@ class IngredientObserver
         Cache::forget("base_recipe.{$ingredient->id}");
         Cache::forget("most_energy_efficient_recipe.{$ingredient->id}");
         Cache::forget("most_resource_efficient_recipe.{$ingredient->id}");
+        Cache::forget('loop_catalog');
 
         $this->flushProductionCalcKeys();
     }

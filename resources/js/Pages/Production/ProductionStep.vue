@@ -279,6 +279,15 @@
                             Output Extra
                         </button>
                         <button
+                            @click="fillOutput"
+                            :disabled="!canMaximize"
+                            :class="[canMaximize ? 'btn-emerald' : 'btn-gray opacity-20']"
+                            class="btn-sm"
+                            v-show="material.outputs?.final"
+                        >
+                            Fill to 100%
+                        </button>
+                        <button
                             @click="maximizeOutput(true)"
                             :disabled="!canMaximize"
                             :class="[canMaximize ? 'btn-emerald' : 'btn-gray opacity-20']"
@@ -463,22 +472,8 @@ export default {
             const ratio = newQty / qty;
             const delta = newQty - qty;
 
-            console.log({
-                qty,
-                max_clock_speed,
-                newQty,
-                ratio,
-                delta,
-            });
-
             // add additional output
             if (!scale) {
-                console.log('Adding Output', {
-                    product: this.name,
-                    recipe: this.recipe,
-                    qty: delta,
-                });
-
                 this.Bus.emit('AddOutput', {
                     product: this.name,
                     recipe: this.recipe,
@@ -492,6 +487,19 @@ export default {
                     ratio,
                 });
             }
+        },
+
+        // fill this output's buildings to whole 100%-clock machines, leaving other outputs untouched (V55)
+        fillOutput() {
+            const num_buildings = this.overview.selected_variant.num_buildings;
+            const max_clock_speed = this.overview.selected_variant.max_clock_speed;
+            const base_per_min = this.recipe.base_per_min;
+            const newQty = ((base_per_min * num_buildings * max_clock_speed) / 100).$round4();
+
+            this.Bus.emit('FillOutput', {
+                product: this.name,
+                qty: newQty,
+            });
         },
 
         flashDestination(dest) {

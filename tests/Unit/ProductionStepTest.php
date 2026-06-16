@@ -165,6 +165,10 @@ class ProductionStepTest extends TestCase
     #[Test]
     public function it_can_resolve_a_circular_dependency()
     {
+        // V69: the hardcoded override is gone. A direct Step (no ProductionCalculator
+        // loop detection / source injection) still resolves cycles via the
+        // useCompatibleRecipe fallback — swapping a loop-free recipe for the
+        // re-entrant step — without infinite recursion and without an override.
         $step = Step::make(
             product: 'Rubber',
             qty: 5,
@@ -177,23 +181,9 @@ class ProductionStepTest extends TestCase
             ]
         );
 
-        $step->assertOverride('Plastic', 'Plastic');
         $step->assertRecipe('Recycled Rubber');
-
-        $step = Step::make(
-            product: 'Plastic',
-            qty: 5,
-            recipe: 'Recycled Plastic',
-            globals: [
-                'overrides' => [],
-                'favorites' => [
-                    'Plastic' => r('Recycled Rubber'),
-                ],
-            ]
-        );
-
-        $step->assertOverride('Rubber', 'Rubber');
-        $step->assertRecipe('Recycled Plastic');
+        $step->assertIntermediateRecipe('Plastic', 'Recycled Plastic');
+        $this->assertEmpty($step->getOverrides()->all());
 
         $step = Step::make(
             product: 'Fuel',
@@ -207,8 +197,8 @@ class ProductionStepTest extends TestCase
             ]
         );
 
-        $step->assertOverride('Packaged Fuel', 'Diluted Packaged Fuel');
         $step->assertRecipe('Unpackage Fuel');
+        $this->assertEmpty($step->getOverrides()->all());
     }
 
     #[Test]

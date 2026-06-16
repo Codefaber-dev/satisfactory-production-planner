@@ -27,10 +27,19 @@ class Step
             ->setParent($parent)
             ->setChain($chain);
 
-        if (! $parent) {
-            $step->overrideFavoritesIfNecessary();
+        // V58: a solved-loop member is emitted once and produces at the solver's
+        // gross (once known); later encounters are cut in CalculatesSteps.
+        if ($globals->isLoopMember($step->getName())) {
+            $globals->markEmitted($step->getName());
+
+            if ($globals->hasLoopGross($step->getName())) {
+                $step->setQty($globals->getLoopGross($step->getName()));
+            }
         }
 
+        // Last-resort terminator for cycles the solver/injection didn't resolve
+        // (V69 source injection is preemptive in ProductionCalculator; this remains
+        // for direct Step usage without loop detection). Swaps to a loop-free recipe.
         if (! $step->check()) {
             $step->useCompatibleRecipe();
         }

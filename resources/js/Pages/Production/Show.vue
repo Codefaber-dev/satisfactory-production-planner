@@ -405,6 +405,10 @@ export default {
 
             this.fetch();
         });
+
+        this.Bus.on('FillOutput', ({ product, qty }) => {
+            this.fillOutput(product, qty);
+        });
     },
 
     props: [
@@ -500,8 +504,19 @@ export default {
 
     computed: {
         allChosenRecipes() {
+            // V57: capture every recipe actually in force in the production tree
+            // (incl. sub-recipes that match the current default), not just the
+            // user's explicit newChoices + top-level outputs — otherwise those
+            // picks are dropped on save and the factory reverts on reload (#4).
+            const treeRecipes = Object.fromEntries(
+                Object.values(this.overviews || {})
+                    .filter((o) => o.overview?.product && o.overview.recipe)
+                    .map((o) => [o.overview.product, o.overview.recipe])
+            );
+
             return Object.assign(
                 {},
+                treeRecipes,
                 this.newChoices,
                 Object.fromEntries(
                     this.form.outputs
@@ -734,6 +749,14 @@ export default {
 
         updateYield(name, qty) {
             this.form.outputs.find((o) => o.product.name === name).yield = qty;
+        },
+
+        // set a single output's yield to its 100%-fill value, leaving all other outputs untouched (V55)
+        fillOutput(name, qty) {
+            if (!this.form.outputs.some((o) => o.product && o.product.name === name)) return;
+
+            this.updateYield(name, (+qty).$round4());
+            this.fetch();
         },
 
         pushOutput({ qty, product, recipe }) {

@@ -68,6 +68,10 @@ class RecipeProductionTest extends TestCase
     #[Test]
     public function it_can_handle_circular_dependencies()
     {
+        // V58: with both recycled recipes selected, the Plastic⇄Rubber loop is
+        // solved as a linear system (both recipes kept), not broken by forcing
+        // Plastic to its base recipe. 100 net Rubber needs 133.33 gross Rubber +
+        // 66.67 gross Plastic (the surplus is consumed internally by the loop).
         $production = ProductionCalculator::make(
             product: 'Rubber',
             qty: 100,
@@ -78,10 +82,10 @@ class RecipeProductionTest extends TestCase
             ]
         );
 
-        $this->assertEquals(100, $production->get('3.Rubber.total'));
-        $this->assertEquals(50, $production->get('2.Plastic.total'));
-        $this->assertEquals(50, $production->get('2.Fuel.total'));
-        $this->assertEquals(150, $production->get('1.Crude Oil.total'));
+        $this->assertEqualsWithDelta(133.3333, $production->get('3.Rubber.total'), 0.001);
+        $this->assertEqualsWithDelta(66.6667, $production->get('3.Plastic.total'), 0.001);
+        $this->assertEqualsWithDelta(100, $production->get('2.Fuel.total'), 0.001);
+        $this->assertEqualsWithDelta(150, $production->get('1.Crude Oil.total'), 0.001);
     }
 
     #[Test]
@@ -126,31 +130,71 @@ class RecipeProductionTest extends TestCase
 
         $steps = $production->getSteps();
 
+        // V58/V69: the Plastic⇄Rubber loop is SOLVED (both recipes kept). The degenerate
+        // 1:1 Fuel⇄Packaged Fuel loop is sourceless → a source is injected (V69), and
+        // because Unpackage Fuel is a deliberate "Packaged Fuel comes from elsewhere"
+        // signal, the injection re-sources the PACKAGED member (Diluted Packaged Fuel)
+        // and KEEPS Unpackage Fuel.
         $steps->assertImported('Caterium Ingot');
         $steps->assertImported('Copper Ingot');
-        $steps->assertOverride('Rubber', 'Rubber');
-        $steps->assertOverride('Packaged Fuel', 'Diluted Packaged Fuel');
         $steps->assertIntermediateRecipe('Plastic', 'Recycled Plastic');
+        $steps->assertIntermediateRecipe('Rubber', 'Recycled Rubber');
         $steps->assertIntermediateRecipe('Quickwire', 'Fused Quickwire');
+        $steps->assertIntermediateRecipe('Fuel', 'Unpackage Fuel');         // unpackage choice preserved
+        $steps->assertIntermediateRecipe('Packaged Fuel', 'Diluted Packaged Fuel'); // packaged member re-sourced
+
+        $this->assertNotEmpty($production->getLoopWarnings());
 
         $this->assertNull($production->get('1.Caterium Ore.total'));
         $this->assertNull($production->get('1.Copper Ore.total'));
+        $this->assertEquals(30, $production->get('5.Computer.total'));
 
-        $this->assertEqualsWithDelta(398.571, $production->get('1.Crude Oil.total'), 0.001);
-        $this->assertEqualsWithDelta(85.714, $production->get('1.Water.total'), 0.001);
+        $this->assertEqualsWithDelta(327.857, $production->get('1.Crude Oil.total'), 0.001);
+        $this->assertEqualsWithDelta(177.143, $production->get('1.Water.total'), 0.001);
         $this->assertEqualsWithDelta(77.857, $production->get('2.Caterium Ingot.total'), 0.001);
         $this->assertEqualsWithDelta(389.286, $production->get('2.Copper Ingot.total'), 0.001);
-        $this->assertEquals(0, $production->get('2.Heavy Oil Residue.total'));
-        $this->assertEqualsWithDelta(265.714, $production->get('2.Rubber.total'), 0.001);
-        $this->assertEquals(0, $production->get('2.Plastic.total'));
+        $this->assertEqualsWithDelta(88.571, $production->get('2.Heavy Oil Residue.total'), 0.001);
+        // Plastic⇄Rubber solved to gross (both recipes kept)
+        $this->assertEqualsWithDelta(348.571, $production->get('3.Plastic.total'), 0.001);
+        $this->assertEqualsWithDelta(354.286, $production->get('3.Rubber.total'), 0.001);
         $this->assertEqualsWithDelta(934.286, $production->get('3.Quickwire.total'), 0.001);
-        $this->assertEqualsWithDelta(171.429, $production->get('3.Plastic.total'), 0.001);
-        $this->assertEquals(0, $production->get('3.Empty Canister.total'));
-        $this->assertEqualsWithDelta(85.714, $production->get('4.Packaged Water.total'), 0.001);
         $this->assertEquals(120, $production->get('4.Circuit Board.total'));
-        $this->assertEqualsWithDelta(85.714, $production->get('5.Fuel.total'), 0.001);
-        $this->assertEqualsWithDelta(85.714, $production->get('5.Packaged Fuel.total'), 0.001);
-        $this->assertEquals(30, $production->get('5.Computer.total'));
+    }
+
+    #[Test]
+    public function importing_a_looped_product_suppresses_the_forced_override()
+    {
+        // B44: importing Packaged Fuel breaks the degenerate Fuel⇄Packaged Fuel loop,
+        // so the forced Diluted Packaged Fuel override must NOT fire — otherwise the
+        // import is ignored and the "Circular Dependencies Found" banner shows wrongly.
+        $production = ProductionCalculator::make(
+            product: 'Plastic',
+            qty: 60,
+            recipe: 'Recycled Plastic',
+            overrides: [],
+            favorites: [
+                'Fuel' => r('Unpackage Fuel'),
+                'Rubber' => r('Rubber'),
+            ],
+            imports: ['Packaged Fuel'],
+        );
+
+        $this->assertSame([], $production->getSteps()->getOverrides()->keys()->all());
+
+        // sanity: without the import, the fallback override still fires
+        $forced = ProductionCalculator::make(
+            product: 'Plastic',
+            qty: 60,
+            recipe: 'Recycled Plastic',
+            overrides: [],
+            favorites: [
+                'Fuel' => r('Unpackage Fuel'),
+                'Rubber' => r('Rubber'),
+            ],
+            imports: [],
+        );
+
+        $this->assertContains('Packaged Fuel', $forced->getSteps()->getOverrides()->keys()->all());
     }
 
     public static function rawIngredientsData()

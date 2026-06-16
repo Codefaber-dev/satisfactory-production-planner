@@ -328,3 +328,86 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
         expect(params.power_multiplier).toBe(0.5);
     });
 });
+
+describe('Show — T95/V55: per-output Fill to 100%', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    const wire = { id: 2, name: 'Wire', recipes: [] };
+    const wireRecipe = { id: 20, description: null, alt_recipe: false, product: wire, product_id: 2, favorite: false };
+
+    function makeMultiWrapper() {
+        return makeWrapper({
+            products: [ironPlate, wire],
+            recipes: { 'Iron Plate': [baseRecipe], Wire: [wireRecipe] },
+            multi: {
+                products: [ironPlate, wire],
+                yields: [25, 20],
+                recipes: [baseRecipe, wireRecipe],
+            },
+        });
+    }
+
+    it('fillOutput sets only the targeted output yield; other outputs untouched', () => {
+        const wrapper = makeMultiWrapper();
+
+        wrapper.vm.fillOutput('Iron Plate', 40);
+
+        const yieldOf = (name) => wrapper.vm.form.outputs.find((o) => o.product.name === name).yield;
+        expect(yieldOf('Iron Plate')).toBe(40);
+        expect(yieldOf('Wire')).toBe(20);
+    });
+
+    it('fillOutput triggers a fetch', () => {
+        const wrapper = makeMultiWrapper();
+
+        wrapper.vm.fillOutput('Iron Plate', 40);
+
+        expect(mockInertia.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('fillOutput on an unknown product is a no-op (no throw, no fetch)', () => {
+        const wrapper = makeMultiWrapper();
+
+        expect(() => wrapper.vm.fillOutput('Nonexistent', 99)).not.toThrow();
+        expect(mockInertia.get).not.toHaveBeenCalled();
+    });
+});
+
+describe('Show — T97/V57: allChosenRecipes captures in-force sub-recipes', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    const ov = (product, recipe, building) => ({
+        clock: 'c100',
+        selected_variant_name: 'mk1',
+        overviews: { c100: { building, details: { mk1: {} } } },
+        overview: { product, recipe, building },
+    });
+
+    const overviewsProp = {
+        'Iron Plate|Iron Plate': ov('Iron Plate', 'Iron Plate', 'Constructor'),
+        'Circuit Board|Caterium Circuit Board': ov('Circuit Board', 'Caterium Circuit Board', 'Assembler'),
+        'Screw|Cast Screw': ov('Screw', 'Cast Screw', 'Constructor'),
+    };
+
+    it('includes effective tree sub-recipes, not just newChoices + outputs', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: overviewsProp },
+        });
+
+        const chosen = wrapper.vm.allChosenRecipes;
+        // sub-recipes in force in the tree are captured even though the user
+        // never touched them via newChoices
+        expect(chosen['Circuit Board']).toBe('Caterium Circuit Board');
+        expect(chosen.Screw).toBe('Cast Screw');
+    });
+
+    it('newChoices override tree recipes for the same product', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: overviewsProp },
+        });
+
+        wrapper.vm.newChoices = { 'Circuit Board': 'Circuit Board' };
+
+        expect(wrapper.vm.allChosenRecipes['Circuit Board']).toBe('Circuit Board');
+    });
+});

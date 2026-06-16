@@ -128,27 +128,4 @@ trait Setters
 
         $this->use_byproduct = $qty;
     }
-
-    protected function overrideFavoritesIfNecessary(): void
-    {
-        $favorites = $this->getFavorites()->values()->pluck('description');
-
-        // scenario 1, recycled rubber and recycled plastic
-        if ($favorites->contains('Recycled Rubber') && $favorites->contains('Recycled Plastic')) {
-            $this->addOverride('Rubber', r('Rubber'));
-        }
-
-        if ($favorites->contains('Recycled Rubber') && $this->getRecipe()->is(r('Recycled Plastic'))) {
-            $this->addOverride('Rubber', r('Rubber'));
-        }
-
-        if ($favorites->contains('Recycled Plastic') && $this->getRecipe()->is(r('Recycled Rubber'))) {
-            $this->addOverride('Plastic', r('Plastic'));
-        }
-
-        // scenario 2, packaged fuel
-        if ($this->getIntermediateRecipe(i('Fuel'))->is(r('Unpackage Fuel')) && $this->getIntermediateRecipe(i('Packaged Fuel'))->is(r('Packaged Fuel'))) {
-            $this->addOverride('Packaged Fuel', r('Diluted Packaged Fuel'));
-        }
-    }
 }

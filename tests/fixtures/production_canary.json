@@ -1,0 +1,178 @@
+{
+    "iron_plate": {
+        "plan": {
+            "product": "Iron Plate",
+            "qty": 30
+        },
+        "snapshot": {
+            "totals": {
+                "1.Iron Ore": 45,
+                "2.Iron Ingot": 45,
+                "3.Iron Plate": 30
+            },
+            "power": 10.9386
+        }
+    },
+    "reinforced_iron_plate": {
+        "plan": {
+            "product": "Reinforced Iron Plate",
+            "qty": 30
+        },
+        "snapshot": {
+            "totals": {
+                "1.Iron Ore": 360,
+                "2.Iron Ingot": 360,
+                "3.Iron Plate": 180,
+                "3.Iron Rod": 90,
+                "4.Screw": 360,
+                "5.Reinforced Iron Plate": 30
+            },
+            "power": 234
+        }
+    },
+    "modular_frame": {
+        "plan": {
+            "product": "Modular Frame",
+            "qty": 10
+        },
+        "snapshot": {
+            "totals": {
+                "1.Iron Ore": 240,
+                "2.Iron Ingot": 240,
+                "3.Iron Plate": 90,
+                "3.Iron Rod": 105,
+                "4.Screw": 180,
+                "5.Reinforced Iron Plate": 15,
+                "6.Modular Frame": 10
+            },
+            "power": 214.7994
+        }
+    },
+    "rotor": {
+        "plan": {
+            "product": "Rotor",
+            "qty": 20
+        },
+        "snapshot": {
+            "totals": {
+                "1.Iron Ore": 225,
+                "2.Iron Ingot": 225,
+                "3.Iron Rod": 225,
+                "4.Rotor": 20,
+                "4.Screw": 500
+            },
+            "power": 213.7558
+        }
+    },
+    "computer": {
+        "plan": {
+            "product": "Computer",
+            "qty": 30
+        },
+        "snapshot": {
+            "totals": {
+                "1.Copper Ore": 720,
+                "1.Crude Oil": 1440,
+                "2.Copper Ingot": 720,
+                "2.Plastic": 960,
+                "3.Copper Sheet": 240,
+                "3.Wire": 480,
+                "4.Cable": 240,
+                "4.Circuit Board": 120,
+                "5.Computer": 30
+            },
+            "power": 2628
+        }
+    },
+    "quickwire_fused": {
+        "plan": {
+            "product": "Quickwire",
+            "qty": 1740,
+            "recipe": "Fused Quickwire"
+        },
+        "snapshot": {
+            "totals": {
+                "1.Caterium Ore": 435,
+                "1.Copper Ore": 725,
+                "2.Caterium Ingot": 145,
+                "2.Copper Ingot": 725,
+                "3.Quickwire": 1740
+            },
+            "power": 420.7167
+        }
+    },
+    "root_loop_rubber": {
+        "plan": {
+            "product": "Rubber",
+            "qty": 100,
+            "recipe": "Recycled Rubber",
+            "favorites": {
+                "Plastic": "Recycled Plastic"
+            }
+        },
+        "snapshot": {
+            "totals": {
+                "1.Crude Oil": 150,
+                "2.Fuel": 100,
+                "3.Plastic": 66.6667,
+                "3.Rubber": 133.3333
+            },
+            "power": 158.8385
+        }
+    },
+    "root_loop_plastic": {
+        "plan": {
+            "product": "Plastic",
+            "qty": 100,
+            "recipe": "Recycled Plastic",
+            "favorites": {
+                "Rubber": "Recycled Rubber"
+            }
+        },
+        "snapshot": {
+            "totals": {
+                "1.Crude Oil": 150,
+                "2.Fuel": 100,
+                "3.Plastic": 133.3333,
+                "3.Rubber": 66.6667
+            },
+            "power": 158.8385
+        }
+    },
+    "caterium_computer": {
+        "plan": {
+            "product": "Computer",
+            "qty": 30,
+            "recipe": "Caterium Computer",
+            "favorites": {
+                "Circuit Board": "Caterium Circuit Board",
+                "Plastic": "Recycled Plastic",
+                "Rubber": "Recycled Rubber",
+                "Fuel": "Unpackage Fuel",
+                "Packaged Fuel": "Packaged Fuel",
+                "Quickwire": "Fused Quickwire"
+            },
+            "imports": ["Caterium Ingot", "Copper Ingot"]
+        },
+        "snapshot": {
+            "totals": {
+                "1.Crude Oil": 327.8571,
+                "1.Water": 177.1429,
+                "2.Caterium Ingot": 77.8571,
+                "2.Copper Ingot": 389.2857,
+                "2.Fuel": 174.2857,
+                "2.Heavy Oil Residue": 88.5714,
+                "3.Empty Canister": 0,
+                "3.Plastic": 348.5714,
+                "3.Quickwire": 934.2857,
+                "3.Rubber": 354.2857,
+                "4.Circuit Board": 120,
+                "4.Packaged Water": 177.1429,
+                "5.Computer": 30,
+                "5.Fuel": 177.1429,
+                "5.Packaged Fuel": 177.1429
+            },
+            "power": 1292.7693
+        }
+    }
+}
