@@ -30,6 +30,13 @@
                                 </span>
                             </div>
                             <span class="font-light"> {{ formatQty(qty) }} </span>
+                            <!-- V64: import note — only for a raw actually imported (import mode) -->
+                            <span
+                                v-if="importNotes[name] && material.raw && (rawSources[name]?.mode ?? 'import') === 'import'"
+                                class="import-note text-xs font-normal italic text-slate-600 dark:text-slate-300"
+                            >
+                                📝 {{ importNotes[name] }}
+                            </span>
                         </div>
                     </div>
 
@@ -88,6 +95,13 @@
                                 <span v-if="newImports[ingr]" class="rounded-lg bg-green-300 px-2 py-1 text-xs">
                                     Imported
                                 </span>
+                                <!-- V64: import note — only when this ingredient is imported -->
+                                <span
+                                    v-if="newImports[ingr] && importNotes[ingr]"
+                                    class="import-note block text-xs font-normal italic text-slate-500 dark:text-slate-400"
+                                >
+                                    📝 {{ importNotes[ingr] }}
+                                </span>
                                 <span
                                     :class="
                                         rateModified
@@ -98,8 +112,8 @@
                                     {{ formatQty(in_qty) }}<template v-if="rateModified"> *</template>
                                     <template v-if="usesByproduct(ingr)"> ({{ getByproductUsed(ingr) }}) </template>
                                 </span>
-                                <span class="font-light italic">
-                                    {{ Math.round((100 * 100 * in_qty) / getDenominator(ingr)) / 100 }}%
+                                <span v-if="usagePercent(in_qty, ingr) !== null" class="font-light italic">
+                                    {{ usagePercent(in_qty, ingr) }}%
                                 </span>
                             </div>
                         </div>
@@ -137,6 +151,14 @@
                                     {{ byproduct }}
                                     <span v-if="overridden" class="rounded-lg bg-amber-300 px-2 py-1 text-xs">
                                         Override
+                                    </span>
+                                    <!-- V66: recycled-byproduct indicator -->
+                                    <span
+                                        v-if="recycledPoints(byproduct)"
+                                        data-test="recycled-badge"
+                                        class="rounded-lg bg-emerald-300 px-2 py-1 text-xs"
+                                    >
+                                        ♻️ {{ Math.round(recycledPoints(byproduct)).toLocaleString() }} pts
                                     </span>
                                 </span>
                                 <span class="font-light"> {{ +qty.toFixed(4) }} </span>
@@ -196,7 +218,16 @@
             </td>
 
             <td class="block p-2 lg:table-cell">
-                <template v-if="recipe && recipes[name]">
+                <!-- raw step (V73): source-mode controls take the Max-Clock slot -->
+                <raw-source-control
+                    v-if="material.raw"
+                    :name="name"
+                    :config="rawSources[name] || {}"
+                    :recipe-options="recipes[name] || []"
+                    :extractor="extractor"
+                    @update="$emit('updateRawSource', $event)"
+                />
+                <template v-else-if="recipe && recipes[name]">
                     <span class="flex flex-wrap items-center justify-end gap-2">
                         {{ overview.details[selectedVariantName].num_buildings }}x {{ selectedVariantName }} @{{ overview.details[selectedVariantName].clock_speed }}% [{{ Math.round(overview.details[selectedVariantName].power_usage) }}
                             MW]
@@ -311,7 +342,9 @@
                 </template>
             </td>
         </tr>
-        <tr class="block lg:table-row" v-if="recipe" v-show="diagrams">
+        <!-- gate on overview presence: a recipe-bearing raw (V79) can lack an overview
+             entry transiently while its source mode changes — don't crash (B49) -->
+        <tr class="block lg:table-row" v-if="recipe && overview" v-show="diagrams">
             <td class="block text-center lg:table-cell" colspan="100">
                 <build-diagram :footprint="footprint" />
             </td>
@@ -321,13 +354,15 @@
 <script>
 import BuildDiagram from '@/Pages/Production/BuildDiagram';
 import RecipePicker from '@/Components/RecipePicker';
+import RawSourceControl from '@/Pages/Production/RawSourceControl.vue';
 import store from '@/store';
 import { DESIGNER_DIMS, groupedFootprint } from '@/blueprintFootprint';
+import { fillTargetQty } from '@/Pages/Production/fillTarget';
 import CloudImage from '../../Components/CloudImage.vue';
 
 export default {
     name: 'ProductionStep',
-    components: { CloudImage, BuildDiagram, RecipePicker },
+    components: { CloudImage, BuildDiagram, RecipePicker, RawSourceControl },
     props: {
         choices: {},
         diagrams: {},
@@ -345,6 +380,21 @@ export default {
         finished: {},
         somersloopSlots: {
             default: () => ({}),
+        },
+        rawSources: {
+            default: () => ({}),
+        },
+        // V64: map ingredient → import note
+        importNotes: {
+            default: () => ({}),
+        },
+        // V66/V67: recycling result { points, recycled, packaged, waste }
+        recycling: {
+            default: null,
+        },
+        // extract-mode raws → extractor rows {product, building, num_buildings} (V62/V76)
+        extractors: {
+            default: () => [],
         },
         costMultiplier: {
             type: Number,
@@ -364,7 +414,10 @@ export default {
     },
 
     mounted() {
-        setTimeout(this.emit, 500);
+        // recipe-less raw steps (import/extract leaves, V72) have no overview to emit
+        if (this.recipe) {
+            setTimeout(this.emit, 500);
+        }
 
         this.Bus.on('flash', ({ dest }) => {
             if (dest === this.identifier) {
@@ -376,16 +429,22 @@ export default {
             }
         });
 
-        this.Bus.emit('RegisterQuickNav', {
-            name: this.name,
-            identifier: this.identifier,
-        });
+        // Imported products are hidden via v-show (still mounted), so guard the
+        // QuickNav registration here — otherwise they'd appear in the nav (§V70, B46).
+        if (!this.production.imported) {
+            this.Bus.emit('RegisterQuickNav', {
+                name: this.name,
+                identifier: this.identifier,
+            });
+        }
     },
 
     data() {
-        const key = `${this.production.recipe.product.name}|${
-            this.production.recipe.description || this.production.recipe.product.name
-        }`;
+        // raw leaves (import/extract, V72) carry no recipe — key by name instead
+        const recipe = this.production.recipe;
+        const key = recipe
+            ? `${recipe.product.name}|${recipe.description || recipe.product.name}`
+            : this.name;
         const clock = store.getItem(`${key}.clock`, this.overviews?.[key]?.clock);
         const variant = store.getItem(`${key}.selected_variant_name`, this.overviews?.[key]?.selected_variant_name);
 
@@ -393,7 +452,7 @@ export default {
             key,
             selectedOverview: clock,
             selectedVariantName: variant,
-            recipe: this.production.recipe,
+            recipe,
             qty: this.production.qty,
             overridden: this.production.overridden,
             shouldFlash: false,
@@ -406,10 +465,16 @@ export default {
         },
 
         overview() {
-            return this.overviews[this.key].overviews[this.selectedOverview];
+            // raw leaves have no overview (recipe-gated UI never reads this for them)
+            return this.overviews?.[this.key]?.overviews?.[this.selectedOverview] ?? null;
         },
 
         footprint() {
+            // overview can be null for a recipe-bearing raw without an overview entry (B49)
+            if (!this.overview) {
+                return null;
+            }
+
             const base = this.overview.details[this.selectedVariantName].footprint;
             const groupSize = this.buildingMultiples[this.overview.building];
 
@@ -423,6 +488,22 @@ export default {
                 DESIGNER_DIMS[this.designerMk] ?? DESIGNER_DIMS.mk1,
                 this.appliedEven
             );
+        },
+
+        // extract raw step (V82): the ExtractorSummary row for this raw → info line in
+        // RawSourceControl. extractors[] holds only extract-mode raws, so a hit ⇒ extract.
+        extractor() {
+            const row = (this.extractors || []).find((r) => r.product === this.name);
+
+            if (!row) {
+                return null;
+            }
+
+            return {
+                count: row.num_buildings,
+                clock: row.clock_speed,
+                power: row.power_usage,
+            };
         },
 
         stepLetter() {
@@ -463,6 +544,11 @@ export default {
             this.Bus.emit('UpdateSomersloopSlots', { key: this.key, slots });
         },
 
+        // V66: recycled points/min for a byproduct of this step, if it is recycled.
+        recycledPoints(byproduct) {
+            return this.recycling?.recycled?.[byproduct]?.points || 0;
+        },
+
         maximizeOutput(scale) {
             const qty = this.overview.qty;
             const num_buildings = this.overview.selected_variant.num_buildings;
@@ -489,12 +575,26 @@ export default {
             }
         },
 
-        // fill this output's buildings to whole 100%-clock machines, leaving other outputs untouched (V55)
+        // fill this output's buildings to whole 100%-clock machines, leaving other
+        // outputs untouched (V55). Blueprint-aware: a grouped type (effective multiple
+        // X > 1) fills to a whole STAMP — num_buildings a multiple of X (V80) — using
+        // the applied/snapshot multiple the diagram groups on (selected_variant.multiple,
+        // T88); ungrouped (X = 1) keeps the V55 path byte-identical.
         fillOutput() {
-            const num_buildings = this.overview.selected_variant.num_buildings;
-            const max_clock_speed = this.overview.selected_variant.max_clock_speed;
-            const base_per_min = this.recipe.base_per_min;
-            const newQty = ((base_per_min * num_buildings * max_clock_speed) / 100).$round4();
+            const variant = this.overview.selected_variant;
+            const X = Math.max(1, variant.multiple || 1);
+
+            let newQty;
+            if (X > 1) {
+                newQty = fillTargetQty({
+                    qty: this.overview.qty,
+                    exactBuildings: variant.exact_buildings,
+                    multiple: X,
+                }).$round4();
+            } else {
+                const base_per_min = this.recipe.base_per_min;
+                newQty = ((base_per_min * variant.num_buildings * variant.max_clock_speed) / 100).$round4();
+            }
 
             this.Bus.emit('FillOutput', {
                 product: this.name,
@@ -523,6 +623,17 @@ export default {
             const byp = this.getTotalByproductUsed(name);
 
             return byp + (+this.allMaterials?.[name] || 0);
+        },
+
+        // Share of the total produced/used `ingr` that this step consumes.
+        // Returns null (→ render nothing) when the denominator is 0 so the UI
+        // never shows "Infinity%" (defense-in-depth for §V71 / B47).
+        usagePercent(in_qty, ingr) {
+            const den = this.getDenominator(ingr);
+            if (!den) {
+                return null;
+            }
+            return Math.round((100 * 100 * in_qty) / den) / 100;
         },
 
         setNewSubFavorite({ recipe }) {

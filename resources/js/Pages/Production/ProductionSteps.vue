@@ -47,6 +47,44 @@
                     </button>
                 </th>
             </tr>
+            <!-- Level 0: raws render first as steps (V72), source-mode controls on the step (V73) -->
+            <template v-if="Object.keys(rawSteps).length">
+                <tr class="block lg:table-row">
+                    <th class="block bg-blue-200 py-2 text-2xl dark:bg-slate-800 lg:table-cell" colspan="100">Level 0</th>
+                </tr>
+                <template v-for="(material, name) in rawSteps">
+                    <ProductionStep
+                        v-for="prod in material.production"
+                        :key="name + '-raw-' + (prod.recipe?.description || 'leaf')"
+                        :level-index="0"
+                        :level-step-map="levelStepMap"
+                        :step-index="rawStepIndex(name)"
+                        :choices="choices"
+                        :diagrams="diagrams"
+                        :material="material"
+                        :name="name"
+                        :new-imports="newImports"
+                        :import-notes="importNotes"
+                        :recycling="recycling"
+                        :production="prod"
+                        :recipes="recipes"
+                        :raw-sources="rawSources"
+                        :extractors="production.extractors || []"
+                        :all-materials="production.all_materials"
+                        :byproducts-used="production.byproducts_used"
+                        :overviews="overviews"
+                        :somersloop-slots="somersloopSlots"
+                        :cost-multiplier="costMultiplier"
+                        :building-multiples="buildingMultiples"
+                        :designer-mk="designerMk"
+                        :applied-even="appliedEven"
+                        @toggle="toggle"
+                        @setNewSubFavorite="setNewSubFavorite"
+                        @updateRawSource="(payload) => $emit('updateRawSource', payload)"
+                    />
+                </template>
+            </template>
+
             <template v-for="(level, index) in resultsArray">
                 <tr class="block lg:table-row">
                     <th class="block bg-blue-200 py-2 text-2xl dark:bg-slate-800 lg:table-cell" colspan="100">Level {{ index + 1 }}</th>
@@ -54,7 +92,7 @@
 
                 <template v-for="(material, name) in level">
                     <ProductionStep
-                        v-for="prod in material.production.filter((o) => o.recipe)"
+                        v-for="prod in material.production.filter((o) => o.recipe && !material.raw)"
                         v-show="
                             !prod.imported &&
                             (!hideCompleted || !productionChecks[name + '-' + (prod.recipe?.description || 'base')])
@@ -73,6 +111,8 @@
                         :material="material"
                         :name="name"
                         :new-imports="newImports"
+                        :import-notes="importNotes"
+                        :recycling="recycling"
                         :production="prod"
                         :recipes="recipes"
                         :all-materials="production.all_materials"
@@ -88,16 +128,37 @@
                     />
                 </template>
             </template>
+
+            <!-- V88: terminal Recycling level — packaging + sink render as full build steps -->
+            <template v-if="recycleSteps.length">
+                <tr class="block lg:table-row">
+                    <th class="block bg-emerald-200 py-2 text-2xl dark:bg-emerald-900 lg:table-cell" colspan="100">
+                        Recycling (AWESOME Sink)
+                    </th>
+                </tr>
+                <RecycleStep
+                    v-for="(step, i) in recycleSteps"
+                    :key="`recycle-step-${i}`"
+                    data-test="recycle-step"
+                    :step="step"
+                    :identifier="recycleIdentifier(i)"
+                    :step-map="recycleStepMap"
+                    :sink-identifier="sinkIdentifier"
+                    :diagrams="diagrams"
+                    @flashDestination="flashDestination"
+                />
+            </template>
         </table>
         </div>
     </div>
 </template>
 <script>
 import ProductionStep from '@/Pages/Production/ProductionStep';
+import RecycleStep from '@/Pages/Production/RecycleStep';
 
 export default {
     name: 'production-steps',
-    components: { ProductionStep },
+    components: { ProductionStep, RecycleStep },
     props: {
         diagrams: {},
         hideCompleted: {},
@@ -132,9 +193,25 @@ export default {
             type: String,
             default: 'both',
         },
+        // current raw_sources map (raw → {mode,...}), V59
+        rawSources: {
+            default: () => ({}),
+        },
+        // V64: map ingredient → import note
+        importNotes: {
+            default: () => ({}),
+        },
+        // V66/V67: recycling result { points, recycled, packaged, waste }
+        recycling: {
+            default: null,
+        },
     },
 
     methods: {
+        rawStepIndex(name) {
+            return Object.keys(this.rawSteps).indexOf(name);
+        },
+
         helpOverride() {
             alert('Your chosen recipe was overridden to avoid a circular dependency.');
         },
@@ -161,17 +238,68 @@ export default {
         stepLetter(index) {
             return Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ')[index];
         },
+
+        // V88: identifier for a recycling step (terminal "R" level)
+        recycleIdentifier(index) {
+            return `R.${this.stepLetter(index)}`;
+        },
+
+        flashDestination(dest) {
+            this.Bus.emit('flash', { dest });
+        },
     },
 
     computed: {
+        // V88: full recycling build steps (packaging + sink) from the backend
+        recycleSteps() {
+            return this.production.recycling_steps || [];
+        },
+
+        // material name → producing-step identifier, incl. packaging steps (so the sink's
+        // packaged inputs link to their Packager step), layered over levelStepMap
+        recycleStepMap() {
+            const map = { ...this.levelStepMap };
+            this.recycleSteps.forEach((step, i) => {
+                if (step.type === 'package') {
+                    map[step.name] = this.recycleIdentifier(i);
+                }
+            });
+            return map;
+        },
+
+        sinkIdentifier() {
+            const i = this.recycleSteps.findIndex((s) => s.type === 'sink');
+            return i >= 0 ? this.recycleIdentifier(i) : '';
+        },
+
         resultsArray() {
             return Object.values(this.production.results).filter((o) =>
                 Object.values(o).some((oo) => !oo.raw && !oo.imported)
             );
         },
 
+        // every raw material, rendered as a Level-0 step (V72)
+        rawSteps() {
+            const raws = {};
+
+            for (const level of Object.values(this.production.results)) {
+                for (const [name, material] of Object.entries(level)) {
+                    if (material.raw) {
+                        raws[name] = material;
+                    }
+                }
+            }
+
+            return raws;
+        },
+
         levelStepMap() {
             const ret = {};
+
+            // raws live at Level 0
+            for (const [rawIndex, name] of Object.keys(this.rawSteps).entries()) {
+                ret[name] = `0.${this.stepLetter(rawIndex)}`;
+            }
 
             for (const [levelIndex, level] of this.resultsArray.entries()) {
                 for (const mat of Object.keys(level)) {

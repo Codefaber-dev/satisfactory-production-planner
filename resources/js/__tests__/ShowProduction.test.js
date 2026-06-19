@@ -139,6 +139,130 @@ describe('Show — T73: saveMyFactory uses allChosenRecipes', () => {
     });
 });
 
+describe('Show — T101: raw_sources plan param (V59)', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('params() includes raw_sources for the fetch round-trip', () => {
+        const wrapper = makeWrapper({ raw_sources: { 'Iron Ore': { mode: 'extract', purity: 'normal' } } });
+        expect(wrapper.vm.params.raw_sources).toEqual({ 'Iron Ore': { mode: 'extract', purity: 'normal' } });
+    });
+
+    it('defaults to empty (all import) when no raw_sources prop', () => {
+        const wrapper = makeWrapper();
+        expect(wrapper.vm.params.raw_sources).toEqual({});
+    });
+
+    it('saveMyFactory persists raw_sources', () => {
+        const wrapper = makeWrapper({
+            factory: { id: 5, name: 'My Factory' },
+            raw_sources: { 'Iron Ore': { mode: 'extract' } },
+        });
+        wrapper.vm.saveMyFactory();
+        expect(mockInertia.patch.mock.calls[0][1].raw_sources).toEqual({ 'Iron Ore': { mode: 'extract' } });
+    });
+});
+
+describe('Show — T107: import_notes plan param (V64)', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('params() includes import_notes for the fetch round-trip', () => {
+        const wrapper = makeWrapper({ import_notes: { 'Caterium Ingot': 'From NW factory' } });
+        expect(wrapper.vm.params.import_notes).toEqual({ 'Caterium Ingot': 'From NW factory' });
+    });
+
+    it('defaults to empty when no import_notes prop', () => {
+        const wrapper = makeWrapper();
+        expect(wrapper.vm.params.import_notes).toEqual({});
+    });
+
+    it('updateImportNote sets a note, and clears it when emptied', () => {
+        const wrapper = makeWrapper();
+        wrapper.vm.updateImportNote({ name: 'Copper Ingot', note: 'imported' });
+        expect(wrapper.vm.newImportNotes).toEqual({ 'Copper Ingot': 'imported' });
+
+        // empty note removes the entry (V64: empty = no display)
+        wrapper.vm.updateImportNote({ name: 'Copper Ingot', note: '' });
+        expect(wrapper.vm.newImportNotes).toEqual({});
+    });
+
+    it('saveMyFactory persists import_notes', () => {
+        const wrapper = makeWrapper({
+            factory: { id: 5, name: 'My Factory' },
+            import_notes: { 'Caterium Ingot': 'From NW factory' },
+        });
+        wrapper.vm.saveMyFactory();
+        expect(mockInertia.patch.mock.calls[0][1].import_notes).toEqual({ 'Caterium Ingot': 'From NW factory' });
+    });
+});
+
+describe('Show — T110: auto_package_recycle plan param (V67)', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('defaults to 0 (OFF) in params', () => {
+        const wrapper = makeWrapper();
+        expect(wrapper.vm.params.auto_package_recycle).toBe(0);
+    });
+
+    it('params reflects the prop when ON', () => {
+        const wrapper = makeWrapper({ auto_package_recycle: true });
+        expect(wrapper.vm.params.auto_package_recycle).toBe(1);
+    });
+
+    it('toggleAutoPackageRecycle flips the flag and refetches', () => {
+        const wrapper = makeWrapper();
+        wrapper.vm.toggleAutoPackageRecycle();
+        expect(wrapper.vm.newAutoPackageRecycle).toBe(true);
+        expect(mockInertia.get).toHaveBeenCalled();
+    });
+
+    it('saveMyFactory persists auto_package_recycle', () => {
+        const wrapper = makeWrapper({
+            factory: { id: 5, name: 'My Factory' },
+            auto_package_recycle: true,
+        });
+        wrapper.vm.saveMyFactory();
+        expect(mockInertia.patch.mock.calls[0][1].auto_package_recycle).toBe(true);
+    });
+});
+
+describe('Show — T125: recycled Packager folds into the build (V87)', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    function withPackaged() {
+        return makeWrapper({
+            production: {
+                ...minimalProduction,
+                recycling: {
+                    points: 7800,
+                    recycled: {},
+                    packaged: [
+                        { fluid: 'Water', product: 'Packaged Water', qty: 60, buildings: 1, power: 10, container: 'Empty Canister', container_qty: 60, points: 7800, building: 'Packager', build_cost: { 'Steel Beam': 20, Rubber: 10, Plastic: 10 } },
+                    ],
+                    waste: {},
+                },
+            },
+        });
+    }
+
+    it('appends a Packager building-detail row', () => {
+        const rows = withPackaged().vm.production__building_details;
+        const pkg = rows.find((r) => r.variant_name === 'Packager');
+        expect(pkg).toBeTruthy();
+        expect(pkg.num_buildings).toBe(1);
+        expect(pkg.power_usage).toBe(10);
+        expect(pkg.build_cost['Steel Beam']).toBe(20);
+    });
+
+    it('folds Packager power into the plan total power', () => {
+        expect(withPackaged().vm.production__total_power).toBe(10);
+    });
+
+    it('folds Packager build cost into total_build_cost', () => {
+        const summary = withPackaged().vm.production__building_summary;
+        expect(summary.total_build_cost['Steel Beam']).toBe(20);
+    });
+});
+
 describe('Show — T74: setDefaultRecipe assigns row.recipe directly', () => {
     beforeEach(() => vi.clearAllMocks());
 
@@ -409,5 +533,52 @@ describe('Show — T97/V57: allChosenRecipes captures in-force sub-recipes', () 
         wrapper.vm.newChoices = { 'Circuit Board': 'Circuit Board' };
 
         expect(wrapper.vm.allChosenRecipes['Circuit Board']).toBe('Circuit Board');
+    });
+});
+
+describe('Show — extractors in building summary (V76)', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    const extractor = {
+        product: 'Iron Ore',
+        building: 'Miner Mk.2',
+        variant_name: 'Miner Mk.2',
+        num_buildings: 3,
+        exact_buildings: 3,
+        power_usage: 45,
+        build_cost: [],
+        clock_speed: 100,
+        footprint: { power_shards: 0, somersloops: 0 },
+    };
+
+    it('merges extract-mode extractors into building_details', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: {}, extractors: [extractor] },
+        });
+
+        const details = wrapper.vm.production__building_details;
+        expect(details).toHaveLength(1);
+        expect(details[0].building).toBe('Miner Mk.2');
+        expect(details[0].num_buildings).toBe(3);
+    });
+
+    it('shows the extractor in the building summary and total power', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: {}, extractors: [extractor] },
+        });
+
+        const summary = wrapper.vm.production__building_summary;
+        expect(summary.variants['Miner Mk.2'].num_buildings).toBe(3);
+        expect(summary.variants['Miner Mk.2'].power_usage).toBe(45);
+        expect(wrapper.vm.production__total_power).toBe(45);
+    });
+
+    it('adds nothing when there are no extractors (byte-identical)', () => {
+        const wrapper = makeWrapper({
+            production: { ...minimalProduction, overviews: {} },
+        });
+
+        expect(wrapper.vm.production__building_details).toHaveLength(0);
+        expect(wrapper.vm.production__total_power).toBe(0);
     });
 });

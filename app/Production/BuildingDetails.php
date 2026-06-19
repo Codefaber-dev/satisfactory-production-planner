@@ -146,6 +146,13 @@ class BuildingDetails extends Collection
         $multiple = max(1, (int) ($this->building_multiples[$building_name] ?? 1));
 
         $this->items = $this->recipe->building->variants->map(function ($variant) use ($max_slots, $slots, $effective_base_per_min, $somersloop_power_amp, $plan_power_multiplier, $multiple) {
+            // exact fractional machine count at 100% clock, before any rounding —
+            // the raw demand Perfect Ratio (V56) scales to a whole number. Independent
+            // of base_clock, ceil, and building_multiples on purpose.
+            $exact_buildings = $effective_base_per_min > 0 && $variant->multiplier > 0
+                ? $this->qty / $effective_base_per_min / $variant->multiplier
+                : 0;
+
             // calc number of buildings needed, assuming belts can handle it
             $num_buildings = 1 * ceil($this->qty / $effective_base_per_min / $variant->multiplier / ($this->base_clock / 100));
             if ($multiple > 1) {
@@ -304,7 +311,7 @@ class BuildingDetails extends Collection
 
             return [
                 "{$this->recipe->building->name} ($variant->name)" => ['variant' => $variant->name] +
-                    compact('num_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed', 'max_slots', 'slots', 'multiple'),
+                    compact('num_buildings', 'exact_buildings', 'clock_speed', 'power_usage', 'energy_per_item', 'total_energy', 'build_cost', 'footprint', 'max_clock_speed', 'max_slots', 'slots', 'multiple'),
             ];
         })->collapse()->all();
 

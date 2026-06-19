@@ -31,7 +31,12 @@ trait CalculatesSteps
 
         // determine if the current ingredient is raw
         if ($this->isRaw()) {
-            return;
+            // V61/V63: a raw with a selected convert/unpackage recipe expands into
+            // that recipe's inputs like a normal step; import/extract raws (no recipe)
+            // stay leaves — extractor power is handled tier-0 (V60).
+            if (! $this->getRecipe()) {
+                return;
+            }
         }
 
         // determine if the current ingredient is imported

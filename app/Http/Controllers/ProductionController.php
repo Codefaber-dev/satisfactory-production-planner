@@ -7,8 +7,11 @@ use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\MultiFactories\Facades\MultiFactories;
+use App\Production\ExtractorSummary;
 use App\Production\Multiplexer;
 use App\Production\ProductionCalculator;
+use App\Production\RecyclingCalc;
+use App\Production\RecyclingSteps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -68,6 +71,12 @@ class ProductionController extends Controller
             'overrides' => $calc->getSteps()->getOverrides(),
             'byproducts' => $calc->getByproducts(),
             'overviews' => $calc->getOverviews(),
+            // V76: extract-mode raws → extractor building rows (summary/parts/power)
+            'extractors' => ExtractorSummary::build($calc->getRawMaterials(), request('raw_sources', [])),
+            // V66/V67: AWESOME Sink recycling (points/min + auto-packaged fluids)
+            'recycling' => $recycling = RecyclingCalc::calc($calc->getByproducts(), $calc->getByproductsUsed(), request()->boolean('auto_package_recycle')),
+            // V88: recycling rendered as full build steps (packaging + sink, with diagrams)
+            'recycling_steps' => RecyclingSteps::build($recycling, (float) request('belt_speed', 780)),
         ];
 
         // dd($calc->getOverviews());
@@ -79,8 +88,11 @@ class ProductionController extends Controller
         $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
         $building_multiples = request('building_multiples', []);
         $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
+        $raw_sources = request('raw_sources', []);
+        $import_notes = request('import_notes', []);
+        $auto_package_recycle = request()->boolean('auto_package_recycle');
 
-        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier', 'raw_sources', 'import_notes', 'auto_package_recycle') + $this->baseData());
     }
 
     public function multi()
@@ -100,6 +112,9 @@ class ProductionController extends Controller
         $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
         $building_multiples = request('building_multiples', []);
         $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
+        $raw_sources = request('raw_sources', []);
+        $import_notes = request('import_notes', []);
+        $auto_package_recycle = request()->boolean('auto_package_recycle');
 
         // add request vars to cache key
         $requestVars = request()->all();
@@ -143,10 +158,16 @@ class ProductionController extends Controller
                 'overrides' => $m->getOverrides(),
                 'byproducts' => $m->getByproducts(),
                 'overviews' => $m->getOverviews(),
+                // V76: extract-mode raws → extractor building rows (summary/parts/power)
+                'extractors' => ExtractorSummary::build($m->getRawMaterials(), request('raw_sources', [])),
+                // V66/V67: AWESOME Sink recycling (points/min + auto-packaged fluids)
+                'recycling' => $recycling = RecyclingCalc::calc($m->getByproducts(), $m->getByproductsUsed(), request()->boolean('auto_package_recycle')),
+                // V88: recycling rendered as full build steps (packaging + sink, with diagrams)
+                'recycling_steps' => RecyclingSteps::build($recycling, (float) request('belt_speed', 780)),
             ];
         });
 
-        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier', 'raw_sources', 'import_notes', 'auto_package_recycle') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant = 'mk1')

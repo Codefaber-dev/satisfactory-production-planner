@@ -16,6 +16,9 @@ class MultiProductionLine extends Model
     protected $casts = [
         'outputs' => 'array',
         'choices' => 'array',
+        'raw_sources' => 'array',
+        'import_notes' => 'array',
+        'auto_package_recycle' => 'bool',
     ];
 
     protected $appends = [
@@ -46,8 +49,11 @@ class MultiProductionLine extends Model
         $yield = $outputs->map(fn ($output) => $output['yield'])->all();
         $recipe = $outputs->map(fn ($output) => $output['recipe']['description'] ?? $output['product']['name'])->all();
         $choices = $atts['choices'] ?? [];
+        $raw_sources = $atts['raw_sources'] ?? [];
+        $import_notes = $atts['import_notes'] ?? [];
+        $auto_package_recycle = ! empty($atts['auto_package_recycle']) ? 1 : 0;
 
-        return "/dashboard/multi?imports={$atts['imports']}&variant=mk1&".http_build_query(compact('product', 'yield', 'recipe', 'choices'));
+        return "/dashboard/multi?imports={$atts['imports']}&variant=mk1&".http_build_query(compact('product', 'yield', 'recipe', 'choices', 'raw_sources', 'import_notes', 'auto_package_recycle'));
     }
 
     public function user()

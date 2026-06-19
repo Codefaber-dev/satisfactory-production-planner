@@ -17,6 +17,9 @@ class ProductionLine extends Model
 
     protected $casts = [
         'choices' => 'array',
+        'raw_sources' => 'array',
+        'import_notes' => 'array',
+        'auto_package_recycle' => 'bool',
     ];
 
     protected $appends = [
@@ -45,6 +48,9 @@ class ProductionLine extends Model
         $params = http_build_query([
             'imports' => $this->imports,
             'choices' => $this->choices ?? [],
+            'raw_sources' => $this->raw_sources ?? [],
+            'import_notes' => $this->import_notes ?? [],
+            'auto_package_recycle' => $this->auto_package_recycle ? 1 : 0,
         ]);
 
         return "/dashboard/{$this->product->name}/{$this->yield}/{$description}/?{$params}";

@@ -51,6 +51,13 @@ trait Setters
     public function setRecipe($recipe = null): static
     {
         if ($this->product->isRaw()) {
+            // V61/V63: a raw in convert/unpackage mode is sourced via a selected
+            // recipe (passed down from the parent's getIntermediateRecipe), so it
+            // stops being a leaf. import/extract raws get no recipe → stay leaves.
+            if ($recipe) {
+                $this->recipe = r($recipe);
+            }
+
             return $this;
         }
 

@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### 🔄 Circular Recipes, Solved
+### ⛏️ Extraction & Recycling
 
-- The planner now solves recipes that feed each other (recycled Plastic/Rubber loops) instead of dodging them — plus a per-output "Fill to 100%" and saved factories that keep your recipe choices.
+- Raw resources now build out as real extractors — miners, pumps, and wells with full power and build cost — and an AWESOME Sink recycles unused byproducts into points/min. Source any raw by extract, convert, or unpackage, package-and-sink leftover fluids, and annotate imports with notes.
 
-## v1.2.2 - Circular Dependency Update
+## v1.2.3 - Extraction & Recycling Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -32,6 +32,17 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
+### v1.2.3
+
+- ⛏️ **Resource Extraction** — Raw resources now appear as their own production steps at the top of the plan, each with a source picker. Choose **Extract** to add real extractors — Miner Mk.1/2/3, Water Extractor, Oil Extractor, or Resource Well Pressurizer — with node purity, miner tier, and power-shard settings. Extractors are counted in the building summary and parts/build-cost list, and their power is rolled into the plan total instead of a rough proxy estimate.
+- 🔀 **Flexible Raw Sourcing** — Beyond extraction, source any raw by **Import** (default), **Convert** (produce one ore from another via a Converter recipe), or **Unpackage** (e.g. get Water by unpackaging Packaged Water). Convert/unpackage chains that loop back on themselves are solved by the equation solver, not dodged.
+- ♻️ **AWESOME Sink Recycling** — The plan now reports total **points/min** from sinking unused byproducts, surfaced as a terminal **Recycling** step. A new **Package & Sink Fluids** toggle in Building Settings packages leftover fluids and gases (which can't be sunk directly) and sinks the packaged form — the added Packager and AWESOME Sink render as full build steps with their own diagrams, building counts, and power.
+- 🛈 **Import Notes** — Add a free-text note to any imported ingredient (e.g. "From NW Steel Factory"). Notes show on the ingredient's production step and persist with saved factories.
+- 🎯 **Perfect Ratio Factory** — A new button in Plan Settings scales the whole plan to the smallest size where every building runs whole at 100% clock — no fractional or underclocked machines anywhere. Works for mutual-recipe loops too, and is now **blueprint-aware**: when a building type is grouped into blueprint stamps, the ratio fills whole stamps. If the perfect ratio would make the factory impractically large, it warns instead of applying.
+- 📐 **Blueprint-aware Fill to 100%** — The per-output "Fill to 100%" button now rounds up to a whole blueprint stamp for grouped building types, so no partial stamps or underclocked machines.
+- 🪲 Bug fix: Loop steps no longer show **"Infinity%"** for an input — the usage percentage now divides by the correct plan total when the output product feeds back into a loop.
+- 🪲 Bug fix: The **Package & Sink Fluids** toggle now correctly sizes leftover fluids — recycling read fully-consumed byproducts as leftover, making the toggle appear to do nothing.
+
 ### v1.2.2
 
 - 🔄 **Circular Recipes Solved** — Recipes that feed each other — like **Recycled Plastic ⇄ Recycled Rubber** — are now solved as a proper system of equations, keeping the recipes you chose. The planner works out exactly how much of each to make instead of silently swapping a recipe to dodge the loop.
@@ -39,6 +50,7 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 - 🧩 **Smarter Loop Handling** — When a loop genuinely can't be solved (e.g. packaging and immediately unpackaging the same fluid), the planner auto-sources it from a non-looping recipe and respects your intent: choosing **Unpackage Fuel** keeps that choice and sources Packaged Fuel elsewhere. You can also just **import** the looped item to break it yourself.
 - 🪲 Bug fix: Saved factories no longer revert their recipe choices on reload — sub-recipe selections now persist correctly.
 - 🛈 The alarming "Circular Dependencies Found" warning is now an informational **"Recipes auto-adjusted to resolve a loop"** note, with a hint to change the recipe or import the item.
+- 🪲 Bug fix: Quick Nav no longer lists imported products — only the steps actually shown in the plan appear in the navigator.
 
 ---
 

@@ -71,6 +71,16 @@
 <!--                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>-->
 <!--                        </select>-->
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
+                        <button
+                            v-if="done && production"
+                            :disabled="working"
+                            data-test="perfect-ratio"
+                            @click="applyPerfectRatio"
+                            class="btn btn-emerald"
+                            title="Scale the whole plan to the smallest size where every building runs whole at 100% clock"
+                        >
+                            🎯 Perfect Ratio
+                        </button>
                     </template>
                     <template v-else>
                         <button class="btn-sm btn-gray" @click="removeOutput(index)">X</button>
@@ -176,6 +186,28 @@
                                 />
                             </div>
                         </div>
+                        <!-- V67: auto-package-and-recycle excess fluids toggle (separate from the V52 multiplier cards) -->
+                        <div
+                            data-test="recycling-setting-card"
+                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+                        >
+                            <ArrowPathIcon alt="Auto-Package Recycle" class="h-10 w-10 shrink-0"/>
+                            <div class="flex w-full flex-col space-y-1">
+                                <label class="whitespace-nowrap text-xl font-bold">Package &amp; Sink Fluids</label>
+                                <label class="relative inline-flex cursor-pointer items-center">
+                                    <input
+                                        type="checkbox"
+                                        data-test="auto-package-recycle-toggle"
+                                        :checked="newAutoPackageRecycle"
+                                        @change="toggleAutoPackageRecycle"
+                                        class="peer sr-only"
+                                    />
+                                    <span
+                                        class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
+                                    ></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <template v-if="uniqueBuildings.length">
                     <h2 class="mb-1 font-bold text-xl">
@@ -198,8 +230,8 @@
                         </button>
                     </div>
                     <div class="flex flex-wrap gap-3">
-                        <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
-                            <label class="relative inline-flex cursor-pointer items-center">
+                        <div class="flex items-center gap-3 bg-sky-600 p-4 rounded-lg border border-sky-700" v-for="building in uniqueBuildings.filter(o => ! o.toLowerCase().includes('water') && ! o.toLowerCase().includes('oil') && ! o.toLowerCase().includes('miner')&& ! o.toLowerCase().includes('pressurizer'))" :key="building">
+                            <label class="relative inline-flex cursor-pointer items-center ">
                                 <input
                                     type="checkbox"
                                     :id="`bp-toggle-${building}`"
@@ -227,7 +259,7 @@
                         </div>
                     </div>
                     </template>
-                    <div class="mt-3">
+                    <div class="mt-3 flex flex-wrap gap-2">
                         <button :disabled="working" @click="fetch({ preserveScroll: true })" class="btn btn-emerald">
                             Update
                         </button>
@@ -300,6 +332,10 @@
                             :help-import="helpImport"
                             :help-raw-materials="helpRawMaterials"
                             :new-imports="newImports"
+                            :import-notes="newImportNotes"
+                            :raw-sources="newRawSources"
+                            :recycling="production.recycling"
+                            @updateImportNote="updateImportNote"
                             :production="production"
                             :production__building_summary="production__building_summary"
                             :production__building_details="production__building_details"
@@ -317,16 +353,20 @@
                             :diagrams="diagrams"
                             :hide-completed="hideCompleted"
                             :new-imports="newImports"
+                            :import-notes="newImportNotes"
+                            :recycling="production.recycling"
                             :production="production"
                             :overviews="overviews"
                             :production-checks="productionChecks"
                             :recipes="recipes"
                             :choices="allChosenRecipes"
+                            :raw-sources="newRawSources"
                             :somersloop-slots="somersloopSlots"
                             :cost-multiplier="costMultiplier"
                             :building-multiples="appliedMultiples"
                             :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
+                            @updateRawSource="updateRawSource"
                             :even="newEven"
                             :applied-even="!!even"
                             :speed-limit="newSpeedLimit"
@@ -346,13 +386,14 @@
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
 import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
+import { computePerfectRatio } from '@/perfectRatio';
 import { DESIGNER_DIMS, loadDesignerMk, saveDesignerMk } from '@/blueprintFootprint';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
 import ProductionQuickNav from '@/Components/ProductionQuickNav.vue';
-import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon } from '@heroicons/vue/24/outline';
+import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 export default {
     name: 'ShowNew',
@@ -368,6 +409,7 @@ export default {
         QueueListIcon,
         BuildingOffice2Icon,
         PowerIcon,
+        ArrowPathIcon,
     },
 
     mounted() {
@@ -434,6 +476,9 @@ export default {
         'power_multiplier',
         'building_multiples',
         'building_cost_multiplier',
+        'raw_sources',
+        'import_notes',
+        'auto_package_recycle',
     ],
 
     data() {
@@ -491,6 +536,12 @@ export default {
             costMultiplier: this.cost_multiplier || 1.0,
             powerMultiplier: this.power_multiplier || 1.0,
             buildingCostMultiplier: this.building_cost_multiplier || 1.0,
+            // V59: per-raw source mode config (default import for any raw not present).
+            newRawSources: this.raw_sources || {},
+            // V64: per-ingredient import notes (map ingredient → free-text note).
+            newImportNotes: this.import_notes || {},
+            // V67: auto-package-and-recycle excess fluids toggle (default OFF).
+            newAutoPackageRecycle: !!this.auto_package_recycle,
             bpSizes,
             bpEnabled,
             appliedMultiples: effectiveMultiples(bpSizes, bpEnabled),
@@ -539,7 +590,7 @@ export default {
             //     return [];
             // }
 
-            return Object.values(this.overviews).map((o) => {
+            const recipeDetails = Object.values(this.overviews).map((o) => {
                 const clock = o.clock;
                 const variant_name = o.selected_variant_name;
                 return {
@@ -549,6 +600,21 @@ export default {
                     ...o.overviews[clock].details[variant_name],
                 };
             });
+
+            // V76: extract-mode raws contribute their extractors (summary/parts/power)
+            // V87: auto-package Packager steps fold into the build (summary/parts/power)
+            const recycleDetails = (this.production.recycling?.packaged || []).map((p) => ({
+                product: p.product,
+                variant_name: p.building || 'Packager',
+                num_buildings: p.buildings,
+                exact_buildings: p.buildings,
+                power_usage: p.power,
+                build_cost: p.build_cost || {},
+                clock_speed: 100,
+                footprint: { power_shards: 0, somersloops: 0 },
+            }));
+
+            return [...recipeDetails, ...(this.production.extractors || []), ...recycleDetails];
 
             // let ret = [];
             //
@@ -667,6 +733,9 @@ export default {
                 power_multiplier: this.powerMultiplier,
                 building_cost_multiplier: this.buildingCostMultiplier,
                 building_multiples: this.buildingMultiples,
+                raw_sources: this.newRawSources,
+                import_notes: this.newImportNotes,
+                auto_package_recycle: this.newAutoPackageRecycle ? 1 : 0,
             };
 
             if (this.form.outputs.length > 1) {
@@ -714,6 +783,37 @@ export default {
             this.appliedMultiples = this.buildingMultiples;
 
             this.$inertia.get(`/dashboard/${this.endpoint}`, this.params, options);
+        },
+
+        // V59–V63: a raw's source mode changed. Update the map immutably and refetch
+        // so the new sourcing (extractor / convert recipe / unpackage) is applied.
+        updateRawSource({ name, config }) {
+            this.newRawSources = {
+                ...this.newRawSources,
+                [name]: config,
+            };
+
+            this.fetch({ preserveScroll: true });
+        },
+
+        // V64: an import note changed. Update the map immutably. No refetch — notes
+        // carry no calc impact; the bound map updates the display directly and
+        // persists on save.
+        updateImportNote({ name, note }) {
+            const next = { ...this.newImportNotes };
+            if (note) {
+                next[name] = note;
+            } else {
+                delete next[name];
+            }
+            this.newImportNotes = next;
+        },
+
+        // V67: toggle auto-package-and-recycle excess fluids. Changes the plan's
+        // recycling output (and adds Packager steps), so refetch.
+        toggleAutoPackageRecycle() {
+            this.newAutoPackageRecycle = !this.newAutoPackageRecycle;
+            this.fetch({ preserveScroll: true });
         },
 
         async fetchNewYield() {
@@ -807,6 +907,9 @@ export default {
                     yield: output.yield,
                     choices: this.allChosenRecipes,
                     imports,
+                    raw_sources: this.newRawSources,
+                    import_notes: this.newImportNotes,
+                    auto_package_recycle: this.newAutoPackageRecycle,
                 });
             } else {
                 name = prompt('Provide a name for your factory');
@@ -821,6 +924,9 @@ export default {
                 yield: output.yield,
                 choices: this.allChosenRecipes,
                 imports,
+                raw_sources: this.newRawSources,
+                import_notes: this.newImportNotes,
+                auto_package_recycle: this.newAutoPackageRecycle,
             });
         },
 
@@ -834,6 +940,9 @@ export default {
                     outputs: this.form.outputs,
                     choices: this.allChosenRecipes,
                     imports,
+                    raw_sources: this.newRawSources,
+                    import_notes: this.newImportNotes,
+                    auto_package_recycle: this.newAutoPackageRecycle,
                 });
             }
             const name = prompt('Provide a name for your factory');
@@ -843,6 +952,9 @@ export default {
                 outputs: this.form.outputs,
                 choices: this.allChosenRecipes,
                 imports,
+                raw_sources: this.newRawSources,
+                import_notes: this.newImportNotes,
+                auto_package_recycle: this.newAutoPackageRecycle,
             });
         },
 
@@ -966,6 +1078,39 @@ export default {
             alert(
                 'Choose whether to produce each intermediate product in this factory (default) or to import select products from elsewhere.'
             );
+        },
+
+        // Perfect Ratio Factory mode (§V56 / T96): scale every output by the
+        // smallest whole factor S that makes every step's machine count a whole
+        // integer at 100% clock. S = LCM of each step's exact fractional demand.
+        // Blueprint-aware (§V81 / T123): a grouped step (effective multiple X > 1,
+        // d.multiple = the applied/snapshot building_multiple, T88) scales to a whole
+        // STAMP — S clears denominator(exact_buildings / X) — so num_buildings stays a
+        // multiple of X; ungrouped (X=1) is identical to V56.
+        applyPerfectRatio() {
+            const steps = this.production__building_details.map((d) => ({
+                count: d.exact_buildings,
+                multiple: d.multiple || 1,
+            }));
+            const { ratio, blocked, reason, maxBuildings } = computePerfectRatio(steps);
+
+            if (blocked) {
+                const detail =
+                    reason === 'buildings'
+                        ? `the perfect ratio would need up to ${maxBuildings} of a single building`
+                        : `the required scale factor (×${ratio}) is too large`;
+                alert(
+                    `Perfect Ratio not applied — ${detail}. Your factory would be impractically large. Try scaling a smaller portion manually.`
+                );
+                return;
+            }
+
+            if (ratio === 1) {
+                alert('This factory is already in a perfect ratio — every building runs whole at 100% clock.');
+                return;
+            }
+
+            this.Bus.emit('ScaleOutputs', { ratio });
         },
     },
 };

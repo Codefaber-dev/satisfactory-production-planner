@@ -89,6 +89,30 @@ class RecipeProductionTest extends TestCase
     }
 
     #[Test]
+    public function all_materials_includes_the_final_product_when_it_feeds_a_loop()
+    {
+        // B47: the requested output (Rubber) is consumed by the
+        // other loop member (Recycled Plastic eats Rubber). getAllMaterials must
+        // include the final product's total so the frontend usage-% denominator
+        // is non-zero (otherwise the input % renders "Infinity%").
+        $production = ProductionCalculator::make(
+            product: 'Rubber',
+            qty: 100,
+            recipe: 'Recycled Rubber',
+            overrides: [],
+            favorites: [
+                'Plastic' => r('Recycled Plastic'),
+            ]
+        );
+
+        $all = $production->getAllMaterials();
+
+        $this->assertArrayHasKey('Rubber', $all->all(),
+            'final product consumed by a loop member must appear in all_materials');
+        $this->assertEqualsWithDelta(133.3333, $all['Rubber'], 0.001);
+    }
+
+    #[Test]
     public function it_can_calculate_fused_quickwire()
     {
         $production = ProductionCalculator::make(

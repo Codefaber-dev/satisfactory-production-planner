@@ -79,14 +79,24 @@ trait ParsesSteps
 
     public function hasUsableByproducts(): bool
     {
-        return (bool) $this->getAllMaterials()->intersectByKeys($this->getByproducts())->count();
+        // byproduct substitution targets intermediates only — the final product
+        // is never replaced by a byproduct, so keep it excluded here (unchanged).
+        return (bool) $this->materialTotals(excludeFinal: true)->intersectByKeys($this->getByproducts())->count();
     }
 
     public function getAllMaterials()
     {
-        return $this->results->map(function ($tier) {
+        // "all" includes the final product (matches Multiplexer::getAllMaterials).
+        // The final product must be present so the frontend usage-% denominator is
+        // non-zero when a loop member consumes it (B47 / §V71).
+        return $this->materialTotals(excludeFinal: false);
+    }
+
+    protected function materialTotals(bool $excludeFinal)
+    {
+        return $this->results->map(function ($tier) use ($excludeFinal) {
             return $tier
-                ->reject(fn ($val, $name) => $this->isFinalProduct($name))
+                ->when($excludeFinal, fn ($t) => $t->reject(fn ($val, $name) => $this->isFinalProduct($name)))
                 ->map(fn ($val, $name) => round($val->total, 4))
                 ->filter();
         })->collapse();

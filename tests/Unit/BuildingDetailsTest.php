@@ -475,6 +475,36 @@ class BuildingDetailsTest extends TestCase
     }
 
     #[Test]
+    public function exact_buildings_is_unrounded_and_independent_of_ceil(): void
+    {
+        // T96/V56: exact_buildings is the raw fractional machine demand at 100%
+        // clock, before ceil. Iron Rod base_per_min=15; qty=22.5 → 1.5 machines.
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 1.5;
+
+        $details = BuildingDetails::calc($recipe, $qty, 780)->first();
+
+        $this->assertEqualsWithDelta(1.5, $details['exact_buildings'], 1e-9);
+        $this->assertEquals(2, $details['num_buildings'], 'displayed count still ceils');
+    }
+
+    #[Test]
+    public function exact_buildings_ignores_building_multiples(): void
+    {
+        // V56: Perfect Ratio targets pure 100%-clock demand — building_multiples
+        // rounding (which inflates num_buildings) must not touch exact_buildings.
+        $recipe = r('Iron Rod');
+        $qty = $recipe->base_per_min * 3; // exactly 3 machines at 100%
+
+        $base = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, [])->first();
+        $multiple4 = BuildingDetails::calc($recipe, $qty, 780, 100, 0, 1.0, 1.0, ['Constructor' => 4])->first();
+
+        $this->assertEqualsWithDelta(3.0, $base['exact_buildings'], 1e-9);
+        $this->assertEqualsWithDelta(3.0, $multiple4['exact_buildings'], 1e-9);
+        $this->assertEquals(4, $multiple4['num_buildings'], 'num_buildings still rounds to the multiple');
+    }
+
+    #[Test]
     public function energy_per_item_is_consistent_across_qty_scales(): void
     {
         // energy_per_item should remain stable at small qty (no even-rows);

@@ -3,6 +3,7 @@
 namespace App\Production;
 
 use App\Favorites\Facades\Favorites;
+use App\Enums\Building as BuildingEnum;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Production\Concerns\ParsesSteps;
@@ -185,6 +186,11 @@ class ProductionCalculator
 
     public function calculate(): void
     {
+        // V61/V63: fold raw convert/unpackage source modes into the calc — the chosen
+        // recipe becomes a normal recipe pick, and an unpackage raw's Packaged input
+        // defaults to import. Idempotent (safe across recalc passes).
+        $this->mergeRawSources();
+
         $detected = $this->detectLoops();
         $loops = $detected['solvable'];
         $loopOf = $this->loopOfMap($loops);
@@ -253,7 +259,12 @@ class ProductionCalculator
             return $empty;
         }
 
-        $candidates = collect(LoopCatalog::all())->pluck('members')->flatten()->unique();
+        // Raw products sourced via convert/unpackage are boundary in the static
+        // catalog (all raws are cut there), so add them explicitly — a raw↔raw convert
+        // cycle (e.g. Iron Ore ⇄ Limestone ⇄ Sulfur) only becomes visible here (V61).
+        $candidates = collect(LoopCatalog::all())->pluck('members')->flatten()
+            ->merge($this->rawRecipeProducts())
+            ->unique();
 
         if ($candidates->isEmpty()) {
             return $empty;
@@ -341,14 +352,18 @@ class ProductionCalculator
         // Prefer a self-contained recipe-swap (keeps producing) over auto-import.
         // Among members with a loop-free alternate, pick the least-disruptive + cheapest:
         //  1. preserve an unpackage choice — choosing "Unpackage X" deliberately sources
-        //     X from its packaged form, so re-source the PACKAGED member instead;
+        //     X from its packaged form, so NEVER swap that member; re-source the PACKAGED
+        //     member instead (and if it has no loop-free recipe, fall through to auto-import
+        //     it). Hard-excluded, not merely penalised: when the packaged member lacks an
+        //     alternate (e.g. Packaged Turbofuel), the unpackage-self member is the only one
+        //     with a loop-free recipe and a soft penalty would still swap the user's pick.
         //  2. prefer non-user-chosen members;
         //  3. then the most resource-efficient swap.
         $candidates = collect($members)
+            ->reject(fn ($m) => $this->unpackagesItself($m, $recipeOf))
             ->map(fn ($m) => ['product' => $m, 'recipe' => $this->loopFreeRecipe($m, $members)])
             ->filter(fn ($c) => $c['recipe'] !== null)
-            ->sortBy(fn ($c) => ($this->unpackagesItself($c['product'], $recipeOf) ? 1e12 : 0)
-                + ($userPicked->contains($c['product']) ? 1e9 : 0)
+            ->sortBy(fn ($c) => ($userPicked->contains($c['product']) ? 1e9 : 0)
                 + (float) $c['recipe']->resource)
             ->values();
 
@@ -495,6 +510,83 @@ class ProductionCalculator
         $selection[$this->product->name] = $this->recipe->description ?? $this->product->name;
 
         return $selection;
+    }
+
+    /**
+     * V61/V63: fold raw convert/unpackage source modes into the existing recipe-pick
+     * + import machinery. The selected recipe is added as a choice (so it flows through
+     * loop detection, getChoice, and the Step walk), and an unpackage raw's Packaged
+     * input ingredient(s) default to import.
+     */
+    protected function mergeRawSources(): void
+    {
+        $choices = [];
+        $imports = [];
+
+        foreach ($this->rawSourceConfigs() as $name => $config) {
+            $ingredient = i($name);
+
+            // V79: the recipe lives in `choices` (the main RecipePicker), not in
+            // raw_sources. Use the user's choice when present; otherwise default it
+            // (first convert recipe / the Unpackage recipe) so the raw becomes
+            // recipe-bearing and the step renders the picker.
+            $recipe = $this->choices->get($name)
+                ?? $this->defaultRawRecipe($ingredient, $config['mode'] ?? 'import');
+
+            if (! $recipe) {
+                continue;
+            }
+
+            $choices[$name] = $recipe;
+
+            // V63(a): the Packaged input of an unpackage raw is imported by default
+            // (the loop is broken on the packaged side — "import the packaged contents").
+            if (($config['mode'] ?? null) === 'unpackage') {
+                foreach ($recipe->ingredients as $packagedInput) {
+                    $imports[] = $packagedInput->name;
+                }
+            }
+        }
+
+        $this->choices = $this->choices->merge($choices);
+        $this->imports = collect($this->imports)->merge($imports)->unique()->values()->all();
+    }
+
+    /**
+     * Default recipe for a convert/unpackage raw with no explicit choice (V79):
+     * the Unpackage recipe (by name) for unpackage, else the first Converter
+     * ore-conversion recipe producing the raw.
+     */
+    protected function defaultRawRecipe(Ingredient $ingredient, string $mode): ?Recipe
+    {
+        if ($mode === 'unpackage') {
+            return $ingredient->recipes
+                ->first(fn ($r) => str_starts_with($r->description ?? '', 'Unpackage'));
+        }
+
+        // convert = a Converter ore-conversion recipe (raw from another raw +
+        // Reanimated SAM, T68) — not just any alt that happens to produce the raw.
+        return $ingredient->recipes
+            ->first(fn ($r) => optional($r->building)->name === BuildingEnum::CONVERTER->value);
+    }
+
+    /**
+     * Raw source-mode configs in a recipe-bearing mode (convert + unpackage), keyed
+     * by raw. V79: gated on mode only — the recipe no longer lives here.
+     *
+     * @return \Illuminate\Support\Collection<string, array{mode: string}>
+     */
+    protected function rawSourceConfigs(): Collection
+    {
+        return collect(request('raw_sources', []))
+            ->filter(fn ($config) => is_array($config)
+                && in_array($config['mode'] ?? 'import', ['convert', 'unpackage'], true));
+    }
+
+    /** Raw product names sourced via a convert/unpackage recipe (V61/V63 loop candidates). */
+    protected function rawRecipeProducts(): Collection
+    {
+        return $this->rawSourceConfigs()->keys();
     }
 
     public function getSteps(): Step
