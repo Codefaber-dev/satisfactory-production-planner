@@ -23,6 +23,12 @@ class ProductionCachePayloadTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+
+        // Parallel CI workers share the redis test prefix and flush it in their
+        // own setUp, which can evict this test's entries between a write and a
+        // read-back. Use the in-memory array store (per-process, isolated) — the
+        // plain-array guarantee under test is store-agnostic.
+        config()->set('cache.default', 'array');
         Cache::flush();
     }
 
