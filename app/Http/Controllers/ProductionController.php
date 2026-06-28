@@ -48,7 +48,9 @@ class ProductionController extends Controller
 
         $choices = collect(request('choices'))->map(fn ($name) => r($name));
 
-        $calc = ProductionCalculator::make(
+        // V70: cache only the plain-array payload (finite TTL, whitelisted key),
+        // never the live calculator object graph.
+        $production = ProductionCalculator::cachedPayload(
             product: $product,
             qty: $yield = $qty,
             recipe: $recipe,
@@ -56,21 +58,6 @@ class ProductionController extends Controller
             variant: $variant,
             choices: $choices
         );
-
-        $production = [
-            'results' => $calc->getResults(),
-            'byproducts_used' => $calc->getByproductsUsed(),
-            'raw_materials' => $calc->getRawMaterials(),
-            'intermediate_materials' => $calc->getIntermediateMaterials(),
-            'all_materials' => $calc->getAllMaterials(),
-            'final' => $calc->getSteps()->toArray(),
-            'recipe' => $calc->getSteps()->getRecipe(),
-            'overrides' => $calc->getSteps()->getOverrides(),
-            'byproducts' => $calc->getByproducts(),
-            'overviews' => $calc->getOverviews(),
-        ];
-
-        // dd($calc->getOverviews());
 
         $imports = request('imports');
         $belt_speed = request('belt_speed', 780);
@@ -101,14 +88,13 @@ class ProductionController extends Controller
         $building_multiples = request('building_multiples', []);
         $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
 
-        // add request vars to cache key
-        $requestVars = request()->all();
-
+        // V70/B46: key from whitelisted inputs only — the md5(request()->all())
+        // term minted a new never-evicted entry per distinct/irrelevant param.
         $cacheKey = 'multi_production_'
             .md5(collect(compact('products', 'yields', 'recipes', 'variant', 'choices', 'even', 'speedLimit', 'belt_speed', 'imports'))->toJson())
-            .md5(collect($requestVars)->toJson());
+            .ProductionCalculator::requestCacheSegment();
 
-        $production = Cache::rememberForever($cacheKey, function () use ($products, $yields, $recipes, $variant, $choices) {
+        $production = Cache::remember($cacheKey, ProductionCalculator::CACHE_TTL, function () use ($products, $yields, $recipes, $variant, $choices) {
 
             $m = new Multiplexer;
 
@@ -132,7 +118,9 @@ class ProductionController extends Controller
             $m->recalculateUsingByproducts();
             $m->recalculateUsingByproducts();
 
-            return $production = [
+            // V70: json round-trip → plain arrays only (no objects/Eloquent) in
+            // the cached payload, identical in shape to the Inertia props.
+            return json_decode(json_encode([
                 'results' => $m->getResults(),
                 'byproducts_used' => $m->getByproductsUsed(),
                 'raw_materials' => $m->getRawMaterials(),
@@ -143,7 +131,7 @@ class ProductionController extends Controller
                 'overrides' => $m->getOverrides(),
                 'byproducts' => $m->getByproducts(),
                 'overviews' => $m->getOverviews(),
-            ];
+            ]), true);
         });
 
         return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
