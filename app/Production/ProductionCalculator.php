@@ -49,51 +49,125 @@ class ProductionCalculator
         $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = 'mk1', $choices = [], $byproducts = []
     ): static {
 
-        // Encode effective favorites in the cache key to prevent cross-user contamination (B13).
-        // When null, load recipe IDs from session NOW (outside the closure) so the key differs
-        // per user. The closure still receives the original $favorites so ProductionGlobals
-        // resolves them in the normal keyed format via getMappedFavorites().
+        // V70/B46: make() returns the LIVE calculator object (callers use its
+        // methods) but no longer caches it. Forever-caching this object graph
+        // (full Step tree + ProductionGlobals collections) produced huge
+        // serialized blobs whose unserialize exhausted the 128 MB PHP memory
+        // limit. The result cache now lives at the plain-array payload layer
+        // (cachedPayload()), keyed by whitelisted inputs under a finite TTL.
+        $production = (new static)->setProduct($product)
+            ->setQty($qty)
+            ->setRecipe($recipe)
+            ->setOverrides($overrides)
+            ->setFavorites($favorites)
+            ->setImports($imports)
+            ->setVariant($variant)
+            ->setChoices($choices)
+            ->setByproducts($byproducts)
+            ->setUsedByproducts([]);
+
+        $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
+
+        $production->calculate();
+
+        $production->doParse();
+
+        // if production byproducts can be utilized then calculate again
+        if ($production->hasUsableByproducts()) {
+            // do it three times for good measure
+            $production->recalculateUsingByproducts();
+            $production->recalculateUsingByproducts();
+            $production->recalculateUsingByproducts();
+        }
+
+        return $production;
+    }
+
+    /**
+     * Finite cache TTL (seconds) for production result payloads — replaces
+     * rememberForever so entries eventually evict instead of growing without
+     * bound (V70/B46).
+     */
+    public const CACHE_TTL = 86400; // 24h
+
+    /**
+     * Request params that actually affect the computed plan. The cache key is
+     * built from these only — NOT request()->all() (V70/B46): hashing the full
+     * request minted a new never-evicted entry per distinct/irrelevant param
+     * (factory id, etc.), and pairing that with forever-cached object graphs
+     * exhausted the 128 MB PHP memory limit in production.
+     */
+    protected const CACHE_REQUEST_KEYS = [
+        'belt_speed', 'even', 'speedLimit', 'imports', 'somersloops',
+        'cost_multiplier', 'power_multiplier', 'building_multiples',
+        'building_cost_multiplier', 'raw',
+    ];
+
+    /**
+     * Hash of the whitelisted, computation-affecting request params (V70).
+     */
+    public static function requestCacheSegment(): string
+    {
+        return md5(collect(request()->only(static::CACHE_REQUEST_KEYS))->toJson());
+    }
+
+    /**
+     * Build (or read from cache) the plain-array result payload for a single
+     * production plan. V70: caches only serializable arrays — never the live
+     * ProductionCalculator/Step graph or Eloquent models — under a finite TTL
+     * and a whitelisted key. Effective favorites are encoded in the key to
+     * prevent cross-user contamination (B13).
+     *
+     * @return array<string, mixed>
+     */
+    public static function cachedPayload(
+        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = 'mk1', $choices = [], $byproducts = []
+    ): array {
+        // Encode effective favorites in the cache key to prevent cross-user
+        // contamination (B13). When null, resolve session favorite IDs now so
+        // the key differs per user.
         $favoritesKey = is_null($favorites)
             ? Favorites::all()->pluck('id')->sort()->values()->all()
             : collect($favorites)->map(fn ($r) => is_object($r) ? $r->id : $r)->sort()->values()->all();
 
-        // add request vars to cache key
-        $requestVars = request()->all();
-
         $cacheKey = 'production_calc_'
             .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'imports', 'variant', 'choices', 'byproducts'))->put('favorites', $favoritesKey)->toJson())
-            .md5(collect($requestVars)->toJson());
+            .static::requestCacheSegment();
 
-        return Cache::rememberForever($cacheKey, function () use ($product, $qty, $recipe, $overrides, $favorites, $imports, $variant, $choices, $byproducts) {
-            $production = (new static)->setProduct($product)
-                ->setQty($qty)
-                ->setRecipe($recipe)
-                ->setOverrides($overrides)
-                ->setFavorites($favorites)
-                ->setImports($imports)
-                ->setVariant($variant)
-                ->setChoices($choices)
-                ->setByproducts($byproducts)
-                ->setUsedByproducts([]);
+        return Cache::remember($cacheKey, static::CACHE_TTL, fn () => static::make(
+            product: $product,
+            qty: $qty,
+            recipe: $recipe,
+            overrides: $overrides,
+            favorites: $favorites,
+            imports: $imports,
+            variant: $variant,
+            choices: $choices,
+            byproducts: $byproducts,
+        )->toPayload());
+    }
 
-            $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
-
-            $production->calculate();
-
-            $production->doParse();
-
-            // if production byproducts can be utilized then calculate again
-
-            if ($production->hasUsableByproducts()) {
-                // do it three times for good measure
-                $production->recalculateUsingByproducts();
-                $production->recalculateUsingByproducts();
-                $production->recalculateUsingByproducts();
-            }
-
-            return $production;
-        });
-
+    /**
+     * Plain-array Inertia payload for this plan. The json round-trip guarantees
+     * no objects/Eloquent models survive into the cache (V70, T113) — identical
+     * in shape to what Inertia serializes to the client.
+     *
+     * @return array<string, mixed>
+     */
+    public function toPayload(): array
+    {
+        return json_decode(json_encode([
+            'results' => $this->getResults(),
+            'byproducts_used' => $this->getByproductsUsed(),
+            'raw_materials' => $this->getRawMaterials(),
+            'intermediate_materials' => $this->getIntermediateMaterials(),
+            'all_materials' => $this->getAllMaterials(),
+            'final' => $this->getSteps()->toArray(),
+            'recipe' => $this->getSteps()->getRecipe(),
+            'overrides' => $this->getSteps()->getOverrides(),
+            'byproducts' => $this->getByproducts(),
+            'overviews' => $this->getOverviews(),
+        ]), true);
     }
 
     public function recalculateUsingByproducts($byproducts = null, $used_byproducts = null)
