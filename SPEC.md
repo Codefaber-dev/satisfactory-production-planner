@@ -189,7 +189,7 @@ Backport `app/Helpers/UpdateOneZero.php` into the canonical seeders so a fresh `
 | T121 | x      | Dead legacy calc layer: confirm `app/Helpers/ProductionCalculator.php` (413 lines) + `ProductionStats.php` unreferenced (grep clean outside app/Helpers; `ProductionTree` used only by own test — but V58 reserves TopSort build-ordering, decide keep/drop) → delete + drop orphaned tests | V58 |
 | T122 | x      | Migration: index `recipes.description` (`Recipe::ofName` firstWhere scan) | I.base-data |
 | T123 | x      | Split `Show.vue` (972 lines > 800 cap): extract Plan Settings panel + Building Settings panel components; behavior unchanged (existing ShowProduction tests green) | V38, V51 |
-| T124 | .      | Model-level `rememberForever` → finite TTL + plain-array/id payloads: `r()`/`i()`/`b()` (helpers.php), `baseRecipe`, `mostEnergyEfficientRecipe`/`mostResourceEfficientRecipe` (Ingredient.php) — cached Recipe carries full `$with` graph (ingredients/byproducts/building/product). Extends V70 beyond the two plan-cache sites; keep observer invalidation | I.prod-cache, V70 |
+| T124 | x      | Model-level `rememberForever` → finite TTL + plain-array/id payloads: `r()`/`i()`/`b()` (helpers.php), `baseRecipe`, `mostEnergyEfficientRecipe`/`mostResourceEfficientRecipe` (Ingredient.php) — cached Recipe carries full `$with` graph (ingredients/byproducts/building/product). Extends V70 beyond the two plan-cache sites; keep observer invalidation | I.prod-cache, V70 |
 ## §B — Bug Log
 
 | id | date | cause | fix |

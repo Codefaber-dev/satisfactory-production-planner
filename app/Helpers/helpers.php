@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
+// Finite TTL for model-level caches (T124): entries evict instead of living
+// forever; observers still invalidate on save. 24h, matching the payload caches.
+const MODEL_CACHE_TTL = 86400;
+
 function guest_token(): string
 {
     return Session::getId();
@@ -34,7 +38,7 @@ function r($name, $force = false)
         Cache::forget("recipes.$key");
     }
 
-    return Cache::rememberForever("recipes.$key", function () use ($name) {
+    return Cache::remember("recipes.$key", MODEL_CACHE_TTL, function () use ($name) {
         if (is_string($name)) {
             return Recipe::ofName($name);
         }
@@ -51,7 +55,7 @@ function i($name, bool $force = false)
         Cache::forget("ingredients.$key");
     }
 
-    return Cache::rememberForever("ingredients.$key", function () use ($name) {
+    return Cache::remember("ingredients.$key", MODEL_CACHE_TTL, function () use ($name) {
         if (is_string($name)) {
             return Ingredient::ofName($name);
         }
@@ -62,7 +66,7 @@ function i($name, bool $force = false)
 
 function b($name)
 {
-    return Cache::rememberForever("buildings.{$name}", function () use ($name) {
+    return Cache::remember("buildings.{$name}", MODEL_CACHE_TTL, function () use ($name) {
         return Building::whereName($name)->first();
     });
 }
