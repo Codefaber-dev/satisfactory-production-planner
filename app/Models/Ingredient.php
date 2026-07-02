@@ -20,6 +20,8 @@ class Ingredient extends Model
     protected $casts = [
         'raw' => 'bool',
         'tier' => 'int',
+        'is_liquid' => 'bool',
+        'sink_points' => 'int',
     ];
 
     /**
@@ -28,6 +30,24 @@ class Ingredient extends Model
     public function isRaw(): bool
     {
         return (bool) $this->raw;
+    }
+
+    /**
+     * AWESOME Sink eligibility (V65): solid only — unpackaged fluids/gases are not
+     * sinkable (their Packaged forms are) — and must carry a positive points value.
+     */
+    public function isSinkable(): bool
+    {
+        return ! $this->is_liquid && (int) $this->sink_points > 0;
+    }
+
+    /**
+     * Recyclable points/min for a given flow rate (V65): qty/min × sink_points,
+     * or 0 when the item is not sinkable.
+     */
+    public function recyclablePoints(float $qtyPerMin): float
+    {
+        return $this->isSinkable() ? $qtyPerMin * (int) $this->sink_points : 0.0;
     }
 
     public static function ofName($name, $default = null): ?Ingredient

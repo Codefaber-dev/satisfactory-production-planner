@@ -32,6 +32,9 @@ class GuestFactories implements FactoriesContract
                     'factory' => $atts['id'],
                     'imports' => $atts['imports'],
                     'choices' => $atts['choices'] ?? [],
+                    'raw_sources' => $atts['raw_sources'] ?? [],
+                    'import_notes' => $atts['import_notes'] ?? [],
+                    'auto_package_recycle' => ! empty($atts['auto_package_recycle']) ? 1 : 0,
                 ]);
                 $atts['url'] = "/dashboard/{$product->name}/{$atts['yield']}/{$description}/?{$params}";
 
@@ -62,6 +65,9 @@ class GuestFactories implements FactoriesContract
         $line->yield = (isset($attributes['yield']) && (bool) $attributes['yield']) ? $attributes['yield'] : $line->yield;
         $line->notes = (isset($attributes['notes'])) ? $attributes['notes'] : $line->notes;
         $line->imports = (isset($attributes['imports'])) ? $attributes['imports'] : $line->imports;
+        $line->raw_sources = (isset($attributes['raw_sources'])) ? $attributes['raw_sources'] : $line->raw_sources;
+        $line->import_notes = (isset($attributes['import_notes'])) ? $attributes['import_notes'] : $line->import_notes;
+        $line->auto_package_recycle = (isset($attributes['auto_package_recycle'])) ? $attributes['auto_package_recycle'] : $line->auto_package_recycle;
         $line->is_shared = (isset($attributes['is_shared'])) ? $attributes['is_shared'] : $line->is_shared;
 
         $line->recipe_id ??= Ingredient::find($line->ingredient_id)->baseRecipe()->id;

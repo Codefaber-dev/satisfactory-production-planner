@@ -22,7 +22,7 @@
             <ul v-if="links.length" class="mt-2 flex max-h-[400px] flex-col overflow-y-auto pr-8">
                 <li v-for="link in filteredLinks">
                     <button
-                        class="text-sm text-cyan-600 hover:text-cyan-500 dark:text-cyan-200 dark:hover:text-cyan-100"
+                        class="text-sm text-cyan-600 hover:text-cyan-500 dark:text-cyan-200 dark:hover:text-cyan-100 whitespace-nowrap"
                         @click="scrollTo(link.identifier)"
                     >
                         {{ link.checked ? '✅ ' : '' }} {{ link.identifier }} {{ link.name }}
