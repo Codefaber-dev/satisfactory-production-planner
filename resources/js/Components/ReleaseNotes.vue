@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import { router } from '@inertiajs/vue3';
+
 export default {
     name: 'ReleaseNotes',
 
@@ -32,9 +34,30 @@ export default {
         };
     },
 
+    mounted() {
+        // releaseNotes is an optional (lazy) Inertia prop — absent by default.
+        // Un-acked visitors auto-show the modal, so fetch the content now.
+        if (this.show) {
+            this.load();
+        }
+    },
+
     methods: {
+        // Partial-reload just the releaseNotes prop; server renders it on demand.
+        load() {
+            if (this.releaseNotes) {
+                return;
+            }
+
+            router.reload({ only: ['releaseNotes'] });
+        },
+
         toggle() {
             this.show = !this.show;
+
+            if (this.show) {
+                this.load();
+            }
         },
 
         acknowledge() {
