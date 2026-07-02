@@ -16,6 +16,9 @@ class ProductionCalculator
     // V58: cap on loop steady-state iterations (productive loops converge in a few)
     protected const MAX_LOOP_ITERATIONS = 15;
 
+    // V74: cap on byproduct recalculation passes (was a fixed 3× "for good measure")
+    protected const MAX_BYPRODUCT_PASSES = 3;
+
     // V58: warnings for loops that could not be solved (fell back to propagated demand)
     protected array $loop_warnings = [];
 
@@ -72,15 +75,39 @@ class ProductionCalculator
 
         $production->doParse();
 
-        // if production byproducts can be utilized then calculate again
+        // if production byproducts can be utilized then calculate again.
+        // V74: iterate to steady state with an early exit instead of a fixed
+        // 3× — an identical byproduct state means further passes are no-ops,
+        // so stopping early is byte-identical to the old fixed-pass behavior.
         if ($production->hasUsableByproducts()) {
-            // do it three times for good measure
-            $production->recalculateUsingByproducts();
-            $production->recalculateUsingByproducts();
-            $production->recalculateUsingByproducts();
+            $previous = null;
+
+            for ($pass = 0; $pass < self::MAX_BYPRODUCT_PASSES; $pass++) {
+                $production->recalculateUsingByproducts();
+
+                $state = $production->byproductState();
+
+                if ($state === $previous) {
+                    break;
+                }
+
+                $previous = $state;
+            }
         }
 
         return $production;
+    }
+
+    /**
+     * Serialized byproduct production/consumption state, used to detect
+     * convergence between recalculation passes (V74).
+     */
+    public function byproductState(): string
+    {
+        return json_encode([
+            'byproducts' => $this->getByproducts(),
+            'used' => $this->getByproductsUsed(),
+        ]);
     }
 
     /**

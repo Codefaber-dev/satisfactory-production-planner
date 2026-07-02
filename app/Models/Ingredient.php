@@ -115,7 +115,7 @@ class Ingredient extends Model
      */
     public function baseRecipe(): Recipe
     {
-        return Cache::rememberForever("base_recipe.{$this->id}", function () {
+        return Cache::remember("base_recipe.{$this->id}", MODEL_CACHE_TTL, function () {
             if ($recipe = $this->recipes()->firstWhere('alt_recipe', false)) {
                 return $recipe;
             }
@@ -130,7 +130,7 @@ class Ingredient extends Model
 
     public function mostEnergyEfficientRecipe()
     {
-        return Cache::rememberForever("most_energy_efficient_recipe.{$this->id}", function () {
+        return Cache::remember("most_energy_efficient_recipe.{$this->id}", MODEL_CACHE_TTL, function () {
             return $this->recipes->map(function ($recipe) {
                 try {
                     return [
@@ -146,7 +146,7 @@ class Ingredient extends Model
 
     public function mostResourceEfficientRecipe()
     {
-        return Cache::rememberForever("most_resource_efficient_recipe.{$this->id}", function () {
+        return Cache::remember("most_resource_efficient_recipe.{$this->id}", MODEL_CACHE_TTL, function () {
             return $this->recipes->map(function ($recipe) {
                 try {
                     return [

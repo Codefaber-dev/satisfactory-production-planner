@@ -61,15 +61,6 @@
                         </option>
                     </select>
                     <template v-if="index === 0">
-<!--                        <select-->
-<!--                            v-model="form.variant"-->
-<!--                            class="w-full rounded py-2 px-1 shadow dark:bg-sky-800 md:w-[unset]"-->
-<!--                        >-->
-<!--                            <option value="mk1">Production mk1 (base)</option>-->
-<!--                            <option disabled value="mk2">Production mk2 (mk++ mod) (no mod support yet)</option>-->
-<!--                            <option disabled value="mk3">Production mk3 (mk++ mod) (no mod support yet)</option>-->
-<!--                            <option disabled value="mk4">Production mk4 (mk++ mod) (no mod support yet)</option>-->
-<!--                        </select>-->
                         <button @click="addOutput" class="btn btn-emerald">Add Output</button>
                     </template>
                     <template v-else>
@@ -97,167 +88,23 @@
                     </button>
                 </div>
 
-                <div v-if="showBuildingSettings" class="rounded border border-sky-700 p-3 mb-2">
-                    <h2 class="mb-1 font-bold text-xl">
-                        Plan Settings
-                    </h2>
-                    <div class="mb-4 flex flex-wrap gap-3">
-                        <div
-                            data-test="plan-setting-card"
-                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
-                        >
-                            <RocketLaunchIcon alt="Belt Speed" class="h-10 w-10 shrink-0"/>
-                            <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-xl font-bold">Belt Speed</label>
-                                <select
-                                    v-model="form.belt_speed"
-                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
-                                >
-                                    <option value="60">60 per min (mk1)</option>
-                                    <option value="120">120 per min (mk2)</option>
-                                    <option value="270">270 per min (mk3)</option>
-                                    <option value="480">480 per min (mk4)</option>
-                                    <option value="780">780 per min (mk5)</option>
-                                    <option value="1200">1200 per min (mk6)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div
-                            data-test="plan-setting-card"
-                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
-                        >
-                            <QueueListIcon alt="Recipe Cost" class="h-10 w-10 shrink-0"/>
-                            <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-xl font-bold">Recipe Cost ×</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    min="0.1"
-                                    max="10"
-                                    v-model.number="costMultiplier"
-                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
-                                    title="Recipe cost multiplier (1.0 = default)"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            data-test="plan-setting-card"
-                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
-                        >
-                            <BuildingOffice2Icon alt="Building Cost" class="h-10 w-10 shrink-0"/>
-                            <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-xl font-bold">Building Cost ×</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    min="0.1"
-                                    max="10"
-                                    v-model.number="buildingCostMultiplier"
-                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
-                                    title="Building cost multiplier (1.0 = default)"
-                                />
-                            </div>
-                        </div>
-                        <div
-                            data-test="plan-setting-card"
-                            class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
-                        >
-                            <PowerIcon alt="Power Cost" class="h-10 w-10 shrink-0"/>
-                            <div class="flex w-full flex-col space-y-1">
-                                <label class="whitespace-nowrap text-xl font-bold">Power Cost ×</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    min="0.1"
-                                    max="10"
-                                    v-model.number="powerMultiplier"
-                                    class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
-                                    title="Power cost multiplier (1.0 = default)"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <template v-if="uniqueBuildings.length">
-                    <h2 class="mb-1 font-bold text-xl">
-                        Blueprint Mode
-                    </h2>
-                    <p class="mb-2 font-medium text-slate-700 dark:text-slate-100">
-                        When enabled, production will be divided evenly into groups of the specified number of buildings
-                    </p>
-                    <div class="mb-2 flex flex-wrap items-center gap-2">
-                        <span class="font-medium text-slate-700 dark:text-slate-100">Blueprint Designer</span>
-                        <button
-                            v-for="(dim, mk) in designerDims"
-                            :key="mk"
-                            type="button"
-                            @click="setDesignerMk(mk)"
-                            :class="[bpDesigner === mk ? 'btn-gray' : 'btn-emerald']"
-                            class="btn-sm"
-                        >
-                            Mk.{{ mk.slice(2) }} ({{ dim }}m)
-                        </button>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
-                            <label class="relative inline-flex cursor-pointer items-center">
-                                <input
-                                    type="checkbox"
-                                    :id="`bp-toggle-${building}`"
-                                    :checked="!!bpEnabled[building]"
-                                    @change="toggleBlueprintEnabled(building)"
-                                    class="peer sr-only"
-                                />
-                                <span
-                                    class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
-                                ></span>
-                            </label>
-                            <label :for="`bp-toggle-${building}`" class="cursor-pointer whitespace-nowrap">
-                                {{ building }}
-                            </label>
-                            <input
-                                type="number"
-                                min="1"
-                                max="40"
-                                step="1"
-                                :value="bpSizes[building] || 1"
-                                :disabled="!bpEnabled[building]"
-                                @change="setBlueprintSize(building, $event.target.value)"
-                                class="w-14 rounded py-1 px-1 text-sm shadow disabled:opacity-40 dark:bg-sky-800"
-                            />
-                        </div>
-                    </div>
-                    </template>
-                    <div class="mt-3">
-                        <button :disabled="working" @click="fetch({ preserveScroll: true })" class="btn btn-emerald">
-                            Update
-                        </button>
-                    </div>
-                </div>
-                <!--            <div class="mt-4 flex flex-col">-->
-                <!--                <hr class="mb-4" />-->
-                <!--                <span class="font-semibold">-->
-                <!--                    Recipe:-->
-                <!--                    <ul class="flex">-->
-                <!--                        <li-->
-                <!--                            class="px-4 font-medium"-->
-                <!--                            v-for="ing in production.final.recipe.ingredients"-->
-                <!--                        >-->
-                <!--                            {{ ing.name }} ({{ +ing.pivot.base_qty }} per min)-->
-                <!--                        </li>-->
-                <!--                    </ul>-->
-                <!--                </span>-->
-                <!--                <span class="font-semibold">-->
-                <!--                    Byproducts:-->
-                <!--                    <ul class="flex">-->
-                <!--                        <li-->
-                <!--                            class="px-4 font-medium"-->
-                <!--                            v-for="ing in production.final.recipe.byproducts"-->
-                <!--                        >-->
-                <!--                            {{ ing.name }} ({{ +ing.pivot.base_qty }} per min)-->
-                <!--                        </li>-->
-                <!--                    </ul>-->
-                <!--                </span>-->
-                <!--            </div>-->
+                <plan-settings-panel
+                    v-if="showBuildingSettings"
+                    v-model:belt-speed="form.belt_speed"
+                    v-model:cost-multiplier="costMultiplier"
+                    v-model:building-cost-multiplier="buildingCostMultiplier"
+                    v-model:power-multiplier="powerMultiplier"
+                    :unique-buildings="uniqueBuildings"
+                    :designer-dims="designerDims"
+                    :bp-designer="bpDesigner"
+                    :bp-enabled="bpEnabled"
+                    :bp-sizes="bpSizes"
+                    :working="working"
+                    @set-designer-mk="setDesignerMk"
+                    @toggle-blueprint-enabled="toggleBlueprintEnabled"
+                    @set-blueprint-size="setBlueprintSize"
+                    @apply="fetch({ preserveScroll: true })"
+                />
             </div>
         </template>
         <!-- end template header -->
@@ -349,25 +196,20 @@ import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, sav
 import { DESIGNER_DIMS, loadDesignerMk, saveDesignerMk } from '@/blueprintFootprint';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
 import ProductionSteps from '@/Pages/Production/ProductionSteps';
-import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import ProductionWarning from '@/Pages/Production/ProductionWarning';
 import ProductionQuickNav from '@/Components/ProductionQuickNav.vue';
-import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon } from '@heroicons/vue/24/outline';
+import PlanSettingsPanel from '@/Pages/Production/PlanSettingsPanel.vue';
 
 export default {
     name: 'ShowNew',
 
     components: {
         ProductionQuickNav,
-        BuildingSummary,
         ProductionSteps,
         ProductionSummary,
         AppLayout,
         ProductionWarning,
-        RocketLaunchIcon,
-        QueueListIcon,
-        BuildingOffice2Icon,
-        PowerIcon,
+        PlanSettingsPanel,
     },
 
     mounted() {
@@ -464,13 +306,6 @@ export default {
             newFactory: this.multi ? this.multiFactory : this.factory,
             done: true,
             working: false,
-            // newYield: this.yield,
-            // newProduct: this.products.filter(o => o.id === this.product.id)[0],
-            // newRecipe: this.recipes[this.product.name].filter(o => o.id === this.production.recipe.id)[0],
-            // newVariant: this.variant,
-            // recipe_models: this.production.recipe_models,
-            // newBeltSpeed: this.belt_speed || 780,
-            // production_recipes : this.production.recipes,
             productionChecks: {},
             buildingChecks: {},
             hideCompleted: true,
@@ -535,10 +370,6 @@ export default {
         },
 
         production__building_details() {
-            // if (! this.$refs.productionSteps) {
-            //     return [];
-            // }
-
             return Object.values(this.overviews).map((o) => {
                 const clock = o.clock;
                 const variant_name = o.selected_variant_name;
@@ -549,25 +380,6 @@ export default {
                     ...o.overviews[clock].details[variant_name],
                 };
             });
-
-            // let ret = [];
-            //
-            // for (let tier in this.production.results) {
-            //     if (+tier === 1) continue;
-            //
-            //     for (let ing in this.production.results[tier]) {
-            //         this.production.results[tier][ing].production.forEach(p => {
-            //             let selected =
-            //             ret.push({
-            //                 product: ing,
-            //                 variant_name: p.overview.selected_variant_name,
-            //                 ...p.overview.details[p.overview.selected_variant_name],
-            //             });
-            //         });
-            //     }
-            // }
-            //
-            // return ret;
         },
 
         production__building_summary() {
@@ -587,35 +399,6 @@ export default {
             ret.total_build_cost = this.production__building_details.mapAndSumProperties('build_cost');
 
             return ret;
-
-            // let ret = {};
-            // ret.total_build_cost = {};
-            // ret.variants = {};
-            // this.production__building_details.forEach((o) => {
-            //     if (!ret.variants.hasOwnProperty(o.variant_name))
-            //         ret.variants[o.variant_name] = Object.assign({}, o);
-            //     else {
-            //         ret.variants[o.variant_name].num_buildings += o.num_buildings;
-            //         ret.variants[o.variant_name].power_usage += o.power_usage;
-            //     }
-            //
-            //     for (let prop in o.build_cost) {
-            //         // increment the build cost for the particular building
-            //         if (ret.variants[o.variant_name].build_cost.hasOwnProperty(prop))
-            //             ret.variants[o.variant_name].build_cost[prop] +=
-            //                 o.build_cost[prop];
-            //         else
-            //             ret.variants[o.variant_name].build_cost[prop] =
-            //                 o.build_cost[prop];
-            //
-            //         // increment the total build cost
-            //         if (ret.total_build_cost.hasOwnProperty(prop))
-            //             ret.total_build_cost[prop] += o.build_cost[prop];
-            //         else ret.total_build_cost[prop] = o.build_cost[prop];
-            //     }
-            // });
-
-            // return ret;
         },
 
         production__total_power() {
@@ -861,14 +644,6 @@ export default {
             this.$inertia.post(`/favorites/${this.recipe.id}`);
         },
 
-        // setDefaultRecipe(row) {
-        //     this.recipes[row.product.name].forEach((recipe) => {
-        //         if (this.isFavorite(recipe)) {
-        //             row.recipe = recipe;
-        //         }
-        //     });
-        // },
-
         setDefaultRecipe(row) {
             const available = this.recipes[row.product.name];
 
@@ -938,23 +713,6 @@ export default {
         savePrefs() {
             store.setItem('diagrams', this.diagrams);
         },
-
-        // getOutputs(name) {
-        //     let ret = {};
-        //
-        //     Object.keys(this.production.recipes)
-        //         .filter((product) => {
-        //             return !!this.production.recipes[product];
-        //         })
-        //         .filter((product) => {
-        //             return this.production.recipes[product].inputs[name]?.needed_qty > 0;
-        //         })
-        //         .forEach((product) => {
-        //             ret[product] = Math.round(10000 * this.production.recipes[product].inputs[name].needed_qty) / 10000;
-        //         });
-        //
-        //     return ret;
-        // },
 
         helpRawMaterials() {
             alert(

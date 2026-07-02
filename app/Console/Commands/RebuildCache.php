@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Enums\Ingredient;
 use App\Enums\Recipe;
+use App\Support\BaseDataPayload;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 
 class RebuildCache extends Command
 {
@@ -40,11 +40,10 @@ class RebuildCache extends Command
             r($recipe->value, force: true);
         });
 
-        $this->info('Caching all recipes');
-        Cache::forget('all_recipes');
-        Cache::remember('all_recipes', now()->addDay(), function () {
-            return \App\Models\Recipe::all()->groupBy(fn ($recipe) => $recipe->product->name);
-        });
+        $this->info('Caching base-data payloads');
+        BaseDataPayload::flush();
+        BaseDataPayload::recipes();
+        BaseDataPayload::products();
 
         return static::SUCCESS;
     }

@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Inertia\Middleware;
 use Laravel\Jetstream\Jetstream;
 
@@ -40,15 +42,26 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
-        $releaseNotesFile = Jetstream::localizedMarkdownPath('release-notes.md');
-        $releaseNotes = Str::markdown(file_get_contents($releaseNotesFile));
-        $version = config('app.version');
-
         return array_merge(parent::share($request), [
             'user' => auth()->check() ? $request->user()->toArray() : new User,
-            'releaseNotes' => $releaseNotes,
-            'version' => $version,
+            // V72: optional prop — only rendered + shipped when the client
+            // partial-reloads it (release-notes modal), not on every response.
+            'releaseNotes' => Inertia::optional(fn () => static::releaseNotesHtml()),
+            'version' => config('app.version'),
             'donations' => 1 * config('app.donations'),
         ]);
+    }
+
+    /**
+     * Rendered release-notes HTML, cached per app version (V72). The key
+     * rotates with config('app.version'), so rememberForever self-invalidates
+     * on release; the markdown file is parsed once per version, not per request.
+     */
+    public static function releaseNotesHtml(): string
+    {
+        return Cache::rememberForever(
+            'release_notes_html:'.config('app.version'),
+            fn () => Str::markdown(file_get_contents(Jetstream::localizedMarkdownPath('release-notes.md')))
+        );
     }
 }

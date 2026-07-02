@@ -8,14 +8,16 @@
 </template>
 
 <script>
-import { marked } from 'marked';
+import MarkdownIt from 'markdown-it';
+
+const markdown = new MarkdownIt();
 
 export default {
     name: 'Parser',
 
     mounted() {
         const text = this.$refs.content?.textContent ?? '';
-        this.rendered = marked.parse(text.trim());
+        this.rendered = markdown.render(text.trim());
     },
 
     data() {

@@ -1523,7 +1523,7 @@ class RecipeSeeder extends Seeder
             IngredientEnum::TURBOFUEL->value => [
                 [
                     'base_yield' => 5,
-                    'base_per_min' => 18.8,
+                    'base_per_min' => 18.75,
                     'ingredients' => [
                         IngredientEnum::FUEL->value => 22.5,
                         IngredientEnum::COMPACTED_COAL->value => 15,
@@ -2090,7 +2090,7 @@ class RecipeSeeder extends Seeder
             IngredientEnum::TURBO_MOTOR->value => [
                 [
                     'base_yield' => 1,
-                    'base_per_min' => 1.9,
+                    'base_per_min' => 1.875,
                     'ingredients' => [
                         IngredientEnum::COOLING_SYSTEM->value => 7.5,
                         IngredientEnum::RADIO_CONTROL_UNIT->value => 3.75,

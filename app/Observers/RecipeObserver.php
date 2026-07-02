@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Recipe;
 use App\Production\Concerns\InvalidatesProductionCache;
+use App\Support\BaseDataPayload;
 use Illuminate\Support\Facades\Cache;
 
 class RecipeObserver
@@ -24,6 +25,8 @@ class RecipeObserver
         Cache::forget("most_energy_efficient_recipe.{$recipe->product_id}");
         Cache::forget("most_resource_efficient_recipe.{$recipe->product_id}");
         Cache::forget('loop_catalog');
+
+        BaseDataPayload::flush();
 
         $this->flushProductionCalcKeys();
     }

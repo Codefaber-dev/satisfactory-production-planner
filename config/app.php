@@ -85,7 +85,7 @@ return [
 
     'name' => 'Satisfactory Production Planner',
 
-    'version' => '1.2.2',
+    'version' => '1.2.3',
 
     'donations' => env('DONATIONS', 0),
 

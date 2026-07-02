@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### 🔄 Circular Recipes, Solved
+### ⚡ Faster Everywhere
 
-- The planner now solves recipes that feed each other (recycled Plastic/Rubber loops) instead of dodging them — plus a per-output "Fill to 100%" and saved factories that keep your recipe choices.
+- A performance pass across the whole planner: pages load noticeably faster, plans calculate quicker, and the app downloads less to your browser. No gameplay changes — just speed.
 
-## v1.2.2 - Circular Dependency Update
+## v1.2.3 - Performance Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -31,6 +31,17 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.2.3
+
+- ⚡ **Faster Page Loads** — The recipe and product data that powers every planner page is now pre-built and cached on the server instead of being recomputed on every request. This was the single biggest cost on each page view and it's gone.
+- 🧮 **Quicker Calculations** — The calculator now stops recalculating byproduct recycling as soon as the numbers settle, instead of always running extra passes. Same results, less waiting — especially on Update-heavy sessions.
+- 📦 **Smaller Download** — A frontend cleanup pass removed duplicate and unused libraries. The app bundle is about 13% smaller, so first visits and updates load faster.
+- 📔 **Lighter Pages** — These release notes are now only fetched when you open them, instead of being shipped with every single page.
+- 🪲 Fix for self-hosted installs: the database seeder now has the corrected Turbo Motor (1.875/min) and Turbofuel (18.75/min) rates, so a fresh install matches the live site without extra steps.
+- 🔒 Internal hardening: removed a legacy maintenance endpoint and tightened server-side caching.
+
+---
 
 ### v1.2.2
 

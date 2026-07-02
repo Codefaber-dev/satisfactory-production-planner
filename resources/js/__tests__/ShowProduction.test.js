@@ -245,6 +245,9 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
                     BuildingSummary: true,
                     ProductionWarning: true,
                     ProductionQuickNav: true,
+                    // panel extracted to its own component (T123) — render it
+                    // for real so the card/control assertions still apply
+                    PlanSettingsPanel: false,
                 },
             },
             props: { ...defaultProps, ...propsOverride },

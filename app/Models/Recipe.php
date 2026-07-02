@@ -158,12 +158,12 @@ class Recipe extends Model
 
     public function getEnergyEfficientAttribute()
     {
-        return Cache::rememberForever("recipe.{$this->id}.energy_efficient", fn () => $this->is($this->product->recipes()->orderBy('energy')->first()));
+        return Cache::remember("recipe.{$this->id}.energy_efficient", MODEL_CACHE_TTL, fn () => $this->is($this->product->recipes()->orderBy('energy')->first()));
     }
 
     public function getResourceEfficientAttribute()
     {
-        return Cache::rememberForever("recipe.{$this->id}.resource_efficient", fn () => $this->is($this->product->recipes()->orderBy('resource')->first()));
+        return Cache::remember("recipe.{$this->id}.resource_efficient", MODEL_CACHE_TTL, fn () => $this->is($this->product->recipes()->orderBy('resource')->first()));
     }
 
     public function getEnergyUsage()

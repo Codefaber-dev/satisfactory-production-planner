@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Recipe;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\MultiProductionLineController;
@@ -8,7 +7,6 @@ use App\Http\Controllers\PowerPlanController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionLineController;
 use App\Http\Controllers\SharedFactoryController;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,14 +24,6 @@ use Illuminate\Support\Facades\Route;
 // redirect the old domain to the new
 Route::domain('satisfactory.codefaber.dev')->group(function () {
     Route::permanentRedirect('{any}', str_replace('satisfactory.codefaber.dev', 'satisfactoryproductionplanner.com', Request::fullUrl()));
-});
-
-Route::get('/apply-fixes', function () {
-    r(Recipe::TURBO_MOTOR->value)->update(['base_per_min' => 1.875]);
-    r(Recipe::TURBOFUEL->value)->update(['base_per_min' => 18.75]);
-
-    Artisan::call('rebuild-cache');
-    Artisan::call('flush-production-cache');
 });
 
 Route::get('/favorites', [FavoritesController::class, 'index'])->name('favorites');
