@@ -15,7 +15,6 @@
         "laravel/jetstream": "^5.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.7",
-        "marcj/topsort": "^2.0",
         "predis/predis": "^3.0",
         "tightenco/ziggy": "^2.0"
     },
