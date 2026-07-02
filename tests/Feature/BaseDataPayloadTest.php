@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Favorites\Facades\Favorites;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Models\User;
@@ -83,7 +84,7 @@ class BaseDataPayloadTest extends TestCase
         // Re-resolve the Favorites singleton (container + facade caches) for
         // the authenticated user.
         $this->app->forgetInstance('Favorites');
-        \App\Favorites\Facades\Favorites::clearResolvedInstance('Favorites');
+        Favorites::clearResolvedInstance('Favorites');
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertInertia(function ($page) use ($recipe) {

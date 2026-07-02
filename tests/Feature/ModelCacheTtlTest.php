@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Building;
+use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -32,9 +34,9 @@ class ModelCacheTtlTest extends TestCase
         $ingredient = i('Iron Plate');
         $building = b('Constructor');
 
-        $this->assertInstanceOf(\App\Models\Recipe::class, $recipe);
-        $this->assertInstanceOf(\App\Models\Ingredient::class, $ingredient);
-        $this->assertInstanceOf(\App\Models\Building::class, $building);
+        $this->assertInstanceOf(Recipe::class, $recipe);
+        $this->assertInstanceOf(Ingredient::class, $ingredient);
+        $this->assertInstanceOf(Building::class, $building);
 
         $this->assertTrue(Cache::has('recipes.Iron Plate'));
         $this->assertTrue(Cache::has('ingredients.Iron Plate'));
