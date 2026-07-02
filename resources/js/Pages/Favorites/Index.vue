@@ -107,7 +107,7 @@
 <script>
 import RecipePicker from '@/Components/RecipePicker';
 import AppLayout from '@/Layouts/AppLayout';
-import { debounce } from 'lodash';
+import { debounce } from '@/debounce';
 
 export default {
     name: 'Index',
