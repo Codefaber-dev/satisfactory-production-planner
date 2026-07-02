@@ -549,11 +549,18 @@ export default {
 
         // V59–V63: a raw's source mode changed. Update the map immutably and refetch
         // so the new sourcing (extractor / convert recipe / unpackage) is applied.
+        // V104/B58: leaving convert/unpackage drops the raw's recipe choice so the
+        // stale pick can't be re-captured on save (backend gate authoritative).
         updateRawSource({ name, config }) {
             this.newRawSources = {
                 ...this.newRawSources,
                 [name]: config,
             };
+
+            if (!['convert', 'unpackage'].includes(config?.mode)) {
+                const { [name]: dropped, ...rest } = this.newChoices;
+                this.newChoices = rest;
+            }
 
             this.fetch({ preserveScroll: true });
         },

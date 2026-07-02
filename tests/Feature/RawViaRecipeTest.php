@@ -217,6 +217,104 @@ class RawViaRecipeTest extends TestCase
     }
 
     #[Test]
+    public function import_mode_ignores_stale_convert_choice(): void
+    {
+        // V104 / B58: a stale choices[raw] entry (left over from a convert dalliance,
+        // a saved factory, or a crafted URL) must NOT make an import-mode raw
+        // recipe-bearing. Import mode = leaf, byte-identical to a fresh import.
+        request()->merge(['raw_sources' => [
+            'Coal' => ['mode' => 'import'],
+        ]]);
+
+        $production = ProductionCalculator::make(
+            product: 'Steel Ingot',
+            qty: 45,
+            choices: ['Coal' => r('Coal (Iron)')],
+        );
+
+        $coal = $this->findStep($production->getSteps(), 'Coal');
+
+        $this->assertNotNull($coal, 'Coal should be a step in the tree.');
+        $this->assertNull($coal->getRecipe(), 'Import-mode Coal must be a leaf despite the stale choice.');
+        $this->assertEmpty($coal->getChildren() ?? [], 'Import-mode Coal must not recurse.');
+    }
+
+    #[Test]
+    public function absent_raw_source_entry_ignores_stale_convert_choice(): void
+    {
+        // V104 / V59: no raw_sources entry at all = default import → same leaf
+        // behavior; the stale choice alone must not flip the raw to convert.
+        $production = ProductionCalculator::make(
+            product: 'Steel Ingot',
+            qty: 45,
+            choices: ['Coal' => r('Coal (Iron)')],
+        );
+
+        $coal = $this->findStep($production->getSteps(), 'Coal');
+
+        $this->assertNotNull($coal, 'Coal should be a step in the tree.');
+        $this->assertNull($coal->getRecipe(), 'Default-import Coal must be a leaf despite the stale choice.');
+        $this->assertEmpty($coal->getChildren() ?? []);
+    }
+
+    #[Test]
+    public function extract_mode_ignores_stale_convert_choice(): void
+    {
+        // V104: extract mode is also a leaf (tier-0 extractor, no recipe) — the
+        // stale convert choice must not override it.
+        request()->merge(['raw_sources' => [
+            'Coal' => ['mode' => 'extract', 'purity' => 'normal', 'miner' => 'mk2', 'shards' => 0],
+        ]]);
+
+        $production = ProductionCalculator::make(
+            product: 'Steel Ingot',
+            qty: 45,
+            choices: ['Coal' => r('Coal (Iron)')],
+        );
+
+        $coal = $this->findStep($production->getSteps(), 'Coal');
+
+        $this->assertNotNull($coal, 'Coal should be a step in the tree.');
+        $this->assertNull($coal->getRecipe(), 'Extract-mode Coal must be a leaf despite the stale choice.');
+        $this->assertEmpty($coal->getChildren() ?? []);
+    }
+
+    #[Test]
+    public function mode_round_trip_convert_to_import_restores_the_leaf(): void
+    {
+        // V104: convert run honors the choice; flipping back to import with the
+        // same choice still present restores the plain leaf (mode gate, not
+        // choice presence, decides).
+        request()->merge(['raw_sources' => [
+            'Coal' => ['mode' => 'convert'],
+        ]]);
+
+        $convert = ProductionCalculator::make(
+            product: 'Steel Ingot',
+            qty: 45,
+            choices: ['Coal' => r('Coal (Iron)')],
+        );
+
+        $coal = $this->findStep($convert->getSteps(), 'Coal');
+        $this->assertTrue(optional($coal->getRecipe())->is(r('Coal (Iron)')),
+            'Convert-mode Coal honors the chosen converter recipe.');
+
+        request()->merge(['raw_sources' => [
+            'Coal' => ['mode' => 'import'],
+        ]]);
+
+        $import = ProductionCalculator::make(
+            product: 'Steel Ingot',
+            qty: 45,
+            choices: ['Coal' => r('Coal (Iron)')],
+        );
+
+        $coal = $this->findStep($import->getSteps(), 'Coal');
+        $this->assertNull($coal->getRecipe(), 'Flipping back to import restores the leaf.');
+        $this->assertEmpty($coal->getChildren() ?? []);
+    }
+
+    #[Test]
     public function a_self_looping_unpackage_output_imports_the_packaged_input_not_the_output(): void
     {
         // V97 / B55: Unpackage Alumina Solution (non-raw fluid) self-loops with its

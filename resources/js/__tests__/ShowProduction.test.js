@@ -72,6 +72,40 @@ function makeWrapper(propsOverride = {}) {
     });
 }
 
+describe('Show — T149/V104: updateRawSource prunes stale raw choices', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('leaving convert mode drops the raw recipe choice', () => {
+        const wrapper = makeWrapper();
+        wrapper.vm.newChoices = { Coal: 'Coal (Iron)', 'Iron Rod': 'Steel Rod' };
+
+        wrapper.vm.updateRawSource({ name: 'Coal', config: { mode: 'import' } });
+
+        expect(wrapper.vm.newChoices).toEqual({ 'Iron Rod': 'Steel Rod' });
+        expect(wrapper.vm.newRawSources.Coal).toEqual({ mode: 'import' });
+    });
+
+    it('extract mode also drops the choice', () => {
+        const wrapper = makeWrapper();
+        wrapper.vm.newChoices = { Coal: 'Coal (Iron)' };
+
+        wrapper.vm.updateRawSource({ name: 'Coal', config: { mode: 'extract', purity: 'normal' } });
+
+        expect(wrapper.vm.newChoices.Coal).toBeUndefined();
+    });
+
+    it('convert and unpackage modes keep the choice', () => {
+        const wrapper = makeWrapper();
+        wrapper.vm.newChoices = { Coal: 'Coal (Iron)', Water: 'Unpackage Water' };
+
+        wrapper.vm.updateRawSource({ name: 'Coal', config: { mode: 'convert' } });
+        wrapper.vm.updateRawSource({ name: 'Water', config: { mode: 'unpackage' } });
+
+        expect(wrapper.vm.newChoices.Coal).toBe('Coal (Iron)');
+        expect(wrapper.vm.newChoices.Water).toBe('Unpackage Water');
+    });
+});
+
 describe('Show — T73: saveMyFactory uses allChosenRecipes', () => {
     beforeEach(() => vi.clearAllMocks());
 
