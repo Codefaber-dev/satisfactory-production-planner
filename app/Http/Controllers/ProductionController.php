@@ -113,11 +113,9 @@ class ProductionController extends Controller
                 $m->add($calc);
             }
 
-            // now recalculate to take advantage of byproducts,
-            // do it several times to ensure a steady state
-            $m->recalculateUsingByproducts();
-            $m->recalculateUsingByproducts();
-            $m->recalculateUsingByproducts();
+            // now recalculate to take advantage of byproducts, iterating
+            // to a steady state with an early exit (V74)
+            $m->recalculateUsingByproductsUntilStable();
 
             // V70: json round-trip → plain arrays only (no objects/Eloquent) in
             // the cached payload, identical in shape to the Inertia props.

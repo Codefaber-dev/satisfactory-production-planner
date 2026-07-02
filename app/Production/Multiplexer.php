@@ -35,6 +35,45 @@ class Multiplexer
         });
     }
 
+    /**
+     * Recalculate byproduct usage until the shared byproduct state stops
+     * changing (V74) — replaces the fixed 3× pass. An identical state means
+     * the next pass is a no-op, so early exit is byte-identical to the old
+     * fixed-pass behavior. Returns the number of passes run.
+     */
+    public function recalculateUsingByproductsUntilStable(int $maxPasses = 3): int
+    {
+        $previous = null;
+        $passes = 0;
+
+        while ($passes < $maxPasses) {
+            $this->recalculateUsingByproducts();
+            $passes++;
+
+            $state = $this->byproductState();
+
+            if ($state === $previous) {
+                break;
+            }
+
+            $previous = $state;
+        }
+
+        return $passes;
+    }
+
+    /**
+     * Serialized byproduct production/consumption state across all calcs,
+     * used for convergence detection (V74).
+     */
+    public function byproductState(): string
+    {
+        return json_encode([
+            'byproducts' => $this->getByproducts(),
+            'used' => $this->getByproductsUsed(),
+        ]);
+    }
+
     public function getRawMaterials()
     {
         $results = $this->getResults();
