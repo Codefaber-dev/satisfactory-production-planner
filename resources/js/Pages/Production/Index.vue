@@ -32,35 +32,6 @@
                                 :selected="recipe"
                                 @select="selectRecipe"
                             />
-                            <!--                            <select-->
-                            <!--                                ref="recipe"-->
-                            <!--                                class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800 dark:text-gray-100"-->
-                            <!--                                v-model="recipe"-->
-                            <!--                                name="recipe"-->
-                            <!--                                id="recipe"-->
-                            <!--                            >-->
-                            <!--                                <option-->
-                            <!--                                    :data-recipe-id="option.id"-->
-                            <!--                                    :key="option.id"-->
-                            <!--                                    v-for="option in recipes[product.name]"-->
-                            <!--                                    :value="option"-->
-                            <!--                                >-->
-                            <!--                                    <span v-if="option.favorite">&star;</span>-->
-                            <!--                                    {{ option.description || 'default' }}-->
-                            <!--                                </option>-->
-                            <!--                            </select>-->
-                            <!--                            <button-->
-                            <!--                                :disabled="working"-->
-                            <!--                                @click="setNewFavorite"-->
-                            <!--                                class="btn btn-emerald"-->
-                            <!--                                v-if="-->
-                            <!--                                    recipe &&-->
-                            <!--                                    !recipe.favorite &&-->
-                            <!--                                    recipes[product.name].length > 1-->
-                            <!--                                "-->
-                            <!--                            >-->
-                            <!--                                Set Favorite-->
-                            <!--                            </button>-->
                         </div>
                         <div
                             v-if="recipe && recipe.base_per_min"
@@ -74,12 +45,12 @@
                                 v-model="yield"
                                 class="rounded p-4 shadow dark:border dark:border-gray-500 dark:bg-gray-800"
                             />
-                        </div>
-                        <div
-                            v-if="yield"
-                            class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
-                        >
                             <input type="hidden" v-model="variant" value="mk1">
+                        </div>
+<!--                        <div-->
+<!--                            v-if="yield"-->
+<!--                            class="flex w-full flex-col space-y-2 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"-->
+<!--                        >-->
 <!--                            <span class="font-semibold">Select default building variant</span>-->
 <!--                            <select-->
 <!--                                v-model="variant"-->
@@ -90,7 +61,7 @@
 <!--                                <option disabled value="mk3">mk3 (mk++ mod) (no mod support yet)</option>-->
 <!--                                <option disabled value="mk4">mk4 (mk++ mod) (no mod support yet)</option>-->
 <!--                            </select>-->
-                        </div>
+<!--                        </div>-->
 
                         <div class="space-x-4">
                             <button :disabled="working" @click="fetch" class="btn btn-emerald" v-if="yield">Go</button>
