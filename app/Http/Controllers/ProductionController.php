@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Factories\Facades\Factories;
 use App\Favorites\Facades\Favorites;
-use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\MultiFactories\Facades\MultiFactories;
 use App\Production\Multiplexer;
 use App\Production\ProductionCalculator;
+use App\Support\BaseDataPayload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -19,11 +19,12 @@ class ProductionController extends Controller
 {
     protected function baseData()
     {
-        $products = Ingredient::processed()->orderBy('name')->get();
-        $recipes = Cache::remember('all_recipes', now()->addDay(), function () {
-            return Recipe::all()->groupBy(fn ($recipe) => $recipe->product->name);
-        });
         $favorites = Favorites::all();
+
+        // V73: cached plain-array payloads with appends pre-baked; the
+        // per-user favorite flag is merged here, never cached (B13).
+        $products = BaseDataPayload::products();
+        $recipes = BaseDataPayload::withFavorites($favorites->pluck('id')->all());
         $factory = Factories::find(request('factory'));
         $multiFactory = MultiFactories::find(request('multiFactory'));
         $choices = ! empty(request('choices', [])) ? collect(request('choices', (object) []))->reject(fn ($name) => r($name)->isDefault())->all() : null;
