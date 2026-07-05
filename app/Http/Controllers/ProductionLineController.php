@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Factories\Facades\Factories;
+use App\Http\Requests\PlanParams;
 use App\MultiFactories\Facades\MultiFactories;
 use Inertia\Inertia;
 
@@ -23,6 +24,8 @@ class ProductionLineController extends Controller
 
     public function store()
     {
+        request()->validate(PlanParams::rules());
+
         $attributes = [
             'name' => request('name'),
             'ingredient_id' => request('ingredient_id'),
@@ -31,7 +34,7 @@ class ProductionLineController extends Controller
             'notes' => request()->has('notes') ? request('notes', '') : null,
             'imports' => request()->has('imports') ? request('imports', '') : null,
             'choices' => request()->has('choices') ? request('choices', []) : [],
-            'raw_sources' => request()->has('raw_sources') ? request('raw_sources', []) : [],
+            'raw_sources' => PlanParams::sanitizeRawSources(request('raw_sources', []) ?: []),
             'import_notes' => request()->has('import_notes') ? request('import_notes', []) : [],
             'auto_package_recycle' => request()->boolean('auto_package_recycle'),
         ];
@@ -43,6 +46,8 @@ class ProductionLineController extends Controller
 
     public function update($id)
     {
+        request()->validate(PlanParams::rules());
+
         $attributes = [
             'name' => request('name'),
             'recipe_id' => request('recipe_id'),
@@ -50,7 +55,7 @@ class ProductionLineController extends Controller
             'notes' => request()->has('notes') ? request('notes', '') : null,
             'imports' => request()->has('imports') ? request('imports', '') : null,
             'choices' => request()->has('choices') ? request('choices', []) : [],
-            'raw_sources' => request()->has('raw_sources') ? request('raw_sources', []) : [],
+            'raw_sources' => PlanParams::sanitizeRawSources(request('raw_sources', []) ?: []),
             'import_notes' => request()->has('import_notes') ? request('import_notes', []) : [],
             'auto_package_recycle' => request()->boolean('auto_package_recycle'),
             'is_shared' => request()->has('is_shared') ? request('is_shared', false) : false,

@@ -706,7 +706,10 @@ class ProductionCalculator
 
     /**
      * Raw source-mode configs in a recipe-bearing mode (convert + unpackage), keyed
-     * by raw. V79: gated on mode only — the recipe no longer lives here.
+     * by raw. V79: gated on mode — the recipe no longer lives here. V105/B59: the
+     * endpoint is public, so keys are untrusted — only names that resolve to a real
+     * raw ingredient pass (unknown names would hit defaultRawRecipe(null); non-raws
+     * don't take source modes at all).
      *
      * @return Collection<string, array{mode: string}>
      */
@@ -714,13 +717,24 @@ class ProductionCalculator
     {
         return collect(request('raw_sources', []))
             ->filter(fn ($config) => is_array($config)
-                && in_array($config['mode'] ?? 'import', ['convert', 'unpackage'], true));
+                && in_array($config['mode'] ?? 'import', ['convert', 'unpackage'], true))
+            ->filter(fn ($config, $name) => is_string($name)
+                && ($ingredient = i($name))
+                && $ingredient->isRaw());
     }
 
-    /** Raw product names sourced via a convert/unpackage recipe (V61/V63 loop candidates). */
+    /**
+     * Raw product names sourced via a convert/unpackage recipe (V61/V63 loop
+     * candidates). V105/B59: only recipe-resolved raws — mergeRawSources sets a
+     * choice for every raw it resolves, so a recipe-less raw (e.g. Wood in convert
+     * mode) is excluded here rather than blowing up in detectLoops' baseRecipe()
+     * call. Requires mergeRawSources to have run first (it does — make():316 vs 318).
+     */
     protected function rawRecipeProducts(): Collection
     {
-        return $this->rawSourceConfigs()->keys();
+        return $this->rawSourceConfigs()->keys()
+            ->filter(fn ($name) => $this->choices->has($name))
+            ->values();
     }
 
     public function getSteps(): Step
