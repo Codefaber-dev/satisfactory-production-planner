@@ -71,10 +71,12 @@ class RecyclingSteps
             return [];
         }
 
-        $cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
-        $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
-        $building_multiples = collect(request('building_multiples', []))->map(fn ($v) => max(1, (int) $v))->all();
-        $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
+        [
+            'cost_multiplier' => $cost_multiplier,
+            'power_multiplier' => $power_multiplier,
+            'building_multiples' => $building_multiples,
+            'building_cost_multiplier' => $building_cost_multiplier,
+        ] = static::planParams();
 
         $overviews = [];
 
@@ -110,7 +112,25 @@ class RecyclingSteps
     }
 
     /**
+     * The plan-level multiplier params (clamped), read once per request — the single
+     * source both overviews() and packagingStep() thread into their calcs (V107).
+     *
+     * @return array{cost_multiplier: float, power_multiplier: float, building_multiples: array<string, int>, building_cost_multiplier: float}
+     */
+    protected static function planParams(): array
+    {
+        return [
+            'cost_multiplier' => max(0.1, min(10.0, (float) request('cost_multiplier', 1.0))),
+            'power_multiplier' => max(0.1, min(10.0, (float) request('power_multiplier', 1.0))),
+            'building_multiples' => collect(request('building_multiples', []))->map(fn ($v) => max(1, (int) $v))->all(),
+            'building_cost_multiplier' => max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0))),
+        ];
+    }
+
+    /**
      * A Packager build step for one auto-package fluid (real recipe → real footprint).
+     * V107: same multiplier + somersloop args as overviews() — the step row must
+     * equal its own c100 overview for every multiplier value.
      *
      * @param  array<string, mixed>  $row  a RecyclingCalc packaged row
      * @return array<string, mixed>
@@ -126,8 +146,15 @@ class RecyclingSteps
         $power = (float) ($row['power'] ?? 0);
 
         if ($recipe) {
-            $detail = BuildingDetails::calc($recipe, $qty, $beltSpeed)
-                ->first(); // mk1 variant row
+            $params = static::planParams();
+            $key = $product.'|'.($recipe->description ?? $product);
+            $somersloopSlots = (int) (request('somersloops', [])[$key] ?? 0);
+
+            $detail = BuildingDetails::calc(
+                $recipe, $qty, $beltSpeed, 100, $somersloopSlots,
+                $params['cost_multiplier'], $params['power_multiplier'],
+                $params['building_multiples'], $params['building_cost_multiplier']
+            )->first(); // mk1 variant row
 
             if ($detail) {
                 $footprint = $detail['footprint'];

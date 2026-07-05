@@ -162,6 +162,31 @@ class RecyclingStepsTest extends TestCase
     }
 
     #[Test]
+    public function packaging_step_matches_its_c100_overview_under_multipliers(): void
+    {
+        // V107: packagingStep threads the same cost/power/building multipliers (+
+        // somersloops) into BuildingDetails::calc as overviews() passes to
+        // BuildingOverview::make — the step row must equal its own c100 overview.
+        request()->merge([
+            'power_multiplier' => 2.0,
+            'building_cost_multiplier' => 3.0,
+        ]);
+
+        $recycling = $this->recycling(true);
+        $steps = RecyclingSteps::build($recycling, 780);
+        $overviews = RecyclingSteps::overviews($recycling, 780);
+
+        $package = collect($steps)->firstWhere('type', 'package');
+        $entry = $overviews['Packaged Heavy Oil Residue|Packaged Heavy Oil Residue'];
+        $c100 = $entry['overviews']['c100'];
+        $detail = $c100['details'][$c100['selected_variant_name']];
+
+        $this->assertEqualsWithDelta($detail['power_usage'], $package['power'], 0.001,
+            'packaging step power must equal its c100 overview power under power_multiplier');
+        $this->assertEqualsWithDelta($detail['num_buildings'], $package['num_buildings'], 0.001);
+    }
+
+    #[Test]
     public function package_step_overview_carries_four_clock_variants(): void
     {
         // V93: the package step gets a real 4-clock BuildingOverview set keyed
