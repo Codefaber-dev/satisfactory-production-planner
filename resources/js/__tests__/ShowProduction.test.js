@@ -72,6 +72,45 @@ function makeWrapper(propsOverride = {}) {
     });
 }
 
+describe('Show — T151/V106: sink row folds into building details', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('recycling sink step contributes power and build cost to building details', () => {
+        const wrapper = makeWrapper({
+            production: {
+                ...minimalProduction,
+                recycling_steps: [
+                    {
+                        type: 'sink',
+                        name: 'AWESOME Sink',
+                        building: 'AWESOME Sink',
+                        num_buildings: 3,
+                        power: 90,
+                        build_cost: { 'Reinforced Iron Plate': 45, Cable: 90, Concrete: 135 },
+                        inputs: [],
+                        output: { points: 1000 },
+                    },
+                ],
+            },
+        });
+
+        const sinkRow = wrapper.vm.production__building_details.find((d) => d.variant_name === 'AWESOME Sink');
+
+        expect(sinkRow).toBeTruthy();
+        expect(sinkRow.num_buildings).toBe(3);
+        expect(sinkRow.power_usage).toBe(90);
+        expect(sinkRow.build_cost).toEqual({ 'Reinforced Iron Plate': 45, Cable: 90, Concrete: 135 });
+    });
+
+    it('no recycling steps means no sink row', () => {
+        const wrapper = makeWrapper();
+
+        const sinkRow = wrapper.vm.production__building_details.find((d) => d.variant_name === 'AWESOME Sink');
+
+        expect(sinkRow).toBeUndefined();
+    });
+});
+
 describe('Show — T149/V104: updateRawSource prunes stale raw choices', () => {
     beforeEach(() => vi.clearAllMocks());
 

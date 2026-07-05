@@ -162,6 +162,8 @@ class RecyclingSteps
 
     /**
      * The terminal AWESOME Sink step: consumes every recycled item, outputs points/min.
+     * V106: sized by throughput — each sink takes one belt, so count = ceil(rate /
+     * belt_speed); power and build cost come from the seeded building (V89).
      *
      * @param  list<array{item: string, qty: float}>  $inputs
      * @return array<string, mixed>
@@ -169,26 +171,51 @@ class RecyclingSteps
     protected static function sinkStep(array $inputs, float $points, float $beltSpeed): array
     {
         $rate = array_sum(array_column($inputs, 'qty'));
+        $count = max(1, (int) ceil($beltSpeed > 0 ? $rate / $beltSpeed : 1));
+
+        $variant = optional(Building::ofName(BuildingEnum::AWESOME_SINK->value))->variant('mk1');
+        $basePower = (float) (optional($variant)->base_power ?? 30);
 
         return [
             'type' => 'sink',
             'name' => BuildingEnum::AWESOME_SINK->value,
             'building' => BuildingEnum::AWESOME_SINK->value,
-            'num_buildings' => 1,
-            'power' => 30.0,
-            'footprint' => static::sinkFootprint($rate, $beltSpeed),
+            'num_buildings' => $count,
+            'power' => round($count * $basePower, 4),
+            'build_cost' => static::sinkBuildCost($variant, $count),
+            'footprint' => static::sinkFootprint($rate, $beltSpeed, $count),
             'inputs' => $inputs,
             'output' => ['points' => round($points, 2)],
         ];
     }
 
     /**
-     * Footprint for a single AWESOME Sink (rows = 1), mirroring BuildingDetails' formula
-     * so the diagram matches the rest of the build.
+     * Build cost from the seeded sink building's mk1 variant recipe, scaled by
+     * count (same shape as ExtractorSummary::buildCost). Empty when not seeded.
+     *
+     * @return array<string, int>
+     */
+    protected static function sinkBuildCost(?object $variant, int $count): array
+    {
+        if (! $variant) {
+            return [];
+        }
+
+        return $variant->recipe
+            ->mapWithKeys(fn ($ingredient) => [
+                $ingredient->name => (int) ceil($ingredient->pivot->qty * $count),
+            ])
+            ->all();
+    }
+
+    /**
+     * Footprint for the AWESOME Sink row, mirroring BuildingDetails' formula so the
+     * diagram matches the rest of the build. V106: one sink per row — each sink is
+     * belt-bound, so rows = count and the per-row belt load stays ≤ belt_speed.
      *
      * @return array<string, mixed>
      */
-    protected static function sinkFootprint(float $rate, float $beltSpeed): array
+    protected static function sinkFootprint(float $rate, float $beltSpeed, int $count = 1): array
     {
         $building = Building::ofName(BuildingEnum::AWESOME_SINK->value);
 
@@ -196,7 +223,8 @@ class RecyclingSteps
         $width = (float) (optional($building)->width ?? 16);
         $height = (float) (optional($building)->height ?? 24);
 
-        $rows = 1;
+        $rows = max(1, $count);
+        $rowRate = $rate / $rows;
         $buildingLengthFoundations = (int) ceil($length / 8);
         $lengthFoundations = $rows * ($buildingLengthFoundations + 2);
         $widthFoundations = (int) (ceil($width / 8) + 4);
@@ -207,13 +235,13 @@ class RecyclingSteps
             'foundation_border_y' => false,
             'monogram' => substr(BuildingEnum::AWESOME_SINK->value, 0, 1),
             'belt_speed' => $beltSpeed,
-            'belt_load' => round($rate, 2),
-            'belt_load_in' => round($rate, 2),
+            'belt_load' => round($rowRate, 2),
+            'belt_load_in' => round($rowRate, 2),
             'belt_load_out' => 0,
-            'belt_utilization_in' => $beltSpeed > 0 ? round(100 * $rate / $beltSpeed) : 0,
+            'belt_utilization_in' => $beltSpeed > 0 ? round(100 * $rowRate / $beltSpeed) : 0,
             'belt_utilization_out' => 0,
             'rows' => $rows,
-            'num_buildings' => 1,
+            'num_buildings' => $rows,
             'power_shards' => 0,
             'somersloops' => 0,
             'buildings_per_row' => 1,

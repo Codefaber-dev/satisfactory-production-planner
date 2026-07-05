@@ -108,6 +108,60 @@ class RecyclingStepsTest extends TestCase
     }
 
     #[Test]
+    public function sink_step_count_scales_with_throughput(): void
+    {
+        // V106: the sink is sized by throughput — num_buildings = max(1, ceil(rate /
+        // belt_speed)), power = count × seeded base_power, never hardcoded 1 × 30.
+        $recycling = [
+            'points' => 100000,
+            'recycled' => ['Iron Plate' => ['qty' => 1600, 'points' => 100000]],
+            'packaged' => [],
+            'waste' => [],
+        ];
+
+        $steps = RecyclingSteps::build($recycling, 780);
+        $sink = collect($steps)->firstWhere('type', 'sink');
+
+        $this->assertNotNull($sink);
+        $this->assertSame(3, $sink['num_buildings']); // ceil(1600 / 780)
+        $this->assertEqualsWithDelta(90.0, $sink['power'], 1e-9); // 3 × 30 MW (seeded, V89)
+
+        // V106: sink build cost from the seeded building's recipe, scaled by count
+        $this->assertSame([
+            'Reinforced Iron Plate' => 45,
+            'Cable' => 90,
+            'Concrete' => 135,
+        ], $sink['build_cost']);
+
+        // footprint reflects the count; per-row belt load stays within the belt
+        $this->assertSame(3, $sink['footprint']['num_buildings']);
+        $this->assertSame(3, $sink['footprint']['rows']);
+        $this->assertLessThanOrEqual(100, $sink['footprint']['belt_utilization_in']);
+    }
+
+    #[Test]
+    public function low_rate_sink_is_a_single_building_with_build_cost(): void
+    {
+        $recycling = [
+            'points' => 100,
+            'recycled' => ['Iron Plate' => ['qty' => 100, 'points' => 100]],
+            'packaged' => [],
+            'waste' => [],
+        ];
+
+        $steps = RecyclingSteps::build($recycling, 780);
+        $sink = collect($steps)->firstWhere('type', 'sink');
+
+        $this->assertSame(1, $sink['num_buildings']);
+        $this->assertEqualsWithDelta(30.0, $sink['power'], 1e-9);
+        $this->assertSame([
+            'Reinforced Iron Plate' => 15,
+            'Cable' => 30,
+            'Concrete' => 45,
+        ], $sink['build_cost']);
+    }
+
+    #[Test]
     public function package_step_overview_carries_four_clock_variants(): void
     {
         // V93: the package step gets a real 4-clock BuildingOverview set keyed

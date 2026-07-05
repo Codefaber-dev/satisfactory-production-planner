@@ -424,7 +424,21 @@ export default {
                 footprint: { power_shards: 0, somersloops: 0 },
             }));
 
-            return [...recipeDetails, ...(this.production.extractors || []), ...recycleDetails];
+            // V106: the AWESOME Sink folds in too — power + build cost, like the Packager rows
+            const sinkDetails = (this.production.recycling_steps || [])
+                .filter((s) => s.type === 'sink')
+                .map((s) => ({
+                    product: s.name,
+                    variant_name: s.building,
+                    num_buildings: s.num_buildings,
+                    exact_buildings: s.num_buildings,
+                    power_usage: s.power,
+                    build_cost: s.build_cost || {},
+                    clock_speed: 100,
+                    footprint: { power_shards: 0, somersloops: 0 },
+                }));
+
+            return [...recipeDetails, ...(this.production.extractors || []), ...recycleDetails, ...sinkDetails];
         },
 
         production__building_summary() {
