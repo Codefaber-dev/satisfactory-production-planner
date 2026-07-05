@@ -53,6 +53,9 @@ class ExtractorPlanTest extends TestCase
 
         // V78: power_usage equals ExtractionCalc (= count × 15 MW at 100%, 0 shards)
         $this->assertEqualsWithDelta($row['num_buildings'] * 15, $row['power_usage'], 1e-4);
+
+        // T154: buildCost resolves the building via the cached b() helper
+        $this->assertTrue(Cache::has('buildings.Miner Mk.2'));
     }
 
     #[Test]

@@ -212,4 +212,31 @@ class RecyclingStepsTest extends TestCase
         $this->assertSame([], RecyclingSteps::overviews($this->recycling(false), 780));
         $this->assertSame([], RecyclingSteps::overviews(null));
     }
+
+    #[Test]
+    public function package_recipe_lookup_is_cached_by_fluid_name(): void
+    {
+        // T154: packageRecipe hits the DB once per fluid, then serves from the
+        // model cache (same pattern as r()/i()/b(), TTL'd per T124).
+        $this->assertFalse(Cache::has('package_recipe.Heavy Oil Residue'));
+
+        $recycling = $this->recycling(true);
+
+        $this->assertTrue(Cache::has('package_recipe.Heavy Oil Residue'));
+        $this->assertNotEmpty($recycling['packaged']);
+        $this->assertSame('Packaged Heavy Oil Residue', $recycling['packaged'][0]['product']);
+    }
+
+    #[Test]
+    public function recipe_save_invalidates_the_package_recipe_cache(): void
+    {
+        // T154: observer-invalidated — saving a recipe flushes the package_recipe
+        // key of every fluid it consumes (B17/T35 hook family).
+        $this->recycling(true); // primes the cache
+        $this->assertTrue(Cache::has('package_recipe.Heavy Oil Residue'));
+
+        r('Packaged Heavy Oil Residue')->touch();
+
+        $this->assertFalse(Cache::has('package_recipe.Heavy Oil Residue'));
+    }
 }

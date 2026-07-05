@@ -2,7 +2,6 @@
 
 namespace App\Production;
 
-use App\Models\Building;
 use Illuminate\Support\Collection;
 
 /**
@@ -93,7 +92,7 @@ class ExtractorSummary
      */
     protected static function buildCost(string $buildingName, int $count): array
     {
-        $variant = optional(Building::ofName($buildingName))->variant('mk1');
+        $variant = optional(b($buildingName))->variant('mk1');
 
         if (! $variant) {
             return [];

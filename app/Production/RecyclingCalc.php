@@ -6,6 +6,7 @@ use App\Enums\Building as BuildingEnum;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * AWESOME Sink recycling calc (V66/V67). Given a plan's byproduct flows
@@ -166,14 +167,19 @@ class RecyclingCalc
      */
     protected static function packageRecipe(Ingredient $fluid): ?Recipe
     {
-        return Recipe::query()
-            ->whereHas('ingredients', fn ($q) => $q->where('name', $fluid->name))
-            ->get()
-            ->first(function (Recipe $recipe) {
-                return optional($recipe->building)->name === BuildingEnum::PACKAGER->value
-                    && $recipe->product
-                    && ! $recipe->product->is_liquid
-                    && str_starts_with($recipe->product->name, 'Packaged');
-            });
+        // T154: cached per fluid (model-cache pattern, TTL per T124) and constrained
+        // to Packager recipes — never load every recipe consuming the fluid.
+        // RecipeObserver flushes `package_recipe.{ingredient}` on save.
+        return Cache::remember("package_recipe.{$fluid->name}", MODEL_CACHE_TTL, function () use ($fluid) {
+            return Recipe::query()
+                ->whereHas('ingredients', fn ($q) => $q->where('name', $fluid->name))
+                ->whereHas('building', fn ($q) => $q->where('name', BuildingEnum::PACKAGER->value))
+                ->get()
+                ->first(function (Recipe $recipe) {
+                    return $recipe->product
+                        && ! $recipe->product->is_liquid
+                        && str_starts_with($recipe->product->name, 'Packaged');
+                });
+        });
     }
 }
