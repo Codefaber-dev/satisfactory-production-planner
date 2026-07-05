@@ -72,7 +72,7 @@ function mountWith(extraProps) {
     });
 }
 
-describe('ProductionStep — usagePercent (B47 / V99)', () => {
+describe('ProductionStep — usagePercent (B57 / V99)', () => {
     beforeEach(() => vi.clearAllMocks());
 
     it('computes the share of total produced material a step consumes', () => {
@@ -327,7 +327,7 @@ describe('ProductionStep — QuickNav registration', () => {
         });
     });
 
-    it('V98: does NOT register an imported step in QuickNav (B46)', () => {
+    it('V98: does NOT register an imported step in QuickNav (B56)', () => {
         mountStep(true);
         expect(mockBus.emit).not.toHaveBeenCalledWith('RegisterQuickNav', expect.anything());
     });

@@ -91,7 +91,7 @@ class RecipeProductionTest extends TestCase
     #[Test]
     public function all_materials_includes_the_final_product_when_it_feeds_a_loop()
     {
-        // B47: the requested output (Rubber) is consumed by the
+        // B57: the requested output (Rubber) is consumed by the
         // other loop member (Recycled Plastic eats Rubber). getAllMaterials must
         // include the final product's total so the frontend usage-% denominator
         // is non-zero (otherwise the input % renders "Infinity%").

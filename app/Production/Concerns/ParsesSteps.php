@@ -88,7 +88,7 @@ trait ParsesSteps
     {
         // "all" includes the final product (matches Multiplexer::getAllMaterials).
         // The final product must be present so the frontend usage-% denominator is
-        // non-zero when a loop member consumes it (B47 / §V99).
+        // non-zero when a loop member consumes it (B57 / §V99).
         return $this->materialTotals(excludeFinal: false);
     }
 

@@ -453,7 +453,7 @@ export default {
         });
 
         // Imported products are hidden via v-show (still mounted), so guard the
-        // QuickNav registration here — otherwise they'd appear in the nav (§V98, B46).
+        // QuickNav registration here — otherwise they'd appear in the nav (§V98, B56).
         // V95: terminal recycle steps (synthetic packaging) DO register — they render
         // unconditionally, so only the imported guard applies.
         if (!this.production.imported) {
@@ -655,7 +655,7 @@ export default {
 
         // Share of the total produced/used `ingr` that this step consumes.
         // Returns null (→ render nothing) when the denominator is 0 so the UI
-        // never shows "Infinity%" (defense-in-depth for §V99 / B47).
+        // never shows "Infinity%" (defense-in-depth for §V99 / B57).
         usagePercent(in_qty, ingr) {
             const den = this.getDenominator(ingr);
             if (!den) {
