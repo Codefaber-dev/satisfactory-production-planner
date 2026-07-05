@@ -104,8 +104,9 @@ class ExtractionCalc
             'water' => [120.0, 20.0, false],
             // Oil: purity applies, single building (no tier).
             'oil' => [120.0, 40.0, true],
-            // Resource Well Pressurizer: aggregate canonical rate, purity applies.
-            'well' => [120.0, 150.0, true],
+            // Resource Well Pressurizer: aggregate canonical rate (T155 — 6-satellite
+            // well, satellites 30/60/120 per purity, wiki), whole-well purity applies.
+            'well' => [360.0, 150.0, true],
             // Miner: purity + tier + shards.
             default => static::minerProfile($params),
         };

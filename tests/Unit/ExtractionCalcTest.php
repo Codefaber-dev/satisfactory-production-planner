@@ -59,10 +59,15 @@ class ExtractionCalcTest extends TestCase
 
     public function test_well_nitrogen_is_aggregate_with_purity(): void
     {
+        // T155: aggregate = canonical 6-satellite well (satellites 30/60/120 per
+        // purity, wiki) → base 360 @ normal, ×2 pure = 720. One pressurizer covers
+        // 240/min demand; power stays 150 MW at 100%.
         $r = ExtractionCalc::calc('Nitrogen Gas', 240, ['purity' => 'pure']);
 
         $this->assertSame('well', $r['type']);
-        $this->assertEqualsWithDelta(240, $r['rate_per'], 1e-9); // 120 × 2
+        $this->assertEqualsWithDelta(720, $r['rate_per'], 1e-9); // 360 × 2
+        $this->assertSame(1, $r['count']);
+        $this->assertEqualsWithDelta(150.0, $r['power'], 1e-9);
     }
 
     public function test_power_uses_exponent_and_extractor_power(): void
