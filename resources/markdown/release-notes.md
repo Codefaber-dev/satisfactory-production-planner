@@ -40,8 +40,13 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 - 🛈 **Import Notes** — Add a free-text note to any imported ingredient (e.g. "From NW Steel Factory"). Notes show on the ingredient's production step and persist with saved factories.
 - 🎯 **Perfect Ratio Factory** — A new button in Plan Settings scales the whole plan to the smallest size where every building runs whole at 100% clock — no fractional or underclocked machines anywhere. Works for mutual-recipe loops too, and is now **blueprint-aware**: when a building type is grouped into blueprint stamps, the ratio fills whole stamps. If the perfect ratio would make the factory impractically large, it warns instead of applying.
 - 📐 **Blueprint-aware Fill to 100%** — The per-output "Fill to 100%" button now rounds up to a whole blueprint stamp for grouped building types, so no partial stamps or underclocked machines.
+- 🗑️ **Right-sized Sinks** — The AWESOME Sink step now scales with how much you're actually sinking: one sink per belt of recycled items instead of always one. Sink power and build cost are counted in the building summary, parts list, and plan power total.
+- ⚖️ **Consistent Packaging Steps** — Auto-package Packager steps now respect your plan-level cost, power, and building multipliers (and somersloop settings), matching their overclock overviews exactly.
+- 🕳️ **Truer Well Rates** — The Resource Well Pressurizer now models a whole well (six satellite nodes) instead of a single node: 360/min at normal purity, 720/min on a pure well — in line with the in-game wells.
 - 🪲 Bug fix: Loop steps no longer show **"Infinity%"** for an input — the usage percentage now divides by the correct plan total when the output product feeds back into a loop.
 - 🪲 Bug fix: The **Package & Sink Fluids** toggle now correctly sizes leftover fluids — recycling read fully-consumed byproducts as leftover, making the toggle appear to do nothing.
+- 🪲 Bug fix: Switching a raw resource back to **Import** after trying Convert or Unpackage now fully resets it — previously the old recipe could stick and keep producing the raw instead of importing it.
+- 🔒 Internal hardening: plan requests and factory saves now validate and bound their raw-source and import-note inputs.
 
 ---
 
