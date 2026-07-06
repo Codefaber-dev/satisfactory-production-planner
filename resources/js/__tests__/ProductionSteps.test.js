@@ -216,3 +216,138 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
         expect(wrapper.findAll('[data-test="recycle-step"]')).toHaveLength(0);
     });
 });
+
+describe('ProductionSteps — type-ahead step filter (T156 / V110)', () => {
+    // Iron Ingot gains a byproduct so options cover product / input / byproduct kinds
+    function makeFilterProduction() {
+        const production = makeProduction();
+        production.results[2]['Iron Ingot'].production[0].byproducts = { Slag: 10 };
+        return production;
+    }
+
+    function findStep(wrapper, name) {
+        return wrapper.findAll('.stub-step').find((s) => s.attributes('data-name') === name);
+    }
+
+    function findHeader(wrapper, text) {
+        return wrapper.findAll('tr').find((tr) => tr.text() === text);
+    }
+
+    // V111/B62: assert the inline v-show style, NOT isVisible() — VTU isVisible()
+    // reads jsdom's per-element getComputedStyle cache, which off-document mounts
+    // never invalidate after a reactive toggle (false-red on hide, false-green on show)
+    function isShown(elementWrapper) {
+        return elementWrapper.element.style.display !== 'none';
+    }
+
+    async function setFilter(wrapper, item) {
+        wrapper.vm.filterItem = item;
+        await wrapper.vm.$nextTick();
+    }
+
+    it('offers every product, input ingredient, and byproduct of the plan, sorted', () => {
+        const wrapper = mountSteps({ production: makeFilterProduction() });
+        expect(wrapper.vm.filterOptions).toEqual(['Iron Ingot', 'Iron Ore', 'Slag']);
+    });
+
+    it('shows only steps containing the selected item as input or output', async () => {
+        const wrapper = mountSteps({ production: makeFilterProduction() });
+
+        // Iron Ore: raw step matches by name, Iron Ingot matches by ingredient input
+        await setFilter(wrapper, 'Iron Ore');
+        expect(isShown(findStep(wrapper, 'Iron Ore'))).toBe(true);
+        expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(true);
+
+        // Slag: only the Iron Ingot step (byproduct output) matches
+        await setFilter(wrapper, 'Slag');
+        expect(isShown(findStep(wrapper, 'Iron Ore'))).toBe(false);
+        expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(true);
+
+        // Iron Ingot: only its own step (product output) matches
+        await setFilter(wrapper, 'Iron Ingot');
+        expect(isShown(findStep(wrapper, 'Iron Ore'))).toBe(false);
+        expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(true);
+    });
+
+    it('hides a level header when the filter leaves it no visible steps', async () => {
+        const wrapper = mountSteps({ production: makeFilterProduction() });
+
+        await setFilter(wrapper, 'Slag');
+        expect(isShown(findHeader(wrapper, 'Level 0'))).toBe(false);
+        expect(isShown(findHeader(wrapper, 'Level 1'))).toBe(true);
+    });
+
+    it('clearing the filter restores every step and header', async () => {
+        const wrapper = mountSteps({ production: makeFilterProduction() });
+
+        await setFilter(wrapper, 'Slag');
+        await setFilter(wrapper, null);
+
+        expect(isShown(findStep(wrapper, 'Iron Ore'))).toBe(true);
+        expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(true);
+        expect(isShown(findHeader(wrapper, 'Level 0'))).toBe(true);
+    });
+
+    it('never reveals a step hidden by hideCompleted', async () => {
+        const wrapper = mountSteps({
+            production: makeFilterProduction(),
+            hideCompleted: true,
+            productionChecks: { 'Iron Ingot-base': true },
+        });
+
+        await setFilter(wrapper, 'Iron Ore');
+        expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(false);
+    });
+
+    it('never reveals an imported step', async () => {
+        const production = makeFilterProduction();
+        production.results[2]['Iron Ingot'].production[0].imported = true;
+        const wrapper = mountSteps({ production });
+
+        await setFilter(wrapper, 'Iron Ore');
+        expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(false);
+    });
+
+    it('filters recycle steps on their inputs and output', async () => {
+        const wrapper = mountSteps({
+            production: {
+                ...makeFilterProduction(),
+                recycling_steps: [
+                    {
+                        type: 'package',
+                        name: 'Packaged Water',
+                        building: 'Packager',
+                        num_buildings: 1,
+                        power: 10,
+                        footprint: {},
+                        inputs: [{ item: 'Water', qty: 60 }],
+                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
+                    },
+                    {
+                        type: 'sink',
+                        name: 'AWESOME Sink',
+                        building: 'AWESOME Sink',
+                        num_buildings: 1,
+                        power: 30,
+                        footprint: {},
+                        inputs: [{ item: 'Packaged Water', qty: 60 }],
+                        output: { points: 7800 },
+                    },
+                ],
+            },
+        });
+
+        // recycle-step inputs/outputs join the options
+        expect(wrapper.vm.filterOptions).toContain('Packaged Water');
+        expect(wrapper.vm.filterOptions).toContain('Water');
+
+        // Water: only the packaging step (fluid input) matches
+        await setFilter(wrapper, 'Water');
+        expect(isShown(findStep(wrapper, 'Packaged Water'))).toBe(true);
+        expect(isShown(wrapper.find('.stub-recycle[data-name="AWESOME Sink"]'))).toBe(false);
+
+        // no recycle step matches → Recycling header hides
+        await setFilter(wrapper, 'Iron Ingot');
+        expect(isShown(findHeader(wrapper, 'Recycling (AWESOME Sink)'))).toBe(false);
+    });
+});
