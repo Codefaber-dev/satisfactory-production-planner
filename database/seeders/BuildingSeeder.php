@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\Building as BuildingEnum;
 use App\Enums\Ingredient as IngredientEnum;
 use App\Models\Building;
+use App\Models\Ingredient;
 use Illuminate\Database\Seeder;
 
 class BuildingSeeder extends Seeder
@@ -696,28 +697,60 @@ class BuildingSeeder extends Seeder
     public function run()
     {
         collect($this->buildings)
-            ->each(function ($atts) {
-                $atts = (object) $atts;
+            ->each(fn ($atts) => $this->createBuilding((object) $atts));
+    }
 
-                $building = Building::create([
-                    'name' => $atts->name,
-                    'inputs' => $atts->inputs,
-                    'outputs' => $atts->outputs,
-                    'width' => $atts->width,
-                    'length' => $atts->length,
-                    'height' => $atts->height,
-                ]);
+    /**
+     * Insert only the buildings missing from an existing database (B61) —
+     * non-destructive and idempotent, same pattern as IngredientSeeder::backfill.
+     * Databases seeded before v1.3.0 lack the extractor + AWESOME Sink rows.
+     */
+    public function backfill(): void
+    {
+        // Fresh install (empty table, e.g. tests running migrations before
+        // seeders): the normal seeder run populates everything — skip.
+        if (Building::count() === 0) {
+            return;
+        }
 
-                foreach ($atts->variants as $variant_name => $variant_atts) {
-                    $variant = $building->variants()->create([
-                        'name' => $variant_name,
-                        'multiplier' => $variant_atts['multiplier'],
-                        'base_power' => $variant_atts['base_power'],
-                        'is_generator' => $variant_atts['is_generator'] ?? false,
-                    ]);
+        collect($this->buildings)
+            ->reject(fn ($atts) => Building::whereName($atts['name'])->exists())
+            ->each(fn ($atts) => $this->createBuilding((object) $atts, tolerateMissingIngredients: true));
+    }
 
-                    $variant->setRecipe($variant_atts['recipe']);
-                }
-            });
+    protected function createBuilding(object $atts, bool $tolerateMissingIngredients = false): void
+    {
+        $building = Building::create([
+            'name' => $atts->name,
+            'inputs' => $atts->inputs,
+            'outputs' => $atts->outputs,
+            'width' => $atts->width,
+            'length' => $atts->length,
+            'height' => $atts->height,
+        ]);
+
+        foreach ($atts->variants as $variant_name => $variant_atts) {
+            $variant = $building->variants()->create([
+                'name' => $variant_name,
+                'multiplier' => $variant_atts['multiplier'],
+                'base_power' => $variant_atts['base_power'],
+                'is_generator' => $variant_atts['is_generator'] ?? false,
+            ]);
+
+            $recipe = $variant_atts['recipe'];
+
+            // Backfill (B61) targets old databases whose ingredient set may
+            // predate the recipe's ingredients — attach what exists instead of
+            // fataling mid-migration. The normal run() path stays strict.
+            if ($tolerateMissingIngredients) {
+                $recipe = array_values(array_filter($recipe, function ($row) {
+                    $name = is_string($row['ingredient']) ? $row['ingredient'] : $row['ingredient']->value;
+
+                    return Ingredient::ofName($name) !== null;
+                }));
+            }
+
+            $variant->setRecipe($recipe);
+        }
     }
 }

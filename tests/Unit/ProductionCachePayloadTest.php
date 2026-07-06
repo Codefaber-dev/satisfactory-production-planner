@@ -91,11 +91,53 @@ class ProductionCachePayloadTest extends TestCase
         $this->assertLessThan(128 * 1024 * 1024, memory_get_peak_usage(true), 'peak memory exceeds the 128 MB limit');
     }
 
+    #[Test]
+    public function stale_object_cache_entry_is_recomputed_not_returned(): void
+    {
+        // V108/B60: a cache entry holding anything but an array (e.g. a stale
+        // object graph) must be recomputed and overwritten, never returned —
+        // returning it fatals on cachedPayload()'s array return type.
+        Cache::forever($this->keyFor('Computer', 10), new \stdClass);
+
+        $payload = ProductionCalculator::cachedPayload(product: 'Computer', qty: 10);
+
+        $this->assertIsArray($payload);
+        $this->assertIsArray(Cache::get($this->keyFor('Computer', 10)));
+    }
+
+    #[Test]
+    public function versioned_key_prefix_never_collides_with_legacy_object_entries(): void
+    {
+        // V108/B60: pre-V70 code rememberForever'd the live calculator under
+        // 'production_calc_<md5(params)><md5(request()->all())>'. When the
+        // request holds only whitelisted params, that legacy key is identical
+        // to the V70 key except for the version segment — without versioning,
+        // a cache hit returned the object and fataled in production.
+        $favoritesKey = Favorites::all()->pluck('id')->sort()->values()->all();
+        $paramsHash = md5(collect(['product' => 'Computer', 'qty' => 10])
+            ->put('recipe', null)
+            ->put('overrides', [])
+            ->put('imports', [])
+            ->put('variant', 'mk1')
+            ->put('choices', [])
+            ->put('byproducts', [])
+            ->put('favorites', $favoritesKey)
+            ->toJson());
+        $legacyKey = 'production_calc_'.$paramsHash.md5(collect(request()->all())->toJson());
+
+        Cache::forever($legacyKey, new \stdClass);
+
+        $payload = ProductionCalculator::cachedPayload(product: 'Computer', qty: 10);
+
+        $this->assertIsArray($payload);
+        $this->assertNotSame($legacyKey, $this->keyFor('Computer', 10));
+    }
+
     private function keyFor($product, $qty): string
     {
         $favoritesKey = Favorites::all()->pluck('id')->sort()->values()->all();
 
-        return 'production_calc_'
+        return 'production_calc_v2_'
             .md5(collect(compact('product', 'qty'))
                 ->put('recipe', null)
                 ->put('overrides', [])
