@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Building;
 use App\Production\ProductionCalculator;
 use App\Production\RecyclingCalc;
 use App\Production\RecyclingSteps;
@@ -211,6 +212,25 @@ class RecyclingStepsTest extends TestCase
     {
         $this->assertSame([], RecyclingSteps::overviews($this->recycling(false), 780));
         $this->assertSame([], RecyclingSteps::overviews(null));
+    }
+
+    #[Test]
+    public function unseeded_sink_building_degrades_gracefully(): void
+    {
+        // B61: a prod DB without the v1.3.0 AWESOME Sink row 500'd —
+        // Building::ofName returned a Builder (scope null fallback) and
+        // ->variant('mk1') fataled with Builder::variant(). Missing building
+        // must fall back to the hardcoded defaults instead.
+        Building::where('name', 'AWESOME Sink')->delete();
+        Cache::flush();
+
+        $steps = RecyclingSteps::build($this->recycling(true), 780);
+        $sink = collect($steps)->firstWhere('type', 'sink');
+
+        $this->assertNotNull($sink, 'sink step must still build without the seeded row');
+        $this->assertEqualsWithDelta(30.0, $sink['power'], 1e-9);
+        $this->assertSame([], $sink['build_cost']);
+        $this->assertArrayHasKey('foundations', $sink['footprint']);
     }
 
     #[Test]

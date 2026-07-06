@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -30,15 +29,15 @@ class MultiProductionLine extends Model
         return 'ml_'.app('Hashids')->encode($this->id);
     }
 
-    public function scopeOfHashId(Builder $query, $hashId)
+    /**
+     * B61/V109: a real static finder, NOT a scope — a scope returning null made
+     * callScope() hand callers the Builder, which fataled on ->getPlanUrl().
+     */
+    public static function ofHashId($hashId): ?self
     {
         $id = app('Hashids')->decode((string) Str::of($hashId)->after('ml_'));
 
-        if (empty($id)) {
-            return null;
-        }
-
-        return static::find($id[0]);
+        return empty($id) ? null : static::find($id[0]);
     }
 
     public function getPlanUrl(): string

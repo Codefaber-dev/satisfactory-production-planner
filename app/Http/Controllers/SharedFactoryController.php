@@ -16,6 +16,9 @@ class SharedFactoryController extends Controller
             ProductionLine::ofHashId($hashId) :
             MultiProductionLine::ofHashId($hashId);
 
+        // B61: undecodable/unknown hash → 404, never a Builder fatal
+        abort_unless((bool) $factory, 404);
+
         return redirect()->to($factory->getPlanUrl());
     }
 }

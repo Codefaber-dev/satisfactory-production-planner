@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -40,11 +39,6 @@ class BuildingVariant extends Model
             ->withPivot([
                 'qty',
             ]);
-    }
-
-    public function scopeOfName(Builder $query, $name)
-    {
-        return $query->firstWhere('name', $name);
     }
 
     public function calculatePowerUsage($clock_speed)

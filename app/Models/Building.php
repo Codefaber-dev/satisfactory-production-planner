@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,17 +18,22 @@ class Building extends Model
         return $this->hasMany(BuildingVariant::class);
     }
 
-    public function scopeOfName(Builder $query, $name)
+    /**
+     * B61/V109: a real static finder, NOT a scope — a scope returning null made
+     * callScope() fall back to the Builder itself, so a missing building handed
+     * callers a query builder that fataled on ->variant()/->name.
+     */
+    public static function ofName($name): ?self
     {
-        return $query->whereName($name)->first();
+        return static::whereName($name)->first();
     }
 
-    public function variant($name)
+    public function variant($name): ?BuildingVariant
     {
-        return $this->variants()->ofName($name);
+        return $this->variants->firstWhere('name', $name);
     }
 
-    public function v($name)
+    public function v($name): ?BuildingVariant
     {
         return $this->variant($name);
     }
