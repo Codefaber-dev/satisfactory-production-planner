@@ -217,6 +217,17 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
     });
 });
 
+describe('ProductionSteps — header controls (T157 / V112)', () => {
+    it('no longer renders Force Even Rows or Limit Belt Rates in the header', () => {
+        const wrapper = mountSteps();
+        const buttonText = wrapper.findAll('button').map((b) => b.text()).join(' ');
+
+        expect(buttonText).toContain('Toggle Diagrams');
+        expect(buttonText).not.toContain('Force Even Rows');
+        expect(buttonText).not.toContain('Limit Belt Rates');
+    });
+});
+
 describe('ProductionSteps — type-ahead step filter (T156 / V110)', () => {
     // Iron Ingot gains a byproduct so options cover product / input / byproduct kinds
     function makeFilterProduction() {

@@ -10,19 +10,7 @@
                 {{ diagrams ? '✅' : '⬜' }}
                 Toggle Diagrams
             </button>
-            <button @click="$emit('toggleEvenRows')" class="btn btn-emerald">
-                {{ even ? '✅' : '⬜' }}
-                Force Even Rows
-            </button>
-            <button
-                v-text="
-                    `Limit Belt Rates: ${
-                        speedLimit === 'both' ? 'Inputs & Outputs' : speedLimit === 'inputs' ? 'Inputs' : 'Outputs'
-                    }`
-                "
-                @click="$emit('toggleSpeedLimit')"
-                class="btn btn-emerald"
-            ></button>
+            <!-- V112: Force Even Rows + Limit Belt Rates moved to the Plan Settings panel -->
             <!-- V110: type-ahead ingredient filter -->
             <StepFilter :options="filterOptions" v-model="filterItem" />
         </div>
@@ -196,7 +184,6 @@ export default {
         productionChecks: {},
         recipes: {},
         choices: {},
-        even: {},
         appliedEven: {
             type: Boolean,
             default: false,
@@ -215,10 +202,6 @@ export default {
         designerMk: {
             type: String,
             default: 'mk1',
-        },
-        speedLimit: {
-            type: String,
-            default: 'both',
         },
         // current raw_sources map (raw → {mode,...}), V59
         rawSources: {
