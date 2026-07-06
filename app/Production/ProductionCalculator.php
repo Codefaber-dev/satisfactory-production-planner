@@ -162,11 +162,24 @@ class ProductionCalculator
             ? Favorites::all()->pluck('id')->sort()->values()->all()
             : collect($favorites)->map(fn ($r) => is_object($r) ? $r->id : $r)->sort()->values()->all();
 
-        $cacheKey = 'production_calc_'
+        // V108/B60: the key carries a version segment so entries written by
+        // older code (pre-V70 rememberForever'd the live calculator object
+        // under the unversioned prefix) can never be read back here. Bump the
+        // version whenever the cached shape changes.
+        $cacheKey = 'production_calc_v2_'
             .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'imports', 'variant', 'choices', 'byproducts'))->put('favorites', $favoritesKey)->toJson())
             .static::requestCacheSegment();
 
-        return Cache::remember($cacheKey, static::CACHE_TTL, fn () => static::make(
+        // V108: never trust a cached entry's shape — anything but an array
+        // (stale object graph, corrupted entry) is recomputed and overwritten
+        // instead of fataling on the array return type.
+        $cached = Cache::get($cacheKey);
+
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $payload = static::make(
             product: $product,
             qty: $qty,
             recipe: $recipe,
@@ -176,7 +189,11 @@ class ProductionCalculator
             variant: $variant,
             choices: $choices,
             byproducts: $byproducts,
-        )->toPayload());
+        )->toPayload();
+
+        Cache::put($cacheKey, $payload, static::CACHE_TTL);
+
+        return $payload;
     }
 
     /**
