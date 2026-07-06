@@ -164,7 +164,13 @@
 </template>
 
 <script>
-import { ArrowPathIcon, BuildingOffice2Icon, PowerIcon, QueueListIcon, RocketLaunchIcon } from '@heroicons/vue/24/outline';
+import {
+    ArrowPathIcon,
+    BuildingOffice2Icon,
+    PowerIcon,
+    QueueListIcon,
+    RocketLaunchIcon,
+} from '@heroicons/vue/24/outline';
 
 // Building types that can never be blueprint-grouped: extractors are placed on
 // nodes/fluids in the world, not stamped from the Blueprint Designer.

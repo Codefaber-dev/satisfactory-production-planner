@@ -18,11 +18,11 @@ describe('fillTargetQty — T122/V80', () => {
 
     it('ungrouped (X=1) reduces to whole building count @100% (V55)', () => {
         // 5.2 machines → ceil 6; qty 30 → 30 * 6/5.2
-        expect(fillTargetQty({ qty: 30, exactBuildings: 5.2, multiple: 1 })).toBeCloseTo(30 * 6 / 5.2, 6);
+        expect(fillTargetQty({ qty: 30, exactBuildings: 5.2, multiple: 1 })).toBeCloseTo((30 * 6) / 5.2, 6);
     });
 
     it('default multiple is 1 (ungrouped)', () => {
-        expect(fillTargetQty({ qty: 30, exactBuildings: 5.2 })).toBeCloseTo(30 * 6 / 5.2, 6);
+        expect(fillTargetQty({ qty: 30, exactBuildings: 5.2 })).toBeCloseTo((30 * 6) / 5.2, 6);
     });
 
     it('whole-machine ungrouped step is a no-op', () => {

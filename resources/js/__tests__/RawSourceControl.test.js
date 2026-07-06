@@ -8,9 +8,7 @@ const coalRecipes = [
     { id: 1, description: 'Coal (Iron)', ingredients: [{ name: 'Iron Ore' }, { name: 'Reanimated SAM' }] },
     { id: 2, description: 'Coal (Limestone)', ingredients: [{ name: 'Limestone' }, { name: 'Reanimated SAM' }] },
 ];
-const waterRecipes = [
-    { id: 3, description: 'Unpackage Water', ingredients: [{ name: 'Packaged Water' }] },
-];
+const waterRecipes = [{ id: 3, description: 'Unpackage Water', ingredients: [{ name: 'Packaged Water' }] }];
 
 function mountControl(props) {
     return mount(RawSourceControl, {
@@ -97,17 +95,26 @@ describe('RawSourceControl', () => {
         // no <select> anywhere in extract mode for a miner
         expect(wrapper.findAll('select')).toHaveLength(0);
         // purity buttons present
-        const purityBtns = wrapper.find('[aria-label="purity"]').findAll('button').map((b) => b.text());
+        const purityBtns = wrapper
+            .find('[aria-label="purity"]')
+            .findAll('button')
+            .map((b) => b.text());
         expect(purityBtns).toEqual(['impure', 'normal', 'pure']);
         // shard buttons 0–3
-        const shardBtns = wrapper.find('[aria-label="power shards"]').findAll('button').map((b) => b.text());
+        const shardBtns = wrapper
+            .find('[aria-label="power shards"]')
+            .findAll('button')
+            .map((b) => b.text());
         expect(shardBtns).toEqual(['0', '1', '2', '3']);
     });
 
     it('emits extract params via a button click, preserving mode', async () => {
         const wrapper = mountControl({ name: 'Iron Ore', config: { mode: 'extract' } });
 
-        const pureBtn = wrapper.find('[aria-label="purity"]').findAll('button').find((b) => b.text() === 'pure');
+        const pureBtn = wrapper
+            .find('[aria-label="purity"]')
+            .findAll('button')
+            .find((b) => b.text() === 'pure');
         await pureBtn.trigger('click');
 
         const payload = wrapper.emitted('update').at(-1)[0];
@@ -147,9 +154,7 @@ describe('RawSourceControl', () => {
                 extractor: { count: 6, clock: 100, power: 24 },
             });
 
-            expect(wrapper.find('[aria-label="extractor summary"]').text()).toBe(
-                '6x Miner (mk1) @100% [Pure] [24 MW]'
-            );
+            expect(wrapper.find('[aria-label="extractor summary"]').text()).toBe('6x Miner (mk1) @100% [Pure] [24 MW]');
         });
 
         it('omits the purity tag for water (no purity semantics)', () => {

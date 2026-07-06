@@ -9,7 +9,10 @@ function mountStep(step, extra = {}) {
     return mount(RecycleStep, {
         global: {
             mocks: { Bus: mockBus },
-            stubs: { CloudImage: true, BuildDiagram: { name: 'build-diagram', template: '<div class="stub-diagram" />' } },
+            stubs: {
+                CloudImage: true,
+                BuildDiagram: { name: 'build-diagram', template: '<div class="stub-diagram" />' },
+            },
         },
         props: { step, identifier: 'R.A', diagrams: true, ...extra },
     });
@@ -24,7 +27,10 @@ const sinkStep = {
     num_buildings: 1,
     power: 30,
     footprint: { foundations: 24 },
-    inputs: [{ item: 'Packaged Water', qty: 60 }, { item: 'Concrete', qty: 30 }],
+    inputs: [
+        { item: 'Packaged Water', qty: 60 },
+        { item: 'Concrete', qty: 30 },
+    ],
     output: { points: 8160 },
 };
 

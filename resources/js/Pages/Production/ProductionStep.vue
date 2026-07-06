@@ -467,9 +467,7 @@ export default {
     data() {
         // raw leaves (import/extract, V100) carry no recipe — key by name instead
         const recipe = this.production.recipe;
-        const key = recipe
-            ? `${recipe.product.name}|${recipe.description || recipe.product.name}`
-            : this.name;
+        const key = recipe ? `${recipe.product.name}|${recipe.description || recipe.product.name}` : this.name;
         const clock = store.getItem(`${key}.clock`, this.overviews?.[key]?.clock);
         const variant = store.getItem(`${key}.selected_variant_name`, this.overviews?.[key]?.selected_variant_name);
 

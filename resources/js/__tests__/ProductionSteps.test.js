@@ -17,7 +17,9 @@ function makeProduction() {
                     imported: false,
                     total: 120,
                     outputs: {},
-                    production: [{ name: 'Iron Ore', recipe: null, qty: 120, ingredients: {}, byproducts: {}, outputs: {} }],
+                    production: [
+                        { name: 'Iron Ore', recipe: null, qty: 120, ingredients: {}, byproducts: {}, outputs: {} },
+                    ],
                 },
             },
             2: {
@@ -56,7 +58,8 @@ function mountSteps(extraProps = {}) {
                 RecycleStep: {
                     name: 'RecycleStep',
                     props: ['step', 'identifier', 'stepMap', 'sinkIdentifier'],
-                    template: '<tbody class="stub-recycle" :data-test="\'recycle-step\'" :data-name="step.name" :data-id="identifier" :data-sink="sinkIdentifier" />',
+                    template:
+                        '<tbody class="stub-recycle" :data-test="\'recycle-step\'" :data-name="step.name" :data-id="identifier" :data-sink="sinkIdentifier" />',
                 },
             },
         },
@@ -91,9 +94,7 @@ describe('ProductionSteps — Level 0 raws (V100)', () => {
 
     it('does not render a raw in the normal (non-zero) levels', () => {
         const wrapper = mountSteps();
-        const ironOreSteps = wrapper
-            .findAll('.stub-step')
-            .filter((s) => s.attributes('data-name') === 'Iron Ore');
+        const ironOreSteps = wrapper.findAll('.stub-step').filter((s) => s.attributes('data-name') === 'Iron Ore');
 
         // exactly one Iron Ore step, at Level 0 (not duplicated in tier-1 level)
         expect(ironOreSteps).toHaveLength(1);
@@ -111,8 +112,26 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
             production: {
                 ...makeProduction(),
                 recycling_steps: [
-                    { type: 'package', name: 'Packaged Water', building: 'Packager', num_buildings: 1, power: 10, footprint: {}, inputs: [{ item: 'Water', qty: 60 }], output: { item: 'Packaged Water', qty: 60, to_sink: true } },
-                    { type: 'sink', name: 'AWESOME Sink', building: 'AWESOME Sink', num_buildings: 1, power: 30, footprint: {}, inputs: [{ item: 'Packaged Water', qty: 60 }], output: { points: 7800 } },
+                    {
+                        type: 'package',
+                        name: 'Packaged Water',
+                        building: 'Packager',
+                        num_buildings: 1,
+                        power: 10,
+                        footprint: {},
+                        inputs: [{ item: 'Water', qty: 60 }],
+                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
+                    },
+                    {
+                        type: 'sink',
+                        name: 'AWESOME Sink',
+                        building: 'AWESOME Sink',
+                        num_buildings: 1,
+                        power: 30,
+                        footprint: {},
+                        inputs: [{ item: 'Packaged Water', qty: 60 }],
+                        output: { points: 7800 },
+                    },
                 ],
             },
         });
@@ -154,8 +173,30 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
             production: {
                 ...makeProduction(),
                 recycling_steps: [
-                    { type: 'package', name: 'Packaged Water', building: 'Packager', num_buildings: 1, power: 10, footprint: {}, recipe: null, inputs: [{ item: 'Water', qty: 60 }, { item: 'Empty Canister', qty: 60 }], output: { item: 'Packaged Water', qty: 60, to_sink: true } },
-                    { type: 'sink', name: 'AWESOME Sink', building: 'AWESOME Sink', num_buildings: 1, power: 30, footprint: {}, inputs: [{ item: 'Packaged Water', qty: 60 }], output: { points: 7800 } },
+                    {
+                        type: 'package',
+                        name: 'Packaged Water',
+                        building: 'Packager',
+                        num_buildings: 1,
+                        power: 10,
+                        footprint: {},
+                        recipe: null,
+                        inputs: [
+                            { item: 'Water', qty: 60 },
+                            { item: 'Empty Canister', qty: 60 },
+                        ],
+                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
+                    },
+                    {
+                        type: 'sink',
+                        name: 'AWESOME Sink',
+                        building: 'AWESOME Sink',
+                        num_buildings: 1,
+                        power: 30,
+                        footprint: {},
+                        inputs: [{ item: 'Packaged Water', qty: 60 }],
+                        output: { points: 7800 },
+                    },
                 ],
             },
             overviews,

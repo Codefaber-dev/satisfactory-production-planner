@@ -189,7 +189,12 @@ describe('ProductionStep — recipe-bearing raw with absent overview (B49)', () 
                 'Water|Unpackage Water': {
                     clock: 'c100',
                     selected_variant_name: 'mk1',
-                    overviews: { c100: { building: 'packager', details: { mk1: { footprint: [], num_buildings: 1, clock_speed: 100, power_usage: 30 } } } },
+                    overviews: {
+                        c100: {
+                            building: 'packager',
+                            details: { mk1: { footprint: [], num_buildings: 1, clock_speed: 100, power_usage: 30 } },
+                        },
+                    },
                 },
             },
         });
@@ -232,7 +237,9 @@ describe('ProductionStep — extractor info to RawSourceControl (V82)', () => {
 
     it('maps the matched ExtractorSummary row to { count, clock, power }', () => {
         const wrapper = mountRawStep({
-            extractors: [{ product: 'Iron Ore', building: 'Miner Mk.2', num_buildings: 3, clock_speed: 100, power_usage: 45 }],
+            extractors: [
+                { product: 'Iron Ore', building: 'Miner Mk.2', num_buildings: 3, clock_speed: 100, power_usage: 45 },
+            ],
         });
 
         expect(wrapper.vm.extractor).toEqual({ count: 3, clock: 100, power: 45 });

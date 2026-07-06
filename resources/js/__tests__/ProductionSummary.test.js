@@ -48,7 +48,16 @@ describe('ProductionSummary — recycling output (T110 / V66 / V67)', () => {
                 points: 7800,
                 recycled: {},
                 packaged: [
-                    { fluid: 'Water', product: 'Packaged Water', qty: 60, buildings: 1, power: 10, container: 'Empty Canister', container_qty: 60, points: 7800 },
+                    {
+                        fluid: 'Water',
+                        product: 'Packaged Water',
+                        qty: 60,
+                        buildings: 1,
+                        power: 10,
+                        container: 'Empty Canister',
+                        container_qty: 60,
+                        points: 7800,
+                    },
                 ],
                 waste: {},
             },
