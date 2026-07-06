@@ -67,8 +67,11 @@ class ProductionController extends Controller
         $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
         $building_multiples = request('building_multiples', []);
         $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
+        $raw_sources = request('raw_sources', []);
+        $import_notes = request('import_notes', []);
+        $auto_package_recycle = request()->boolean('auto_package_recycle');
 
-        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'product', 'yield', 'recipe', 'variant', 'belt_speed', 'imports', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier', 'raw_sources', 'import_notes', 'auto_package_recycle') + $this->baseData());
     }
 
     public function multi()
@@ -88,6 +91,9 @@ class ProductionController extends Controller
         $power_multiplier = max(0.1, min(10.0, (float) request('power_multiplier', 1.0)));
         $building_multiples = request('building_multiples', []);
         $building_cost_multiplier = max(0.1, min(10.0, (float) request('building_cost_multiplier', 1.0)));
+        $raw_sources = request('raw_sources', []);
+        $import_notes = request('import_notes', []);
+        $auto_package_recycle = request()->boolean('auto_package_recycle');
 
         // V70/B46: key from whitelisted inputs only — the md5(request()->all())
         // term minted a new never-evicted entry per distinct/irrelevant param.
@@ -118,22 +124,11 @@ class ProductionController extends Controller
             $m->recalculateUsingByproductsUntilStable();
 
             // V70: json round-trip → plain arrays only (no objects/Eloquent) in
-            // the cached payload, identical in shape to the Inertia props.
-            return json_decode(json_encode([
-                'results' => $m->getResults(),
-                'byproducts_used' => $m->getByproductsUsed(),
-                'raw_materials' => $m->getRawMaterials(),
-                'intermediate_materials' => $m->getIntermediateMaterials(),
-                'all_materials' => $m->getAllMaterials(),
-                'final' => $m->getFinals(),
-                'recipe' => $m->getRecipes(),
-                'overrides' => $m->getOverrides(),
-                'byproducts' => $m->getByproducts(),
-                'overviews' => $m->getOverviews(),
-            ]), true);
+            // the cached payload; recycling/extractor keys included (V66/V76/V88).
+            return $m->toPayload();
         });
 
-        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier') + $this->baseData());
+        return Inertia::render('Production/Show', compact('production', 'variant', 'belt_speed', 'imports', 'multi', 'somersloops', 'cost_multiplier', 'power_multiplier', 'building_multiples', 'building_cost_multiplier', 'raw_sources', 'import_notes', 'auto_package_recycle') + $this->baseData());
     }
 
     public function newYield($ingredient, $qty, $recipe, $variant = 'mk1')

@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### ⚡ Faster Everywhere
+### ⛏️ Extraction & Recycling
 
-- A performance pass across the whole planner: pages load noticeably faster, plans calculate quicker, and the app downloads less to your browser. No gameplay changes — just speed.
+- Raw resources now build out as real extractors — miners, pumps, and wells with full power and build cost — and an AWESOME Sink recycles unused byproducts into points/min. Source any raw by extract, convert, or unpackage, package-and-sink leftover fluids, and annotate imports with notes.
 
-## v1.2.3 - Performance Update
+## v1.3.0 - Extraction & Recycling Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -32,6 +32,24 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
 
+### v1.3.0
+
+- ⛏️ **Resource Extraction** — Raw resources now appear as their own production steps at the top of the plan, each with a source picker. Choose **Extract** to add real extractors — Miner Mk.1/2/3, Water Extractor, Oil Extractor, or Resource Well Pressurizer — with node purity, miner tier, and power-shard settings. Extractors are counted in the building summary and parts/build-cost list, and their power is rolled into the plan total instead of a rough proxy estimate.
+- 🔀 **Flexible Raw Sourcing** — Beyond extraction, source any raw by **Import** (default), **Convert** (produce one ore from another via a Converter recipe), or **Unpackage** (e.g. get Water by unpackaging Packaged Water). Convert/unpackage chains that loop back on themselves are solved by the equation solver, not dodged.
+- ♻️ **AWESOME Sink Recycling** — The plan now reports total **points/min** from sinking unused byproducts, surfaced as a terminal **Recycling** step. A new **Package & Sink Fluids** toggle in Building Settings packages leftover fluids and gases (which can't be sunk directly) and sinks the packaged form — the added Packager and AWESOME Sink render as full build steps with their own diagrams, building counts, and power.
+- 🛈 **Import Notes** — Add a free-text note to any imported ingredient (e.g. "From NW Steel Factory"). Notes show on the ingredient's production step and persist with saved factories.
+- 🎯 **Perfect Ratio Factory** — A new button in Plan Settings scales the whole plan to the smallest size where every building runs whole at 100% clock — no fractional or underclocked machines anywhere. Works for mutual-recipe loops too, and is now **blueprint-aware**: when a building type is grouped into blueprint stamps, the ratio fills whole stamps. If the perfect ratio would make the factory impractically large, it warns instead of applying.
+- 📐 **Blueprint-aware Fill to 100%** — The per-output "Fill to 100%" button now rounds up to a whole blueprint stamp for grouped building types, so no partial stamps or underclocked machines.
+- 🗑️ **Right-sized Sinks** — The AWESOME Sink step now scales with how much you're actually sinking: one sink per belt of recycled items instead of always one. Sink power and build cost are counted in the building summary, parts list, and plan power total.
+- ⚖️ **Consistent Packaging Steps** — Auto-package Packager steps now respect your plan-level cost, power, and building multipliers (and somersloop settings), matching their overclock overviews exactly.
+- 🕳️ **Truer Well Rates** — The Resource Well Pressurizer now models a whole well (six satellite nodes) instead of a single node: 360/min at normal purity, 720/min on a pure well — in line with the in-game wells.
+- 🪲 Bug fix: Loop steps no longer show **"Infinity%"** for an input — the usage percentage now divides by the correct plan total when the output product feeds back into a loop.
+- 🪲 Bug fix: The **Package & Sink Fluids** toggle now correctly sizes leftover fluids — recycling read fully-consumed byproducts as leftover, making the toggle appear to do nothing.
+- 🪲 Bug fix: Switching a raw resource back to **Import** after trying Convert or Unpackage now fully resets it — previously the old recipe could stick and keep producing the raw instead of importing it.
+- 🔒 Internal hardening: plan requests and factory saves now validate and bound their raw-source and import-note inputs.
+
+---
+
 ### v1.2.3
 
 - ⚡ **Faster Page Loads** — The recipe and product data that powers every planner page is now pre-built and cached on the server instead of being recomputed on every request. This was the single biggest cost on each page view and it's gone.
@@ -50,6 +68,7 @@ Greetings Pioneers! Here are the latest changes to the Satisfactory Production P
 - 🧩 **Smarter Loop Handling** — When a loop genuinely can't be solved (e.g. packaging and immediately unpackaging the same fluid), the planner auto-sources it from a non-looping recipe and respects your intent: choosing **Unpackage Fuel** keeps that choice and sources Packaged Fuel elsewhere. You can also just **import** the looped item to break it yourself.
 - 🪲 Bug fix: Saved factories no longer revert their recipe choices on reload — sub-recipe selections now persist correctly.
 - 🛈 The alarming "Circular Dependencies Found" warning is now an informational **"Recipes auto-adjusted to resolve a loop"** note, with a hint to change the recipe or import the item.
+- 🪲 Bug fix: Quick Nav no longer lists imported products — only the steps actually shown in the plan appear in the navigator.
 
 ---
 

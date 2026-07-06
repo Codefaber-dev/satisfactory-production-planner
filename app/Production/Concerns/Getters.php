@@ -156,9 +156,16 @@ trait Getters
     public function getIntermediateRecipe(Ingredient $ingredient): ?Recipe
     {
         switch (true) {
-            // no recipe if the ingredient is raw
+            // raw ingredient: leaf by default. A recipe choice applies only while
+            // the raw's source mode is convert/unpackage (V104) — a stale
+            // choices[raw] entry from a previous mode must not survive the flip
+            // back to import/extract (B58).
             case $ingredient->isRaw() :
-                return null;
+                $mode = $this->getRawSource($ingredient->name)['mode'] ?? 'import';
+
+                return in_array($mode, ['convert', 'unpackage'], true)
+                    ? $this->getChoice($ingredient)
+                    : null;
 
                 // if it's the final product
             case $ingredient->is($this->getProduct()):

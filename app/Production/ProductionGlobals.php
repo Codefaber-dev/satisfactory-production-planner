@@ -27,6 +27,10 @@ class ProductionGlobals
 
     protected float $cost_multiplier = 1.0;
 
+    // V59: per-raw source mode config (raw name => ['mode' => import|extract|convert|unpackage, ...]).
+    // Default import for any raw not present → current leaf behavior, output byte-identical.
+    protected Collection $raw_sources;
+
     // V58: loop membership (product => loop id) for active loops in this plan.
     protected Collection $loop_of;
 
@@ -49,6 +53,7 @@ class ProductionGlobals
         $this->variant = $variant;
         $this->belt_speed = request('belt_speed', 780);
         $this->cost_multiplier = max(0.1, min(10.0, (float) request('cost_multiplier', 1.0)));
+        $this->raw_sources = collect(request('raw_sources', []));
         $this->used_byproducts = collect($used_byproducts);
         $this->loop_of = collect($loop_of);
         $this->loop_gross = collect($loop_gross);
@@ -120,6 +125,24 @@ class ProductionGlobals
     public function getCostMultiplier(): float
     {
         return $this->cost_multiplier;
+    }
+
+    // V59: source-mode config for a raw ingredient. Default import (current leaf behavior)
+    // for any raw without an explicit entry → plan output byte-identical.
+    public function getRawSource(string $name): array
+    {
+        $config = $this->raw_sources->get($name, []);
+
+        if (! is_array($config) || ! isset($config['mode'])) {
+            return ['mode' => 'import'];
+        }
+
+        return $config;
+    }
+
+    public function getRawSources(): Collection
+    {
+        return $this->raw_sources;
     }
 
     public function getVariant(): string

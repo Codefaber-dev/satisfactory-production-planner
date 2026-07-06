@@ -10,7 +10,7 @@
                 <tr class="bg-sky-300 dark:bg-sky-800">
                     <th class="text-lg font-semibold" colspan="3">Raw Materials (per min)</th>
                 </tr>
-                <tr v-for="(props, name) in rawMaterials">
+                <tr v-for="(_, name) in rawMaterials">
                     <td colspan="2" class="p-2">
                         <cloud-image
                             class="inline-flex"
@@ -21,6 +21,16 @@
                             :alt="name"
                         />
                         {{ name }}
+                        <!-- V64: import note only for raws actually imported (import mode) -->
+                        <input
+                            v-if="isRawImported(name)"
+                            :value="importNotes[name] || ''"
+                            @input="$emit('updateImportNote', { name, note: $event.target.value })"
+                            type="text"
+                            placeholder="Import note…"
+                            :rel="`import-note-${name}`"
+                            class="import-note mt-1 block w-full rounded bg-gray-100 p-1 text-xs dark:bg-sky-200 dark:text-slate-900"
+                        />
                     </td>
                     <td class="p-2 text-right">
                         <div class="flex justify-end space-x-2">
@@ -83,6 +93,16 @@
                                 <span>{{ name }}</span>
                                 <br />
                                 <span class="italic">{{ qty }} per min</span>
+                                <!-- V64: import note, shown only when this intermediate is imported -->
+                                <input
+                                    v-if="newImports[name]"
+                                    :value="importNotes[name] || ''"
+                                    @input="$emit('updateImportNote', { name, note: $event.target.value })"
+                                    type="text"
+                                    placeholder="Import note…"
+                                    :rel="`import-note-${name}`"
+                                    class="import-note mt-1 block w-full rounded bg-gray-100 p-1 text-xs dark:bg-sky-200 dark:text-slate-900"
+                                />
                             </div>
                         </div>
                     </td>
@@ -217,6 +237,39 @@
                 <td>&nbsp;</td>
             </tr>
 
+            <!-- V66/V67: AWESOME Sink recycling output -->
+            <template v-if="recycling">
+                <tr class="bg-sky-300 dark:bg-sky-700">
+                    <th class="text-lg font-semibold" colspan="3">Recycling (AWESOME Sink)</th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="p-2 font-semibold">Recycled Points / min</td>
+                    <td data-test="recycled-points" class="p-2 text-right font-semibold">
+                        {{ Math.round(recycling.points || 0).toLocaleString() }}
+                    </td>
+                </tr>
+                <tr
+                    v-for="row in recycling.packaged || []"
+                    :key="`pkg-${row.product}`"
+                    data-test="recycled-packaged-row"
+                >
+                    <td colspan="2" class="p-2">
+                        <div class="flex items-center">
+                            <cloud-image class="mr-2 inline-flex" :public-id="`${row.product}.png`" crop="scale" quality="100" width="32" :alt="row.product" />
+                            <div>
+                                <span>{{ row.product }}</span>
+                                <br />
+                                <span class="text-xs italic">
+                                    {{ +(row.qty || 0).toFixed(2) }}/min from {{ row.fluid }} ·
+                                    {{ +(row.buildings || 0).toFixed(2) }}× Packager · {{ Math.ceil(row.power || 0) }} MW
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-2 text-right">{{ Math.round(row.points || 0).toLocaleString() }}</td>
+                </tr>
+            </template>
+
             <tr class="bg-sky-300 dark:bg-sky-700">
                 <th class="text-lg font-semibold" colspan="3">Parts List (Buildings)</th>
             </tr>
@@ -249,13 +302,16 @@
 </template>
 <script>
 import BuildingSummary from '@/Pages/Production/BuildingSummary.vue';
+import CloudImage from '../../Components/CloudImage.vue';
 
 export default {
     name: 'production-summary',
 
     components: {
+        CloudImage,
         BuildingSummary,
     },
+    emits: ['fetch', 'fetchNewYield', 'updateImportNote'],
     props: {
         buildingChecks: {},
         disabledRawMaterials: {},
@@ -264,6 +320,18 @@ export default {
         helpImport: {},
         helpRawMaterials: {},
         newImports: {},
+        // V64: map ingredient → import note
+        importNotes: {
+            default: () => ({}),
+        },
+        // V59: raw source-mode map (raw → {mode,...}); note shown only in import mode
+        rawSources: {
+            default: () => ({}),
+        },
+        // V66/V67: recycling result { points, recycled, packaged, waste }
+        recycling: {
+            default: null,
+        },
         newYield: {},
         production: {},
         production__building_summary: {},
@@ -273,6 +341,14 @@ export default {
         production__net_power: {},
         rawMaterials: {},
         rawUnchanged: {},
+    },
+    methods: {
+        // V64: a raw is "imported" only in import mode (default when no config) —
+        // extract/convert/unpackage raws are produced, not imported, so no note.
+        isRawImported(name) {
+            const mode = this.rawSources[name]?.mode ?? 'import';
+            return mode === 'import';
+        },
     },
 };
 </script>

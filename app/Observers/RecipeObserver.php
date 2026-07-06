@@ -26,6 +26,11 @@ class RecipeObserver
         Cache::forget("most_resource_efficient_recipe.{$recipe->product_id}");
         Cache::forget('loop_catalog');
 
+        // T154: a Package recipe edit invalidates its fluid's package_recipe lookup
+        foreach ($recipe->ingredients as $ingredient) {
+            Cache::forget("package_recipe.{$ingredient->name}");
+        }
+
         BaseDataPayload::flush();
 
         $this->flushProductionCalcKeys();

@@ -488,6 +488,158 @@ class BuildingSeeder extends Seeder
             ],
         ],
 
+        // Miner Mk.1 (V77) — base_power matches ExtractionCalc miner constant (§C)
+        [
+            'name' => BuildingEnum::MINER_MK1->value,
+            'inputs' => 0,
+            'outputs' => 1,
+            'width' => 6,
+            'length' => 14,
+            'height' => 18,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 5,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::PORTABLE_MINER->value, 'qty' => 1],
+                        ['ingredient' => IngredientEnum::IRON_PLATE->value, 'qty' => 10],
+                        ['ingredient' => IngredientEnum::CONCRETE->value, 'qty' => 10],
+                    ],
+                ],
+            ],
+        ],
+
+        // Miner Mk.2 (V77)
+        [
+            'name' => BuildingEnum::MINER_MK2->value,
+            'inputs' => 0,
+            'outputs' => 1,
+            'width' => 6,
+            'length' => 14,
+            'height' => 18,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 15,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::PORTABLE_MINER->value, 'qty' => 2],
+                        ['ingredient' => IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value, 'qty' => 10],
+                        ['ingredient' => IngredientEnum::STEEL_PIPE->value, 'qty' => 20],
+                        ['ingredient' => IngredientEnum::MODULAR_FRAME->value, 'qty' => 10],
+                    ],
+                ],
+            ],
+        ],
+
+        // Miner Mk.3 (V77)
+        [
+            'name' => BuildingEnum::MINER_MK3->value,
+            'inputs' => 0,
+            'outputs' => 1,
+            'width' => 6,
+            'length' => 14,
+            'height' => 18,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 45,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::PORTABLE_MINER->value, 'qty' => 3],
+                        ['ingredient' => IngredientEnum::STEEL_PIPE->value, 'qty' => 50],
+                        ['ingredient' => IngredientEnum::SUPERCOMPUTER->value, 'qty' => 5],
+                        ['ingredient' => IngredientEnum::FUSED_MODULAR_FRAME->value, 'qty' => 10],
+                        ['ingredient' => IngredientEnum::TURBO_MOTOR->value, 'qty' => 3],
+                    ],
+                ],
+            ],
+        ],
+
+        // Water Extractor (V77)
+        [
+            'name' => BuildingEnum::WATER_EXTRACTOR->value,
+            'inputs' => 0,
+            'outputs' => 1,
+            'width' => 20,
+            'length' => 19,
+            'height' => 26,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 20,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::COPPER_SHEET->value, 'qty' => 20],
+                        ['ingredient' => IngredientEnum::REINFORCED_IRON_PLATE->value, 'qty' => 10],
+                        ['ingredient' => IngredientEnum::ROTOR->value, 'qty' => 10],
+                    ],
+                ],
+            ],
+        ],
+
+        // Oil Extractor (V77)
+        [
+            'name' => BuildingEnum::OIL_EXTRACTOR->value,
+            'inputs' => 0,
+            'outputs' => 1,
+            'width' => 8,
+            'length' => 14,
+            'height' => 21,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 40,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::MOTOR->value, 'qty' => 15],
+                        ['ingredient' => IngredientEnum::ENCASED_INDUSTRIAL_BEAM->value, 'qty' => 20],
+                        ['ingredient' => IngredientEnum::CABLE->value, 'qty' => 60],
+                    ],
+                ],
+            ],
+        ],
+
+        // Resource Well Pressurizer (V77)
+        [
+            'name' => BuildingEnum::RESOURCE_WELL_PRESSURIZER->value,
+            'inputs' => 0,
+            'outputs' => 1,
+            'width' => 20,
+            'length' => 20,
+            'height' => 26,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 150,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::RADIO_CONTROL_UNIT->value, 'qty' => 10],
+                        ['ingredient' => IngredientEnum::HEAVY_MODULAR_FRAME->value, 'qty' => 25],
+                        ['ingredient' => IngredientEnum::MOTOR->value, 'qty' => 50],
+                        ['ingredient' => IngredientEnum::ALCLAD_ALUMINUM_SHEET->value, 'qty' => 50],
+                        ['ingredient' => IngredientEnum::RUBBER->value, 'qty' => 100],
+                    ],
+                ],
+            ],
+        ],
+
+        // AWESOME Sink (V89) — backs the recycle step's building + diagram
+        [
+            'name' => BuildingEnum::AWESOME_SINK->value,
+            'inputs' => 1,
+            'outputs' => 0,
+            'width' => 16,
+            'length' => 13,
+            'height' => 24,
+            'variants' => [
+                'mk1' => [
+                    'multiplier' => 1,
+                    'base_power' => 30,
+                    'recipe' => [
+                        ['ingredient' => IngredientEnum::REINFORCED_IRON_PLATE->value, 'qty' => 15],
+                        ['ingredient' => IngredientEnum::CABLE->value, 'qty' => 30],
+                        ['ingredient' => IngredientEnum::CONCRETE->value, 'qty' => 45],
+                    ],
+                ],
+            ],
+        ],
+
         // Quantum Encoder
         [
             'name' => BuildingEnum::QUANTUM_ENCODER->value,

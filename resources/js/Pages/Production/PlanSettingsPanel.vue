@@ -82,6 +82,28 @@
                     />
                 </div>
             </div>
+            <!-- V67: auto-package-and-recycle excess fluids toggle (separate from the V52 multiplier cards) -->
+            <div
+                data-test="recycling-setting-card"
+                class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+            >
+                <ArrowPathIcon alt="Auto-Package Recycle" class="h-10 w-10 shrink-0"/>
+                <div class="flex w-full flex-col space-y-1">
+                    <label class="whitespace-nowrap text-xl font-bold">Package &amp; Sink Fluids</label>
+                    <label class="relative inline-flex cursor-pointer items-center">
+                        <input
+                            type="checkbox"
+                            data-test="auto-package-recycle-toggle"
+                            :checked="autoPackageRecycle"
+                            @change="$emit('toggleAutoPackageRecycle')"
+                            class="peer sr-only"
+                        />
+                        <span
+                            class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
+                        ></span>
+                    </label>
+                </div>
+            </div>
         </div>
         <template v-if="uniqueBuildings.length">
             <h2 class="mb-1 font-bold text-xl">
@@ -104,7 +126,7 @@
                 </button>
             </div>
             <div class="flex flex-wrap gap-3">
-                <div v-for="building in uniqueBuildings" :key="building" class="flex items-center space-x-1">
+                <div v-for="building in blueprintableBuildings" :key="building" class="flex items-center gap-3 bg-sky-600 p-4 rounded-lg border border-sky-700">
                     <label class="relative inline-flex cursor-pointer items-center">
                         <input
                             type="checkbox"
@@ -133,7 +155,7 @@
                 </div>
             </div>
         </template>
-        <div class="mt-3">
+        <div class="mt-3 flex flex-wrap gap-2">
             <button :disabled="working" @click="$emit('apply')" class="btn btn-emerald">
                 Update
             </button>
@@ -142,7 +164,17 @@
 </template>
 
 <script>
-import { BuildingOffice2Icon, PowerIcon, QueueListIcon, RocketLaunchIcon } from '@heroicons/vue/24/outline';
+import {
+    ArrowPathIcon,
+    BuildingOffice2Icon,
+    PowerIcon,
+    QueueListIcon,
+    RocketLaunchIcon,
+} from '@heroicons/vue/24/outline';
+
+// Building types that can never be blueprint-grouped: extractors are placed on
+// nodes/fluids in the world, not stamped from the Blueprint Designer.
+const NON_BLUEPRINTABLE = ['water', 'oil', 'miner', 'pressurizer'];
 
 // Presentational Plan Settings + Blueprint Mode panel, extracted from Show.vue
 // (T123). All state lives in Show; this component only renders and emits.
@@ -154,6 +186,7 @@ export default {
         QueueListIcon,
         BuildingOffice2Icon,
         PowerIcon,
+        ArrowPathIcon,
     },
 
     props: {
@@ -161,6 +194,7 @@ export default {
         costMultiplier: Number,
         buildingCostMultiplier: Number,
         powerMultiplier: Number,
+        autoPackageRecycle: Boolean,
         uniqueBuildings: { type: Array, default: () => [] },
         designerDims: { type: Object, default: () => ({}) },
         bpDesigner: String,
@@ -174,11 +208,21 @@ export default {
         'update:costMultiplier',
         'update:buildingCostMultiplier',
         'update:powerMultiplier',
+        'toggleAutoPackageRecycle',
         'setDesignerMk',
         'toggleBlueprintEnabled',
         'setBlueprintSize',
         'apply',
     ],
+
+    computed: {
+        // extractor buildings are excluded from Blueprint Mode rows
+        blueprintableBuildings() {
+            return this.uniqueBuildings.filter(
+                (building) => !NON_BLUEPRINTABLE.some((term) => building.toLowerCase().includes(term))
+            );
+        },
+    },
 
     methods: {
         // mirror v-model.number: emit a number when parseable, raw value otherwise

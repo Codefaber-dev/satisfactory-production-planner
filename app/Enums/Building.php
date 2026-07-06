@@ -15,6 +15,15 @@ enum Building: string
     case PARTICLE_ACCELERATOR = 'Particle Accelerator';
     case QUANTUM_ENCODER = 'Quantum Encoder';
     case CONVERTER = 'Converter';
+    case AWESOME_SINK = 'AWESOME Sink'; // V89 — backs the recycle step (V88)
+
+    // extractors (V77) — names match ExtractorSummary::buildingName exactly
+    case MINER_MK1 = 'Miner Mk.1';
+    case MINER_MK2 = 'Miner Mk.2';
+    case MINER_MK3 = 'Miner Mk.3';
+    case WATER_EXTRACTOR = 'Water Extractor';
+    case OIL_EXTRACTOR = 'Oil Extractor';
+    case RESOURCE_WELL_PRESSURIZER = 'Resource Well Pressurizer';
 
     // power generators
     case BIOMASS_BURNER = 'Biomass Burner';
