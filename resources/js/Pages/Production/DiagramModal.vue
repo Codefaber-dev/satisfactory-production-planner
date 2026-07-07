@@ -46,7 +46,7 @@
                     @pointerup="onPointerUp"
                     @pointercancel="onPointerUp"
                 >
-                    <diagram-svg :footprint="footprint" :view="view" class="max-h-full" />
+                    <diagram-svg :footprint="footprint" :materials="materials" :view="view" class="max-h-full" />
                 </div>
                 <div v-if="plan" class="w-full shrink-0 overflow-y-auto lg:w-80" data-summary-panel>
                     <building-summary
@@ -81,6 +81,10 @@ export default {
         title: {
             type: String,
             default: '',
+        },
+        materials: {
+            type: Object,
+            default: null,
         },
     },
     emits: ['close'],
