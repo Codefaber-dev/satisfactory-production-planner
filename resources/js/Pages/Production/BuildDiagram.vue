@@ -88,16 +88,31 @@
             </ul>
         </div>
         <div class="w-full min-w-0 flex-1 p-2">
-            <diagram-svg :footprint="footprint" class="shadow-lg" />
+            <button
+                type="button"
+                aria-label="Expand diagram"
+                title="Expand diagram — pan &amp; zoom"
+                class="block w-full cursor-zoom-in"
+                @click="modalOpen = true"
+            >
+                <diagram-svg :footprint="footprint" class="max-h-96 shadow-lg" />
+            </button>
+            <diagram-modal v-if="modalOpen" :footprint="footprint" @close="modalOpen = false" />
         </div>
     </div>
 </template>
 <script>
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
+import DiagramModal from '@/Pages/Production/DiagramModal';
 
 export default {
     name: 'build-diagram',
-    components: { DiagramSvg },
+    components: { DiagramSvg, DiagramModal },
+    data() {
+        return {
+            modalOpen: false,
+        };
+    },
     props: {
         footprint: {
             type: Object,

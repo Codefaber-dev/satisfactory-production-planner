@@ -1,7 +1,7 @@
 <template>
     <svg
-        class="block h-auto max-h-96 w-full"
-        :viewBox="`0 0 ${canvasWidth} ${canvasHeight}`"
+        class="block h-auto w-full"
+        :viewBox="viewBox"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="Build diagram"
@@ -133,6 +133,14 @@
 <script>
 const FOUNDATION_M = 8;
 
+// full diagram extent in meters — the default view and the modal's reset view (V113/V114)
+export const diagramExtent = (footprint) => ({
+    x: 0,
+    y: 0,
+    w: footprint.width_foundations * FOUNDATION_M,
+    h: footprint.length_foundations * FOUNDATION_M,
+});
+
 // tailwind blue-300 / blue-500 / blue-800 — inline because SVG attrs, not classes
 const COLORS = {
     slab: '#93c5fd',
@@ -150,6 +158,11 @@ export default {
             type: Object,
             required: true,
         },
+        // optional pan/zoom window {x, y, w, h} in meters — overrides the fit-all viewBox (V114)
+        view: {
+            type: Object,
+            default: null,
+        },
     },
     computed: {
         COLORS() {
@@ -160,6 +173,11 @@ export default {
         },
         canvasHeight() {
             return this.footprint.length_foundations * FOUNDATION_M;
+        },
+        viewBox() {
+            const { x, y, w, h } = this.view ?? diagramExtent(this.footprint);
+
+            return `${x} ${y} ${w} ${h}`;
         },
         gridX() {
             return Array.from({ length: Math.max(0, this.footprint.width_foundations - 1) }, (_, i) => (i + 1) * FOUNDATION_M);
