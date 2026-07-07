@@ -154,6 +154,20 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         expect(mergerLabels).toHaveLength(16);
     });
 
+    it('keeps line weight static when zooming: every stroked element is non-scaling (V122)', () => {
+        const wrapper = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
+
+        // every stroke-bearing line/rect opts out of viewBox scaling (CAD line weight)
+        for (const el of wrapper.findAll('line, rect[stroke]')) {
+            expect(el.attributes('vector-effect')).toBe('non-scaling-stroke');
+        }
+
+        // widths are screen-pixel values
+        expect(wrapper.find('[data-trunk-segment]').attributes('stroke-width')).toBe('1.5');
+        expect(wrapper.find('[data-tile]').attributes('stroke-width')).toBe('1.5');
+        expect(wrapper.find('[data-marker="top-offset"] line').attributes('stroke-width')).toBe('1');
+    });
+
     it('draws subtle flow arrows: half-size markers at reduced opacity (V120)', () => {
         const wrapper = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
 

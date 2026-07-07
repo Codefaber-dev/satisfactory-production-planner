@@ -26,10 +26,10 @@
         <!-- foundation slab -->
         <rect x="0" y="0" :width="canvasWidth" :height="canvasHeight" :fill="COLORS.slab" />
 
-        <!-- foundation grid (8 m squares) -->
-        <g :stroke="COLORS.grid" stroke-width="0.25" opacity="0.3">
-            <line v-for="x in gridX" :key="`gx-${x}`" :x1="x" y1="0" :x2="x" :y2="canvasHeight" />
-            <line v-for="y in gridY" :key="`gy-${y}`" x1="0" :y1="y" :x2="canvasWidth" :y2="y" />
+        <!-- foundation grid (8 m squares); vector-effect is per-element, never inherited (V122) -->
+        <g :stroke="COLORS.grid" stroke-width="1" opacity="0.3">
+            <line v-for="x in gridX" :key="`gx-${x}`" :x1="x" y1="0" :x2="x" :y2="canvasHeight" vector-effect="non-scaling-stroke" />
+            <line v-for="y in gridY" :key="`gy-${y}`" x1="0" :y1="y" :x2="canvasWidth" :y2="y" vector-effect="non-scaling-stroke" />
         </g>
 
         <!-- belt manifolds: one splitter/merger line per material, hidden in blueprint
@@ -45,7 +45,8 @@
                 :x2="seg.x2"
                 :y2="seg.y2"
                 :stroke="line.color"
-                stroke-width="0.4"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
                 :stroke-dasharray="line.dash"
                 :marker-end="`url(#${uid}-arrow-${line.idx})`"
             />
@@ -58,7 +59,8 @@
                 :x2="stub.x2"
                 :y2="stub.y2"
                 :stroke="line.color"
-                stroke-width="0.4"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
                 :stroke-dasharray="line.dash"
                 :marker-end="`url(#${uid}-arrow-${line.idx})`"
             />
@@ -73,7 +75,8 @@
                     :fill="line.color"
                     fill-opacity="0.25"
                     :stroke="line.color"
-                    stroke-width="0.5"
+                    stroke-width="1.5"
+                    vector-effect="non-scaling-stroke"
                 />
                 <text
                     :x="sq.cx"
@@ -113,7 +116,8 @@
                 :fill="COLORS.tile"
                 fill-opacity="0.25"
                 :stroke="COLORS.tileBorder"
-                stroke-width="0.5"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
             />
             <text
                 :x="tile.x + footprint.building_width / 2"
@@ -129,7 +133,7 @@
 
         <!-- dimension markers -->
         <g v-if="footprint.top_offset > 0" data-marker="top-offset">
-            <line :x1="markerX" y1="0" :x2="markerX" :y2="footprint.top_offset" :stroke="COLORS.marker" stroke-width="0.25" />
+            <line :x1="markerX" y1="0" :x2="markerX" :y2="footprint.top_offset" :stroke="COLORS.marker" stroke-width="1" vector-effect="non-scaling-stroke" />
             <text
                 :x="markerX"
                 :y="footprint.top_offset / 2"
@@ -148,7 +152,8 @@
                 :x2="markerX"
                 :y2="canvasHeight"
                 :stroke="COLORS.marker"
-                stroke-width="0.25"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
             />
             <text
                 :x="markerX"
@@ -162,7 +167,7 @@
             </text>
         </g>
         <g v-if="footprint.left_offset > 0" data-marker="left-offset">
-            <line x1="0" :y1="canvasHeight / 2" :x2="footprint.left_offset" :y2="canvasHeight / 2" :stroke="COLORS.marker" stroke-width="0.25" />
+            <line x1="0" :y1="canvasHeight / 2" :x2="footprint.left_offset" :y2="canvasHeight / 2" :stroke="COLORS.marker" stroke-width="1" vector-effect="non-scaling-stroke" />
             <text
                 :x="footprint.left_offset / 2"
                 :y="canvasHeight / 2"
@@ -181,7 +186,8 @@
                 :x2="canvasWidth"
                 :y2="canvasHeight / 2"
                 :stroke="COLORS.marker"
-                stroke-width="0.25"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
             />
             <text
                 :x="canvasWidth - footprint.left_offset / 2"
@@ -201,7 +207,8 @@
                 :x2="markerX"
                 :y2="rowSpacingTop + footprint.row_spacing"
                 :stroke="COLORS.marker"
-                stroke-width="0.25"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
             />
             <text
                 :x="markerX"
