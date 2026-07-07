@@ -87,143 +87,17 @@
                 </li>
             </ul>
         </div>
-        <div class="flex max-w-full justify-start overflow-x-auto p-2 lg:justify-center">
-            <div
-                style="box-sizing: content-box"
-                :style="{
-                    height: footprint.length_foundations * 2 + 'rem',
-                    width: footprint.width_foundations * 2 + 'rem',
-                }"
-                class="relative flex items-start justify-center bg-blue-300 text-xl shadow-lg"
-            >
-                <div
-                    style="opacity: 0.3; box-sizing: content-box"
-                    class="absolute flex h-full w-full flex-wrap items-center justify-center"
-                >
-                    <template v-for="ii in Array(footprint.foundations)">
-                        <div
-                            class="items-around m-0 flex flex-wrap justify-around border border-blue-500 p-0"
-                            style="box-sizing: border-box; height: 2rem; width: 2rem"
-                        ></div>
-                    </template>
-                </div>
-                <div style="padding: 2rem" class="absolute flex h-full w-full flex-wrap items-center justify-center">
-                    <!-- top offset -->
-                    <div
-                        class="absolute top-0 left-[40%] box-border flex items-center justify-center border-l border-black"
-                        :style="{ height: footprint.top_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '40px',
-                                height: '1.5rem',
-                                top: footprint.top_offset / 8 - 0.75 + 'rem',
-                                left: '-20px',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.top_offset }} m
-                        </div>
-                    </div>
-                    <!-- bottom offset -->
-                    <div
-                        class="absolute bottom-0 left-[40%] box-border flex items-center justify-center border-l border-black"
-                        :style="{ height: footprint.bottom_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '40px',
-                                height: '1.5rem',
-                                top: footprint.bottom_offset / 8 - 0.75 + 'rem',
-                                left: '-20px',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.bottom_offset }} m
-                        </div>
-                    </div>
-                    <!-- left offset -->
-                    <div
-                        class="absolute left-0 bottom-1/2 box-border flex items-center justify-center border-b border-black"
-                        :style="{ width: footprint.left_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '2rem',
-                                height: '1.5rem',
-                                left: footprint.left_offset / 8 - 1 + 'rem',
-                                top: '-0.75rem',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.left_offset }} m
-                        </div>
-                    </div>
-                    <!-- right offset -->
-                    <div
-                        class="absolute right-0 bottom-1/2 box-border flex items-center justify-center border-b border-black"
-                        :style="{ width: footprint.left_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '2rem',
-                                height: '1.5rem',
-                                left: footprint.left_offset / 8 - 1 + 'rem',
-                                top: '-0.75rem',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.left_offset }} m
-                        </div>
-                    </div>
-                    <!-- row spacing -->
-                    <div
-                        v-if="footprint.rows > 1"
-                        class="absolute left-[40%] top-0 box-border flex items-center justify-center border-l border-black"
-                        :style="{
-                            height: footprint.row_spacing / 4 + 'rem',
-                            marginTop: (footprint.row_spacing_offset + footprint.building_top_offset) / 4 + 'rem',
-                        }"
-                    >
-                        <div
-                            :style="{
-                                width: '40px',
-                                height: '1.5rem',
-                                top: footprint.row_spacing / 8 - 0.75 + 'rem',
-                                left: '-20px',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.row_spacing }} m
-                        </div>
-                    </div>
-                    <div class="flex w-full items-center justify-center" v-for="(ii, row) in Array(footprint.rows)">
-                        <div
-                            v-for="(jj, col) in Array(footprint.buildings_per_row)"
-                            :style="{
-                                height: footprint.building_length / 4 + 'rem',
-                                width: footprint.building_width / 4 + 'rem',
-                                marginTop: footprint.building_top_offset / 4 + 'rem',
-                            }"
-                            :class="
-                                1 + col + row * footprint.buildings_per_row <= footprint.num_buildings
-                                    ? ['border-blue-800', 'bg-blue-500']
-                                    : ['border-transparent', 'text-transparent', 'bg-transparent']
-                            "
-                            style="box-sizing: border-box"
-                            class="flex items-center justify-center rounded border bg-opacity-25 text-xs"
-                        >
-                            {{ footprint.monogram }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="w-full min-w-0 flex-1 p-2">
+            <diagram-svg :footprint="footprint" class="shadow-lg" />
         </div>
     </div>
 </template>
 <script>
+import DiagramSvg from '@/Pages/Production/DiagramSvg';
+
 export default {
     name: 'build-diagram',
+    components: { DiagramSvg },
     props: {
         footprint: {
             type: Object,
