@@ -201,15 +201,23 @@ describe('DiagramModal — composition + theming (V115)', () => {
         expect(panel.props('footprint')).toEqual(baseFootprint());
     });
 
-    it('renders in place (no body teleport) with theme-paired panel classes', () => {
+    it('renders in place (no body teleport) with blueprint panel styling (V120)', () => {
         const wrapper = mountModal();
 
         // in-place render: the overlay is inside the component tree, not document.body
         expect(wrapper.find('[data-diagram-modal]').exists()).toBe(true);
 
-        const panel = wrapper.find('[data-diagram-modal] > div');
-        expect(panel.classes()).toContain('bg-white');
-        expect(panel.classes()).toContain('dark:bg-slate-900');
-        expect(panel.classes()).toContain('dark:text-gray-100');
+        const panel = wrapper.find('[data-blueprint-panel]');
+        expect(panel.exists()).toBe(true);
+        expect(panel.classes()).toContain('bg-blue-950');
+        expect(panel.classes()).toContain('text-blue-100');
+    });
+
+    it('renders its diagram in blueprint mode; the inline diagram stays default (V120)', async () => {
+        const modal = mountModal();
+        expect(modal.findComponent(DiagramSvg).props('blueprint')).toBe(true);
+
+        const inline = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
+        expect(inline.findComponent(DiagramSvg).props('blueprint')).toBe(false);
     });
 });

@@ -7,18 +7,19 @@
         aria-label="Build diagram"
     >
         <defs>
+            <!-- subtle flow arrows: half-size triangle at reduced opacity (V120) -->
             <marker
                 v-for="line in manifoldLines"
                 :key="`marker-${line.idx}`"
                 :id="`${uid}-arrow-${line.idx}`"
                 markerUnits="userSpaceOnUse"
-                markerWidth="3"
-                markerHeight="3"
-                refX="2.5"
-                refY="1.5"
+                markerWidth="1.6"
+                markerHeight="1.6"
+                refX="1.3"
+                refY="0.8"
                 orient="auto"
             >
-                <path d="M0,0 L3,1.5 L0,3 z" :fill="line.color" />
+                <path d="M0,0 L1.6,0.8 L0,1.6 z" :fill="line.color" fill-opacity="0.55" />
             </marker>
         </defs>
 
@@ -239,13 +240,24 @@ export const diagramExtent = (footprint) => ({
 });
 
 // tailwind blue-300 / blue-500 / blue-800 — inline because SVG attrs, not classes
-const COLORS = {
+const COLORS_DEFAULT = {
     slab: '#93c5fd',
     grid: '#3b82f6',
     tile: '#3b82f6',
     tileBorder: '#1e40af',
     marker: '#000000',
     label: '#000000',
+};
+
+// engineering-blueprint variant for the modal: deep blue slab, light line work;
+// manifold palette colors stay — functional coding, readable on blue (V120)
+const COLORS_BLUEPRINT = {
+    slab: '#1e3a8a',
+    grid: '#bfdbfe',
+    tile: '#e2e8f0',
+    tileBorder: '#e2e8f0',
+    marker: '#bfdbfe',
+    label: '#e0f2fe',
 };
 
 export default {
@@ -273,6 +285,11 @@ export default {
             type: Object,
             default: null,
         },
+        // engineering-blueprint color set — used by the diagram modal (V120)
+        blueprint: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -282,7 +299,7 @@ export default {
     },
     computed: {
         COLORS() {
-            return COLORS;
+            return this.blueprint ? COLORS_BLUEPRINT : COLORS_DEFAULT;
         },
         MANIFOLD_M() {
             return MANIFOLD_M;

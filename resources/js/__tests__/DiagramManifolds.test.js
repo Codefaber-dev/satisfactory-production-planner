@@ -152,6 +152,32 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         expect(wrapper.find('[data-kind="input"]').text()).not.toContain('MG');
     });
 
+    it('draws subtle flow arrows: half-size markers at reduced opacity (V120)', () => {
+        const wrapper = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
+
+        const marker = wrapper.find('marker');
+        expect(marker.attributes('markerWidth')).toBe('1.6');
+        expect(marker.attributes('markerHeight')).toBe('1.6');
+        expect(marker.find('path').attributes('fill-opacity')).toBe('0.55');
+    });
+
+    it('swaps to the blueprint color set when the blueprint prop is set (V120)', () => {
+        const standard = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
+        const blueprint = mount(DiagramSvg, {
+            props: { footprint: baseFootprint(), materials: { inputs: ['Iron Ore'], outputs: ['Iron Rod'] }, blueprint: true },
+        });
+
+        // slab: light blue → deep blueprint blue; tiles: near-white line work
+        expect(standard.find('svg > rect').attributes('fill')).toBe('#93c5fd');
+        expect(blueprint.find('svg > rect').attributes('fill')).toBe('#1e3a8a');
+        expect(blueprint.find('[data-tile]').attributes('stroke')).toBe('#e2e8f0');
+
+        // manifold palette colors unchanged — functional coding (V116)
+        expect(blueprint.find('[data-trunk-segment]').attributes('stroke')).toBe(
+            standard.find('[data-trunk-segment]').attributes('stroke'),
+        );
+    });
+
     it('renders zero manifold elements in blueprint mode', () => {
         const wrapper = mountSvg(
             { inputs: ['Iron Ore'], outputs: ['Iron Rod'] },

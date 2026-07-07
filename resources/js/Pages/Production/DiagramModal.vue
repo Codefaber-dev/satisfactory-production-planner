@@ -7,11 +7,13 @@
         class="fixed inset-0 z-50 flex items-center justify-center overscroll-contain bg-black bg-opacity-70 p-4"
         @click.self="$emit('close')"
     >
+        <!-- engineering-blueprint styling, independent of app theme (V120) -->
         <div
-            class="flex h-full w-full max-w-6xl flex-col rounded border border-gray-300 bg-white p-4 text-gray-900 shadow-xl dark:border-sky-700 dark:bg-slate-900 dark:text-gray-100"
+            class="flex h-full w-full max-w-6xl flex-col rounded border-2 border-blue-200/60 bg-blue-950 p-4 text-blue-100 shadow-xl"
+            data-blueprint-panel
         >
-            <div class="flex flex-wrap items-center justify-between gap-2 pb-2">
-                <h2 class="text-xl font-bold">{{ heading }}</h2>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-200/40 pb-2">
+                <h2 class="font-mono text-xl font-bold uppercase tracking-widest text-blue-50">{{ heading }}</h2>
                 <div class="flex items-center gap-2">
                     <button type="button" aria-label="Zoom in" class="btn btn-emerald" data-zoom-in @click="zoomBy(ZOOM_STEP)">
                         <MagnifyingGlassPlusIcon class="h-5 w-5" />
@@ -29,15 +31,15 @@
                     <button
                         type="button"
                         aria-label="Close diagram"
-                        class="rounded p-1 hover:bg-gray-300 dark:hover:bg-slate-700"
+                        class="rounded p-1 hover:bg-blue-800"
                         @click="$emit('close')"
                     >
                         <XMarkIcon class="h-6 w-6" />
                     </button>
                 </div>
             </div>
-            <div class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-                <div>
+            <div class="flex min-h-0 flex-1 flex-col gap-4 pt-2 font-mono text-sm lg:flex-row">
+                <div class="shrink-0 overflow-y-auto">
                     <footprint-summary :footprint="footprint" />
                 </div>
                 <div
@@ -49,7 +51,7 @@
                     @pointerup="onPointerUp"
                     @pointercancel="onPointerUp"
                 >
-                    <diagram-svg :footprint="footprint" :materials="materials" :view="view" class="max-h-full" />
+                    <diagram-svg :footprint="footprint" :materials="materials" :view="view" blueprint class="max-h-full" />
                 </div>
             </div>
         </div>
