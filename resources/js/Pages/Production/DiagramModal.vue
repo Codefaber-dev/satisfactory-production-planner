@@ -56,10 +56,8 @@
     </div>
 </template>
 <script>
-import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import DiagramSvg, { diagramExtent } from '@/Pages/Production/DiagramSvg';
-import BuildingSummary from '@/Pages/Production/BuildingSummary';
 import FootprintSummary from './FootprintSummary.vue';
 
 // zoom relative to the fit-all view: 0.25× (4× wider window) … 8× (⅛ window) (V114)
@@ -85,13 +83,6 @@ export default {
         },
     },
     emits: ['close'],
-    // plan-level Building Summary data provided by Show.vue; absent in standalone
-    // mounts → panel hidden (V115)
-    inject: {
-        planSummary: {
-            default: null,
-        },
-    },
     data() {
         return {
             view: diagramExtent(this.footprint),
@@ -105,9 +96,6 @@ export default {
         },
         heading() {
             return this.title || `${this.footprint.monogram} Build Diagram`;
-        },
-        plan() {
-            return unref(this.planSummary);
         },
     },
     mounted() {

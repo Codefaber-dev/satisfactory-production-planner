@@ -234,15 +234,9 @@ export default {
         PlanSettingsPanel,
     },
 
-    // plan-level Building Summary data for the diagram modal (DiagramModal inject, V115)
-    // + liquid/gas names so diagram manifolds skip pipe materials (DiagramSvg inject, V117)
+    // liquid/gas names so diagram manifolds skip pipe materials (DiagramSvg inject, V117)
     provide() {
         return {
-            planSummary: computed(() => ({
-                summary: this.production__building_summary,
-                details: this.production__building_details,
-                totalPower: this.production__total_power,
-            })),
             liquidNames: computed(() => new Set(this.liquids || [])),
         };
     },
