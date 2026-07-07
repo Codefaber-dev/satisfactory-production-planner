@@ -153,9 +153,24 @@
                     </div>
 
                     <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-4">
+                        <!-- V123: summary collapse toggle — xl layout only, mobile tabs untouched -->
+                        <button
+                            rel="toggle-summary"
+                            @click="toggleSummary"
+                            :title="summaryCollapsed ? 'Show Summary' : 'Hide Summary'"
+                            class="hidden self-start rounded-lg border border-gray-500 bg-white p-1 shadow-lg xl:block dark:border-sky-700 dark:bg-slate-900 dark:text-gray-100"
+                        >
+                            <chevron-right-icon v-if="summaryCollapsed" class="h-5 w-5" />
+                            <chevron-left-icon v-else class="h-5 w-5" />
+                        </button>
+
                         <!-- Left Side -->
                         <production-summary
-                            :class="{ 'hidden': selectedTab !== 'productionSummary', 'xl:block': true }"
+                            :class="{
+                                'hidden': selectedTab !== 'productionSummary',
+                                'xl:block': !summaryCollapsed,
+                                'xl:hidden': summaryCollapsed,
+                            }"
                             :building-checks="buildingChecks"
                             :disabled-raw-materials="disabledRawMaterials"
                             @fetch="fetch"
@@ -211,6 +226,7 @@
 
 <script>
 import { computed } from 'vue';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline';
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
 import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
@@ -226,6 +242,8 @@ export default {
     name: 'ShowNew',
 
     components: {
+        ChevronLeftIcon,
+        ChevronRightIcon,
         ProductionQuickNav,
         ProductionSteps,
         ProductionSummary,
@@ -348,6 +366,8 @@ export default {
             newConstraints: [],
             rawUnchanged: true,
             diagrams: store.getItem('diagrams', true),
+            // V123: summary pane collapse — global UI pref, xl layout only.
+            summaryCollapsed: store.getItem('summaryCollapsed', false),
             newImports: this.imports ? Object.fromEntries((this.imports || '').split(',').map((o) => [o, true])) : {},
             showWarnings: true,
             newChoices: this.choices || {},
@@ -827,6 +847,11 @@ export default {
 
         savePrefs() {
             store.setItem('diagrams', this.diagrams);
+        },
+
+        toggleSummary() {
+            this.summaryCollapsed = !this.summaryCollapsed;
+            store.setItem('summaryCollapsed', this.summaryCollapsed);
         },
 
         helpRawMaterials() {
