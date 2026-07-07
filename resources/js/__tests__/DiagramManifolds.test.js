@@ -126,6 +126,24 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         expect(coalX - (ironX + 4)).toBe(2);
     });
 
+    it('staggers same-building squares vertically 4 m center-to-center (V118)', () => {
+        const wrapper = mountSvg({ inputs: ['Iron Ore', 'Coal'], outputs: ['Steel Ingot', 'Slag'] });
+
+        // inputs stack upward away from the row: slot 0 at y=10, slot 1 at y=6
+        expect(Number(lineByMaterial(wrapper, 'Iron Ore').find('[data-manifold-square]').attributes('y'))).toBe(10);
+        expect(Number(lineByMaterial(wrapper, 'Coal').find('[data-manifold-square]').attributes('y'))).toBe(6);
+
+        // outputs stack downward: slot 0 at y=26, slot 1 at y=30
+        expect(Number(lineByMaterial(wrapper, 'Steel Ingot').find('[data-manifold-square]').attributes('y'))).toBe(26);
+        expect(Number(lineByMaterial(wrapper, 'Slag').find('[data-manifold-square]').attributes('y'))).toBe(30);
+
+        // trunks ride their own slot's y level
+        const ironTrunkY = Number(lineByMaterial(wrapper, 'Iron Ore').find('[data-trunk-segment]').attributes('y1'));
+        const coalTrunkY = Number(lineByMaterial(wrapper, 'Coal').find('[data-trunk-segment]').attributes('y1'));
+        expect(ironTrunkY).toBe(12);
+        expect(coalTrunkY).toBe(8);
+    });
+
     it('labels squares SP for splitters and MG for mergers', () => {
         const wrapper = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
 

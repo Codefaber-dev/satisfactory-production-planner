@@ -377,10 +377,12 @@ export default {
 
                 const rowTop = fp.top_offset + fp.building_top_offset + row * (fp.building_length + fp.row_spacing);
                 const rowBottom = rowTop + fp.building_length;
+                // same-building squares stagger vertically, 4 m center-to-center:
+                // inputs stack upward away from the row, outputs downward (V118)
                 const y =
                     line.kind === 'input'
-                        ? Math.max(0, rowTop - MANIFOLD_GAP_M - size)
-                        : Math.min(this.canvasHeight - size, rowBottom + MANIFOLD_GAP_M);
+                        ? Math.max(0, rowTop - MANIFOLD_GAP_M - size - line.slot * size)
+                        : Math.min(this.canvasHeight - size, rowBottom + MANIFOLD_GAP_M + line.slot * size);
                 const midY = y + size / 2;
                 const centers = [];
 
