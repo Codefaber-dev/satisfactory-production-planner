@@ -225,28 +225,11 @@
 </template>
 <script>
 import { unref } from 'vue';
-
-const FOUNDATION_M = 8;
-
-// Conveyor Splitter / Merger real footprint (satisfactory.wiki.gg), meters (V116)
-const MANIFOLD_M = 4;
-// clearance from buildings and between grouped squares (V116)
-const MANIFOLD_GAP_M = 2;
-// vertical center-to-center pitch between same-building slots (V118, 3 m per T167)
-const MANIFOLD_STAGGER_M = 3;
+import { FOUNDATION_M, MANIFOLD_M as MANIFOLD_SIZE_M, contentExtent, manifoldLines } from '@/diagramLayout';
 
 // per-material line coding: color + dasharray both indexed by the material's
 // position in the diagram's ordered list — distinct combos within a diagram (V116)
 const MANIFOLD_PALETTE = ['#d97706', '#059669', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d', '#ea580c'];
-const MANIFOLD_DASHES = ['2 1', '1 1', '3 1', '0.5 1', '3 1 1 1', '4 2'];
-
-// full diagram extent in meters — the default view and the modal's reset view (V113/V114)
-export const diagramExtent = (footprint) => ({
-    x: 0,
-    y: 0,
-    w: footprint.width_foundations * FOUNDATION_M,
-    h: footprint.length_foundations * FOUNDATION_M,
-});
 
 // tailwind blue-300 / blue-500 / blue-800 — inline because SVG attrs, not classes
 const COLORS_DEFAULT = {
@@ -311,7 +294,7 @@ export default {
             return this.blueprint ? COLORS_BLUEPRINT : COLORS_DEFAULT;
         },
         MANIFOLD_M() {
-            return MANIFOLD_M;
+            return MANIFOLD_SIZE_M;
         },
         canvasWidth() {
             return this.footprint.width_foundations * FOUNDATION_M;
@@ -320,7 +303,9 @@ export default {
             return this.footprint.length_foundations * FOUNDATION_M;
         },
         viewBox() {
-            const { x, y, w, h } = this.view ?? diagramExtent(this.footprint);
+            // default view = the content extent, so overflowing stagger bands and
+            // long labels stay visible instead of clipping at the slab edge (V124)
+            const { x, y, w, h } = this.view ?? contentExtent(this.footprint, this.manifoldLines);
 
             return `${x} ${y} ${w} ${h}`;
         },
@@ -360,22 +345,12 @@ export default {
             return this.footprint.row_spacing_offset + this.footprint.building_top_offset;
         },
         manifoldLines() {
-            if (this.footprint.grouped) {
-                return [];
-            }
-
-            // liquids/gases travel pipes, not belts — no manifold line (V117);
-            // filtered BEFORE indexing so color/dash combos stay contiguous
-            const liquids = unref(this.liquidNames);
-            const belts = (names) => (liquids ? names.filter((name) => !liquids.has(name)) : names);
-
-            const inputs = this.materials ? belts(this.materials.inputs ?? []) : ['Input'];
-            const outputs = this.materials ? belts(this.materials.outputs ?? []) : ['Output'];
-
-            return [
-                ...inputs.map((material, slot) => ({ material, kind: 'input', slot, slots: inputs.length })),
-                ...outputs.map((material, slot) => ({ material, kind: 'output', slot, slots: outputs.length })),
-            ].map((line, idx) => this.manifoldLine(line, idx));
+            // geometry from the shared layout module (V124c); the component only
+            // assigns colors — palette per render mode
+            return manifoldLines(this.footprint, this.materials, unref(this.liquidNames)).map((line) => ({
+                ...line,
+                color: MANIFOLD_PALETTE[line.idx % MANIFOLD_PALETTE.length],
+            }));
         },
         markerX() {
             return this.canvasWidth * 0.4;
@@ -385,87 +360,6 @@ export default {
         },
         markerFontSize() {
             return Math.max(3, Math.min(6, this.canvasWidth / 28));
-        },
-    },
-    methods: {
-        // one manifold line = per-row band of squares (one per building at this line's
-        // slot), edge-to-edge trunk segments between consecutive squares, and a stub
-        // to each building. Geometry per V116: group of N squares centered on the
-        // building's vertical axis, 2 m in-group gap (compressed when the group would
-        // outgrow the building width), bands 2 m off the row edge
-        manifoldLine(line, idx) {
-            const fp = this.footprint;
-            const size = MANIFOLD_M;
-            const gap =
-                line.slots > 1
-                    ? Math.min(MANIFOLD_GAP_M, Math.max(0, (fp.building_width - line.slots * size) / (line.slots - 1)))
-                    : 0;
-            const span = line.slots * size + (line.slots - 1) * gap;
-
-            const squares = [];
-            const trunkSegments = [];
-            const stubs = [];
-            const labels = [];
-
-            for (let row = 0; row < fp.rows; row++) {
-                const count = Math.min(fp.buildings_per_row, fp.num_buildings - row * fp.buildings_per_row);
-
-                if (count <= 0) {
-                    break;
-                }
-
-                const rowTop = fp.top_offset + fp.building_top_offset + row * (fp.building_length + fp.row_spacing);
-                const rowBottom = rowTop + fp.building_length;
-                // same-building squares stagger vertically, 3 m center-to-center:
-                // inputs stack upward away from the row, outputs downward (V118)
-                const y =
-                    line.kind === 'input'
-                        ? Math.max(0, rowTop - MANIFOLD_GAP_M - size - line.slot * MANIFOLD_STAGGER_M)
-                        : Math.min(
-                              this.canvasHeight - size,
-                              rowBottom + MANIFOLD_GAP_M + line.slot * MANIFOLD_STAGGER_M
-                          );
-                const midY = y + size / 2;
-                const centers = [];
-
-                for (let b = 0; b < count; b++) {
-                    const buildingCx = fp.left_offset + b * fp.building_width + fp.building_width / 2;
-                    const x = buildingCx - span / 2 + line.slot * (size + gap);
-                    const cx = x + size / 2;
-
-                    centers.push(cx);
-                    squares.push({ x, y, cx });
-                    stubs.push(
-                        line.kind === 'input'
-                            ? { x1: cx, y1: y + size, x2: cx, y2: rowTop }
-                            : { x1: cx, y1: rowBottom, x2: cx, y2: y }
-                    );
-                }
-
-                for (let b = 0; b < centers.length - 1; b++) {
-                    trunkSegments.push(
-                        line.kind === 'input'
-                            ? { x1: centers[b] + size / 2, y1: midY, x2: centers[b + 1] - size / 2, y2: midY }
-                            : { x1: centers[b + 1] - size / 2, y1: midY, x2: centers[b] + size / 2, y2: midY }
-                    );
-                }
-
-                if (row === 0) {
-                    labels.push({ x: centers[0] - size / 2 - 1, y: midY });
-                }
-            }
-
-            return {
-                ...line,
-                idx,
-                color: MANIFOLD_PALETTE[idx % MANIFOLD_PALETTE.length],
-                dash: MANIFOLD_DASHES[idx % MANIFOLD_DASHES.length],
-                monogram: line.kind === 'input' ? 'S' : 'M',
-                squares,
-                trunkSegments,
-                stubs,
-                labels,
-            };
         },
     },
 };

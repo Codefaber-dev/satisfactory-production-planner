@@ -248,4 +248,30 @@ describe('DiagramModal — composition + theming (V115)', () => {
         const [, , w, h] = modalViewBox(wrapper).split(' ').map(Number);
         expect(h / w).toBeCloseTo(1, 5);
     });
+
+    it('fit view derives from the content extent, not the slab, when bands overflow (V124)', () => {
+        // single row of 4 buildings 18×20 m: 4 staggered input bands need 15 m
+        // above the row but top_offset is 10 → extent extends 5 m past the slab
+        const wrapper = mountModal({
+            props: {
+                footprint: {
+                    ...baseFootprint(),
+                    rows: 1,
+                    buildings_per_row: 4,
+                    num_buildings: 4,
+                    building_width: 18,
+                    building_length: 20,
+                    length_foundations: 5,
+                    width_foundations: 13,
+                    row_spacing: 0,
+                    top_offset: 10,
+                    bottom_offset: 10,
+                    left_offset: 16,
+                },
+                materials: { inputs: ['A', 'B', 'C', 'D'], outputs: ['O'] },
+            },
+        });
+
+        expect(modalViewBox(wrapper)).toBe('0 -5 104 45');
+    });
 });

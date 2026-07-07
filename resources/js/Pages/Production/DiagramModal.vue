@@ -58,8 +58,10 @@
     </div>
 </template>
 <script>
+import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
-import DiagramSvg, { diagramExtent } from '@/Pages/Production/DiagramSvg';
+import { contentExtent, manifoldLines } from '@/diagramLayout';
+import DiagramSvg from '@/Pages/Production/DiagramSvg';
 import FootprintSummary from './FootprintSummary.vue';
 
 // zoom relative to the fit-all view: 0.25× (4× wider window) … 8× (⅛ window) (V114)
@@ -70,6 +72,13 @@ const ZOOM_STEP = 1.2;
 export default {
     name: 'diagram-modal',
     components: { FootprintSummary, DiagramSvg, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon },
+    // same liquid-name set DiagramSvg filters manifolds on (V117) — the modal's
+    // fit/zoom extent must match what actually renders (V124)
+    inject: {
+        liquidNames: {
+            default: null,
+        },
+    },
     props: {
         footprint: {
             type: Object,
@@ -87,7 +96,7 @@ export default {
     emits: ['close'],
     data() {
         return {
-            view: diagramExtent(this.footprint),
+            view: null,
             pointers: {},
             panStart: null,
         };
@@ -99,6 +108,17 @@ export default {
         heading() {
             return this.title || `${this.footprint.monogram} Build Diagram`;
         },
+        // content extent (slab + manifold bands + labels, V124) — the fit/reset
+        // view and zoom clamps all derive from this, matching DiagramSvg's render
+        fullExtent() {
+            return contentExtent(
+                this.footprint,
+                manifoldLines(this.footprint, this.materials, unref(this.liquidNames))
+            );
+        },
+    },
+    created() {
+        this.view = this.fullExtent;
     },
     mounted() {
         window.addEventListener('keydown', this.onKeydown);
@@ -119,7 +139,7 @@ export default {
         // the svg fills the stage at every zoom, no letterboxed dead space (V121);
         // unmeasurable stage (jsdom, zero box) falls back to the diagram's aspect
         fitView() {
-            const full = diagramExtent(this.footprint);
+            const full = this.fullExtent;
             const stage = this.$refs.stage;
             const ratio =
                 stage?.clientWidth && stage?.clientHeight ? stage.clientHeight / stage.clientWidth : full.h / full.w;
@@ -143,7 +163,7 @@ export default {
             return this.view.w / pixels;
         },
         zoomBy(factor) {
-            const full = diagramExtent(this.footprint);
+            const full = this.fullExtent;
             const width = Math.min(full.w / MIN_ZOOM, Math.max(full.w / MAX_ZOOM, this.view.w / factor));
             // preserve the CURRENT view aspect (stage-matched, V121), not the diagram's
             const height = width * (this.view.h / this.view.w);

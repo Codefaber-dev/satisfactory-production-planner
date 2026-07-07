@@ -125,22 +125,23 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         expect(coalX - (ironX + 4)).toBe(2);
     });
 
-    it('staggers same-building squares vertically 3 m center-to-center (V118)', () => {
+    it('staggers same-building squares vertically, pitch compressed on multi-row diagrams (V118/V124)', () => {
         const wrapper = mountSvg({ inputs: ['Iron Ore', 'Coal'], outputs: ['Steel Ingot', 'Slag'] });
 
-        // inputs stack upward away from the row: slot 0 at y=10, slot 1 at y=7
+        // 2 rows, row_spacing 16, 1+1 stagger steps → pitch = min(3, (16−12)/2) = 2
+        // inputs stack upward away from the row: slot 0 at y=10, slot 1 at y=8
         expect(Number(lineByMaterial(wrapper, 'Iron Ore').find('[data-manifold-square]').attributes('y'))).toBe(10);
-        expect(Number(lineByMaterial(wrapper, 'Coal').find('[data-manifold-square]').attributes('y'))).toBe(7);
+        expect(Number(lineByMaterial(wrapper, 'Coal').find('[data-manifold-square]').attributes('y'))).toBe(8);
 
-        // outputs stack downward: slot 0 at y=26, slot 1 at y=29
+        // outputs stack downward: slot 0 at y=26, slot 1 at y=28
         expect(Number(lineByMaterial(wrapper, 'Steel Ingot').find('[data-manifold-square]').attributes('y'))).toBe(26);
-        expect(Number(lineByMaterial(wrapper, 'Slag').find('[data-manifold-square]').attributes('y'))).toBe(29);
+        expect(Number(lineByMaterial(wrapper, 'Slag').find('[data-manifold-square]').attributes('y'))).toBe(28);
 
         // trunks ride their own slot's y level
         const ironTrunkY = Number(lineByMaterial(wrapper, 'Iron Ore').find('[data-trunk-segment]').attributes('y1'));
         const coalTrunkY = Number(lineByMaterial(wrapper, 'Coal').find('[data-trunk-segment]').attributes('y1'));
         expect(ironTrunkY).toBe(12);
-        expect(coalTrunkY).toBe(9);
+        expect(coalTrunkY).toBe(10);
     });
 
     it('labels squares S for splitters and M for mergers', () => {
@@ -221,6 +222,67 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
 
         expect(wrapper.findAll('[data-kind="input"]')).toHaveLength(1);
         expect(wrapper.findAll('[data-kind="output"]')).toHaveLength(0);
+    });
+});
+
+describe('DiagramSvg — manifold geometry fits the canvas (V124)', () => {
+    // Manufacturer-like: single row of 4 buildings 18×20 m, 10 m top/bottom offsets
+    const manufacturerFootprint = () => ({
+        ...baseFootprint(),
+        rows: 1,
+        buildings_per_row: 4,
+        num_buildings: 4,
+        building_width: 18,
+        building_length: 20,
+        length_foundations: 5,
+        width_foundations: 13,
+        row_spacing: 0,
+        top_offset: 10,
+        bottom_offset: 10,
+        left_offset: 16,
+    });
+
+    it('gives 4 single-row inputs 4 distinct band levels, unclamped past the slab edge', () => {
+        const wrapper = mountSvg({ inputs: ['A', 'B', 'C', 'D'], outputs: ['O'] }, manufacturerFootprint());
+
+        // rowTop 10, full 3 m pitch: slot y = 10 − 6 − 3k → 4, 1, −2, −5 — no pile-up at 0
+        const ys = ['A', 'B', 'C', 'D'].map((m) =>
+            Number(lineByMaterial(wrapper, m).find('[data-manifold-square]').attributes('y'))
+        );
+        expect(ys).toEqual([4, 1, -2, -5]);
+    });
+
+    it('expands the viewBox to contain overflowing bands (V124a)', () => {
+        const wrapper = mountSvg({ inputs: ['A', 'B', 'C', 'D'], outputs: ['O'] }, manufacturerFootprint());
+
+        // slab 104×40; deepest band at y=−5 → extent 0 −5 104 45
+        expect(wrapper.find('svg').attributes('viewBox')).toBe('0 -5 104 45');
+    });
+
+    it('expands the viewBox left to contain a long end-anchored label', () => {
+        const wrapper = mountSvg({ inputs: ['Reinforced Iron Plate'], outputs: [] }, manufacturerFootprint());
+
+        // label at x=22, 21 chars × 1.5 m → left edge −9.5
+        const [x, , w] = wrapper.find('svg').attributes('viewBox').split(' ').map(Number);
+        expect(x).toBe(-9.5);
+        expect(w).toBe(113.5);
+    });
+
+    it('keeps compressed multi-row bands from crossing: row output band clears next row input band (V124b)', () => {
+        const wrapper = mountSvg({ inputs: ['Iron Ore', 'Coal'], outputs: ['Steel Ingot', 'Slag'] });
+
+        // deepest row-0 output square bottom ≤ highest row-1 input square top
+        const slagRow0Y = Number(lineByMaterial(wrapper, 'Slag').find('[data-manifold-square]').attributes('y'));
+        const coalSquares = lineByMaterial(wrapper, 'Coal').findAll('[data-manifold-square]');
+        const coalRow1Y = Number(coalSquares[coalSquares.length - 1].attributes('y'));
+
+        expect(slagRow0Y + 4).toBeLessThanOrEqual(coalRow1Y);
+    });
+
+    it('leaves a fitting diagram byte-identical: extent stays the slab', () => {
+        const wrapper = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
+
+        expect(wrapper.find('svg').attributes('viewBox')).toBe('0 0 112 64');
     });
 });
 
