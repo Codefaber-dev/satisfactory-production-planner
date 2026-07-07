@@ -225,6 +225,8 @@ const FOUNDATION_M = 8;
 const MANIFOLD_M = 4;
 // clearance from buildings and between grouped squares (V116)
 const MANIFOLD_GAP_M = 2;
+// vertical center-to-center pitch between same-building slots (V118, 3 m per T167)
+const MANIFOLD_STAGGER_M = 3;
 
 // per-material line coding: color + dasharray both indexed by the material's
 // position in the diagram's ordered list — distinct combos within a diagram (V116)
@@ -394,12 +396,12 @@ export default {
 
                 const rowTop = fp.top_offset + fp.building_top_offset + row * (fp.building_length + fp.row_spacing);
                 const rowBottom = rowTop + fp.building_length;
-                // same-building squares stagger vertically, 4 m center-to-center:
+                // same-building squares stagger vertically, 3 m center-to-center:
                 // inputs stack upward away from the row, outputs downward (V118)
                 const y =
                     line.kind === 'input'
-                        ? Math.max(0, rowTop - MANIFOLD_GAP_M - size - line.slot * size)
-                        : Math.min(this.canvasHeight - size, rowBottom + MANIFOLD_GAP_M + line.slot * size);
+                        ? Math.max(0, rowTop - MANIFOLD_GAP_M - size - line.slot * MANIFOLD_STAGGER_M)
+                        : Math.min(this.canvasHeight - size, rowBottom + MANIFOLD_GAP_M + line.slot * MANIFOLD_STAGGER_M);
                 const midY = y + size / 2;
                 const centers = [];
 
@@ -435,7 +437,7 @@ export default {
                 idx,
                 color: MANIFOLD_PALETTE[idx % MANIFOLD_PALETTE.length],
                 dash: MANIFOLD_DASHES[idx % MANIFOLD_DASHES.length],
-                monogram: line.kind === 'input' ? 'SP' : 'MG',
+                monogram: line.kind === 'input' ? 'S' : 'M',
                 squares,
                 trunkSegments,
                 stubs,
