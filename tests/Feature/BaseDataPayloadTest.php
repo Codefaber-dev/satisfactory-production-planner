@@ -72,6 +72,35 @@ class BaseDataPayloadTest extends TestCase
     }
 
     #[Test]
+    public function liquids_payload_lists_raw_and_processed_liquids_only(): void
+    {
+        $this->get(route('dashboard'))->assertOk();
+
+        $cached = Cache::get(BaseDataPayload::LIQUIDS_KEY);
+
+        $this->assertIsArray($cached);
+        $this->assertContains('Water', $cached);          // raw liquid
+        $this->assertContains('Fuel', $cached);           // processed liquid
+        $this->assertNotContains('Iron Ore', $cached);    // solid
+
+        // shipped to the page as the `liquids` prop (V117)
+        $this->get(route('dashboard'))->assertInertia(
+            fn ($page) => $page->has('liquids')->where('liquids', fn ($liquids) => collect($liquids)->contains('Water'))
+        );
+    }
+
+    #[Test]
+    public function ingredient_save_flushes_liquids_payload(): void
+    {
+        $this->get(route('dashboard'))->assertOk();
+        $this->assertTrue(Cache::has(BaseDataPayload::LIQUIDS_KEY));
+
+        Ingredient::first()->save();
+
+        $this->assertFalse(Cache::has(BaseDataPayload::LIQUIDS_KEY));
+    }
+
+    #[Test]
     public function favorite_flag_is_per_user_even_with_warm_shared_cache(): void
     {
         // Warm the shared payload as a guest with no favorites.

@@ -216,6 +216,8 @@
     </svg>
 </template>
 <script>
+import { unref } from 'vue';
+
 const FOUNDATION_M = 8;
 
 // Conveyor Splitter / Merger real footprint (satisfactory.wiki.gg), meters (V116)
@@ -248,6 +250,13 @@ const COLORS = {
 
 export default {
     name: 'diagram-svg',
+    // Set of liquid/gas ingredient names (provided by Show.vue, V117);
+    // absent (standalone mounts) ⇒ no filtering
+    inject: {
+        liquidNames: {
+            default: null,
+        },
+    },
     props: {
         footprint: {
             type: Object,
@@ -316,8 +325,13 @@ export default {
                 return [];
             }
 
-            const inputs = this.materials ? this.materials.inputs ?? [] : ['Input'];
-            const outputs = this.materials ? this.materials.outputs ?? [] : ['Output'];
+            // liquids/gases travel pipes, not belts — no manifold line (V117);
+            // filtered BEFORE indexing so color/dash combos stay contiguous
+            const liquids = unref(this.liquidNames);
+            const belts = (names) => (liquids ? names.filter((name) => !liquids.has(name)) : names);
+
+            const inputs = this.materials ? belts(this.materials.inputs ?? []) : ['Input'];
+            const outputs = this.materials ? belts(this.materials.outputs ?? []) : ['Output'];
 
             return [
                 ...inputs.map((material, slot) => ({ material, kind: 'input', slot, slots: inputs.length })),

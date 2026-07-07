@@ -160,3 +160,54 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         expect(wrapper.findAll('[data-kind="output"]')).toHaveLength(0);
     });
 });
+
+describe('DiagramSvg — belt-only manifolds, liquids filtered (V117)', () => {
+    const provideLiquids = (names) => ({ global: { provide: { liquidNames: new Set(names) } } });
+
+    const mountWithLiquids = (materials, liquids) =>
+        mount(DiagramSvg, { props: { footprint: baseFootprint(), materials }, ...provideLiquids(liquids) });
+
+    it('renders no manifold line for a liquid input or output', () => {
+        // Packager case: fluid arrives by pipe, canisters by belt, packaged form leaves by belt
+        const wrapper = mountWithLiquids(
+            { inputs: ['Heavy Oil Residue', 'Empty Canister'], outputs: ['Packaged Heavy Oil Residue'] },
+            ['Heavy Oil Residue'],
+        );
+
+        expect(lineByMaterial(wrapper, 'Heavy Oil Residue').exists()).toBe(false);
+        expect(lineByMaterial(wrapper, 'Empty Canister').exists()).toBe(true);
+        expect(lineByMaterial(wrapper, 'Packaged Heavy Oil Residue').exists()).toBe(true);
+    });
+
+    it('keeps palette indices contiguous after filtering', () => {
+        const filtered = mountWithLiquids({ inputs: ['Water', 'Coal'], outputs: [] }, ['Water']);
+        const unfiltered = mountWithLiquids({ inputs: ['Coal'], outputs: [] }, []);
+
+        // Coal takes slot/palette index 0 in both — the dropped liquid leaves no gap
+        expect(lineByMaterial(filtered, 'Coal').find('[data-trunk-segment]').attributes('stroke')).toBe(
+            lineByMaterial(unfiltered, 'Coal').find('[data-trunk-segment]').attributes('stroke'),
+        );
+        expect(Number(lineByMaterial(filtered, 'Coal').find('[data-manifold-square]').attributes('x'))).toBe(19);
+    });
+
+    it('renders zero lines on a side whose materials are all liquid', () => {
+        const wrapper = mountWithLiquids({ inputs: ['Water', 'Crude Oil'], outputs: ['Fuel'] }, [
+            'Water',
+            'Crude Oil',
+            'Fuel',
+        ]);
+
+        expect(wrapper.findAll('[data-manifold-line]')).toHaveLength(0);
+    });
+
+    it('does not filter without the inject, and leaves the generic fallback intact', () => {
+        const bare = mountSvg({ inputs: ['Water'], outputs: [] });
+        expect(lineByMaterial(bare, 'Water').exists()).toBe(true);
+
+        const generic = mount(DiagramSvg, {
+            props: { footprint: baseFootprint() },
+            ...provideLiquids(['Water']),
+        });
+        expect(generic.findAll('[data-manifold-label]').map((l) => l.text())).toEqual(['Input', 'Output']);
+    });
+});

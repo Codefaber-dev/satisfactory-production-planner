@@ -23,6 +23,8 @@ class BaseDataPayload
 
     public const PRODUCTS_KEY = 'base_data.products_payload';
 
+    public const LIQUIDS_KEY = 'base_data.liquids_payload';
+
     public const TTL = 86400; // 24h — observers flush on Recipe/Ingredient save
 
     /**
@@ -74,9 +76,23 @@ class BaseDataPayload
         );
     }
 
+    /**
+     * Names of every liquid/gas ingredient (raw + processed) — pipe materials
+     * that never ride belts, so build-diagram manifolds skip them (V117).
+     *
+     * @return array<int, string>
+     */
+    public static function liquids(): array
+    {
+        return Cache::remember(static::LIQUIDS_KEY, static::TTL, function () {
+            return Ingredient::where('is_liquid', true)->orderBy('name')->pluck('name')->all();
+        });
+    }
+
     public static function flush(): void
     {
         Cache::forget(static::RECIPES_KEY);
         Cache::forget(static::PRODUCTS_KEY);
+        Cache::forget(static::LIQUIDS_KEY);
     }
 }
