@@ -16,6 +16,7 @@
                 :footprint="footprint"
                 :materials="materials"
                 :title="title"
+                :details="details"
                 @close="modalOpen = false"
             />
         </div>
@@ -40,6 +41,11 @@ export default {
             default: '',
         },
         materials: {
+            type: Object,
+            default: null,
+        },
+        // step-details payload passed through to the modal side panel (V126)
+        details: {
             type: Object,
             default: null,
         },

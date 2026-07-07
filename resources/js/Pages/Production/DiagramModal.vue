@@ -41,6 +41,8 @@
             <div class="flex min-h-0 flex-1 flex-col gap-4 pt-2 font-mono text-sm lg:flex-row">
                 <div class="shrink-0 overflow-y-auto">
                     <footprint-summary :footprint="footprint" />
+                    <!-- full step details: outputs/inputs/machines/build cost (V126) -->
+                    <diagram-step-details v-if="details" :details="details" />
                 </div>
                 <div
                     ref="stage"
@@ -62,6 +64,7 @@ import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { contentExtent, manifoldLines } from '@/diagramLayout';
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
+import DiagramStepDetails from '@/Pages/Production/DiagramStepDetails.vue';
 import FootprintSummary from './FootprintSummary.vue';
 
 // zoom relative to the fit-all view: 0.25× (4× wider window) … 8× (⅛ window) (V114)
@@ -71,7 +74,14 @@ const ZOOM_STEP = 1.2;
 
 export default {
     name: 'diagram-modal',
-    components: { FootprintSummary, DiagramSvg, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon },
+    components: {
+        FootprintSummary,
+        DiagramStepDetails,
+        DiagramSvg,
+        MagnifyingGlassMinusIcon,
+        MagnifyingGlassPlusIcon,
+        XMarkIcon,
+    },
     // same liquid-name set DiagramSvg filters manifolds on (V117) — the modal's
     // fit/zoom extent must match what actually renders (V124)
     inject: {
@@ -89,6 +99,11 @@ export default {
             default: '',
         },
         materials: {
+            type: Object,
+            default: null,
+        },
+        // full step details payload for the side panel (V126); null ⇒ no section
+        details: {
             type: Object,
             default: null,
         },

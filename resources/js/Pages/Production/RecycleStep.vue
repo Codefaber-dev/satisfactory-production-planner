@@ -79,6 +79,7 @@
                     :footprint="step.footprint"
                     :title="step.name"
                     :materials="{ inputs: step.inputs.map((input) => input.item), outputs: [] }"
+                    :details="sinkDetails"
                 />
             </td>
         </tr>
@@ -102,6 +103,20 @@ export default {
         // map of material name → producing-step identifier (for input links)
         stepMap: { type: Object, default: () => ({}) },
         diagrams: { type: Boolean, default: false },
+    },
+    computed: {
+        // sink equivalents of the modal step-details payload (V126)
+        sinkDetails() {
+            return {
+                output: { name: this.step.name, qty: this.step.output?.points || 0, unit: 'points/min' },
+                inputs: Object.fromEntries((this.step.inputs || []).map((input) => [input.item, input.qty])),
+                building: this.step.building,
+                num_buildings: this.step.num_buildings,
+                power_usage: this.step.power,
+                build_cost: this.step.build_cost || {},
+                max_slots: 0,
+            };
+        },
     },
 };
 </script>

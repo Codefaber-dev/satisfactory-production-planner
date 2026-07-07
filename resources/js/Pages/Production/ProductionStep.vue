@@ -358,7 +358,12 @@
              entry transiently while its source mode changes — don't crash (B49) -->
         <tr class="block lg:table-row" v-if="recipe && overview" v-show="diagrams">
             <td class="block text-center lg:table-cell" colspan="100">
-                <build-diagram :footprint="footprint" :title="production.name" :materials="diagramMaterials" />
+                <build-diagram
+                    :footprint="footprint"
+                    :title="production.name"
+                    :materials="diagramMaterials"
+                    :details="diagramDetails"
+                />
             </td>
         </tr>
     </tbody>
@@ -493,6 +498,32 @@ export default {
             return {
                 inputs: Object.keys(this.production.ingredients || {}),
                 outputs: [this.production.name, ...Object.keys(this.production.byproducts || {})],
+            };
+        },
+
+        // full step details for the diagram modal side panel (V126): overview
+        // numbers as-is (multipliers baked in) + the step's material rates
+        diagramDetails() {
+            const detail = this.overview?.details?.[this.selectedVariantName];
+
+            if (!detail) {
+                return null;
+            }
+
+            return {
+                output: { name: this.production.name || this.name, qty: this.overview.qty },
+                byproducts: this.production.byproducts || {},
+                inputs: this.production.ingredients || {},
+                building: this.overview.building,
+                variant: this.selectedVariantName,
+                num_buildings: detail.num_buildings,
+                clock_speed: detail.clock_speed,
+                power_usage: detail.power_usage,
+                energy_per_item: detail.energy_per_item,
+                total_energy: detail.total_energy,
+                build_cost: detail.build_cost || {},
+                slots: detail.slots ?? 0,
+                max_slots: detail.max_slots ?? 0,
             };
         },
 
