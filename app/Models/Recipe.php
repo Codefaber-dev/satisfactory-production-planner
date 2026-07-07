@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -155,6 +156,27 @@ class Recipe extends Model
     //
     //    return "[" . (int) $ppm . " ppm] {$description} :{$this->building->name}: ($ingredients)$byproducts [e:{$energy}, r:{$rarity}]";
     // }
+
+    /**
+     * Bulk-warm the per-recipe efficiency-flag caches from an already-loaded
+     * collection (V127, fixes B66): per-product min by energy/resource computed
+     * in memory (ties → lowest id), so serializing the collection never runs
+     * the accessors' per-recipe queries or their $with hydration cascades.
+     *
+     * @param  Collection<int, Recipe>  $recipes
+     */
+    public static function warmEfficiencyFlagCaches($recipes): void
+    {
+        $recipes->groupBy('product_id')->each(function ($group) {
+            $energyId = $group->sortBy([['energy', 'asc'], ['id', 'asc']])->first()->id;
+            $resourceId = $group->sortBy([['resource', 'asc'], ['id', 'asc']])->first()->id;
+
+            $group->each(function (Recipe $recipe) use ($energyId, $resourceId) {
+                Cache::put("recipe.{$recipe->id}.energy_efficient", $recipe->id === $energyId, MODEL_CACHE_TTL);
+                Cache::put("recipe.{$recipe->id}.resource_efficient", $recipe->id === $resourceId, MODEL_CACHE_TTL);
+            });
+        });
+    }
 
     public function getEnergyEfficientAttribute()
     {
