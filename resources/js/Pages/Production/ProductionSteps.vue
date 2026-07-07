@@ -277,9 +277,7 @@ export default {
                 return true;
             }
 
-            return (
-                (step.inputs || []).some((i) => i.item === this.filterItem) || step.output?.item === this.filterItem
-            );
+            return (step.inputs || []).some((i) => i.item === this.filterItem) || step.output?.item === this.filterItem;
         },
 
         // V110: hide a level header when the filter leaves it no visible steps

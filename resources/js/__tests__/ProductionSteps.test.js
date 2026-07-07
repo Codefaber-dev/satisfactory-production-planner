@@ -220,7 +220,10 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
 describe('ProductionSteps — header controls (T157 / V112)', () => {
     it('no longer renders Force Even Rows or Limit Belt Rates in the header', () => {
         const wrapper = mountSteps();
-        const buttonText = wrapper.findAll('button').map((b) => b.text()).join(' ');
+        const buttonText = wrapper
+            .findAll('button')
+            .map((b) => b.text())
+            .join(' ');
 
         expect(buttonText).toContain('Toggle Diagrams');
         expect(buttonText).not.toContain('Force Even Rows');
