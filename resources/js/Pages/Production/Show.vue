@@ -105,6 +105,8 @@
                     v-model:building-cost-multiplier="buildingCostMultiplier"
                     v-model:power-multiplier="powerMultiplier"
                     :auto-package-recycle="newAutoPackageRecycle"
+                    :even="newEven"
+                    :speed-limit="newSpeedLimit"
                     :unique-buildings="uniqueBuildings"
                     :designer-dims="designerDims"
                     :bp-designer="bpDesigner"
@@ -112,6 +114,8 @@
                     :bp-sizes="bpSizes"
                     :working="working"
                     @toggle-auto-package-recycle="toggleAutoPackageRecycle"
+                    @toggle-even-rows="toggleEvenRows"
+                    @toggle-speed-limit="toggleSpeedLimit"
                     @set-designer-mk="setDesignerMk"
                     @toggle-blueprint-enabled="toggleBlueprintEnabled"
                     @set-blueprint-size="setBlueprintSize"
@@ -194,13 +198,9 @@
                             :designer-mk="bpDesigner"
                             @setNewSubFavorite="setNewSubFavorite"
                             @updateRawSource="updateRawSource"
-                            :even="newEven"
                             :applied-even="!!even"
-                            :speed-limit="newSpeedLimit"
                             @toggle="toggleProductionCheck"
                             @toggleDiagrams="toggleDiagrams"
-                            @toggleEvenRows="toggleEvenRows"
-                            @toggleSpeedLimit="toggleSpeedLimit"
                         />
                     </div>
                 </div>
@@ -535,15 +535,9 @@ export default {
     },
 
     methods: {
-        toggleSpeedLimit() {
-            if (this.newSpeedLimit === 'both') {
-                this.newSpeedLimit = 'inputs';
-            } else if (this.newSpeedLimit === 'inputs') {
-                this.newSpeedLimit = 'outputs';
-            } else {
-                this.newSpeedLimit = 'both';
-            }
-
+        // V112: the panel select supplies the value directly (header cycle button removed)
+        toggleSpeedLimit(value) {
+            this.newSpeedLimit = value;
             this.fetch();
         },
 

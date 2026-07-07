@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { RocketLaunchIcon, QueueListIcon, BuildingOffice2Icon, PowerIcon } from '@heroicons/vue/24/outline';
+import {
+    AdjustmentsHorizontalIcon,
+    BuildingOffice2Icon,
+    PowerIcon,
+    QueueListIcon,
+    RocketLaunchIcon,
+    TableCellsIcon,
+} from '@heroicons/vue/24/outline';
 import '../bootstrap';
 import Show from '../Pages/Production/Show.vue';
 
@@ -521,6 +528,48 @@ describe('Show — T91/V51: plan settings live in Building Settings panel', () =
             expect(card.find('label').text()).toBe(expected[i].label);
             expect(card.find(expected[i].control).exists()).toBe(true);
         });
+    });
+
+    it('T157/V112: Force Even Rows + Limit Belt Rates render as panel cards with icon + label + control', async () => {
+        const wrapper = makeHeaderWrapper();
+        wrapper.vm.showBuildingSettings = true;
+        await wrapper.vm.$nextTick();
+
+        const evenCard = wrapper.find('[data-test="even-rows-setting-card"]');
+        expect(evenCard.exists()).toBe(true);
+        expect(evenCard.findComponent(TableCellsIcon).exists()).toBe(true);
+        expect(evenCard.find('label').text()).toBe('Force Even Rows');
+        expect(evenCard.find('[data-test="even-rows-toggle"]').exists()).toBe(true);
+
+        const limitCard = wrapper.find('[data-test="speed-limit-setting-card"]');
+        expect(limitCard.exists()).toBe(true);
+        expect(limitCard.findComponent(AdjustmentsHorizontalIcon).exists()).toBe(true);
+        expect(limitCard.find('label').text()).toBe('Limit Belt Rates');
+        expect(limitCard.find('[data-test="speed-limit-select"]').element.value).toBe('both');
+    });
+
+    it('T157/V112: even toggle applies immediately — fetch sent with flipped even param', async () => {
+        const wrapper = makeHeaderWrapper();
+        wrapper.vm.showBuildingSettings = true;
+        await wrapper.vm.$nextTick();
+
+        await wrapper.find('[data-test="even-rows-toggle"]').trigger('change');
+
+        expect(mockInertia.get).toHaveBeenCalled();
+        const params = mockInertia.get.mock.calls.at(-1)[1];
+        expect(params.even).toBe(1);
+    });
+
+    it('T157/V112: speed-limit select applies immediately — fetch sent with chosen speedLimit', async () => {
+        const wrapper = makeHeaderWrapper();
+        wrapper.vm.showBuildingSettings = true;
+        await wrapper.vm.$nextTick();
+
+        await wrapper.find('[data-test="speed-limit-select"]').setValue('inputs');
+
+        expect(mockInertia.get).toHaveBeenCalled();
+        const params = mockInertia.get.mock.calls.at(-1)[1];
+        expect(params.speedLimit).toBe('inputs');
     });
 
     it('fetch payload unchanged: panel-bound values sent as same params', () => {

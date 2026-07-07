@@ -10,19 +10,9 @@
                 {{ diagrams ? '✅' : '⬜' }}
                 Toggle Diagrams
             </button>
-            <button @click="$emit('toggleEvenRows')" class="btn btn-emerald">
-                {{ even ? '✅' : '⬜' }}
-                Force Even Rows
-            </button>
-            <button
-                v-text="
-                    `Limit Belt Rates: ${
-                        speedLimit === 'both' ? 'Inputs & Outputs' : speedLimit === 'inputs' ? 'Inputs' : 'Outputs'
-                    }`
-                "
-                @click="$emit('toggleSpeedLimit')"
-                class="btn btn-emerald"
-            ></button>
+            <!-- V112: Force Even Rows + Limit Belt Rates moved to the Plan Settings panel -->
+            <!-- V110: type-ahead ingredient filter -->
+            <StepFilter :options="filterOptions" v-model="filterItem" />
         </div>
         <div class="overflow-x-auto">
         <table class="block w-full p-2 lg:table lg:table-auto lg:p-0">
@@ -49,12 +39,13 @@
             </tr>
             <!-- Level 0: raws render first as steps (V100), source-mode controls on the step (V101) -->
             <template v-if="Object.keys(rawSteps).length">
-                <tr class="block lg:table-row">
+                <tr v-show="rawStepsVisible" class="block lg:table-row">
                     <th class="block bg-blue-200 py-2 text-2xl dark:bg-slate-800 lg:table-cell" colspan="100">Level 0</th>
                 </tr>
                 <template v-for="(material, name) in rawSteps">
                     <ProductionStep
                         v-for="prod in material.production"
+                        v-show="stepMatchesFilter(prod, name)"
                         :key="name + '-raw-' + (prod.recipe?.description || 'leaf')"
                         :level-index="0"
                         :level-step-map="levelStepMap"
@@ -86,7 +77,7 @@
             </template>
 
             <template v-for="(level, index) in resultsArray">
-                <tr class="block lg:table-row">
+                <tr v-show="levelHasVisibleStep(level)" class="block lg:table-row">
                     <th class="block bg-blue-200 py-2 text-2xl dark:bg-slate-800 lg:table-cell" colspan="100">Level {{ index + 1 }}</th>
                 </tr>
 
@@ -95,7 +86,8 @@
                         v-for="prod in material.production.filter((o) => o.recipe && !material.raw)"
                         v-show="
                             !prod.imported &&
-                            (!hideCompleted || !productionChecks[name + '-' + (prod.recipe?.description || 'base')])
+                            (!hideCompleted || !productionChecks[name + '-' + (prod.recipe?.description || 'base')]) &&
+                            stepMatchesFilter(prod, name)
                         "
                         :class="[
                             productionChecks[name + '-' + (prod.recipe?.description || 'base')]
@@ -131,7 +123,7 @@
 
             <!-- V88: terminal Recycling level — packaging + sink render as full build steps -->
             <template v-if="recycleSteps.length">
-                <tr class="block lg:table-row">
+                <tr v-show="anyRecycleStepVisible" class="block lg:table-row">
                     <th class="block bg-emerald-200 py-2 text-2xl dark:bg-emerald-900 lg:table-cell" colspan="100">
                         Recycling (AWESOME Sink)
                     </th>
@@ -141,6 +133,7 @@
                          (no recipes[name] entry), output destination → the AWESOME Sink -->
                     <ProductionStep
                         v-if="step.type === 'package'"
+                        v-show="recycleStepMatchesFilter(step)"
                         v-bind="packagePayload(step)"
                         data-test="recycle-step"
                         :identifier-override="recycleIdentifier(i)"
@@ -152,6 +145,7 @@
                     <!-- V91: terminal AWESOME Sink step -->
                     <RecycleStep
                         v-else
+                        v-show="recycleStepMatchesFilter(step)"
                         data-test="recycle-step"
                         :step="step"
                         :identifier="recycleIdentifier(i)"
@@ -168,10 +162,18 @@
 <script>
 import ProductionStep from '@/Pages/Production/ProductionStep';
 import RecycleStep from '@/Pages/Production/RecycleStep';
+import StepFilter from '@/Pages/Production/StepFilter';
 
 export default {
     name: 'production-steps',
-    components: { ProductionStep, RecycleStep },
+    components: { ProductionStep, RecycleStep, StepFilter },
+
+    data() {
+        return {
+            // V110: selected type-ahead filter item (null = no filter, display-only, not persisted)
+            filterItem: null,
+        };
+    },
     props: {
         diagrams: {},
         hideCompleted: {},
@@ -182,7 +184,6 @@ export default {
         productionChecks: {},
         recipes: {},
         choices: {},
-        even: {},
         appliedEven: {
             type: Boolean,
             default: false,
@@ -201,10 +202,6 @@ export default {
         designerMk: {
             type: String,
             default: 'mk1',
-        },
-        speedLimit: {
-            type: String,
-            default: 'both',
         },
         // current raw_sources map (raw → {mode,...}), V59
         rawSources: {
@@ -238,7 +235,6 @@ export default {
         },
 
         getStepIndex(level, name) {
-            console.log({ level, name });
             return Object.keys(level)
                 .map((key) => {
                     return { key, ...level[key] };
@@ -259,6 +255,38 @@ export default {
 
         flashDestination(dest) {
             this.Bus.emit('flash', { dest });
+        },
+
+        // V110: a step matches when the selected item is its output product,
+        // one of its byproducts, or one of its ingredient inputs
+        stepMatchesFilter(prod, name) {
+            if (!this.filterItem) {
+                return true;
+            }
+
+            return (
+                name === this.filterItem ||
+                this.filterItem in (prod.ingredients || {}) ||
+                this.filterItem in (prod.byproducts || {})
+            );
+        },
+
+        // V110: recycle-step variant — descriptors carry inputs[]/output, not a prod shape
+        recycleStepMatchesFilter(step) {
+            if (!this.filterItem) {
+                return true;
+            }
+
+            return (step.inputs || []).some((i) => i.item === this.filterItem) || step.output?.item === this.filterItem;
+        },
+
+        // V110: hide a level header when the filter leaves it no visible steps
+        levelHasVisibleStep(level) {
+            return Object.entries(level).some(([name, material]) =>
+                material.production.some(
+                    (prod) => prod.recipe && !material.raw && !prod.imported && this.stepMatchesFilter(prod, name)
+                )
+            );
         },
 
         // V90/V93: adapt a backend `package` recycling descriptor into ProductionStep
@@ -289,6 +317,51 @@ export default {
     },
 
     computed: {
+        // V110: type-ahead options = every ingredient + product of the displayed plan —
+        // union over rendered steps of output product + byproducts + input ingredients
+        filterOptions() {
+            const names = new Set();
+
+            const addProd = (name, prod) => {
+                names.add(name);
+                Object.keys(prod.ingredients || {}).forEach((n) => names.add(n));
+                Object.keys(prod.byproducts || {}).forEach((n) => names.add(n));
+            };
+
+            for (const [name, material] of Object.entries(this.rawSteps)) {
+                material.production.forEach((prod) => addProd(name, prod));
+            }
+
+            for (const level of this.resultsArray) {
+                for (const [name, material] of Object.entries(level)) {
+                    material.production
+                        .filter((o) => o.recipe && !material.raw && !o.imported)
+                        .forEach((prod) => addProd(name, prod));
+                }
+            }
+
+            for (const step of this.recycleSteps) {
+                (step.inputs || []).forEach((i) => names.add(i.item));
+                if (step.output?.item) {
+                    names.add(step.output.item);
+                }
+            }
+
+            return [...names].sort((a, b) => a.localeCompare(b));
+        },
+
+        // V110: Level 0 header hides when the filter leaves no visible raw step
+        rawStepsVisible() {
+            return Object.entries(this.rawSteps).some(([name, material]) =>
+                material.production.some((prod) => this.stepMatchesFilter(prod, name))
+            );
+        },
+
+        // V110: Recycling header hides when the filter leaves no visible recycle step
+        anyRecycleStepVisible() {
+            return this.recycleSteps.some((step) => this.recycleStepMatchesFilter(step));
+        },
+
         // V88: full recycling build steps (packaging + sink) from the backend
         recycleSteps() {
             return this.production.recycling_steps || [];

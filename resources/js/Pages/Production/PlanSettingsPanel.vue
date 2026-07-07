@@ -26,6 +26,72 @@
                 </div>
             </div>
             <div
+                data-test="speed-limit-setting-card"
+                class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+            >
+                <AdjustmentsHorizontalIcon alt="Limit Belt Rates" class="h-10 w-10 shrink-0"/>
+                <div class="flex w-full flex-col space-y-1">
+                    <label class="whitespace-nowrap text-xl font-bold">Limit Belt Rates</label>
+                    <select
+                        data-test="speed-limit-select"
+                        :value="speedLimit"
+                        @change="$emit('toggleSpeedLimit', $event.target.value)"
+                        class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
+                    >
+                        <option value="both">Inputs &amp; Outputs</option>
+                        <option value="inputs">Inputs</option>
+                        <option value="outputs">Outputs</option>
+                    </select>
+                </div>
+            </div>
+            <!-- V112: Force Even Rows + Limit Belt Rates, relocated from the Production Steps header;
+                 both apply immediately on change (not gated on the Update button) -->
+            <div
+                data-test="even-rows-setting-card"
+                class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+            >
+                <TableCellsIcon alt="Force Even Rows" class="h-10 w-10 shrink-0"/>
+                <div class="flex w-full flex-col space-y-1">
+                    <label class="whitespace-nowrap text-xl font-bold">Force Even Rows</label>
+                    <label class="relative inline-flex cursor-pointer items-center">
+                        <input
+                            type="checkbox"
+                            data-test="even-rows-toggle"
+                            :checked="even"
+                            @change="$emit('toggleEvenRows')"
+                            class="peer sr-only"
+                        />
+                        <span
+                            class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
+                        ></span>
+                    </label>
+                </div>
+            </div>
+            <!-- V67: auto-package-and-recycle excess fluids toggle (separate from the V52 multiplier cards) -->
+            <div
+                data-test="recycling-setting-card"
+                class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
+            >
+                <ArrowPathIcon alt="Auto-Package Recycle" class="h-10 w-10 shrink-0"/>
+                <div class="flex w-full flex-col space-y-1">
+                    <label class="whitespace-nowrap text-xl font-bold">Package &amp; Sink Excess Fluids</label>
+                    <label class="relative inline-flex cursor-pointer items-center">
+                        <input
+                            type="checkbox"
+                            data-test="auto-package-recycle-toggle"
+                            :checked="autoPackageRecycle"
+                            @change="$emit('toggleAutoPackageRecycle')"
+                            class="peer sr-only"
+                        />
+                        <span
+                            class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
+                        ></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4 flex flex-wrap gap-3">
+            <div
                 data-test="plan-setting-card"
                 class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
             >
@@ -80,28 +146,6 @@
                         class="w-full rounded py-2 px-1 shadow dark:bg-sky-800"
                         title="Power cost multiplier (1.0 = default)"
                     />
-                </div>
-            </div>
-            <!-- V67: auto-package-and-recycle excess fluids toggle (separate from the V52 multiplier cards) -->
-            <div
-                data-test="recycling-setting-card"
-                class="flex min-w-40 flex-1 items-center space-x-3 rounded border border-sky-700 p-3 shadow dark:bg-sky-700"
-            >
-                <ArrowPathIcon alt="Auto-Package Recycle" class="h-10 w-10 shrink-0"/>
-                <div class="flex w-full flex-col space-y-1">
-                    <label class="whitespace-nowrap text-xl font-bold">Package &amp; Sink Fluids</label>
-                    <label class="relative inline-flex cursor-pointer items-center">
-                        <input
-                            type="checkbox"
-                            data-test="auto-package-recycle-toggle"
-                            :checked="autoPackageRecycle"
-                            @change="$emit('toggleAutoPackageRecycle')"
-                            class="peer sr-only"
-                        />
-                        <span
-                            class="h-5 w-9 rounded-full bg-gray-400 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-emerald-500 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400 dark:bg-sky-900"
-                        ></span>
-                    </label>
                 </div>
             </div>
         </div>
@@ -165,11 +209,13 @@
 
 <script>
 import {
+    AdjustmentsHorizontalIcon,
     ArrowPathIcon,
     BuildingOffice2Icon,
     PowerIcon,
     QueueListIcon,
     RocketLaunchIcon,
+    TableCellsIcon,
 } from '@heroicons/vue/24/outline';
 
 // Building types that can never be blueprint-grouped: extractors are placed on
@@ -187,6 +233,8 @@ export default {
         BuildingOffice2Icon,
         PowerIcon,
         ArrowPathIcon,
+        TableCellsIcon,
+        AdjustmentsHorizontalIcon,
     },
 
     props: {
@@ -195,6 +243,9 @@ export default {
         buildingCostMultiplier: Number,
         powerMultiplier: Number,
         autoPackageRecycle: Boolean,
+        // V112: relocated Production Steps header controls (immediate-apply)
+        even: Boolean,
+        speedLimit: { type: String, default: 'both' },
         uniqueBuildings: { type: Array, default: () => [] },
         designerDims: { type: Object, default: () => ({}) },
         bpDesigner: String,
@@ -209,6 +260,8 @@ export default {
         'update:buildingCostMultiplier',
         'update:powerMultiplier',
         'toggleAutoPackageRecycle',
+        'toggleEvenRows',
+        'toggleSpeedLimit',
         'setDesignerMk',
         'toggleBlueprintEnabled',
         'setBlueprintSize',
