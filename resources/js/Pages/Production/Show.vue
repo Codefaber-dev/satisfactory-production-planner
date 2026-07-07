@@ -210,6 +210,7 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
 import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
@@ -231,6 +232,13 @@ export default {
         AppLayout,
         ProductionWarning,
         PlanSettingsPanel,
+    },
+
+    // liquid/gas names so diagram manifolds skip pipe materials (DiagramSvg inject, V117)
+    provide() {
+        return {
+            liquidNames: computed(() => new Set(this.liquids || [])),
+        };
     },
 
     mounted() {
@@ -277,6 +285,7 @@ export default {
     props: [
         'products',
         'recipes',
+        'liquids',
         'favorites',
         'production',
         'product',

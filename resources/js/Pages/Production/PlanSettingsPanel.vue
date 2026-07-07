@@ -74,7 +74,7 @@
             >
                 <ArrowPathIcon alt="Auto-Package Recycle" class="h-10 w-10 shrink-0"/>
                 <div class="flex w-full flex-col space-y-1">
-                    <label class="whitespace-nowrap text-xl font-bold">Package &amp; Sink Excess Fluids</label>
+                    <label class="whitespace-nowrap text-xl font-bold">Sink Excess Fluids</label>
                     <label class="relative inline-flex cursor-pointer items-center">
                         <input
                             type="checkbox"

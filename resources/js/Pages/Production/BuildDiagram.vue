@@ -1,230 +1,48 @@
 <template>
     <div class="flex flex-col items-center gap-4 lg:flex-row lg:items-start lg:justify-end lg:gap-8">
-        <div class="w-full max-w-xs text-left lg:w-48">
-            <ul>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Foundations </span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.foundations }}
-                        ( {{ footprint.length_foundations }}
-                        x
-                        {{ footprint.width_foundations }})
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold">Walls</span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.walls }}
-                        ({{ footprint.height_walls }}
-                        x
-                        {{ 2 * (footprint.length_foundations + footprint.width_foundations) }})
-                    </span>
-                </li>
-                <li v-if="footprint.grouped" class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Blueprints </span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.blueprints }}
-                        ({{ footprint.group_size }} ea)
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold">{{ footprint.grouped ? 'Blueprint Rows' : 'Building Rows' }}</span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.rows }}
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold">
-                        {{ footprint.grouped ? 'Blueprints Per Row' : 'Buildings Per Row' }}
-                    </span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.buildings_per_row }}
-                    </span>
-                </li>
-                <li v-show="footprint.rows > 1" class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Row Spacing </span>
-                    <span class="flex-1 text-right"> {{ footprint.row_spacing }} m </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Top Offset </span>
-                    <span class="flex-1 text-right"> {{ footprint.top_offset }} m </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Left Offset </span>
-                    <span class="flex-1 text-right"> {{ footprint.left_offset }} m </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Belt Speed </span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.belt_speed }}
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Input Max Rate </span>
-                    <span class="flex-1 text-right" :class="{ 'text-red-300': footprint.belt_utilization_in > 100 }">
-                        {{ footprint.belt_load_in }} <br />
-                        ({{ footprint.belt_utilization_in }}%)
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Output Max Rate </span>
-                    <span class="flex-1 text-right" :class="{ 'text-red-300': footprint.belt_utilization_out > 100 }">
-                        {{ footprint.belt_load_out }} <br />
-                        ({{ footprint.belt_utilization_out }}%)
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Power Shards </span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.power_shards }}
-                    </span>
-                </li>
-                <li class="flex border-b border-gray-300">
-                    <span class="ml-2 font-semibold"> Somersloops </span>
-                    <span class="flex-1 text-right">
-                        {{ footprint.somersloops }}
-                    </span>
-                </li>
-            </ul>
-        </div>
-        <div class="flex max-w-full justify-start overflow-x-auto p-2 lg:justify-center">
-            <div
-                style="box-sizing: content-box"
-                :style="{
-                    height: footprint.length_foundations * 2 + 'rem',
-                    width: footprint.width_foundations * 2 + 'rem',
-                }"
-                class="relative flex items-start justify-center bg-blue-300 text-xl shadow-lg"
+        <footprint-summary :footprint="footprint" />
+        <div class="w-full min-w-0 flex-1 p-2">
+            <button
+                type="button"
+                aria-label="Expand diagram"
+                title="Expand diagram — pan &amp; zoom"
+                class="block w-full cursor-zoom-in"
+                @click="modalOpen = true"
             >
-                <div
-                    style="opacity: 0.3; box-sizing: content-box"
-                    class="absolute flex h-full w-full flex-wrap items-center justify-center"
-                >
-                    <template v-for="ii in Array(footprint.foundations)">
-                        <div
-                            class="items-around m-0 flex flex-wrap justify-around border border-blue-500 p-0"
-                            style="box-sizing: border-box; height: 2rem; width: 2rem"
-                        ></div>
-                    </template>
-                </div>
-                <div style="padding: 2rem" class="absolute flex h-full w-full flex-wrap items-center justify-center">
-                    <!-- top offset -->
-                    <div
-                        class="absolute top-0 left-[40%] box-border flex items-center justify-center border-l border-black"
-                        :style="{ height: footprint.top_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '40px',
-                                height: '1.5rem',
-                                top: footprint.top_offset / 8 - 0.75 + 'rem',
-                                left: '-20px',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.top_offset }} m
-                        </div>
-                    </div>
-                    <!-- bottom offset -->
-                    <div
-                        class="absolute bottom-0 left-[40%] box-border flex items-center justify-center border-l border-black"
-                        :style="{ height: footprint.bottom_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '40px',
-                                height: '1.5rem',
-                                top: footprint.bottom_offset / 8 - 0.75 + 'rem',
-                                left: '-20px',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.bottom_offset }} m
-                        </div>
-                    </div>
-                    <!-- left offset -->
-                    <div
-                        class="absolute left-0 bottom-1/2 box-border flex items-center justify-center border-b border-black"
-                        :style="{ width: footprint.left_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '2rem',
-                                height: '1.5rem',
-                                left: footprint.left_offset / 8 - 1 + 'rem',
-                                top: '-0.75rem',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.left_offset }} m
-                        </div>
-                    </div>
-                    <!-- right offset -->
-                    <div
-                        class="absolute right-0 bottom-1/2 box-border flex items-center justify-center border-b border-black"
-                        :style="{ width: footprint.left_offset / 4 + 'rem' }"
-                    >
-                        <div
-                            :style="{
-                                width: '2rem',
-                                height: '1.5rem',
-                                left: footprint.left_offset / 8 - 1 + 'rem',
-                                top: '-0.75rem',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.left_offset }} m
-                        </div>
-                    </div>
-                    <!-- row spacing -->
-                    <div
-                        v-if="footprint.rows > 1"
-                        class="absolute left-[40%] top-0 box-border flex items-center justify-center border-l border-black"
-                        :style="{
-                            height: footprint.row_spacing / 4 + 'rem',
-                            marginTop: (footprint.row_spacing_offset + footprint.building_top_offset) / 4 + 'rem',
-                        }"
-                    >
-                        <div
-                            :style="{
-                                width: '40px',
-                                height: '1.5rem',
-                                top: footprint.row_spacing / 8 - 0.75 + 'rem',
-                                left: '-20px',
-                            }"
-                            class="absolute whitespace-nowrap bg-blue-300 p-1 text-xs text-black"
-                        >
-                            {{ footprint.row_spacing }} m
-                        </div>
-                    </div>
-                    <div class="flex w-full items-center justify-center" v-for="(ii, row) in Array(footprint.rows)">
-                        <div
-                            v-for="(jj, col) in Array(footprint.buildings_per_row)"
-                            :style="{
-                                height: footprint.building_length / 4 + 'rem',
-                                width: footprint.building_width / 4 + 'rem',
-                                marginTop: footprint.building_top_offset / 4 + 'rem',
-                            }"
-                            :class="
-                                1 + col + row * footprint.buildings_per_row <= footprint.num_buildings
-                                    ? ['border-blue-800', 'bg-blue-500']
-                                    : ['border-transparent', 'text-transparent', 'bg-transparent']
-                            "
-                            style="box-sizing: border-box"
-                            class="flex items-center justify-center rounded border bg-opacity-25 text-xs"
-                        >
-                            {{ footprint.monogram }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <diagram-svg :footprint="footprint" :materials="materials" class="h-auto max-h-96 shadow-lg" />
+            </button>
+            <diagram-modal
+                v-if="modalOpen"
+                :footprint="footprint"
+                :materials="materials"
+                :title="title"
+                @close="modalOpen = false"
+            />
         </div>
     </div>
 </template>
 <script>
+import DiagramSvg from '@/Pages/Production/DiagramSvg';
+import DiagramModal from '@/Pages/Production/DiagramModal';
+import FootprintSummary from './FootprintSummary.vue';
+
 export default {
     name: 'build-diagram',
+    components: { FootprintSummary, DiagramSvg, DiagramModal },
+    data() {
+        return {
+            modalOpen: false,
+        };
+    },
     props: {
+        title: {
+            type: String,
+            default: '',
+        },
+        materials: {
+            type: Object,
+            default: null,
+        },
         footprint: {
             type: Object,
             default() {

@@ -358,7 +358,7 @@
              entry transiently while its source mode changes — don't crash (B49) -->
         <tr class="block lg:table-row" v-if="recipe && overview" v-show="diagrams">
             <td class="block text-center lg:table-cell" colspan="100">
-                <build-diagram :footprint="footprint" />
+                <build-diagram :footprint="footprint" :title="production.name" :materials="diagramMaterials" />
             </td>
         </tr>
     </tbody>
@@ -485,6 +485,15 @@ export default {
     computed: {
         ingredients() {
             return this.production.ingredients;
+        },
+
+        // manifold materials for the build diagram: input belts per ingredient,
+        // output belts for the product + each byproduct (V116)
+        diagramMaterials() {
+            return {
+                inputs: Object.keys(this.production.ingredients || {}),
+                outputs: [this.production.name, ...Object.keys(this.production.byproducts || {})],
+            };
         },
 
         overview() {

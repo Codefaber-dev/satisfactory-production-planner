@@ -25,13 +25,14 @@ class ProductionController extends Controller
         // per-user favorite flag is merged here, never cached (B13).
         $products = BaseDataPayload::products();
         $recipes = BaseDataPayload::withFavorites($favorites->pluck('id')->all());
+        $liquids = BaseDataPayload::liquids();
         $factory = Factories::find(request('factory'));
         $multiFactory = MultiFactories::find(request('multiFactory'));
         $choices = ! empty(request('choices', [])) ? collect(request('choices', (object) []))->reject(fn ($name) => r($name)->isDefault())->all() : null;
         $even = request('even') ? 1 : 0;
         $speedLimit = request('speedLimit', 'both');
 
-        return compact('products', 'recipes', 'favorites', 'factory', 'multiFactory', 'choices', 'even', 'speedLimit');
+        return compact('products', 'recipes', 'liquids', 'favorites', 'factory', 'multiFactory', 'choices', 'even', 'speedLimit');
     }
 
     public function index()

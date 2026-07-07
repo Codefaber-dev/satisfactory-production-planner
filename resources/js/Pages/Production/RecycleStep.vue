@@ -75,7 +75,11 @@
         <!-- build diagram -->
         <tr class="block lg:table-row" v-if="step.footprint" v-show="diagrams">
             <td class="block text-center lg:table-cell" colspan="100">
-                <build-diagram :footprint="step.footprint" />
+                <build-diagram
+                    :footprint="step.footprint"
+                    :title="step.name"
+                    :materials="{ inputs: step.inputs.map((input) => input.item), outputs: [] }"
+                />
             </td>
         </tr>
     </tbody>
