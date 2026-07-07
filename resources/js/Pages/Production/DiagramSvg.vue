@@ -325,17 +325,30 @@ export default {
             return `${x} ${y} ${w} ${h}`;
         },
         gridX() {
-            return Array.from({ length: Math.max(0, this.footprint.width_foundations - 1) }, (_, i) => (i + 1) * FOUNDATION_M);
+            return Array.from(
+                { length: Math.max(0, this.footprint.width_foundations - 1) },
+                (_, i) => (i + 1) * FOUNDATION_M
+            );
         },
         gridY() {
-            return Array.from({ length: Math.max(0, this.footprint.length_foundations - 1) }, (_, i) => (i + 1) * FOUNDATION_M);
+            return Array.from(
+                { length: Math.max(0, this.footprint.length_foundations - 1) },
+                (_, i) => (i + 1) * FOUNDATION_M
+            );
         },
         rowPitch() {
             return this.footprint.building_length + this.footprint.row_spacing;
         },
         tiles() {
-            const { rows, buildings_per_row, num_buildings, left_offset, top_offset, building_top_offset, building_width } =
-                this.footprint;
+            const {
+                rows,
+                buildings_per_row,
+                num_buildings,
+                left_offset,
+                top_offset,
+                building_top_offset,
+                building_width,
+            } = this.footprint;
 
             return Array.from({ length: rows * buildings_per_row }, (_, i) => ({
                 key: i,
@@ -408,7 +421,10 @@ export default {
                 const y =
                     line.kind === 'input'
                         ? Math.max(0, rowTop - MANIFOLD_GAP_M - size - line.slot * MANIFOLD_STAGGER_M)
-                        : Math.min(this.canvasHeight - size, rowBottom + MANIFOLD_GAP_M + line.slot * MANIFOLD_STAGGER_M);
+                        : Math.min(
+                              this.canvasHeight - size,
+                              rowBottom + MANIFOLD_GAP_M + line.slot * MANIFOLD_STAGGER_M
+                          );
                 const midY = y + size / 2;
                 const centers = [];
 
@@ -422,7 +438,7 @@ export default {
                     stubs.push(
                         line.kind === 'input'
                             ? { x1: cx, y1: y + size, x2: cx, y2: rowTop }
-                            : { x1: cx, y1: rowBottom, x2: cx, y2: y },
+                            : { x1: cx, y1: rowBottom, x2: cx, y2: y }
                     );
                 }
 
@@ -430,7 +446,7 @@ export default {
                     trunkSegments.push(
                         line.kind === 'input'
                             ? { x1: centers[b] + size / 2, y1: midY, x2: centers[b + 1] - size / 2, y2: midY }
-                            : { x1: centers[b + 1] - size / 2, y1: midY, x2: centers[b] + size / 2, y2: midY },
+                            : { x1: centers[b + 1] - size / 2, y1: midY, x2: centers[b] + size / 2, y2: midY }
                     );
                 }
 

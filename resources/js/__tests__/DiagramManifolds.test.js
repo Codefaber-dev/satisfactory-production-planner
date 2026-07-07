@@ -38,8 +38,7 @@ const baseFootprint = () => ({
     somersloops: 0,
 });
 
-const mountSvg = (materials, footprint = baseFootprint()) =>
-    mount(DiagramSvg, { props: { footprint, materials } });
+const mountSvg = (materials, footprint = baseFootprint()) => mount(DiagramSvg, { props: { footprint, materials } });
 
 const lineByMaterial = (wrapper, material) => wrapper.find(`[data-manifold-line="${material}"]`);
 
@@ -180,7 +179,11 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
     it('swaps to the blueprint color set when the blueprint prop is set (V120)', () => {
         const standard = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] });
         const blueprint = mount(DiagramSvg, {
-            props: { footprint: baseFootprint(), materials: { inputs: ['Iron Ore'], outputs: ['Iron Rod'] }, blueprint: true },
+            props: {
+                footprint: baseFootprint(),
+                materials: { inputs: ['Iron Ore'], outputs: ['Iron Rod'] },
+                blueprint: true,
+            },
         });
 
         // slab: light blue → deep blueprint blue; tiles: near-white line work
@@ -190,14 +193,14 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
 
         // manifold palette colors unchanged — functional coding (V116)
         expect(blueprint.find('[data-trunk-segment]').attributes('stroke')).toBe(
-            standard.find('[data-trunk-segment]').attributes('stroke'),
+            standard.find('[data-trunk-segment]').attributes('stroke')
         );
     });
 
     it('renders zero manifold elements in blueprint mode', () => {
         const wrapper = mountSvg(
             { inputs: ['Iron Ore'], outputs: ['Iron Rod'] },
-            groupedFootprint(baseFootprint(), 8, 32),
+            groupedFootprint(baseFootprint(), 8, 32)
         );
 
         expect(wrapper.findAll('[data-manifold-line]')).toHaveLength(0);
@@ -231,7 +234,7 @@ describe('DiagramSvg — belt-only manifolds, liquids filtered (V117)', () => {
         // Packager case: fluid arrives by pipe, canisters by belt, packaged form leaves by belt
         const wrapper = mountWithLiquids(
             { inputs: ['Heavy Oil Residue', 'Empty Canister'], outputs: ['Packaged Heavy Oil Residue'] },
-            ['Heavy Oil Residue'],
+            ['Heavy Oil Residue']
         );
 
         expect(lineByMaterial(wrapper, 'Heavy Oil Residue').exists()).toBe(false);
@@ -245,7 +248,7 @@ describe('DiagramSvg — belt-only manifolds, liquids filtered (V117)', () => {
 
         // Coal takes slot/palette index 0 in both — the dropped liquid leaves no gap
         expect(lineByMaterial(filtered, 'Coal').find('[data-trunk-segment]').attributes('stroke')).toBe(
-            lineByMaterial(unfiltered, 'Coal').find('[data-trunk-segment]').attributes('stroke'),
+            lineByMaterial(unfiltered, 'Coal').find('[data-trunk-segment]').attributes('stroke')
         );
         expect(Number(lineByMaterial(filtered, 'Coal').find('[data-manifold-square]').attributes('x'))).toBe(19);
     });
