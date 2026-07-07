@@ -39,7 +39,10 @@
                 </div>
             </div>
             <div class="flex min-h-0 flex-1 flex-col gap-4 pt-2 font-mono text-sm lg:flex-row">
-                <div class="shrink-0 overflow-y-auto">
+                <!-- spec-sheet side panel: everything left-aligned on a single
+                     line — the modal renders in place, so text-center from the
+                     step markup would otherwise leak in (V115/V126) -->
+                <div class="shrink-0 overflow-y-auto overflow-x-auto whitespace-nowrap text-left lg:max-w-md">
                     <footprint-summary :footprint="footprint" />
                     <!-- full step details: outputs/inputs/machines/build cost (V126) -->
                     <diagram-step-details v-if="details" :details="details" />

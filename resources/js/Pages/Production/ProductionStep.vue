@@ -515,7 +515,9 @@ export default {
                 byproducts: this.production.byproducts || {},
                 inputs: this.production.ingredients || {},
                 building: this.overview.building,
-                variant: this.selectedVariantName,
+                // detail.variant is the bare tier ('mk1'); selectedVariantName is
+                // the composite details key ('Smelter (mk1)') — prefer the bare one
+                variant: detail.variant ?? this.selectedVariantName,
                 num_buildings: detail.num_buildings,
                 clock_speed: detail.clock_speed,
                 power_usage: detail.power_usage,
