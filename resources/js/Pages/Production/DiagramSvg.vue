@@ -1,6 +1,6 @@
 <template>
     <svg
-        class="block h-auto w-full"
+        class="block w-full"
         :viewBox="viewBox"
         preserveAspectRatio="xMidYMid meet"
         role="img"

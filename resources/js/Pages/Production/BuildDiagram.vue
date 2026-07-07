@@ -9,7 +9,7 @@
                 class="block w-full cursor-zoom-in"
                 @click="modalOpen = true"
             >
-                <diagram-svg :footprint="footprint" :materials="materials" class="max-h-96 shadow-lg" />
+                <diagram-svg :footprint="footprint" :materials="materials" class="h-auto max-h-96 shadow-lg" />
             </button>
             <diagram-modal
                 v-if="modalOpen"

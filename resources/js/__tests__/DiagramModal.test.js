@@ -220,4 +220,32 @@ describe('DiagramModal — composition + theming (V115)', () => {
         const inline = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
         expect(inline.findComponent(DiagramSvg).props('blueprint')).toBe(false);
     });
+
+    it('lets the svg fill the stage; the inline svg keeps its height cap (V121)', () => {
+        const modalSvg = mountModal().findComponent(DiagramSvg).find('svg');
+        expect(modalSvg.classes()).toContain('h-full');
+
+        const inlineSvg = mount(BuildDiagram, { props: { footprint: baseFootprint() } })
+            .findComponent(DiagramSvg)
+            .find('svg');
+        expect(inlineSvg.classes()).toContain('h-auto');
+        expect(inlineSvg.classes()).toContain('max-h-96');
+    });
+
+    it('fits the view window to the measured stage aspect, centered on the diagram (V121)', async () => {
+        const wrapper = mountModal();
+        const stage = wrapper.find('.touch-none').element;
+
+        // square stage: window = 112x112 (diagram is 112x64), centered vertically
+        Object.defineProperty(stage, 'clientWidth', { value: 800 });
+        Object.defineProperty(stage, 'clientHeight', { value: 800 });
+        await wrapper.find('[data-reset-view]').trigger('click');
+
+        expect(modalViewBox(wrapper)).toBe('0 -24 112 112');
+
+        // zoom preserves the stage-matched aspect
+        await wrapper.find('[data-zoom-in]').trigger('click');
+        const [, , w, h] = modalViewBox(wrapper).split(' ').map(Number);
+        expect(h / w).toBeCloseTo(1, 5);
+    });
 });

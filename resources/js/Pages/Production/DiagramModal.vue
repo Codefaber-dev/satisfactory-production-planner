@@ -51,7 +51,7 @@
                     @pointerup="onPointerUp"
                     @pointercancel="onPointerUp"
                 >
-                    <diagram-svg :footprint="footprint" :materials="materials" :view="view" blueprint class="max-h-full" />
+                    <diagram-svg :footprint="footprint" :materials="materials" :view="view" blueprint class="h-full" />
                 </div>
             </div>
         </div>
@@ -102,6 +102,9 @@ export default {
     },
     mounted() {
         window.addEventListener('keydown', this.onKeydown);
+        // stage box is only measurable once mounted — refit so the view window
+        // matches the stage aspect and the svg fills the modal (V121)
+        this.view = this.fitView();
     },
     beforeUnmount() {
         window.removeEventListener('keydown', this.onKeydown);
@@ -112,8 +115,26 @@ export default {
                 this.$emit('close');
             }
         },
+        // smallest stage-aspect window containing the whole diagram, centered —
+        // the svg fills the stage at every zoom, no letterboxed dead space (V121);
+        // unmeasurable stage (jsdom, zero box) falls back to the diagram's aspect
+        fitView() {
+            const full = diagramExtent(this.footprint);
+            const stage = this.$refs.stage;
+            const ratio =
+                stage?.clientWidth && stage?.clientHeight ? stage.clientHeight / stage.clientWidth : full.h / full.w;
+            const w = Math.max(full.w, full.h / ratio);
+            const h = w * ratio;
+
+            return {
+                x: full.x - (w - full.w) / 2,
+                y: full.y - (h - full.h) / 2,
+                w,
+                h,
+            };
+        },
         resetView() {
-            this.view = diagramExtent(this.footprint);
+            this.view = this.fitView();
         },
         // meters per screen pixel at the current zoom; jsdom (clientWidth 0) falls back to 1:1
         unitsPerPixel() {
@@ -124,7 +145,8 @@ export default {
         zoomBy(factor) {
             const full = diagramExtent(this.footprint);
             const width = Math.min(full.w / MIN_ZOOM, Math.max(full.w / MAX_ZOOM, this.view.w / factor));
-            const height = width * (full.h / full.w);
+            // preserve the CURRENT view aspect (stage-matched, V121), not the diagram's
+            const height = width * (this.view.h / this.view.w);
 
             this.view = {
                 x: this.view.x + (this.view.w - width) / 2,
