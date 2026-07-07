@@ -97,7 +97,7 @@
             >
                 <diagram-svg :footprint="footprint" class="max-h-96 shadow-lg" />
             </button>
-            <diagram-modal v-if="modalOpen" :footprint="footprint" @close="modalOpen = false" />
+            <diagram-modal v-if="modalOpen" :footprint="footprint" :title="title" @close="modalOpen = false" />
         </div>
     </div>
 </template>
@@ -114,6 +114,10 @@ export default {
         };
     },
     props: {
+        title: {
+            type: String,
+            default: '',
+        },
         footprint: {
             type: Object,
             default() {

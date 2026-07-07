@@ -358,7 +358,7 @@
              entry transiently while its source mode changes — don't crash (B49) -->
         <tr class="block lg:table-row" v-if="recipe && overview" v-show="diagrams">
             <td class="block text-center lg:table-cell" colspan="100">
-                <build-diagram :footprint="footprint" />
+                <build-diagram :footprint="footprint" :title="production.name" />
             </td>
         </tr>
     </tbody>

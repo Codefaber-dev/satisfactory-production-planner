@@ -210,6 +210,7 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
 import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
@@ -231,6 +232,17 @@ export default {
         AppLayout,
         ProductionWarning,
         PlanSettingsPanel,
+    },
+
+    // plan-level Building Summary data for the diagram modal (DiagramModal inject, V115)
+    provide() {
+        return {
+            planSummary: computed(() => ({
+                summary: this.production__building_summary,
+                details: this.production__building_details,
+                totalPower: this.production__total_power,
+            })),
+        };
     },
 
     mounted() {

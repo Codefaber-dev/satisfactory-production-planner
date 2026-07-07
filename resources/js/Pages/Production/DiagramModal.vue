@@ -1,27 +1,42 @@
 <template>
-    <teleport to="body">
+    <!-- rendered in place (no teleport): the dark variant is scoped to AppLayout's
+         .dark root, and a body teleport would escape it — dark: classes would never
+         fire inside the modal (V115) -->
+    <div
+        data-diagram-modal
+        class="fixed inset-0 z-50 flex items-center justify-center overscroll-contain bg-black bg-opacity-70 p-4"
+        @click.self="$emit('close')"
+    >
         <div
-            data-diagram-modal
-            class="fixed inset-0 z-50 flex items-center justify-center overscroll-contain bg-black bg-opacity-70 p-4"
-            @click.self="$emit('close')"
+            class="flex h-full w-full max-w-6xl flex-col rounded border border-gray-300 bg-white p-4 text-gray-900 shadow-xl dark:border-sky-700 dark:bg-slate-900 dark:text-gray-100"
         >
-            <div class="flex h-full w-full max-w-6xl flex-col rounded bg-gray-100 p-4 shadow-xl">
-                <div class="flex items-center justify-between pb-2">
-                    <span class="text-lg font-semibold">{{ footprint.monogram }} Build Diagram</span>
-                    <div class="flex items-center gap-2">
-                        <button type="button" class="btn btn-emerald" data-reset-view @click="resetView">
-                            Reset View
-                        </button>
-                        <button
-                            type="button"
-                            aria-label="Close diagram"
-                            class="rounded p-1 hover:bg-gray-300"
-                            @click="$emit('close')"
-                        >
-                            <XMarkIcon class="h-6 w-6" />
-                        </button>
-                    </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2">
+                <h2 class="text-xl font-bold">{{ heading }}</h2>
+                <div class="flex items-center gap-2">
+                    <button type="button" aria-label="Zoom in" class="btn btn-emerald" data-zoom-in @click="zoomBy(ZOOM_STEP)">
+                        <MagnifyingGlassPlusIcon class="h-5 w-5" />
+                    </button>
+                    <button
+                        type="button"
+                        aria-label="Zoom out"
+                        class="btn btn-emerald"
+                        data-zoom-out
+                        @click="zoomBy(1 / ZOOM_STEP)"
+                    >
+                        <MagnifyingGlassMinusIcon class="h-5 w-5" />
+                    </button>
+                    <button type="button" class="btn btn-emerald" data-reset-view @click="resetView">Reset View</button>
+                    <button
+                        type="button"
+                        aria-label="Close diagram"
+                        class="rounded p-1 hover:bg-gray-300 dark:hover:bg-slate-700"
+                        @click="$emit('close')"
+                    >
+                        <XMarkIcon class="h-6 w-6" />
+                    </button>
                 </div>
+            </div>
+            <div class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
                 <div
                     ref="stage"
                     class="min-h-0 flex-1 cursor-grab touch-none select-none overflow-hidden"
@@ -33,34 +48,66 @@
                 >
                     <diagram-svg :footprint="footprint" :view="view" class="max-h-full" />
                 </div>
+                <div v-if="plan" class="w-full shrink-0 overflow-y-auto lg:w-80" data-summary-panel>
+                    <building-summary
+                        :production__building_summary="plan.summary"
+                        :production__building_details="plan.details"
+                        :production__total_power="plan.totalPower"
+                    />
+                </div>
             </div>
         </div>
-    </teleport>
+    </div>
 </template>
 <script>
-import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { unref } from 'vue';
+import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import DiagramSvg, { diagramExtent } from '@/Pages/Production/DiagramSvg';
+import BuildingSummary from '@/Pages/Production/BuildingSummary';
 
 // zoom relative to the fit-all view: 0.25× (4× wider window) … 8× (⅛ window) (V114)
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 8;
+const ZOOM_STEP = 1.2;
 
 export default {
     name: 'diagram-modal',
-    components: { DiagramSvg, XMarkIcon },
+    components: { BuildingSummary, DiagramSvg, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon },
     props: {
         footprint: {
             type: Object,
             required: true,
         },
+        title: {
+            type: String,
+            default: '',
+        },
     },
     emits: ['close'],
+    // plan-level Building Summary data provided by Show.vue; absent in standalone
+    // mounts → panel hidden (V115)
+    inject: {
+        planSummary: {
+            default: null,
+        },
+    },
     data() {
         return {
             view: diagramExtent(this.footprint),
             pointers: {},
             panStart: null,
         };
+    },
+    computed: {
+        ZOOM_STEP() {
+            return ZOOM_STEP;
+        },
+        heading() {
+            return this.title || `${this.footprint.monogram} Build Diagram`;
+        },
+        plan() {
+            return unref(this.planSummary);
+        },
     },
     mounted() {
         window.addEventListener('keydown', this.onKeydown);
@@ -96,7 +143,7 @@ export default {
             };
         },
         onWheel(event) {
-            this.zoomBy(event.deltaY < 0 ? 1.2 : 1 / 1.2);
+            this.zoomBy(event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP);
         },
         pinchDistance() {
             const [a, b] = Object.values(this.pointers);

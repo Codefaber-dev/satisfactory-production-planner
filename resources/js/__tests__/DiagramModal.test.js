@@ -40,9 +40,7 @@ const baseFootprint = () => ({
 // full extent = 14×8 by 8×8 m
 const FULL_VIEWBOX = '0 0 112 64';
 
-const teleportStub = { global: { stubs: { teleport: true } } };
-
-const mountModal = () => mount(DiagramModal, { props: { footprint: baseFootprint() }, ...teleportStub });
+const mountModal = (options = {}) => mount(DiagramModal, { props: { footprint: baseFootprint() }, ...options });
 
 const modalViewBox = (wrapper) => wrapper.findComponent(DiagramSvg).find('svg').attributes('viewBox');
 
@@ -61,7 +59,7 @@ const firePointer = async (wrapper, type, { pointerId, clientX, clientY }) => {
 
 describe('BuildDiagram — modal entry point (V114)', () => {
     it('opens the modal with the same footprint on diagram click, none before', async () => {
-        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() }, ...teleportStub });
+        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
 
         expect(wrapper.findComponent(DiagramModal).exists()).toBe(false);
 
@@ -74,7 +72,7 @@ describe('BuildDiagram — modal entry point (V114)', () => {
     });
 
     it('closes on modal close event', async () => {
-        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() }, ...teleportStub });
+        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
         await wrapper.find('[aria-label="Expand diagram"]').trigger('click');
 
         await wrapper.findComponent(DiagramModal).find('[aria-label="Close diagram"]').trigger('click');
@@ -166,5 +164,69 @@ describe('DiagramModal — pan/zoom (V114)', () => {
 
         await wrapper.find('[data-diagram-modal]').trigger('click');
         expect(wrapper.emitted('close')).toHaveLength(1);
+    });
+
+    it('zoom in/out buttons zoom the viewBox within the wheel clamps', async () => {
+        const wrapper = mountModal();
+
+        await wrapper.find('[data-zoom-in]').trigger('click');
+        expect(viewWidth(wrapper)).toBeCloseTo(112 / 1.2, 5);
+
+        await wrapper.find('[data-zoom-out]').trigger('click');
+        expect(viewWidth(wrapper)).toBeCloseTo(112, 5);
+
+        for (let i = 0; i < 40; i++) {
+            await wrapper.find('[data-zoom-out]').trigger('click');
+        }
+        expect(viewWidth(wrapper)).toBeCloseTo(112 * 4, 5);
+    });
+});
+
+describe('DiagramModal — composition + theming (V115)', () => {
+    it('shows the step title as the heading, monogram fallback without one', () => {
+        const titled = mountModal({ props: { footprint: baseFootprint(), title: 'Iron Rod' } });
+        expect(titled.find('h2').text()).toBe('Iron Rod');
+
+        const untitled = mountModal();
+        expect(untitled.find('h2').text()).toBe('C Build Diagram');
+    });
+
+    it('renders the BuildingSummary panel when planSummary is provided', () => {
+        const wrapper = mountModal({
+            global: {
+                provide: {
+                    planSummary: {
+                        summary: {
+                            variants: { 'Constructor (mk1)': { num_buildings: 4, power_usage: 16, build_cost: { 'Iron Plate': 8 } } },
+                            total_build_cost: { 'Iron Plate': 8 },
+                        },
+                        details: [{ footprint: { power_shards: 2, somersloops: 1 } }],
+                        totalPower: 16,
+                    },
+                },
+            },
+        });
+
+        const panel = wrapper.find('[data-summary-panel]');
+        expect(panel.exists()).toBe(true);
+        expect(panel.text()).toContain('Building Summary');
+        expect(panel.text()).toContain('4x Constructor (mk1)');
+        expect(panel.text()).toContain('Iron Plate 8');
+    });
+
+    it('hides the summary panel when no planSummary is provided', () => {
+        expect(mountModal().find('[data-summary-panel]').exists()).toBe(false);
+    });
+
+    it('renders in place (no body teleport) with theme-paired panel classes', () => {
+        const wrapper = mountModal();
+
+        // in-place render: the overlay is inside the component tree, not document.body
+        expect(wrapper.find('[data-diagram-modal]').exists()).toBe(true);
+
+        const panel = wrapper.find('[data-diagram-modal] > div');
+        expect(panel.classes()).toContain('bg-white');
+        expect(panel.classes()).toContain('dark:bg-slate-900');
+        expect(panel.classes()).toContain('dark:text-gray-100');
     });
 });
