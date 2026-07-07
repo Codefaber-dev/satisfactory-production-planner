@@ -37,6 +37,9 @@
                 </div>
             </div>
             <div class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+                <div>
+                    <footprint-summary :footprint="footprint" />
+                </div>
                 <div
                     ref="stage"
                     class="min-h-0 flex-1 cursor-grab touch-none select-none overflow-hidden"
@@ -48,13 +51,6 @@
                 >
                     <diagram-svg :footprint="footprint" :materials="materials" :view="view" class="max-h-full" />
                 </div>
-                <div v-if="plan" class="w-full shrink-0 overflow-y-auto lg:w-80" data-summary-panel>
-                    <building-summary
-                        :production__building_summary="plan.summary"
-                        :production__building_details="plan.details"
-                        :production__total_power="plan.totalPower"
-                    />
-                </div>
             </div>
         </div>
     </div>
@@ -64,6 +60,7 @@ import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import DiagramSvg, { diagramExtent } from '@/Pages/Production/DiagramSvg';
 import BuildingSummary from '@/Pages/Production/BuildingSummary';
+import FootprintSummary from './FootprintSummary.vue';
 
 // zoom relative to the fit-all view: 0.25× (4× wider window) … 8× (⅛ window) (V114)
 const MIN_ZOOM = 0.25;
@@ -72,7 +69,7 @@ const ZOOM_STEP = 1.2;
 
 export default {
     name: 'diagram-modal',
-    components: { BuildingSummary, DiagramSvg, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon },
+    components: { FootprintSummary, DiagramSvg, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon },
     props: {
         footprint: {
             type: Object,

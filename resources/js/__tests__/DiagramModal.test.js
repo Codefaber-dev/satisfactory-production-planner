@@ -191,31 +191,14 @@ describe('DiagramModal — composition + theming (V115)', () => {
         expect(untitled.find('h2').text()).toBe('C Build Diagram');
     });
 
-    it('renders the BuildingSummary panel when planSummary is provided', () => {
-        const wrapper = mountModal({
-            global: {
-                provide: {
-                    planSummary: {
-                        summary: {
-                            variants: { 'Constructor (mk1)': { num_buildings: 4, power_usage: 16, build_cost: { 'Iron Plate': 8 } } },
-                            total_build_cost: { 'Iron Plate': 8 },
-                        },
-                        details: [{ footprint: { power_shards: 2, somersloops: 1 } }],
-                        totalPower: 16,
-                    },
-                },
-            },
-        });
+    it('renders the FootprintSummary stats panel beside the stage (V119)', () => {
+        const wrapper = mountModal();
 
-        const panel = wrapper.find('[data-summary-panel]');
+        const panel = wrapper.findComponent({ name: 'footprint-summary' });
         expect(panel.exists()).toBe(true);
-        expect(panel.text()).toContain('Building Summary');
-        expect(panel.text()).toContain('4x Constructor (mk1)');
-        expect(panel.text()).toContain('Iron Plate 8');
-    });
-
-    it('hides the summary panel when no planSummary is provided', () => {
-        expect(mountModal().find('[data-summary-panel]').exists()).toBe(false);
+        expect(panel.text()).toContain('Foundations');
+        expect(panel.text()).toContain('Belt Speed');
+        expect(panel.props('footprint')).toEqual(baseFootprint());
     });
 
     it('renders in place (no body teleport) with theme-paired panel classes', () => {
