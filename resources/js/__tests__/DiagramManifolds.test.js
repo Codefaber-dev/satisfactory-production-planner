@@ -192,9 +192,16 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         expect(blueprint.find('svg > rect').attributes('fill')).toBe('#1e3a8a');
         expect(blueprint.find('[data-tile]').attributes('stroke')).toBe('#e2e8f0');
 
-        // manifold palette colors unchanged — functional coding (V116)
-        expect(blueprint.find('[data-trunk-segment]').attributes('stroke')).toBe(
-            standard.find('[data-trunk-segment]').attributes('stroke')
+        // manifold palette swaps to the light 400-series set — the dark 600s are
+        // unreadable on the deep-blue slab (V125, revises V120's unchanged clause)
+        const standardStroke = standard.find('[data-trunk-segment]').attributes('stroke');
+        const blueprintStroke = blueprint.find('[data-trunk-segment]').attributes('stroke');
+        expect(standardStroke).toBe('#d97706');
+        expect(blueprintStroke).toBe('#fbbf24');
+
+        // same index mapping + dash coding in both modes
+        expect(blueprint.find('[data-trunk-segment]').attributes('stroke-dasharray')).toBe(
+            standard.find('[data-trunk-segment]').attributes('stroke-dasharray')
         );
     });
 

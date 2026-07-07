@@ -228,8 +228,20 @@ import { unref } from 'vue';
 import { FOUNDATION_M, MANIFOLD_M as MANIFOLD_SIZE_M, contentExtent, manifoldLines } from '@/diagramLayout';
 
 // per-material line coding: color + dasharray both indexed by the material's
-// position in the diagram's ordered list — distinct combos within a diagram (V116)
+// position in the diagram's ordered list — distinct combos within a diagram (V116).
+// 600-series for the light inline slab; 400-series for the deep-blue blueprint
+// slab — the dark 600s are unreadable there (V125, B65). Same index mapping.
 const MANIFOLD_PALETTE = ['#d97706', '#059669', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d', '#ea580c'];
+const MANIFOLD_PALETTE_BLUEPRINT = [
+    '#fbbf24',
+    '#34d399',
+    '#a78bfa',
+    '#f87171',
+    '#22d3ee',
+    '#f472b6',
+    '#a3e635',
+    '#fb923c',
+];
 
 // tailwind blue-300 / blue-500 / blue-800 — inline because SVG attrs, not classes
 const COLORS_DEFAULT = {
@@ -346,10 +358,12 @@ export default {
         },
         manifoldLines() {
             // geometry from the shared layout module (V124c); the component only
-            // assigns colors — palette per render mode
+            // assigns colors — palette per render mode (V125)
+            const palette = this.blueprint ? MANIFOLD_PALETTE_BLUEPRINT : MANIFOLD_PALETTE;
+
             return manifoldLines(this.footprint, this.materials, unref(this.liquidNames)).map((line) => ({
                 ...line,
-                color: MANIFOLD_PALETTE[line.idx % MANIFOLD_PALETTE.length],
+                color: palette[line.idx % palette.length],
             }));
         },
         markerX() {
