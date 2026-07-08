@@ -163,8 +163,7 @@ describe('DiagramModal — step cell + nav panel (V130)', () => {
 });
 
 describe('DiagramStepDetails — material jump links (V130)', () => {
-    const mountDetails = () =>
-        mount(DiagramStepDetails, { props: { details: baseDetails(), identifier: '2.B' } });
+    const mountDetails = () => mount(DiagramStepDetails, { props: { details: baseDetails(), identifier: '2.B' } });
 
     it('links an input to its producing step and emits navigate on click', async () => {
         registerDiagram({ identifier: '1.A', name: 'Copper Ore', open: () => {} });

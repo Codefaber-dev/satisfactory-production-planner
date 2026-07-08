@@ -379,9 +379,7 @@ describe('DiagramSvg — pipe manifolds (V132, supersedes V117 filtering)', () =
         const wrapper = mountWithLiquids({ inputs: ['Water', 'Coal'], outputs: [] }, ['Water']);
 
         // Water at slot 0 (band nearest the row), Coal at slot 1 — distinct band y
-        const junctionY = Number(
-            lineByMaterial(wrapper, 'Water').find('[data-junction] rect').attributes('y')
-        );
+        const junctionY = Number(lineByMaterial(wrapper, 'Water').find('[data-junction] rect').attributes('y'));
         const squareY = Number(lineByMaterial(wrapper, 'Coal').find('[data-manifold-square]').attributes('y'));
 
         expect(junctionY).not.toBe(squareY);

@@ -231,7 +231,12 @@ describe('DiagramModal — composition + theming (V115)', () => {
         // zooming in shrinks the view window ⇒ more pixels per meter
         const before = Number(scale.text().match(/= ([\d.]+) px/)[1]);
         await wrapper.find('[data-zoom-in]').trigger('click');
-        const after = Number(wrapper.find('[data-scale-cell]').text().match(/= ([\d.]+) px/)[1]);
+        const after = Number(
+            wrapper
+                .find('[data-scale-cell]')
+                .text()
+                .match(/= ([\d.]+) px/)[1]
+        );
         expect(after).toBeGreaterThan(before);
     });
 

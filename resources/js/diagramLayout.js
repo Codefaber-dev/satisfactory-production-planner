@@ -209,9 +209,7 @@ export const manifoldLines = (footprint, materials, liquids = null) => {
     return lines.map((line) => {
         const idx = line.pipe ? pipeIdx++ : beltIdx++;
 
-        return footprint.grouped
-            ? blueprintPortLine(footprint, line, idx)
-            : manifoldLine(footprint, line, idx, pitch);
+        return footprint.grouped ? blueprintPortLine(footprint, line, idx) : manifoldLine(footprint, line, idx, pitch);
     });
 };
 
