@@ -364,6 +364,7 @@
                     :materials="diagramMaterials"
                     :details="diagramDetails"
                     :identifier="production.imported ? '' : identifier"
+                    @update:max-clock="updateClock('c' + $event)"
                 />
             </td>
         </tr>
@@ -515,6 +516,9 @@ export default {
                 output: { name: this.production.name || this.name, qty: this.overview.qty },
                 byproducts: this.production.byproducts || {},
                 inputs: this.production.ingredients || {},
+                // header RECIPE cell + MAX CLOCK dropdown (V131)
+                recipe_name: this.production.recipe?.description || 'Default',
+                max_clock_speed: detail.max_clock_speed,
                 building: this.overview.building,
                 // detail.variant is the bare tier ('mk1'); selectedVariantName is
                 // the composite details key ('Smelter (mk1)') — prefer the bare one

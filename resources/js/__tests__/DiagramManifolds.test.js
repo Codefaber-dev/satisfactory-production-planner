@@ -205,14 +205,51 @@ describe('DiagramSvg — belt manifolds (V116)', () => {
         );
     });
 
-    it('renders zero manifold elements in blueprint mode', () => {
-        const wrapper = mountSvg(
-            { inputs: ['Iron Ore'], outputs: ['Iron Rod'] },
-            groupedFootprint(baseFootprint(), 8, 32)
-        );
+    it('renders blueprint-mode I/O port lines instead of manifolds (V133)', () => {
+        const grouped = groupedFootprint(baseFootprint(), 8, 32);
+        const wrapper = mountSvg({ inputs: ['Iron Ore'], outputs: ['Iron Rod'] }, grouped);
 
-        expect(wrapper.findAll('[data-manifold-line]')).toHaveLength(0);
+        // splitters/mergers/junctions live inside the blueprint — none rendered
         expect(wrapper.findAll('[data-manifold-square]')).toHaveLength(0);
+        expect(wrapper.findAll('[data-junction]')).toHaveLength(0);
+
+        const lines = wrapper.findAll('[data-manifold-line]');
+        expect(lines).toHaveLength(2);
+
+        // one port per rendered tile per line
+        expect(wrapper.findAll('[data-port]')).toHaveLength(2 * grouped.num_buildings);
+
+        const tileTop = grouped.top_offset + grouped.building_top_offset;
+
+        // inputs enter the left side near the tile top…
+        const input = lineByMaterial(wrapper, 'Iron Ore');
+        const inSeg = input.find('[data-trunk-segment]');
+        expect(Number(inSeg.attributes('x1'))).toBe(0);
+        expect(Number(inSeg.attributes('y1'))).toBeCloseTo(tileTop + 2, 5);
+        expect(Number(inSeg.attributes('x2'))).toBeGreaterThan(0);
+
+        // …outputs exit the left side near the tile bottom (drawn toward the edge)
+        const output = lineByMaterial(wrapper, 'Iron Rod');
+        const outSeg = output.find('[data-trunk-segment]');
+        expect(Number(outSeg.attributes('y1'))).toBeCloseTo(tileTop + grouped.building_length - 2, 5);
+        expect(Number(outSeg.attributes('x1'))).toBeGreaterThan(Number(outSeg.attributes('x2')));
+
+        // color-coded + labeled like ungrouped manifolds
+        expect(wrapper.findAll('[data-manifold-label]').map((l) => l.text())).toEqual(['Iron Ore', 'Iron Rod']);
+    });
+
+    it('classifies blueprint port lines as pipes for liquids (V133)', () => {
+        const grouped = groupedFootprint(baseFootprint(), 8, 32);
+        const wrapper = mount(DiagramSvg, {
+            props: { footprint: grouped, materials: { inputs: ['Water', 'Coal'], outputs: [] } },
+            global: { provide: { liquidNames: new Set(['Water']) } },
+        });
+
+        const pipe = lineByMaterial(wrapper, 'Water');
+        expect(pipe.attributes('data-pipe')).toBeDefined();
+        expect(pipe.find('[data-trunk-segment]').attributes('stroke')).toBe('#2563eb');
+
+        expect(lineByMaterial(wrapper, 'Coal').find('[data-trunk-segment]').attributes('stroke')).toBe('#d97706');
     });
 
     it('falls back to generic single input and output lines without a materials prop', () => {
@@ -293,43 +330,73 @@ describe('DiagramSvg — manifold geometry fits the canvas (V124)', () => {
     });
 });
 
-describe('DiagramSvg — belt-only manifolds, liquids filtered (V117)', () => {
+describe('DiagramSvg — pipe manifolds (V132, supersedes V117 filtering)', () => {
     const provideLiquids = (names) => ({ global: { provide: { liquidNames: new Set(names) } } });
 
     const mountWithLiquids = (materials, liquids) =>
         mount(DiagramSvg, { props: { footprint: baseFootprint(), materials }, ...provideLiquids(liquids) });
 
-    it('renders no manifold line for a liquid input or output', () => {
+    it('renders a liquid as a pipe line with T-junctions instead of splitter squares', () => {
         // Packager case: fluid arrives by pipe, canisters by belt, packaged form leaves by belt
         const wrapper = mountWithLiquids(
             { inputs: ['Heavy Oil Residue', 'Empty Canister'], outputs: ['Packaged Heavy Oil Residue'] },
             ['Heavy Oil Residue']
         );
 
-        expect(lineByMaterial(wrapper, 'Heavy Oil Residue').exists()).toBe(false);
-        expect(lineByMaterial(wrapper, 'Empty Canister').exists()).toBe(true);
-        expect(lineByMaterial(wrapper, 'Packaged Heavy Oil Residue').exists()).toBe(true);
+        const pipe = lineByMaterial(wrapper, 'Heavy Oil Residue');
+        expect(pipe.exists()).toBe(true);
+        expect(pipe.attributes('data-pipe')).toBeDefined();
+        expect(pipe.findAll('[data-junction]').length).toBeGreaterThan(0);
+        expect(pipe.findAll('[data-manifold-square]')).toHaveLength(0);
+
+        const belt = lineByMaterial(wrapper, 'Empty Canister');
+        expect(belt.attributes('data-pipe')).toBeUndefined();
+        expect(belt.findAll('[data-manifold-square]').length).toBeGreaterThan(0);
+        expect(belt.findAll('[data-junction]')).toHaveLength(0);
     });
 
-    it('keeps palette indices contiguous after filtering', () => {
-        const filtered = mountWithLiquids({ inputs: ['Water', 'Coal'], outputs: [] }, ['Water']);
-        const unfiltered = mountWithLiquids({ inputs: ['Coal'], outputs: [] }, []);
+    it('colors pipes from their own palette, distinct from belts', () => {
+        const wrapper = mountWithLiquids({ inputs: ['Water', 'Coal'], outputs: [] }, ['Water']);
 
-        // Coal takes slot/palette index 0 in both — the dropped liquid leaves no gap
-        expect(lineByMaterial(filtered, 'Coal').find('[data-trunk-segment]').attributes('stroke')).toBe(
-            lineByMaterial(unfiltered, 'Coal').find('[data-trunk-segment]').attributes('stroke')
+        const pipeStroke = lineByMaterial(wrapper, 'Water').find('[data-trunk-segment]').attributes('stroke');
+        const beltStroke = lineByMaterial(wrapper, 'Coal').find('[data-trunk-segment]').attributes('stroke');
+
+        expect(pipeStroke).toBe('#2563eb'); // pipe palette entry 0
+        expect(beltStroke).toBe('#d97706'); // belt palette entry 0
+        expect(pipeStroke).not.toBe(beltStroke);
+    });
+
+    it('keeps belt palette indices contiguous — pipes index separately', () => {
+        const mixed = mountWithLiquids({ inputs: ['Water', 'Coal'], outputs: [] }, ['Water']);
+        const beltOnly = mountWithLiquids({ inputs: ['Coal'], outputs: [] }, []);
+
+        expect(lineByMaterial(mixed, 'Coal').find('[data-trunk-segment]').attributes('stroke')).toBe(
+            lineByMaterial(beltOnly, 'Coal').find('[data-trunk-segment]').attributes('stroke')
         );
-        expect(Number(lineByMaterial(filtered, 'Coal').find('[data-manifold-square]').attributes('x'))).toBe(19);
     });
 
-    it('renders zero lines on a side whose materials are all liquid', () => {
+    it('staggers pipes in the same slot sequence as belts', () => {
+        const wrapper = mountWithLiquids({ inputs: ['Water', 'Coal'], outputs: [] }, ['Water']);
+
+        // Water at slot 0 (band nearest the row), Coal at slot 1 — distinct band y
+        const junctionY = Number(
+            lineByMaterial(wrapper, 'Water').find('[data-junction] rect').attributes('y')
+        );
+        const squareY = Number(lineByMaterial(wrapper, 'Coal').find('[data-manifold-square]').attributes('y'));
+
+        expect(junctionY).not.toBe(squareY);
+    });
+
+    it('renders an all-liquid side entirely as pipe lines', () => {
         const wrapper = mountWithLiquids({ inputs: ['Water', 'Crude Oil'], outputs: ['Fuel'] }, [
             'Water',
             'Crude Oil',
             'Fuel',
         ]);
 
-        expect(wrapper.findAll('[data-manifold-line]')).toHaveLength(0);
+        expect(wrapper.findAll('[data-manifold-line]')).toHaveLength(3);
+        expect(wrapper.findAll('[data-pipe]')).toHaveLength(3);
+        expect(wrapper.findAll('[data-manifold-square]')).toHaveLength(0);
     });
 
     it('does not filter without the inject, and leaves the generic fallback intact', () => {

@@ -66,7 +66,7 @@ export const groupedFootprint = (footprint, groupSize, designerM, even = false) 
         foundations: lengthFoundations * widthFoundations,
         walls: heightWalls * 2 * (lengthFoundations + widthFoundations),
         row_spacing: rows === 1 ? 0 : 8 * (tileFoundations + 2) - designerM,
-        top_offset: Math.ceil((8 * (tileFoundations + 2) - designerM) / 2 + (foundationBorderY ? 8 : 0)),
+        top_offset: Math.floor((8 * (tileFoundations + 2) - designerM) / 2 + (foundationBorderY ? 8 : 0)),
         bottom_offset: Math.floor((8 * (tileFoundations + 2) - designerM) / 2 + (foundationBorderY ? 8 : 0)),
         row_spacing_offset:
             Math.ceil((8 * (tileFoundations + 2) - designerM) / 2 + (foundationBorderY ? 8 : 0)) + designerM,

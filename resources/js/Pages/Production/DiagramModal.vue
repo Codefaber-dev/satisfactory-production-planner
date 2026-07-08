@@ -25,6 +25,14 @@
                         <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Title</div>
                         <h2 class="text-lg font-bold uppercase tracking-widest text-blue-50">{{ heading }}</h2>
                     </div>
+                    <div
+                        v-if="details?.recipe_name"
+                        class="border-l border-blue-200/60 px-4 py-1.5"
+                        data-recipe-cell
+                    >
+                        <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Recipe</div>
+                        <div class="text-lg tracking-widest text-blue-50">{{ details.recipe_name }}</div>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 border-l border-blue-200/60 px-3 py-1.5">
                     <button
@@ -98,6 +106,25 @@
                                     <div class="border-b border-r border-blue-200/40 px-2 py-1">
                                         <div class="text-[9px] uppercase tracking-widest text-blue-300">Units</div>
                                         <div>Dimensions in meters</div>
+                                    </div>
+                                    <div
+                                        v-if="details?.max_clock_speed"
+                                        class="border-b border-r border-blue-200/40 px-2 py-1"
+                                    >
+                                        <div class="text-[9px] uppercase tracking-widest text-blue-300">
+                                            Max Clock
+                                        </div>
+                                        <select
+                                            class="border-0 bg-transparent p-0 font-mono text-sm text-blue-100 focus:ring-0"
+                                            data-max-clock-select
+                                            :value="details.max_clock_speed"
+                                            @change="$emit('update:maxClock', Number($event.target.value))"
+                                        >
+                                            <option class="bg-blue-950" :value="100">100%</option>
+                                            <option class="bg-blue-950" :value="150">150%</option>
+                                            <option class="bg-blue-950" :value="200">200%</option>
+                                            <option class="bg-blue-950" :value="250">250%</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +229,7 @@ export default {
             default: '',
         },
     },
-    emits: ['close'],
+    emits: ['close', 'update:maxClock'],
     data() {
         return {
             view: null,

@@ -19,6 +19,7 @@
                 :details="details"
                 :identifier="identifier"
                 @close="modalOpen = false"
+                @update:max-clock="$emit('update:maxClock', $event)"
             />
         </div>
     </div>
@@ -31,6 +32,7 @@ import { registerDiagram } from '@/diagramRegistry';
 
 export default {
     name: 'build-diagram',
+    emits: ['update:maxClock'],
     components: { FootprintSummary, DiagramSvg, DiagramModal },
     data() {
         return {

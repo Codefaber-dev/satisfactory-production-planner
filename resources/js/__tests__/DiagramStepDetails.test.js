@@ -76,12 +76,52 @@ describe('DiagramModal — step-details panel (V126)', () => {
         expect(buildCost).toContain('20× Cable');
     });
 
-    it('gates the somersloop line on max_slots', () => {
+    it('gates the somersloop line on slots actually in use (V131)', () => {
         const withSlots = mountModal(detailsPayload());
         expect(withSlots.find('[data-details-sloops]').text()).toContain('1/2 per machine');
 
+        // slot capacity present but unused ⇒ no line
+        const unused = mountModal({ ...detailsPayload(), slots: 0, max_slots: 2 });
+        expect(unused.find('[data-details-sloops]').exists()).toBe(false);
+
         const noSlots = mountModal({ ...detailsPayload(), slots: 0, max_slots: 0 });
         expect(noSlots.find('[data-details-sloops]').exists()).toBe(false);
+    });
+
+    it('shows power shards per machine only when overclocked (V131)', () => {
+        const overclocked = mountModal({ ...detailsPayload(), max_clock_speed: 250 });
+        expect(overclocked.find('[data-details-shards]').text()).toContain('Power shards: 3 per machine');
+
+        const oneShard = mountModal({ ...detailsPayload(), max_clock_speed: 150 });
+        expect(oneShard.find('[data-details-shards]').text()).toContain('Power shards: 1 per machine');
+
+        const stock = mountModal({ ...detailsPayload(), max_clock_speed: 100 });
+        expect(stock.find('[data-details-shards]').exists()).toBe(false);
+    });
+
+    it('shows the recipe name in a header compartment beside the title (V131)', () => {
+        const wrapper = mountModal({ ...detailsPayload(), recipe_name: 'Cast Screw' });
+
+        const cell = wrapper.find('[data-recipe-cell]');
+        expect(cell.exists()).toBe(true);
+        expect(cell.text()).toContain('Cast Screw');
+
+        expect(mountModal(detailsPayload()).find('[data-recipe-cell]').exists()).toBe(false);
+    });
+
+    it('offers a max-clock dropdown that emits the chosen clock (V131)', async () => {
+        const wrapper = mountModal({ ...detailsPayload(), max_clock_speed: 150 });
+
+        const select = wrapper.find('[data-max-clock-select]');
+        expect(select.exists()).toBe(true);
+        expect(select.element.value).toBe('150');
+
+        await select.setValue('250');
+        expect(wrapper.emitted('update:maxClock')).toHaveLength(1);
+        expect(wrapper.emitted('update:maxClock')[0]).toEqual([250]);
+
+        // sink payloads carry no max clock ⇒ no dropdown
+        expect(mountModal(detailsPayload()).find('[data-max-clock-select]').exists()).toBe(false);
     });
 
     it('renders no details section without the prop (standalone mounts unchanged)', () => {

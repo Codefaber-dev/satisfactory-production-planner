@@ -113,7 +113,7 @@ const manifoldLine = (footprint, line, idx, pitch) => {
         ...line,
         idx,
         dash: MANIFOLD_DASHES[idx % MANIFOLD_DASHES.length],
-        monogram: line.kind === 'input' ? 'S' : 'M',
+        monogram: line.pipe ? null : line.kind === 'input' ? 'S' : 'M',
         squares,
         trunkSegments,
         stubs,
@@ -121,24 +121,98 @@ const manifoldLine = (footprint, line, idx, pitch) => {
     };
 };
 
-// all manifold lines for a diagram. `liquids` = Set of liquid/gas names (V117):
-// pipes not belts — filtered BEFORE indexing so color/dash combos stay contiguous.
-// Grouped (blueprint-mode) footprints render no manifolds (V116). Color is NOT
-// assigned here — the component picks the mode palette (V125).
-export const manifoldLines = (footprint, materials, liquids = null) => {
-    if (footprint.grouped) {
-        return [];
+// blueprint I/O port square size + inset from the tile's top/bottom edge (V133)
+export const PORT_M = 2;
+const PORT_INSET_M = 2;
+
+// blueprint-mode I/O line (V133): splitters/mergers/junctions live inside the
+// blueprint, so each material renders as a port row instead — inputs enter each
+// tile's LEFT side near the top, outputs exit the left side near the bottom.
+// One port per tile, a directional trunk from the slab's left edge feeding the
+// ports (inputs flow edge → tiles, outputs tiles → edge), label at the edge.
+const blueprintPortLine = (footprint, line, idx) => {
+    const fp = footprint;
+    const trunkSegments = [];
+    const ports = [];
+    const labels = [];
+
+    for (let row = 0; row < fp.rows; row++) {
+        const count = Math.min(fp.buildings_per_row, fp.num_buildings - row * fp.buildings_per_row);
+
+        if (count <= 0) {
+            break;
+        }
+
+        const tileTop = fp.top_offset + fp.building_top_offset + row * (fp.building_length + fp.row_spacing);
+        const y =
+            line.kind === 'input'
+                ? tileTop + PORT_INSET_M + line.slot * MANIFOLD_STAGGER_M
+                : tileTop + fp.building_length - PORT_INSET_M - line.slot * MANIFOLD_STAGGER_M;
+
+        const stops = Array.from({ length: count }, (_, c) => fp.left_offset + c * fp.building_width);
+        stops.forEach((x) => ports.push({ x, y }));
+
+        for (let i = 0; i < stops.length; i++) {
+            const from = i === 0 ? 0 : stops[i - 1] + PORT_M / 2;
+            const to = stops[i] - PORT_M / 2;
+
+            trunkSegments.push(
+                line.kind === 'input' ? { x1: from, y1: y, x2: to, y2: y } : { x1: to, y1: y, x2: from, y2: y }
+            );
+        }
+
+        if (row === 0) {
+            labels.push({ x: -1, y });
+        }
     }
 
-    const belts = (names) => (liquids ? names.filter((name) => !liquids.has(name)) : names);
-    const inputs = materials ? belts(materials.inputs ?? []) : ['Input'];
-    const outputs = materials ? belts(materials.outputs ?? []) : ['Output'];
+    return {
+        ...line,
+        idx,
+        dash: MANIFOLD_DASHES[idx % MANIFOLD_DASHES.length],
+        monogram: null,
+        squares: [],
+        trunkSegments,
+        stubs: [],
+        ports,
+        labels,
+    };
+};
+
+// all manifold lines for a diagram. `liquids` = Set of liquid/gas names: those
+// materials render as PIPE lines — T-junctions instead of splitter/merger
+// squares, indexed into their own palette (V132, supersedes V117's filtering).
+// Belts and pipes share each side's slot sequence, so mixed bands stagger as
+// one group. Grouped (blueprint-mode) footprints render I/O port lines instead
+// of manifolds (V133, revises V116's render-nothing clause). Color is NOT
+// assigned here — the component picks the mode palette (V125).
+export const manifoldLines = (footprint, materials, liquids = null) => {
+    const classify = (names, kind) =>
+        names.map((material, slot) => ({
+            material,
+            kind,
+            slot,
+            slots: names.length,
+            pipe: liquids ? liquids.has(material) : false,
+        }));
+
+    const inputs = materials ? (materials.inputs ?? []) : ['Input'];
+    const outputs = materials ? (materials.outputs ?? []) : ['Output'];
+    const lines = [...classify(inputs, 'input'), ...classify(outputs, 'output')];
     const pitch = staggerPitch(footprint, inputs.length, outputs.length);
 
-    return [
-        ...inputs.map((material, slot) => ({ material, kind: 'input', slot, slots: inputs.length })),
-        ...outputs.map((material, slot) => ({ material, kind: 'output', slot, slots: outputs.length })),
-    ].map((line, idx) => manifoldLine(footprint, line, idx, pitch));
+    // per-class palette indices: belts stay contiguous in the belt palette,
+    // pipes in theirs (V132)
+    let beltIdx = 0;
+    let pipeIdx = 0;
+
+    return lines.map((line) => {
+        const idx = line.pipe ? pipeIdx++ : beltIdx++;
+
+        return footprint.grouped
+            ? blueprintPortLine(footprint, line, idx)
+            : manifoldLine(footprint, line, idx, pitch);
+    });
 };
 
 // V124a: rendered extent = slab ∪ every manifold square ∪ every label text box.

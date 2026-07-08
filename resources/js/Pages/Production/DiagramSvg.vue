@@ -10,8 +10,8 @@
             <!-- subtle flow arrows: half-size triangle at reduced opacity (V120) -->
             <marker
                 v-for="line in manifoldLines"
-                :key="`marker-${line.idx}`"
-                :id="`${uid}-arrow-${line.idx}`"
+                :key="`marker-${line.seq}`"
+                :id="`${uid}-arrow-${line.seq}`"
                 markerUnits="userSpaceOnUse"
                 markerWidth="1.6"
                 markerHeight="1.6"
@@ -35,7 +35,13 @@
         <!-- belt manifolds: one splitter/merger line per material, hidden in blueprint
              mode — blueprints contain their own internals (V116). Trunks + stubs paint
              beneath the squares so a trunk crossing another slot stays readable -->
-        <g v-for="line in manifoldLines" :key="`manifold-${line.idx}`" :data-manifold-line="line.material" :data-kind="line.kind">
+        <g
+            v-for="line in manifoldLines"
+            :key="`manifold-${line.seq}`"
+            :data-manifold-line="line.material"
+            :data-kind="line.kind"
+            :data-pipe="line.pipe ? '' : undefined"
+        >
             <line
                 v-for="(seg, i) in line.trunkSegments"
                 :key="`trunk-${i}`"
@@ -48,7 +54,7 @@
                 stroke-width="1.5"
                 vector-effect="non-scaling-stroke"
                 :stroke-dasharray="line.dash"
-                :marker-end="`url(#${uid}-arrow-${line.idx})`"
+                :marker-end="`url(#${uid}-arrow-${line.seq})`"
             />
             <line
                 v-for="(stub, i) in line.stubs"
@@ -62,33 +68,82 @@
                 stroke-width="1.5"
                 vector-effect="non-scaling-stroke"
                 :stroke-dasharray="line.dash"
-                :marker-end="`url(#${uid}-arrow-${line.idx})`"
+                :marker-end="`url(#${uid}-arrow-${line.seq})`"
             />
             <g v-for="(sq, i) in line.squares" :key="`square-${i}`">
-                <rect
-                    data-manifold-square
-                    :x="sq.x"
-                    :y="sq.y"
-                    :width="MANIFOLD_M"
-                    :height="MANIFOLD_M"
-                    rx="1"
-                    :fill="line.color"
-                    fill-opacity="0.25"
-                    :stroke="line.color"
-                    stroke-width="1.5"
-                    vector-effect="non-scaling-stroke"
-                />
-                <text
-                    :x="sq.cx"
-                    :y="sq.y + MANIFOLD_M / 2"
-                    text-anchor="middle"
-                    dominant-baseline="central"
-                    font-size="1.6"
-                    :fill="COLORS.label"
-                >
-                    {{ line.monogram }}
-                </text>
+                <template v-if="line.pipe">
+                    <!-- pipe T-junction (V132): trunk bar through the cell middle,
+                         arm toward the building (down for input bands above the
+                         row, up for output bands below it) -->
+                    <g data-junction>
+                        <rect
+                            :x="sq.x"
+                            :y="sq.y + MANIFOLD_M / 2 - 0.75"
+                            :width="MANIFOLD_M"
+                            height="1.5"
+                            rx="0.5"
+                            :fill="line.color"
+                            fill-opacity="0.25"
+                            :stroke="line.color"
+                            stroke-width="1.5"
+                            vector-effect="non-scaling-stroke"
+                        />
+                        <rect
+                            :x="sq.cx - 0.75"
+                            :y="line.kind === 'input' ? sq.y + MANIFOLD_M / 2 : sq.y + MANIFOLD_M / 2 - 2"
+                            width="1.5"
+                            height="2"
+                            rx="0.5"
+                            :fill="line.color"
+                            fill-opacity="0.25"
+                            :stroke="line.color"
+                            stroke-width="1.5"
+                            vector-effect="non-scaling-stroke"
+                        />
+                    </g>
+                </template>
+                <template v-else>
+                    <rect
+                        data-manifold-square
+                        :x="sq.x"
+                        :y="sq.y"
+                        :width="MANIFOLD_M"
+                        :height="MANIFOLD_M"
+                        rx="1"
+                        :fill="line.color"
+                        fill-opacity="0.25"
+                        :stroke="line.color"
+                        stroke-width="1.5"
+                        vector-effect="non-scaling-stroke"
+                    />
+                    <text
+                        :x="sq.cx"
+                        :y="sq.y + MANIFOLD_M / 2"
+                        text-anchor="middle"
+                        dominant-baseline="central"
+                        font-size="1.6"
+                        :fill="COLORS.label"
+                    >
+                        {{ line.monogram }}
+                    </text>
+                </template>
             </g>
+            <!-- blueprint I/O ports on each tile's left edge (V133) -->
+            <rect
+                v-for="(port, i) in line.ports || []"
+                :key="`port-${i}`"
+                data-port
+                :x="port.x - PORT_M / 2"
+                :y="port.y - PORT_M / 2"
+                :width="PORT_M"
+                :height="PORT_M"
+                rx="0.5"
+                :fill="line.color"
+                fill-opacity="0.25"
+                :stroke="line.color"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+            />
             <text
                 v-for="(label, i) in line.labels"
                 :key="`label-${i}`"
@@ -248,13 +303,18 @@
 </template>
 <script>
 import { unref } from 'vue';
-import { FOUNDATION_M, MANIFOLD_M as MANIFOLD_SIZE_M, contentExtent, manifoldLines } from '@/diagramLayout';
+import { FOUNDATION_M, MANIFOLD_M as MANIFOLD_SIZE_M, PORT_M, contentExtent, manifoldLines } from '@/diagramLayout';
 
 // per-material line coding: color + dasharray both indexed by the material's
 // position in the diagram's ordered list — distinct combos within a diagram (V116).
 // 600-series for the light inline slab; 400-series for the deep-blue blueprint
 // slab — the dark 600s are unreadable there (V125, B65). Same index mapping.
 const MANIFOLD_PALETTE = ['#d97706', '#059669', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#65a30d', '#ea580c'];
+// pipes carry their own palettes — liquids read as a distinct family in both
+// modes (V132); indexed separately from belts so each class stays contiguous
+const PIPE_PALETTE = ['#2563eb', '#0d9488', '#c026d3', '#4f46e5', '#0284c7', '#9f1239'];
+const PIPE_PALETTE_BLUEPRINT = ['#93c5fd', '#5eead4', '#f0abfc', '#a5b4fc', '#7dd3fc', '#fda4af'];
+
 const MANIFOLD_PALETTE_BLUEPRINT = [
     '#fbbf24',
     '#34d399',
@@ -331,6 +391,9 @@ export default {
         MANIFOLD_M() {
             return MANIFOLD_SIZE_M;
         },
+        PORT_M() {
+            return PORT_M;
+        },
         canvasWidth() {
             return this.footprint.width_foundations * FOUNDATION_M;
         },
@@ -381,13 +444,15 @@ export default {
         },
         manifoldLines() {
             // geometry from the shared layout module (V124c); the component only
-            // assigns colors — palette per render mode (V125)
-            const palette = this.blueprint ? MANIFOLD_PALETTE_BLUEPRINT : MANIFOLD_PALETTE;
+            // assigns colors — belt/pipe palette per render mode (V125/V132)
+            const belts = this.blueprint ? MANIFOLD_PALETTE_BLUEPRINT : MANIFOLD_PALETTE;
+            const pipes = this.blueprint ? PIPE_PALETTE_BLUEPRINT : PIPE_PALETTE;
 
-            return manifoldLines(this.footprint, this.materials, unref(this.liquidNames)).map((line) => ({
-                ...line,
-                color: palette[line.idx % palette.length],
-            }));
+            return manifoldLines(this.footprint, this.materials, unref(this.liquidNames)).map((line, seq) => {
+                const palette = line.pipe ? pipes : belts;
+
+                return { ...line, seq, color: palette[line.idx % palette.length] };
+            });
         },
         markerX() {
             return this.canvasWidth * 0.4;

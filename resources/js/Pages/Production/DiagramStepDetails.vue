@@ -53,8 +53,11 @@
                     <template v-if="details.clock_speed"> @{{ qty(details.clock_speed) }}%</template>
                     [{{ Math.ceil(details.power_usage || 0) }} MW]
                 </li>
-                <li v-if="details.max_slots > 0" data-details-sloops>
+                <li v-if="details.slots > 0" data-details-sloops>
                     Somersloops: {{ details.slots || 0 }}/{{ details.max_slots }} per machine
+                </li>
+                <li v-if="powerShards > 0" data-details-shards>
+                    Power shards: {{ powerShards }} per machine
                 </li>
                 <li v-if="details.energy_per_item" data-details-energy>
                     {{ qty(details.energy_per_item) }} MJ per item — {{ qty(details.total_energy) }} MJ total
@@ -120,6 +123,12 @@ export default {
         },
     },
     computed: {
+        // shards per machine follow the chosen max-clock tier (V131)
+        powerShards() {
+            const clock = this.details.max_clock_speed || 100;
+
+            return clock > 200 ? 3 : clock > 150 ? 2 : clock > 100 ? 1 : 0;
+        },
         // variant keys can be the composite "Building (mk)" details key — never
         // repeat the building name inside its own parenthetical
         showVariant() {
