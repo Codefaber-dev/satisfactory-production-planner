@@ -6,10 +6,6 @@
             class="flex flex-wrap items-center justify-center gap-2 rounded-t-lg bg-gray-900 p-4 text-xl font-semibold text-white dark:bg-sky-700"
         >
             <span class="w-full text-center sm:w-auto">Production Steps</span>
-            <button @click="$emit('toggleDiagrams')" class="btn btn-emerald">
-                {{ diagrams ? '✅' : '⬜' }}
-                Toggle Diagrams
-            </button>
             <!-- V112: Force Even Rows + Limit Belt Rates moved to the Plan Settings panel -->
             <!-- V110: type-ahead ingredient filter -->
             <StepFilter :options="filterOptions" v-model="filterItem" />
@@ -51,7 +47,6 @@
                         :level-step-map="levelStepMap"
                         :step-index="rawStepIndex(name)"
                         :choices="choices"
-                        :diagrams="diagrams"
                         :material="material"
                         :name="name"
                         :new-imports="newImports"
@@ -99,7 +94,6 @@
                         :level-step-map="levelStepMap"
                         :step-index="getStepIndex(level, name)"
                         :choices="choices"
-                        :diagrams="diagrams"
                         :material="material"
                         :name="name"
                         :new-imports="newImports"
@@ -140,7 +134,6 @@
                         :level-step-map="packageDestinationMap"
                         :recipes="{}"
                         :synthetic="true"
-                        :diagrams="diagrams"
                     />
                     <!-- V91: terminal AWESOME Sink step -->
                     <RecycleStep
@@ -150,7 +143,6 @@
                         :step="step"
                         :identifier="recycleIdentifier(i)"
                         :step-map="recycleStepMap"
-                        :diagrams="diagrams"
                         @flashDestination="flashDestination"
                     />
                 </template>
@@ -175,7 +167,6 @@ export default {
         };
     },
     props: {
-        diagrams: {},
         hideCompleted: {},
         newImports: {},
         newProduct: {},

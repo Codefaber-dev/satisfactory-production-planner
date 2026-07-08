@@ -73,7 +73,7 @@
         </tr>
 
         <!-- build diagram -->
-        <tr class="block lg:table-row" v-if="step.footprint" v-show="diagrams">
+        <tr class="block lg:table-row" v-if="step.footprint">
             <td class="block text-center lg:table-cell" colspan="100">
                 <build-diagram
                     :footprint="step.footprint"
@@ -103,7 +103,6 @@ export default {
         identifier: { type: String, default: '' },
         // map of material name → producing-step identifier (for input links)
         stepMap: { type: Object, default: () => ({}) },
-        diagrams: { type: Boolean, default: false },
     },
     computed: {
         // sink equivalents of the modal step-details payload (V126)

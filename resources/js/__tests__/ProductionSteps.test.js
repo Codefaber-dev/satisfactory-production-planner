@@ -225,7 +225,7 @@ describe('ProductionSteps — header controls (T157 / V112)', () => {
             .map((b) => b.text())
             .join(' ');
 
-        expect(buttonText).toContain('Toggle Diagrams');
+        expect(buttonText).not.toContain('Toggle Diagrams'); // modal-only diagrams (V134)
         expect(buttonText).not.toContain('Force Even Rows');
         expect(buttonText).not.toContain('Limit Belt Rates');
     });

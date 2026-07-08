@@ -1,39 +1,35 @@
 <template>
-    <div class="flex flex-col items-center gap-4 lg:flex-row lg:items-start lg:justify-end lg:gap-8">
-        <footprint-summary :footprint="footprint" />
-        <div class="w-full min-w-0 flex-1 p-2">
-            <button
-                type="button"
-                aria-label="Expand diagram"
-                title="Expand diagram — pan &amp; zoom"
-                class="block w-full cursor-zoom-in"
-                @click="modalOpen = true"
-            >
-                <diagram-svg :footprint="footprint" :materials="materials" class="h-auto max-h-96 shadow-lg" />
-            </button>
-            <diagram-modal
-                v-if="modalOpen"
-                :footprint="footprint"
-                :materials="materials"
-                :title="title"
-                :details="details"
-                :identifier="identifier"
-                @close="modalOpen = false"
-                @update:max-clock="$emit('update:maxClock', $event)"
-            />
-        </div>
+    <!-- modal-only diagram access (V134): compact trigger, no inline render -->
+    <div class="flex justify-center py-1">
+        <button
+            type="button"
+            aria-label="Expand diagram"
+            title="View build diagram — pan &amp; zoom"
+            class="btn btn-emerald btn-sm"
+            @click="modalOpen = true"
+        >
+            📐 View Diagram
+        </button>
+        <diagram-modal
+            v-if="modalOpen"
+            :footprint="footprint"
+            :materials="materials"
+            :title="title"
+            :details="details"
+            :identifier="identifier"
+            @close="modalOpen = false"
+            @update:max-clock="$emit('update:maxClock', $event)"
+        />
     </div>
 </template>
 <script>
-import DiagramSvg from '@/Pages/Production/DiagramSvg';
 import DiagramModal from '@/Pages/Production/DiagramModal';
-import FootprintSummary from './FootprintSummary.vue';
 import { registerDiagram } from '@/diagramRegistry';
 
 export default {
     name: 'build-diagram',
     emits: ['update:maxClock'],
-    components: { FootprintSummary, DiagramSvg, DiagramModal },
+    components: { DiagramModal },
     data() {
         return {
             modalOpen: false,

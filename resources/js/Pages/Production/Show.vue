@@ -196,7 +196,6 @@
                         <production-steps
                             :class="{ 'hidden': selectedTab !== 'productionSteps', 'xl:flex': true }"
                             ref="productionSteps"
-                            :diagrams="diagrams"
                             :hide-completed="hideCompleted"
                             :new-imports="newImports"
                             :import-notes="newImportNotes"
@@ -215,7 +214,6 @@
                             @updateRawSource="updateRawSource"
                             :applied-even="!!even"
                             @toggle="toggleProductionCheck"
-                            @toggleDiagrams="toggleDiagrams"
                         />
                     </div>
                 </div>
@@ -365,7 +363,6 @@ export default {
             disabledRawMaterials: {},
             newConstraints: [],
             rawUnchanged: true,
-            diagrams: store.getItem('diagrams', true),
             // V123: summary pane collapse — global UI pref, xl layout only.
             summaryCollapsed: store.getItem('summaryCollapsed', false),
             newImports: this.imports ? Object.fromEntries((this.imports || '').split(',').map((o) => [o, true])) : {},
@@ -648,11 +645,6 @@ export default {
             this.fetch({ preserveScroll: true });
         },
 
-        toggleDiagrams() {
-            this.diagrams = !this.diagrams;
-            this.savePrefs();
-        },
-
         updateYield(name, qty) {
             this.form.outputs.find((o) => o.product.name === name).yield = qty;
         },
@@ -843,10 +835,6 @@ export default {
         setDesignerMk(mk) {
             this.bpDesigner = mk;
             saveDesignerMk(store, mk);
-        },
-
-        savePrefs() {
-            store.setItem('diagrams', this.diagrams);
         },
 
         toggleSummary() {

@@ -97,7 +97,7 @@
                     >
                         <div class="flex flex-col lg:flex-row">
                             <div class="lg:border-r lg:border-blue-200/40">
-                                <footprint-summary :footprint="footprint" title-block />
+                                <footprint-summary :footprint="footprint" />
                                 <div class="flex">
                                     <div class="border-b border-r border-blue-200/40 px-2 py-1" data-scale-cell>
                                         <div class="text-[9px] uppercase tracking-widest text-blue-300">Scale</div>

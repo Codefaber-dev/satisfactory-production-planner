@@ -356,7 +356,7 @@
         </tr>
         <!-- gate on overview presence: a recipe-bearing raw (V79) can lack an overview
              entry transiently while its source mode changes — don't crash (B49) -->
-        <tr class="block lg:table-row" v-if="recipe && overview" v-show="diagrams">
+        <tr class="block lg:table-row" v-if="recipe && overview">
             <td class="block text-center lg:table-cell" colspan="100">
                 <build-diagram
                     :footprint="footprint"
@@ -384,7 +384,6 @@ export default {
     components: { CloudImage, BuildDiagram, RecipePicker, RawSourceControl },
     props: {
         choices: {},
-        diagrams: {},
         name: {},
         newImports: {},
         recipes: {},

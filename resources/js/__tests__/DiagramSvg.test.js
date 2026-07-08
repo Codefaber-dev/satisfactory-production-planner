@@ -148,13 +148,22 @@ describe('DiagramSvg — SVG build diagram (V113)', () => {
     });
 });
 
-describe('BuildDiagram — composes DiagramSvg (V113)', () => {
-    it('renders the stats list and the svg diagram, without an overflow-x scroll wrapper', () => {
+describe('BuildDiagram — modal-only composition (V134)', () => {
+    it('renders no inline diagram or stats, just the View Diagram trigger', () => {
         const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
+
+        expect(wrapper.findComponent(DiagramSvg).exists()).toBe(false);
+        expect(wrapper.text()).not.toContain('Foundations');
+        expect(wrapper.find('[aria-label="Expand diagram"]').exists()).toBe(true);
+    });
+
+    it('renders the svg and footprint stats inside the opened modal', async () => {
+        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
+
+        await wrapper.find('[aria-label="Expand diagram"]').trigger('click');
 
         expect(wrapper.findComponent(DiagramSvg).exists()).toBe(true);
         expect(wrapper.text()).toContain('Foundations');
         expect(wrapper.text()).toContain('Belt Speed');
-        expect(wrapper.find('.overflow-x-auto').exists()).toBe(false);
     });
 });

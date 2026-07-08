@@ -213,12 +213,9 @@ describe('DiagramModal — composition + theming (V115)', () => {
         expect(sheet.classes()).toContain('text-blue-100');
     });
 
-    it('renders its diagram in blueprint mode; the inline diagram stays default (V120/V128)', async () => {
+    it('renders its diagram in blueprint mode (V120/V128)', () => {
         const modal = mountModal();
         expect(modal.findComponent(DiagramSvg).props('blueprint')).toBe(true);
-
-        const inline = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
-        expect(inline.findComponent(DiagramSvg).props('blueprint')).toBe(false);
     });
 
     it('renders the footprint stats as title-block compartments with a live scale cell (V128)', async () => {
@@ -238,15 +235,9 @@ describe('DiagramModal — composition + theming (V115)', () => {
         expect(after).toBeGreaterThan(before);
     });
 
-    it('lets the svg fill the stage; the inline svg keeps its height cap (V121)', () => {
+    it('lets the svg fill the stage (V121)', () => {
         const modalSvg = mountModal().findComponent(DiagramSvg).find('svg');
         expect(modalSvg.classes()).toContain('h-full');
-
-        const inlineSvg = mount(BuildDiagram, { props: { footprint: baseFootprint() } })
-            .findComponent(DiagramSvg)
-            .find('svg');
-        expect(inlineSvg.classes()).toContain('h-auto');
-        expect(inlineSvg.classes()).toContain('max-h-96');
     });
 
     it('fits the view window to the measured stage aspect, centered on the diagram (V121)', async () => {
