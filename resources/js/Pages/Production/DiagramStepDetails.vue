@@ -102,7 +102,7 @@ export default {
                     'button',
                     {
                         type: 'button',
-                        class: 'underline decoration-dotted underline-offset-2 hover:text-blue-50',
+                        class: 'underline decoration-dotted underline-offset-2 hover:text-blue-50 cursor-pointer',
                         'data-material-link': '',
                         onClick: () => this.$parent.$emit('navigate', producer),
                     },
