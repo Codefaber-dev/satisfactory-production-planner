@@ -138,4 +138,58 @@ class RecyclingCalcTest extends TestCase
 
         $this->assertEqualsWithDelta(8160.0, $result['points'], 0.001);
     }
+
+    #[Test]
+    public function packaging_container_demand_spawns_a_container_production_row(): void
+    {
+        // B68/V135: packaging consumes Empty Canisters the plan never produced —
+        // the calc must add a container production row via the container's base
+        // recipe (Constructor: 30 Plastic → 60 Empty Canister, 4 MW).
+        $result = RecyclingCalc::calc(['Water' => 60], [], true);
+
+        $this->assertCount(1, $result['containers']);
+        $row = $result['containers'][0];
+
+        $this->assertSame('Empty Canister', $row['product']);
+        $this->assertEqualsWithDelta(60.0, $row['qty'], 0.001);
+        $this->assertEqualsWithDelta(1.0, $row['buildings'], 0.001);
+        $this->assertSame('Constructor', $row['building']);
+        $this->assertEqualsWithDelta(4.0, $row['power'], 0.001); // Constructor mk1 base_power
+
+        $plastic = collect($row['inputs'])->firstWhere('item', 'Plastic');
+        $this->assertNotNull($plastic, 'container production must surface its recipe inputs');
+        $this->assertEqualsWithDelta(30.0, $plastic['qty'], 0.001);
+
+        // V87 pattern: the row carries the building's build cost so it folds
+        // into the build summary / parts list
+        $this->assertNotEmpty($row['build_cost']);
+    }
+
+    #[Test]
+    public function leftover_container_byproduct_offsets_packaging_demand_before_sinking(): void
+    {
+        // V135: leftover Empty Canister byproduct feeds the Packager before the
+        // sink — 100 leftover − 60 demand → 40 sunk, no production row.
+        $result = RecyclingCalc::calc(['Water' => 60, 'Empty Canister' => 100], [], true);
+
+        $this->assertEqualsWithDelta(40.0, $result['recycled']['Empty Canister']['qty'], 0.001);
+        $this->assertEmpty($result['containers']);
+
+        // points reflect only the 40 actually sunk
+        $canisterPoints = 40 * (int) i('Empty Canister')->sink_points;
+        $packagedPoints = $result['packaged'][0]['points'];
+        $this->assertEqualsWithDelta($canisterPoints + $packagedPoints, $result['points'], 0.001);
+    }
+
+    #[Test]
+    public function container_shortfall_after_offset_is_produced(): void
+    {
+        // V135: 20 leftover − 60 demand → all 20 feed packaging (none sunk),
+        // remaining 40 come from a production row.
+        $result = RecyclingCalc::calc(['Water' => 60, 'Empty Canister' => 20], [], true);
+
+        $this->assertArrayNotHasKey('Empty Canister', $result['recycled']);
+        $this->assertCount(1, $result['containers']);
+        $this->assertEqualsWithDelta(40.0, $result['containers'][0]['qty'], 0.001);
+    }
 }

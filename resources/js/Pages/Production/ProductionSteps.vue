@@ -135,6 +135,17 @@
                         :recipes="{}"
                         :synthetic="true"
                     />
+                    <!-- V135: container production step — output feeds its Packager step -->
+                    <ProductionStep
+                        v-else-if="step.type === 'produce'"
+                        v-show="recycleStepMatchesFilter(step)"
+                        v-bind="producePayload(step)"
+                        data-test="recycle-step"
+                        :identifier-override="recycleIdentifier(i)"
+                        :level-step-map="recycleStepMap"
+                        :recipes="{}"
+                        :synthetic="true"
+                    />
                     <!-- V91: terminal AWESOME Sink step -->
                     <RecycleStep
                         v-else
@@ -305,6 +316,38 @@ export default {
                 allMaterials: {},
             };
         },
+
+        // V135: adapt a backend `produce` (container production) descriptor —
+        // output destinations = the packaging steps consuming this container,
+        // resolved through recycleStepMap
+        producePayload(step) {
+            const consumers = this.recycleSteps.filter(
+                (s) => s.type === 'package' && (s.inputs || []).some((i) => i.item === step.name)
+            );
+
+            return {
+                name: step.name,
+                production: {
+                    recipe: { product: { name: step.name }, description: step.recipe ?? null },
+                    qty: step.output.qty,
+                    ingredients: Object.fromEntries((step.inputs || []).map((i) => [i.item, i.qty])),
+                    byproducts: {},
+                    imported: false,
+                    overridden: false,
+                },
+                material: {
+                    raw: false,
+                    outputs: Object.fromEntries(
+                        consumers.map((s) => [s.name, s.inputs.find((i) => i.item === step.name).qty])
+                    ),
+                },
+                overviews: this.overviews,
+                choices: {},
+                newImports: {},
+                byproductsUsed: {},
+                allMaterials: {},
+            };
+        },
     },
 
     computed: {
@@ -358,12 +401,14 @@ export default {
             return this.production.recycling_steps || [];
         },
 
-        // material name → producing-step identifier, incl. packaging steps (so the sink's
-        // packaged inputs link to their Packager step), layered over levelStepMap
+        // material name → producing-step identifier, incl. packaging + container
+        // produce steps (V135) (so the sink's packaged inputs link to their Packager
+        // step, and a Packager's container input links to its produce step), layered
+        // over levelStepMap
         recycleStepMap() {
             const map = { ...this.levelStepMap };
             this.recycleSteps.forEach((step, i) => {
-                if (step.type === 'package') {
+                if (step.type === 'package' || step.type === 'produce') {
                     map[step.name] = this.recycleIdentifier(i);
                 }
             });
@@ -381,9 +426,11 @@ export default {
             return sink ? sink.name : 'AWESOME Sink';
         },
 
-        // V90: levelStepMap + the sink, so a packaging ProductionStep's output destination links to it
+        // V90: recycleStepMap + the sink, so a packaging ProductionStep's output
+        // destination links to the sink and its container input links to its
+        // produce step (V135)
         packageDestinationMap() {
-            return { ...this.levelStepMap, [this.sinkName]: this.sinkIdentifier };
+            return { ...this.recycleStepMap, [this.sinkName]: this.sinkIdentifier };
         },
 
         resultsArray() {

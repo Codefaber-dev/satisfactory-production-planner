@@ -166,7 +166,7 @@ class ProductionCalculator
         // older code (pre-V70 rememberForever'd the live calculator object
         // under the unversioned prefix) can never be read back here. Bump the
         // version whenever the cached shape changes.
-        $cacheKey = 'production_calc_v2_'
+        $cacheKey = 'production_calc_v3_'
             .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'imports', 'variant', 'choices', 'byproducts'))->put('favorites', $favoritesKey)->toJson())
             .static::requestCacheSegment();
 

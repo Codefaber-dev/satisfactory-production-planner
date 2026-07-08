@@ -215,6 +215,62 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
         const wrapper = mountSteps({ production: { ...makeProduction(), recycling_steps: [] } });
         expect(wrapper.findAll('[data-test="recycle-step"]')).toHaveLength(0);
     });
+
+    it('renders a container produce step as a ProductionStep feeding the Packager (V135)', () => {
+        const wrapper = mountSteps({
+            production: {
+                ...makeProduction(),
+                recycling_steps: [
+                    {
+                        type: 'produce',
+                        name: 'Empty Canister',
+                        building: 'Constructor',
+                        num_buildings: 1,
+                        power: 4,
+                        footprint: {},
+                        recipe: null,
+                        inputs: [{ item: 'Plastic', qty: 30 }],
+                        output: { item: 'Empty Canister', qty: 60 },
+                    },
+                    {
+                        type: 'package',
+                        name: 'Packaged Water',
+                        building: 'Packager',
+                        num_buildings: 1,
+                        power: 10,
+                        footprint: {},
+                        inputs: [
+                            { item: 'Water', qty: 60 },
+                            { item: 'Empty Canister', qty: 60 },
+                        ],
+                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
+                    },
+                    {
+                        type: 'sink',
+                        name: 'AWESOME Sink',
+                        building: 'AWESOME Sink',
+                        num_buildings: 1,
+                        power: 30,
+                        footprint: {},
+                        inputs: [{ item: 'Packaged Water', qty: 60 }],
+                        output: { points: 7800 },
+                    },
+                ],
+            },
+        });
+
+        // the produce step is a real ProductionStep, not a RecycleStep
+        expect(wrapper.find('.stub-step[data-name="Empty Canister"]').exists()).toBe(true);
+
+        // it is reachable in the map so the Packager's canister input links to it
+        expect(wrapper.vm.recycleStepMap['Empty Canister']).toBe('R.A');
+        expect(wrapper.vm.packageDestinationMap['Empty Canister']).toBe('R.A');
+
+        // its output destination is the consuming package step, never the sink
+        const payload = wrapper.vm.producePayload(wrapper.vm.recycleSteps[0]);
+        expect(payload.production.ingredients).toEqual({ Plastic: 30 });
+        expect(payload.material.outputs).toEqual({ 'Packaged Water': 60 });
+    });
 });
 
 describe('ProductionSteps — header controls (T157 / V112)', () => {

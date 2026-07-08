@@ -18,18 +18,22 @@ use Illuminate\Support\Facades\Cache;
  *  - fluid/gas leftover → recycled only when the auto-package toggle is on AND a
  *    Package recipe with a sinkable packaged form exists (V67): packaged → sunk,
  *    surfacing the Packager building/power + empty-container input
+ *  - container demand from packaging (V135): leftover container byproduct feeds
+ *    the Packager before the sink; any shortfall is produced via the container's
+ *    base recipe → a `containers` production row
  *  - everything else → waste
  *
  * Total points/min = Σ recycled flows × sink_points.
  *
  * @phpstan-type PackagedRow array{fluid: string, product: string, qty: float, buildings: float, power: float, container: ?string, container_qty: float, points: float}
+ * @phpstan-type ContainerRow array{product: string, qty: float, buildings: float, power: float, building: ?string, build_cost: array<string, int>, inputs: list<array{item: string, qty: float}>}
  */
 class RecyclingCalc
 {
     /**
      * @param  Collection|array<string, float>  $byproducts  produced byproduct qty/min
      * @param  Collection|array<string, float>  $byproductsUsed  byproduct qty/min consumed elsewhere
-     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, waste: array<string, float>}
+     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, containers: list<array<string, mixed>>, waste: array<string, float>}
      */
     public static function calc($byproducts, $byproductsUsed = [], bool $autoPackage = false): array
     {
@@ -63,11 +67,10 @@ class RecyclingCalc
                 continue;
             }
 
-            // sinkable solid → recycle directly (V66)
+            // sinkable solid → recycle directly (V66); points totalled after the
+            // container offset (V135)
             if ($ingredient->isSinkable()) {
-                $flowPoints = $leftover * (int) $ingredient->sink_points;
-                $recycled[$name] = ['qty' => $leftover, 'points' => $flowPoints];
-                $points += $flowPoints;
+                $recycled[$name] = ['qty' => $leftover, 'points' => $leftover * (int) $ingredient->sink_points];
 
                 continue;
             }
@@ -78,7 +81,6 @@ class RecyclingCalc
 
                 if ($row) {
                     $packaged[] = $row;
-                    $points += $row['points'];
 
                     continue;
                 }
@@ -87,7 +89,91 @@ class RecyclingCalc
             $waste[$name] = $leftover;
         }
 
-        return compact('points', 'recycled', 'packaged', 'waste');
+        // V135/B68: packaging consumes empty containers the plan may not supply —
+        // net the demand against leftover container byproduct, produce the rest.
+        [$recycled, $containers] = static::resolveContainers($recycled, $packaged);
+
+        // recompute: the container offset removes sunk container flows
+        $points = (float) (collect($recycled)->sum('points') + collect($packaged)->sum('points'));
+
+        return compact('points', 'recycled', 'packaged', 'containers', 'waste');
+    }
+
+    /**
+     * Supply the packaging steps' empty-container demand (V135): leftover container
+     * byproduct (already in $recycled) feeds the Packager before the sink; any
+     * shortfall becomes a production row via the container's base recipe.
+     *
+     * @param  array<string, array{qty: float, points: float}>  $recycled
+     * @param  list<array<string, mixed>>  $packaged
+     * @return array{0: array<string, array{qty: float, points: float}>, 1: list<array<string, mixed>>}
+     */
+    protected static function resolveContainers(array $recycled, array $packaged): array
+    {
+        $demand = collect($packaged)
+            ->filter(fn ($row) => ! empty($row['container']) && (float) ($row['container_qty'] ?? 0) > 0)
+            ->groupBy('container')
+            ->map(fn ($rows) => $rows->sum('container_qty'));
+
+        $containers = [];
+
+        foreach ($demand as $name => $qty) {
+            if (isset($recycled[$name])) {
+                $available = (float) $recycled[$name]['qty'];
+                $used = min($available, $qty);
+                $remaining = $available - $used;
+                $qty -= $used;
+
+                $recycled = $remaining > 1e-9
+                    ? array_replace($recycled, [$name => [
+                        'qty' => $remaining,
+                        'points' => $remaining * (int) optional(Ingredient::ofName($name))->sink_points,
+                    ]])
+                    : collect($recycled)->except($name)->all();
+            }
+
+            if ($qty > 1e-9 && ($row = static::produceContainer($name, $qty))) {
+                $containers[] = $row;
+            }
+        }
+
+        return [$recycled, $containers];
+    }
+
+    /**
+     * A production row for a container shortfall (V135): the container's base
+     * recipe (Empty Canister ← Plastic, Empty Fluid Tank ← Aluminum Ingot) sized
+     * to the demand — same shape family as the packaged rows so it folds into
+     * the build summary / parts / power (V87). Null when no recipe exists.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected static function produceContainer(string $name, float $qty): ?array
+    {
+        $recipe = optional(Ingredient::ofName($name))->baseRecipe();
+
+        if (! $recipe || (float) $recipe->base_per_min <= 0) {
+            return null;
+        }
+
+        $buildings = $qty / (float) $recipe->base_per_min;
+        $basePower = (float) (optional(optional($recipe->building)->variant('mk1'))->base_power ?? 0);
+
+        return [
+            'product' => $name,
+            'qty' => $qty,
+            'buildings' => $buildings,
+            'power' => $buildings * $basePower,
+            'building' => optional($recipe->building)->name,
+            'build_cost' => static::packagerBuildCost($recipe, $buildings),
+            'inputs' => $recipe->ingredients
+                ->map(fn ($ingredient) => [
+                    'item' => $ingredient->name,
+                    'qty' => $buildings * (float) $ingredient->pivot->base_qty,
+                ])
+                ->values()
+                ->all(),
+        ];
     }
 
     /**

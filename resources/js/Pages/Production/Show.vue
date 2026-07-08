@@ -439,7 +439,11 @@ export default {
 
             // V76: extract-mode raws contribute their extractors (summary/parts/power)
             // V87: auto-package Packager steps fold into the build (summary/parts/power)
-            const recycleDetails = (this.production.recycling?.packaged || []).map((p) => ({
+            // V135: container production rows (Empty Canister/Fluid Tank) fold in too
+            const recycleDetails = [
+                ...(this.production.recycling?.packaged || []),
+                ...(this.production.recycling?.containers || []),
+            ].map((p) => ({
                 product: p.product,
                 variant_name: p.building || 'Packager',
                 num_buildings: p.buildings,

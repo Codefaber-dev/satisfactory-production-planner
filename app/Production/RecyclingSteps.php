@@ -11,6 +11,9 @@ use App\Models\Ingredient;
  * descriptors so the frontend can render them like every other build step —
  * with inputs, an output, and a build diagram.
  *
+ *  - one **produce** step per container shortfall (V135): the container's base
+ *    recipe (Constructor) sized to the packaging demand; output feeds the
+ *    Packager, never the sink.
  *  - one **packaging** step per auto-package fluid: a real Packager step whose
  *    footprint/power come from BuildingDetails::calc on the Package recipe; input
  *    = the leftover fluid, output = the Packaged form (→ the sink).
@@ -31,6 +34,7 @@ class RecyclingSteps
 
         $recycled = $recycling['recycled'] ?? [];
         $packaged = $recycling['packaged'] ?? [];
+        $containers = $recycling['containers'] ?? [];
 
         if (empty($recycled) && empty($packaged)) {
             return [];
@@ -42,6 +46,11 @@ class RecyclingSteps
         // direct sinkable byproducts feed the sink
         foreach ($recycled as $name => $info) {
             $sinkInputs[] = ['item' => $name, 'qty' => round((float) ($info['qty'] ?? 0), 4)];
+        }
+
+        // V135: container shortfall → a production step feeding the Packager (not the sink)
+        foreach ($containers as $row) {
+            $steps[] = static::produceStep($row, $beltSpeed);
         }
 
         // each auto-package fluid → a real Packager step; its output feeds the sink
@@ -60,9 +69,10 @@ class RecyclingSteps
      * step's Package recipe, keyed `product|recipe.description ?? product` — the same
      * shape + key convention as ParsesSteps::getOverviews — so the frontend renders the
      * package ProductionStep with real overclock/somersloop controls. Merged into the
-     * plan `overviews` map by the controller.
+     * plan `overviews` map by the controller. Container produce steps (V135) get the
+     * same treatment — their rows share the product/qty shape.
      *
-     * @param  array{packaged?: list<array<string, mixed>>}|null  $recycling
+     * @param  array{packaged?: list<array<string, mixed>>, containers?: list<array<string, mixed>>}|null  $recycling
      * @return array<string, array<string, mixed>>
      */
     public static function overviews(?array $recycling, float $beltSpeed = 780): array
@@ -80,7 +90,7 @@ class RecyclingSteps
 
         $overviews = [];
 
-        foreach ($recycling['packaged'] ?? [] as $row) {
+        foreach (array_merge($recycling['packaged'] ?? [], $recycling['containers'] ?? []) as $row) {
             $product = $row['product'];
             $qty = (float) ($row['qty'] ?? 0);
             $recipe = optional(Ingredient::ofName($product))->baseRecipe();
@@ -141,27 +151,10 @@ class RecyclingSteps
         $qty = (float) ($row['qty'] ?? 0);
         $recipe = optional(Ingredient::ofName($product))->baseRecipe(); // the Package recipe
 
-        $footprint = null;
-        $numBuildings = (float) ($row['buildings'] ?? 0);
-        $power = (float) ($row['power'] ?? 0);
-
-        if ($recipe) {
-            $params = static::planParams();
-            $key = $product.'|'.($recipe->description ?? $product);
-            $somersloopSlots = (int) (request('somersloops', [])[$key] ?? 0);
-
-            $detail = BuildingDetails::calc(
-                $recipe, $qty, $beltSpeed, 100, $somersloopSlots,
-                $params['cost_multiplier'], $params['power_multiplier'],
-                $params['building_multiples'], $params['building_cost_multiplier']
-            )->first(); // mk1 variant row
-
-            if ($detail) {
-                $footprint = $detail['footprint'];
-                $numBuildings = $detail['num_buildings'];
-                $power = $detail['power_usage'];
-            }
-        }
+        [$footprint, $numBuildings, $power] = static::stepDetail(
+            $recipe, $product, $qty, $beltSpeed,
+            (float) ($row['buildings'] ?? 0), (float) ($row['power'] ?? 0)
+        );
 
         // V94: real recipe input rates — the fluid at its leftover rate AND the empty
         // container — never the packaged output qty reused for the input (B53).
@@ -185,6 +178,75 @@ class RecyclingSteps
             'inputs' => $inputs,
             'output' => ['item' => $product, 'qty' => round($qty, 4), 'to_sink' => true],
         ];
+    }
+
+    /**
+     * A production step for a container shortfall (V135): the container's base
+     * recipe (e.g. Empty Canister ← Plastic, Constructor) sized to the packaging
+     * demand. Output feeds the Packager — never `to_sink`.
+     *
+     * @param  array<string, mixed>  $row  a RecyclingCalc containers row
+     * @return array<string, mixed>
+     */
+    protected static function produceStep(array $row, float $beltSpeed): array
+    {
+        $product = $row['product'];
+        $qty = (float) ($row['qty'] ?? 0);
+        $recipe = optional(Ingredient::ofName($product))->baseRecipe();
+
+        [$footprint, $numBuildings, $power] = static::stepDetail(
+            $recipe, $product, $qty, $beltSpeed,
+            (float) ($row['buildings'] ?? 0), (float) ($row['power'] ?? 0)
+        );
+
+        $inputs = collect($row['inputs'] ?? [])
+            ->map(fn ($input) => ['item' => $input['item'], 'qty' => round((float) $input['qty'], 4)])
+            ->values()
+            ->all();
+
+        return [
+            'type' => 'produce',
+            'name' => $product,
+            'building' => $row['building'] ?? optional(optional($recipe)->building)->name,
+            'recipe' => optional($recipe)->description,
+            'num_buildings' => $numBuildings,
+            'power' => round($power, 4),
+            'footprint' => $footprint,
+            'inputs' => $inputs,
+            'output' => ['item' => $product, 'qty' => round($qty, 4)],
+        ];
+    }
+
+    /**
+     * Footprint / building count / power for a recipe-backed recycling step via
+     * BuildingDetails::calc (mk1 variant), threading the plan multipliers +
+     * somersloops (V107). Falls back to the row's own numbers without a recipe.
+     *
+     * @return array{0: ?array<string, mixed>, 1: float, 2: float}
+     */
+    protected static function stepDetail(
+        ?object $recipe, string $product, float $qty, float $beltSpeed,
+        float $fallbackBuildings, float $fallbackPower
+    ): array {
+        if (! $recipe) {
+            return [null, $fallbackBuildings, $fallbackPower];
+        }
+
+        $params = static::planParams();
+        $key = $product.'|'.($recipe->description ?? $product);
+        $somersloopSlots = (int) (request('somersloops', [])[$key] ?? 0);
+
+        $detail = BuildingDetails::calc(
+            $recipe, $qty, $beltSpeed, 100, $somersloopSlots,
+            $params['cost_multiplier'], $params['power_multiplier'],
+            $params['building_multiples'], $params['building_cost_multiplier']
+        )->first(); // mk1 variant row
+
+        if (! $detail) {
+            return [null, $fallbackBuildings, $fallbackPower];
+        }
+
+        return [$detail['footprint'], $detail['num_buildings'], $detail['power_usage']];
     }
 
     /**
