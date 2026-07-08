@@ -201,24 +201,41 @@ describe('DiagramModal — composition + theming (V115)', () => {
         expect(panel.props('footprint')).toEqual(baseFootprint());
     });
 
-    it('renders in place (no body teleport) with blueprint panel styling (V120)', () => {
+    it('renders in place (no body teleport) as a blueprint engineering-drawing sheet (V128)', () => {
         const wrapper = mountModal();
 
         // in-place render: the overlay is inside the component tree, not document.body
         expect(wrapper.find('[data-diagram-modal]').exists()).toBe(true);
 
-        const panel = wrapper.find('[data-blueprint-panel]');
-        expect(panel.exists()).toBe(true);
-        expect(panel.classes()).toContain('bg-blue-950');
-        expect(panel.classes()).toContain('text-blue-100');
+        const sheet = wrapper.find('[data-drawing-sheet]');
+        expect(sheet.exists()).toBe(true);
+        expect(sheet.classes()).toContain('bg-blue-950');
+        expect(sheet.classes()).toContain('text-blue-100');
     });
 
-    it('renders its diagram in blueprint mode; the inline diagram stays default (V120)', async () => {
+    it('renders its diagram in blueprint mode; the inline diagram stays default (V120/V128)', async () => {
         const modal = mountModal();
         expect(modal.findComponent(DiagramSvg).props('blueprint')).toBe(true);
 
         const inline = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
         expect(inline.findComponent(DiagramSvg).props('blueprint')).toBe(false);
+    });
+
+    it('renders the footprint stats as title-block compartments with a live scale cell (V128)', async () => {
+        const wrapper = mountModal();
+
+        expect(wrapper.find('[data-title-block]').exists()).toBe(true);
+        expect(wrapper.findAll('[data-title-block-cell]').length).toBeGreaterThan(5);
+
+        const scale = wrapper.find('[data-scale-cell]');
+        expect(scale.exists()).toBe(true);
+        expect(scale.text()).toMatch(/1 m = [\d.]+ px/);
+
+        // zooming in shrinks the view window ⇒ more pixels per meter
+        const before = Number(scale.text().match(/= ([\d.]+) px/)[1]);
+        await wrapper.find('[data-zoom-in]').trigger('click');
+        const after = Number(wrapper.find('[data-scale-cell]').text().match(/= ([\d.]+) px/)[1]);
+        expect(after).toBeGreaterThan(before);
     });
 
     it('lets the svg fill the stage; the inline svg keeps its height cap (V121)', () => {

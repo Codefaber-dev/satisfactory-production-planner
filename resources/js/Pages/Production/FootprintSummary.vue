@@ -3,6 +3,12 @@ export default {
     name: 'footprint-summary',
     props: {
         footprint: {},
+        // engineering-drawing title-block variant for the diagram modal (V128);
+        // default rendering unchanged for the inline diagram (V119)
+        titleBlock: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         // label/value pairs for the spec-sheet table — values pre-composed so
@@ -31,9 +37,22 @@ export default {
 </script>
 
 <template>
+    <!-- title-block variant: each stat is a bordered compartment with a tiny
+         uppercase label over the value, like an engineering drawing (V128) -->
+    <div v-if="titleBlock" class="flex flex-wrap" data-title-block>
+        <div
+            v-for="[label, value, over] in rows"
+            :key="label"
+            class="border-b border-r border-blue-200/40 px-2 py-1"
+            data-title-block-cell
+        >
+            <div class="text-[9px] uppercase tracking-widest text-blue-300">{{ label }}</div>
+            <div :class="{ 'font-bold text-red-400': over }">{{ value }}</div>
+        </div>
+    </div>
     <!-- two-column spec sheet: fixed label column, values start on a shared
          left edge, one line per row (never wraps) -->
-    <div class="w-full text-left lg:w-64">
+    <div v-else class="w-full text-left lg:w-64">
         <ul>
             <li
                 v-for="[label, value, over] in rows"

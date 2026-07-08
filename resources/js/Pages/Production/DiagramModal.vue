@@ -7,56 +7,88 @@
         class="fixed inset-0 z-50 flex items-center justify-center overscroll-contain bg-black bg-opacity-70 p-4"
         @click.self="$emit('close')"
     >
-        <!-- engineering-blueprint styling, independent of app theme (V120) -->
+        <!-- engineering-drawing sheet in blueprint colors: title-block layout,
+             deep-blue surface, light-blue hairlines, mono — independent of app
+             theme (V128 layout, V120 palette) -->
         <div
-            class="flex h-full w-full max-w-6xl flex-col rounded border-2 border-blue-200/60 bg-blue-950 p-4 text-blue-100 shadow-xl"
-            data-blueprint-panel
+            class="flex h-full w-full max-w-6xl flex-col border-2 border-blue-200/60 bg-blue-950 font-mono text-blue-100 shadow-xl"
+            data-drawing-sheet
         >
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-200/40 pb-2">
-                <h2 class="font-mono text-xl font-bold uppercase tracking-widest text-blue-50">{{ heading }}</h2>
-                <div class="flex items-center gap-2">
-                    <button type="button" aria-label="Zoom in" class="btn btn-emerald" data-zoom-in @click="zoomBy(ZOOM_STEP)">
-                        <MagnifyingGlassPlusIcon class="h-5 w-5" />
+            <!-- header strip: TITLE compartment + outline controls -->
+            <div class="flex flex-wrap items-stretch justify-between border-b-2 border-blue-200/60">
+                <div class="px-4 py-1.5">
+                    <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Title</div>
+                    <h2 class="text-lg font-bold uppercase tracking-widest text-blue-50">{{ heading }}</h2>
+                </div>
+                <div class="flex items-center gap-2 border-l border-blue-200/60 px-3 py-1.5">
+                    <button
+                        type="button"
+                        aria-label="Zoom in"
+                        class="border border-blue-200/60 p-1.5 hover:bg-blue-800"
+                        data-zoom-in
+                        @click="zoomBy(ZOOM_STEP)"
+                    >
+                        <MagnifyingGlassPlusIcon class="h-4 w-4" />
                     </button>
                     <button
                         type="button"
                         aria-label="Zoom out"
-                        class="btn btn-emerald"
+                        class="border border-blue-200/60 p-1.5 hover:bg-blue-800"
                         data-zoom-out
                         @click="zoomBy(1 / ZOOM_STEP)"
                     >
-                        <MagnifyingGlassMinusIcon class="h-5 w-5" />
+                        <MagnifyingGlassMinusIcon class="h-4 w-4" />
                     </button>
-                    <button type="button" class="btn btn-emerald" data-reset-view @click="resetView">Reset View</button>
+                    <button
+                        type="button"
+                        class="border border-blue-200/60 px-2 py-1 text-xs uppercase tracking-wider hover:bg-blue-800"
+                        data-reset-view
+                        @click="resetView"
+                    >
+                        Reset View
+                    </button>
                     <button
                         type="button"
                         aria-label="Close diagram"
-                        class="rounded p-1 hover:bg-blue-800"
+                        class="border border-blue-200/60 p-1.5 hover:bg-blue-800"
                         @click="$emit('close')"
                     >
-                        <XMarkIcon class="h-6 w-6" />
+                        <XMarkIcon class="h-4 w-4" />
                     </button>
                 </div>
             </div>
-            <div class="flex min-h-0 flex-1 flex-col gap-4 pt-2 font-mono text-sm lg:flex-row">
-                <!-- spec-sheet side panel: everything left-aligned on a single
-                     line — the modal renders in place, so text-center from the
-                     step markup would otherwise leak in (V115/V126) -->
-                <div class="shrink-0 overflow-y-auto overflow-x-auto whitespace-nowrap text-left lg:max-w-md">
-                    <footprint-summary :footprint="footprint" />
+            <!-- stage: blueprint palette (V120/V125) -->
+            <div
+                ref="stage"
+                class="min-h-0 flex-1 cursor-grab touch-none select-none overflow-hidden"
+                @wheel.prevent="onWheel"
+                @pointerdown="onPointerDown"
+                @pointermove="onPointerMove"
+                @pointerup="onPointerUp"
+                @pointercancel="onPointerUp"
+            >
+                <diagram-svg :footprint="footprint" :materials="materials" :view="view" blueprint class="h-full" />
+            </div>
+            <!-- title block: bordered compartments, left-aligned, single-line (T174/V128) -->
+            <div
+                class="max-h-80 shrink-0 overflow-y-auto whitespace-nowrap border-t-2 border-blue-200/60 text-left text-sm"
+            >
+                <div class="flex flex-col lg:flex-row">
+                    <div class="lg:border-r lg:border-blue-200/40">
+                        <footprint-summary :footprint="footprint" title-block />
+                        <div class="flex">
+                            <div class="border-b border-r border-blue-200/40 px-2 py-1" data-scale-cell>
+                                <div class="text-[9px] uppercase tracking-widest text-blue-300">Scale</div>
+                                <div>1 m = {{ scalePx }} px</div>
+                            </div>
+                            <div class="border-b border-r border-blue-200/40 px-2 py-1">
+                                <div class="text-[9px] uppercase tracking-widest text-blue-300">Units</div>
+                                <div>Dimensions in meters</div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- full step details: outputs/inputs/machines/build cost (V126) -->
-                    <diagram-step-details v-if="details" :details="details" />
-                </div>
-                <div
-                    ref="stage"
-                    class="min-h-0 flex-1 cursor-grab touch-none select-none overflow-hidden"
-                    @wheel.prevent="onWheel"
-                    @pointerdown="onPointerDown"
-                    @pointermove="onPointerMove"
-                    @pointerup="onPointerUp"
-                    @pointercancel="onPointerUp"
-                >
-                    <diagram-svg :footprint="footprint" :materials="materials" :view="view" blueprint class="h-full" />
+                    <diagram-step-details v-if="details" :details="details" class="flex-1" />
                 </div>
             </div>
         </div>
@@ -125,6 +157,18 @@ export default {
         },
         heading() {
             return this.title || `${this.footprint.monogram} Build Diagram`;
+        },
+        // live scale readout for the title block (V128): screen pixels per meter
+        // at the current zoom — recomputes with every view change; jsdom (zero
+        // stage box) falls back to the full extent, i.e. 1:1 at fit view
+        scalePx() {
+            if (!this.view) {
+                return 1;
+            }
+
+            const pixels = this.$refs.stage?.clientWidth || this.fullExtent.w;
+
+            return +(pixels / this.view.w).toFixed(1);
         },
         // content extent (slab + manifold bands + labels, V124) — the fit/reset
         // view and zoom clamps all derive from this, matching DiagramSvg's render

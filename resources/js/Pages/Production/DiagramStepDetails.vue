@@ -1,17 +1,22 @@
 <template>
-    <!-- full plan-step details for the diagram modal side panel: blueprint-styled
-         (mono/uppercase headers, light-blue line work) to match the modal (V126/V120).
-         Displays the overview numbers as-is — multipliers are already baked in. -->
-    <div class="space-y-3 border-t border-blue-200/40 pt-3 text-left text-blue-100" data-step-details>
-        <section v-if="details.output" data-details-output>
-            <h3 class="mb-1 font-bold uppercase tracking-widest text-blue-50">Output</h3>
+    <!-- full plan-step details for the diagram modal title block: bordered
+         compartments with tiny uppercase labels, engineering-drawing style in blueprint colors
+         (V126/V128). Displays the overview numbers as-is — multipliers are
+         already baked in. -->
+    <div class="flex flex-wrap content-start items-stretch text-left" data-step-details>
+        <section v-if="details.output" class="grow border-b border-r border-blue-200/40 px-2 py-1" data-details-output>
+            <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Output</h3>
             <ul>
                 <li>{{ qty(details.output.qty) }} {{ details.output.unit || 'per min' }} — {{ details.output.name }}</li>
             </ul>
         </section>
 
-        <section v-if="entries(details.byproducts).length" data-details-byproducts>
-            <h3 class="mb-1 font-bold uppercase tracking-widest text-blue-50">Byproducts</h3>
+        <section
+            v-if="entries(details.byproducts).length"
+            class="grow border-b border-r border-blue-200/40 px-2 py-1"
+            data-details-byproducts
+        >
+            <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Byproducts</h3>
             <ul>
                 <li v-for="[name, amount] in entries(details.byproducts)" :key="name">
                     {{ qty(amount) }} per min — {{ name }}
@@ -19,8 +24,12 @@
             </ul>
         </section>
 
-        <section v-if="entries(details.inputs).length" data-details-inputs>
-            <h3 class="mb-1 font-bold uppercase tracking-widest text-blue-50">Inputs</h3>
+        <section
+            v-if="entries(details.inputs).length"
+            class="grow border-b border-r border-blue-200/40 px-2 py-1"
+            data-details-inputs
+        >
+            <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Inputs</h3>
             <ul>
                 <li v-for="[name, amount] in entries(details.inputs)" :key="name">
                     {{ qty(amount) }} per min — {{ name }}
@@ -28,8 +37,12 @@
             </ul>
         </section>
 
-        <section v-if="details.num_buildings" data-details-building>
-            <h3 class="mb-1 font-bold uppercase tracking-widest text-blue-50">Machines</h3>
+        <section
+            v-if="details.num_buildings"
+            class="grow border-b border-r border-blue-200/40 px-2 py-1"
+            data-details-building
+        >
+            <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Machines</h3>
             <ul>
                 <li>
                     {{ details.num_buildings }}× {{ details.building
@@ -46,8 +59,12 @@
             </ul>
         </section>
 
-        <section v-if="entries(details.build_cost).length" data-details-build-cost>
-            <h3 class="mb-1 font-bold uppercase tracking-widest text-blue-50">Build Cost</h3>
+        <section
+            v-if="entries(details.build_cost).length"
+            class="grow border-b border-r border-blue-200/40 px-2 py-1"
+            data-details-build-cost
+        >
+            <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Build Cost</h3>
             <ul>
                 <li v-for="[name, amount] in entries(details.build_cost)" :key="name">
                     {{ Math.ceil(amount) }}× {{ name }}
