@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### ⛏️ Extraction & Recycling
+### 📐 Interactive Build Diagrams
 
-- Raw resources now build out as real extractors — miners, pumps, and wells with full power and build cost — and an AWESOME Sink recycles unused byproducts into points/min. Source any raw by extract, convert, or unpackage, package-and-sink leftover fluids, and annotate imports with notes.
+- Every buildable step now opens a full-screen, pan-and-zoom build diagram styled like an engineering drawing — foundation grid, dimension markers, belt manifolds and color-coded pipe runs, and a title block with the step's complete stats. Jump between step diagrams, follow inputs to their producing steps, and change max clock without leaving the modal.
 
-## v1.3.0 - Extraction & Recycling Update
+## v1.3.1 - Build Diagrams Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -31,6 +31,22 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.3.1
+
+- 📐 **Interactive Build Diagrams** — Every buildable step (and the AWESOME Sink) has a **View Diagram** button that opens a full-screen, pan-and-zoom build diagram styled like an engineering drawing: foundation grid, dimension markers, belt manifolds with per-material splitter/merger runs, and a title block with the step's complete stats — footprint, belt rates, machines, power, energy, build cost, and a live drawing scale.
+- 🧭 **Diagram Navigation** — Move between step diagrams without leaving the modal: a collapsible **Steps** panel lists every diagram, and each input, byproduct, and output name links to the step that produces it. The header shows the step number, product, and recipe.
+- ⏱️ **Max Clock from the Diagram** — Change a step's max clock (100/150/200/250%) right in the modal; machines, footprint, and power update in place. Somersloop and power-shard usage appear only when actually in use.
+- 🚰 **Pipes on Diagrams** — Liquids and gases draw as their own color-coded pipe runs with T-junctions, staggered alongside the belt manifolds. Pipe throughput planning is left to you.
+- 🧊 **Blueprint I/O** — Blueprint-grouped diagrams show color-coded input/output ports on each stamp with directional feed lines — inputs enter near the top-left, outputs exit near the bottom-left; splitters and mergers are assumed inside the blueprint.
+- 🗂️ **Collapsible Summary** — The summary pane can now collapse to give Production Steps the full width. Your preference sticks across visits.
+- 🔎 **Step Filter** — A type-ahead ingredient filter in the Production Steps header shows only the steps that consume or produce the picked item. Force Even Rows and Limit Belt Rates moved into Plan Settings.
+- ⚡ **Faster Cold Loads** — Fixed a worst-case page load that ran thousands of database queries right after a server cache flush; it now runs a handful.
+- 🧹 **Cleaner Steps List** — Inline diagrams and the Toggle Diagrams button are gone; diagrams live entirely in the modal, one click away on every applicable row.
+- 🪲 Bug fix: diagram dimension labels no longer oversize and overlap the splitter/merger rows, and the top/bottom offset measurements are no longer swapped.
+- 🪲 Bug fix: manifold colors are now readable on the blueprint-blue modal, and manifold geometry always fits the canvas — long material names and deep stagger bands no longer clip.
+
+---
 
 ### v1.3.0
 
