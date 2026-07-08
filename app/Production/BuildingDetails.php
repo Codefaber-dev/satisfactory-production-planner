@@ -302,8 +302,10 @@ class BuildingDetails extends Collection
                 'foundations' => $foundations = $length_foundations * $width_foundations,
                 'walls' => $height_walls * (2 * ($length_foundations + $width_foundations)),
                 'row_spacing' => ($rows === 1) ? 0 : 8 * ($building_length_foundations + 2) - $building_length,
-                'top_offset' => $top_offset = ceil((8 * ($building_length_foundations + 2) - $building_length) / 2 + ($foundation_border_y ? 8 : 0)),
-                'bottom_offset' => $top_offset = floor((8 * ($building_length_foundations + 2) - $building_length) / 2 + ($foundation_border_y ? 8 : 0)),
+                // V129/B67: the grid puts the odd half-meter below the row —
+                // top gap takes the floor, bottom the ceil (were swapped)
+                'top_offset' => $top_offset = floor((8 * ($building_length_foundations + 2) - $building_length) / 2 + ($foundation_border_y ? 8 : 0)),
+                'bottom_offset' => ceil((8 * ($building_length_foundations + 2) - $building_length) / 2 + ($foundation_border_y ? 8 : 0)),
                 'row_spacing_offset' => $top_offset + $building_length,
                 'left_offset' => 16 + (8 * ($width_foundations - 4) - $building_width * $buildings_per_row) / 2,
                 'building_top_offset' => $building_length % 2 ? 0.5 : 0,

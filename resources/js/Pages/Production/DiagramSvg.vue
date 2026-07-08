@@ -133,14 +133,25 @@
 
         <!-- dimension markers -->
         <g v-if="footprint.top_offset > 0" data-marker="top-offset">
-            <line :x1="markerX" y1="0" :x2="markerX" :y2="footprint.top_offset" :stroke="COLORS.marker" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <line
+                :x1="markerX"
+                y1="0"
+                :x2="markerX"
+                :y2="footprint.top_offset + footprint.building_top_offset"
+                :stroke="COLORS.marker"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"
+            />
             <text
-                :x="markerX"
-                :y="footprint.top_offset / 2"
-                text-anchor="middle"
+                :x="markerX + 1"
+                y="2"
+                text-anchor="start"
                 dominant-baseline="central"
                 :font-size="markerFontSize"
                 :fill="COLORS.label"
+                :stroke="COLORS.slab"
+                stroke-width="0.5"
+                paint-order="stroke"
             >
                 {{ footprint.top_offset }} m
             </text>
@@ -148,7 +159,7 @@
         <g v-if="footprint.bottom_offset > 0" data-marker="bottom-offset">
             <line
                 :x1="markerX"
-                :y1="canvasHeight - footprint.bottom_offset"
+                :y1="canvasHeight - footprint.bottom_offset + footprint.building_top_offset"
                 :x2="markerX"
                 :y2="canvasHeight"
                 :stroke="COLORS.marker"
@@ -156,12 +167,15 @@
                 vector-effect="non-scaling-stroke"
             />
             <text
-                :x="markerX"
-                :y="canvasHeight - footprint.bottom_offset / 2"
-                text-anchor="middle"
+                :x="markerX + 1"
+                :y="canvasHeight - 2"
+                text-anchor="start"
                 dominant-baseline="central"
                 :font-size="markerFontSize"
                 :fill="COLORS.label"
+                :stroke="COLORS.slab"
+                stroke-width="0.5"
+                paint-order="stroke"
             >
                 {{ footprint.bottom_offset }} m
             </text>
@@ -170,11 +184,14 @@
             <line x1="0" :y1="canvasHeight / 2" :x2="footprint.left_offset" :y2="canvasHeight / 2" :stroke="COLORS.marker" stroke-width="1" vector-effect="non-scaling-stroke" />
             <text
                 :x="footprint.left_offset / 2"
-                :y="canvasHeight / 2"
+                :y="canvasHeight / 2 - 2"
                 text-anchor="middle"
                 dominant-baseline="central"
                 :font-size="markerFontSize"
                 :fill="COLORS.label"
+                :stroke="COLORS.slab"
+                stroke-width="0.5"
+                paint-order="stroke"
             >
                 {{ footprint.left_offset }} m
             </text>
@@ -191,11 +208,14 @@
             />
             <text
                 :x="canvasWidth - footprint.left_offset / 2"
-                :y="canvasHeight / 2"
+                :y="canvasHeight / 2 - 2"
                 text-anchor="middle"
                 dominant-baseline="central"
                 :font-size="markerFontSize"
                 :fill="COLORS.label"
+                :stroke="COLORS.slab"
+                stroke-width="0.5"
+                paint-order="stroke"
             >
                 {{ footprint.left_offset }} m
             </text>
@@ -211,12 +231,15 @@
                 vector-effect="non-scaling-stroke"
             />
             <text
-                :x="markerX"
+                :x="markerX + 1"
                 :y="rowSpacingTop + footprint.row_spacing / 2"
-                text-anchor="middle"
+                text-anchor="start"
                 dominant-baseline="central"
                 :font-size="markerFontSize"
                 :fill="COLORS.label"
+                :stroke="COLORS.slab"
+                stroke-width="0.5"
+                paint-order="stroke"
             >
                 {{ footprint.row_spacing }} m
             </text>
@@ -373,7 +396,7 @@ export default {
             return Math.min(this.footprint.building_width, this.footprint.building_length) / 3;
         },
         markerFontSize() {
-            return Math.max(3, Math.min(6, this.canvasWidth / 28));
+            return 2.5;
         },
     },
 };
