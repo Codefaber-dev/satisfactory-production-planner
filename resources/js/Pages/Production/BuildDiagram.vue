@@ -17,6 +17,7 @@
                 :materials="materials"
                 :title="title"
                 :details="details"
+                :identifier="identifier"
                 @close="modalOpen = false"
             />
         </div>
@@ -26,6 +27,7 @@
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
 import DiagramModal from '@/Pages/Production/DiagramModal';
 import FootprintSummary from './FootprintSummary.vue';
+import { registerDiagram } from '@/diagramRegistry';
 
 export default {
     name: 'build-diagram',
@@ -35,7 +37,28 @@ export default {
             modalOpen: false,
         };
     },
+    mounted() {
+        // modal cross-navigation (V130): only identifier-bearing diagrams join
+        // the registry — standalone mounts (tests, previews) stay out
+        if (this.identifier) {
+            this.unregisterDiagram = registerDiagram({
+                identifier: this.identifier,
+                name: this.title,
+                open: () => {
+                    this.modalOpen = true;
+                },
+            });
+        }
+    },
+    beforeUnmount() {
+        this.unregisterDiagram?.();
+    },
     props: {
+        // step identifier (e.g. '2.B') for the modal cross-nav registry (V130)
+        identifier: {
+            type: String,
+            default: '',
+        },
         title: {
             type: String,
             default: '',

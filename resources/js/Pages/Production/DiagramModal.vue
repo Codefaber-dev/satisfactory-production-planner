@@ -14,11 +14,17 @@
             class="flex h-full w-full max-w-6xl flex-col border-2 border-blue-200/60 bg-blue-950 font-mono text-blue-100 shadow-xl"
             data-drawing-sheet
         >
-            <!-- header strip: TITLE compartment + outline controls -->
+            <!-- header strip: STEP + TITLE compartments + outline controls -->
             <div class="flex flex-wrap items-stretch justify-between border-b-2 border-blue-200/60">
-                <div class="px-4 py-1.5">
-                    <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Title</div>
-                    <h2 class="text-lg font-bold uppercase tracking-widest text-blue-50">{{ heading }}</h2>
+                <div class="flex items-stretch">
+                    <div v-if="identifier" class="border-r border-blue-200/60 px-4 py-1.5" data-step-cell>
+                        <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Step</div>
+                        <div class="text-lg font-bold tracking-widest text-blue-50">{{ identifier }}</div>
+                    </div>
+                    <div class="px-4 py-1.5">
+                        <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Title</div>
+                        <h2 class="text-lg font-bold uppercase tracking-widest text-blue-50">{{ heading }}</h2>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 border-l border-blue-200/60 px-3 py-1.5">
                     <button
@@ -57,38 +63,85 @@
                     </button>
                 </div>
             </div>
-            <!-- stage: blueprint palette (V120/V125) -->
-            <div
-                ref="stage"
-                class="min-h-0 flex-1 cursor-grab touch-none select-none overflow-hidden"
-                @wheel.prevent="onWheel"
-                @pointerdown="onPointerDown"
-                @pointermove="onPointerMove"
-                @pointerup="onPointerUp"
-                @pointercancel="onPointerUp"
-            >
-                <diagram-svg :footprint="footprint" :materials="materials" :view="view" blueprint class="h-full" />
-            </div>
-            <!-- title block: bordered compartments, left-aligned, single-line (T174/V128) -->
-            <div
-                class="max-h-80 shrink-0 overflow-y-auto whitespace-nowrap border-t-2 border-blue-200/60 text-left text-sm"
-            >
-                <div class="flex flex-col lg:flex-row">
-                    <div class="lg:border-r lg:border-blue-200/40">
-                        <footprint-summary :footprint="footprint" title-block />
-                        <div class="flex">
-                            <div class="border-b border-r border-blue-200/40 px-2 py-1" data-scale-cell>
-                                <div class="text-[9px] uppercase tracking-widest text-blue-300">Scale</div>
-                                <div>1 m = {{ scalePx }} px</div>
+            <div class="flex min-h-0 flex-1">
+                <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+                    <!-- stage: blueprint palette (V120/V125) -->
+                    <div
+                        ref="stage"
+                        class="min-h-0 flex-1 cursor-grab touch-none select-none overflow-hidden"
+                        @wheel.prevent="onWheel"
+                        @pointerdown="onPointerDown"
+                        @pointermove="onPointerMove"
+                        @pointerup="onPointerUp"
+                        @pointercancel="onPointerUp"
+                    >
+                        <diagram-svg
+                            :footprint="footprint"
+                            :materials="materials"
+                            :view="view"
+                            blueprint
+                            class="h-full"
+                        />
+                    </div>
+                    <!-- title block: bordered compartments, left-aligned, single-line (T174/V128) -->
+                    <div
+                        class="max-h-80 shrink-0 overflow-y-auto whitespace-nowrap border-t-2 border-blue-200/60 text-left text-sm"
+                    >
+                        <div class="flex flex-col lg:flex-row">
+                            <div class="lg:border-r lg:border-blue-200/40">
+                                <footprint-summary :footprint="footprint" title-block />
+                                <div class="flex">
+                                    <div class="border-b border-r border-blue-200/40 px-2 py-1" data-scale-cell>
+                                        <div class="text-[9px] uppercase tracking-widest text-blue-300">Scale</div>
+                                        <div>1 m = {{ scalePx }} px</div>
+                                    </div>
+                                    <div class="border-b border-r border-blue-200/40 px-2 py-1">
+                                        <div class="text-[9px] uppercase tracking-widest text-blue-300">Units</div>
+                                        <div>Dimensions in meters</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="border-b border-r border-blue-200/40 px-2 py-1">
-                                <div class="text-[9px] uppercase tracking-widest text-blue-300">Units</div>
-                                <div>Dimensions in meters</div>
-                            </div>
+                            <!-- full step details: outputs/inputs/machines/build cost (V126) -->
+                            <diagram-step-details
+                                v-if="details"
+                                :details="details"
+                                :identifier="identifier"
+                                class="flex-1"
+                                @navigate="navigateTo"
+                            />
                         </div>
                     </div>
-                    <!-- full step details: outputs/inputs/machines/build cost (V126) -->
-                    <diagram-step-details v-if="details" :details="details" class="flex-1" />
+                </div>
+                <!-- cross-nav panel: jump to any other step's modal (V130) -->
+                <div class="flex shrink-0 flex-col border-l border-blue-200/60 text-left" data-modal-nav>
+                    <button
+                        type="button"
+                        class="px-2 py-1.5 text-[9px] uppercase tracking-[0.25em] text-blue-300 hover:bg-blue-800"
+                        :aria-label="navOpen ? 'Collapse step navigation' : 'Expand step navigation'"
+                        data-modal-nav-toggle
+                        @click="navOpen = !navOpen"
+                    >
+                        {{ navOpen ? 'Steps ▸' : '◂' }}
+                    </button>
+                    <ul v-if="navOpen" class="min-h-0 w-48 overflow-y-auto text-xs">
+                        <li v-for="entry in navEntries" :key="entry.identifier">
+                            <button
+                                type="button"
+                                class="w-full truncate px-2 py-1 text-left"
+                                :class="
+                                    entry.identifier === identifier
+                                        ? 'bg-blue-200/20 font-bold text-blue-50'
+                                        : 'hover:bg-blue-800'
+                                "
+                                :disabled="entry.identifier === identifier"
+                                :data-current="entry.identifier === identifier ? '' : undefined"
+                                data-modal-nav-item
+                                @click="navigateTo(entry)"
+                            >
+                                {{ entry.identifier }} {{ entry.name }}
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -98,6 +151,7 @@
 import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { contentExtent, manifoldLines } from '@/diagramLayout';
+import { diagramRegistry } from '@/diagramRegistry';
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
 import DiagramStepDetails from '@/Pages/Production/DiagramStepDetails.vue';
 import FootprintSummary from './FootprintSummary.vue';
@@ -142,6 +196,11 @@ export default {
             type: Object,
             default: null,
         },
+        // step identifier (e.g. '2.B') — header STEP cell + nav highlight (V130)
+        identifier: {
+            type: String,
+            default: '',
+        },
     },
     emits: ['close'],
     data() {
@@ -149,6 +208,7 @@ export default {
             view: null,
             pointers: {},
             panStart: null,
+            navOpen: true,
         };
     },
     computed: {
@@ -157,6 +217,12 @@ export default {
         },
         heading() {
             return this.title || `${this.footprint.monogram} Build Diagram`;
+        },
+        // every registered diagram, identifier-sorted — the modal jump list (V130)
+        navEntries() {
+            return [...diagramRegistry].sort((a, b) =>
+                a.identifier.localeCompare(b.identifier, undefined, { numeric: true })
+            );
         },
         // live scale readout for the title block (V128): screen pixels per meter
         // at the current zoom — recomputes with every view change; jsdom (zero
@@ -217,6 +283,15 @@ export default {
         },
         resetView() {
             this.view = this.fitView();
+        },
+        // jump to another step's modal: open the target, close this one (V130)
+        navigateTo(entry) {
+            if (entry.identifier === this.identifier) {
+                return;
+            }
+
+            entry.open();
+            this.$emit('close');
         },
         // meters per screen pixel at the current zoom; jsdom (clientWidth 0) falls back to 1:1
         unitsPerPixel() {

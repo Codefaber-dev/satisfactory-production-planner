@@ -80,6 +80,7 @@
                     :title="step.name"
                     :materials="{ inputs: step.inputs.map((input) => input.item), outputs: [] }"
                     :details="sinkDetails"
+                    :identifier="identifier"
                 />
             </td>
         </tr>

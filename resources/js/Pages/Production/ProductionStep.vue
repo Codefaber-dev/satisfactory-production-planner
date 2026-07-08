@@ -363,6 +363,7 @@
                     :title="production.name"
                     :materials="diagramMaterials"
                     :details="diagramDetails"
+                    :identifier="production.imported ? '' : identifier"
                 />
             </td>
         </tr>

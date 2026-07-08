@@ -7,7 +7,10 @@
         <section v-if="details.output" class="grow border-b border-r border-blue-200/40 px-2 py-1" data-details-output>
             <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Output</h3>
             <ul>
-                <li>{{ qty(details.output.qty) }} {{ details.output.unit || 'per min' }} — {{ details.output.name }}</li>
+                <li>
+                    {{ qty(details.output.qty) }} {{ details.output.unit || 'per min' }} —
+                    <material-name :name="details.output.name" />
+                </li>
             </ul>
         </section>
 
@@ -19,7 +22,7 @@
             <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Byproducts</h3>
             <ul>
                 <li v-for="[name, amount] in entries(details.byproducts)" :key="name">
-                    {{ qty(amount) }} per min — {{ name }}
+                    {{ qty(amount) }} per min — <material-name :name="name" />
                 </li>
             </ul>
         </section>
@@ -32,7 +35,7 @@
             <h3 class="text-[9px] font-normal uppercase tracking-widest text-blue-300">Inputs</h3>
             <ul>
                 <li v-for="[name, amount] in entries(details.inputs)" :key="name">
-                    {{ qty(amount) }} per min — {{ name }}
+                    {{ qty(amount) }} per min — <material-name :name="name" />
                 </li>
             </ul>
         </section>
@@ -74,12 +77,46 @@
     </div>
 </template>
 <script>
+import { h } from 'vue';
+import { diagramRegistry } from '@/diagramRegistry';
+
 export default {
     name: 'diagram-step-details',
+    components: {
+        // material name as a jump link when another registered step produces it
+        // (V130); imports/raw leaves have no registry entry => plain text
+        MaterialName: {
+            name: 'material-name',
+            props: { name: { type: String, required: true } },
+            render() {
+                const producer = this.$parent.producerOf(this.name);
+
+                if (!producer) {
+                    return h('span', this.name);
+                }
+
+                return h(
+                    'button',
+                    {
+                        type: 'button',
+                        class: 'underline decoration-dotted underline-offset-2 hover:text-blue-50',
+                        'data-material-link': '',
+                        onClick: () => this.$parent.$emit('navigate', producer),
+                    },
+                    `${this.name} (${producer.identifier})`
+                );
+            },
+        },
+    },
     props: {
         details: {
             type: Object,
             required: true,
+        },
+        // this step's identifier — a material never links back to itself (V130)
+        identifier: {
+            type: String,
+            default: '',
         },
     },
     computed: {
@@ -89,7 +126,11 @@ export default {
             return this.details.variant && !this.details.variant.includes(this.details.building);
         },
     },
+    emits: ['navigate'],
     methods: {
+        producerOf(name) {
+            return diagramRegistry.find((entry) => entry.name === name && entry.identifier !== this.identifier) ?? null;
+        },
         entries(map) {
             return Object.entries(map || {});
         },
