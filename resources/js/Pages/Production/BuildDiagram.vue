@@ -1,6 +1,6 @@
 <template>
     <!-- modal-only diagram access (V134): compact trigger, no inline render -->
-    <div class="flex justify-end py-2">
+    <div class="flex justify-end py-2 mx-2">
         <button
             type="button"
             aria-label="Expand diagram"
