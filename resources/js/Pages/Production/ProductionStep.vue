@@ -59,12 +59,15 @@
                                     />
                                 </div>
                                 <span class="text-xs lg:whitespace-nowrap">
+                                    <!-- V138: identifier link only when the dest step is mapped -->
                                     <a
+                                        v-if="levelStepMap[mat]"
                                         @click="flashDestination(levelStepMap[mat])"
                                         :href="`#${levelStepMap[mat]}`"
                                         class="text-sky-700"
                                         >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
                                     </a>
+                                    <template v-else>{{ mat }}</template>
                                     <br />
                                     {{ formatQtyWithPercentage(out_qty, qty) }}
                                 </span>
@@ -192,12 +195,15 @@
                                         />
                                     </div>
                                     <span class="text-xs lg:whitespace-nowrap">
+                                        <!-- V138: identifier link only when the dest step is mapped -->
                                         <a
+                                            v-if="levelStepMap[mat]"
                                             @click="flashDestination(levelStepMap[mat])"
                                             :href="`#${levelStepMap[mat]}`"
                                             class="text-sky-700"
                                             >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
                                         </a>
+                                        <template v-else>{{ mat }}</template>
                                         <br />
                                         {{ formatQtyWithPercentage(out_qty, qty) }}
                                     </span>

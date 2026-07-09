@@ -87,6 +87,29 @@ class RecyclingInjectionTest extends TestCase
     }
 
     #[Test]
+    public function zero_qty_destinations_are_filtered_from_outputs(): void
+    {
+        // V138/B70: the injected Packaged HOR calc's HOR child ends at qty 0
+        // (fully byproduct-covered) — its suppliers must NOT list it as a
+        // ghost 0/min destination (Crude Oil showed "Heavy Oil Residue 0 per
+        // min (1.undefined)").
+        request()->merge(['auto_package_recycle' => true]);
+        $payload = $this->payload();
+
+        $crude = $this->resultsProduction($payload, 'Crude Oil');
+        $this->assertArrayNotHasKey('Heavy Oil Residue', $crude['outputs']);
+
+        // general form: every outputs entry is a positive flow
+        foreach ($payload['results'] as $tier) {
+            foreach ($tier as $name => $material) {
+                foreach ($material['outputs'] as $dest => $qty) {
+                    $this->assertGreaterThan(0, $qty, "$name → $dest must be a positive flow");
+                }
+            }
+        }
+    }
+
+    #[Test]
     public function recycling_group_is_sink_only(): void
     {
         request()->merge(['auto_package_recycle' => true]);
