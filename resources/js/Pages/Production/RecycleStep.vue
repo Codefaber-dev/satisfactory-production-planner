@@ -4,6 +4,7 @@
          peer of every production step — only the content differs (points/min output,
          recycled-item inputs, no recipe/clock controls). -->
     <tbody
+        :class="shouldFlash ? ['dark:bg-slate-500', 'bg-slate-300'] : []"
         class="mb-4 block rounded-lg border border-gray-300 transition-all duration-300 dark:border-slate-700 lg:mb-0 lg:table-row-group lg:rounded-none lg:border-0"
     >
         <tr class="block border-t border-gray-200 dark:border-slate-700 lg:table-row">
@@ -94,9 +95,25 @@ export default {
     name: 'RecycleStep',
     components: { CloudImage, BuildDiagram },
     emits: ['flashDestination'],
+    data() {
+        return {
+            shouldFlash: false,
+        };
+    },
     mounted() {
         // V95: the terminal sink step appears in QuickNav under its R.* identifier
         this.Bus.emit('RegisterQuickNav', { name: this.step.name, identifier: this.identifier });
+
+        // flash parity with ProductionStep: highlight when a destination link
+        // targeting this step is clicked
+        this.Bus.on('flash', ({ dest }) => {
+            if (dest === this.identifier) {
+                this.shouldFlash = true;
+                setTimeout(() => {
+                    this.shouldFlash = false;
+                }, 1200);
+            }
+        });
     },
     props: {
         step: { type: Object, required: true },

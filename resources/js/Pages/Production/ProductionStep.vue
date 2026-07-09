@@ -456,7 +456,6 @@ export default {
 
         this.Bus.on('flash', ({ dest }) => {
             if (dest === this.identifier) {
-                console.log('flashing now');
                 this.shouldFlash = true;
                 setTimeout(() => {
                     this.shouldFlash = false;
@@ -681,7 +680,6 @@ export default {
         },
 
         flashDestination(dest) {
-            console.log('emitting flash');
             this.Bus.emit('flash', { dest });
         },
 
