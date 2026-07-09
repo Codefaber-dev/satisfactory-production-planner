@@ -18,42 +18,118 @@ use Illuminate\Support\Facades\Cache;
  *  - fluid/gas leftover → recycled only when the auto-package toggle is on AND a
  *    Package recipe with a sinkable packaged form exists (V67): packaged → sunk,
  *    surfacing the Packager building/power + empty-container input
- *  - container demand from packaging (V135): leftover container byproduct feeds
- *    the Packager before the sink; any shortfall is produced via the container's
- *    base recipe → a `containers` production row
+ *  - container demand from packaging (V135/V136): leftover container byproduct
+ *    feeds the Packager before the sink; any shortfall is produced via a **full
+ *    nested production chain** (V136) — container ← Plastic ← Crude Oil etc. —
+ *    whose own fluid byproducts (Plastic → HOR) feed back into packaging,
+ *    iterated to a fixed point
  *  - everything else → waste
  *
  * Total points/min = Σ recycled flows × sink_points.
  *
  * @phpstan-type PackagedRow array{fluid: string, product: string, qty: float, buildings: float, power: float, container: ?string, container_qty: float, points: float}
- * @phpstan-type ContainerRow array{product: string, qty: float, buildings: float, power: float, building: ?string, build_cost: array<string, int>, inputs: list<array{item: string, qty: float}>}
+ * @phpstan-type ChainRow array{product: string, qty: float, buildings: float, power: float, building: ?string, recipe: ?string, build_cost: array<string, int>, inputs: list<array{item: string, qty: float}>}
  */
 class RecyclingCalc
 {
     /**
+     * Container-chain fixpoint iteration bounds (V136): the packaging↔chain
+     * feedback is geometric (each round's extra fluid is a fraction of the
+     * last), so demand converges fast; the cap only guards pathological data.
+     */
+    protected const MAX_CHAIN_PASSES = 20;
+
+    protected const CHAIN_EPSILON = 1e-4;
+
+    /**
      * @param  Collection|array<string, float>  $byproducts  produced byproduct qty/min
      * @param  Collection|array<string, float>  $byproductsUsed  byproduct qty/min consumed elsewhere
-     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, containers: list<array<string, mixed>>, waste: array<string, float>}
+     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, containers: list<array<string, mixed>>, raw_materials: array<string, float>, intermediate_materials: array<string, float>, all_materials: array<string, float>, waste: array<string, float>}
      */
     public static function calc($byproducts, $byproductsUsed = [], bool $autoPackage = false): array
     {
-        $produced = collect($byproducts);
-        $used = collect($byproductsUsed);
+        $leftovers = static::leftovers(collect($byproducts), collect($byproductsUsed));
 
-        $points = 0.0;
         $recycled = [];
         $packaged = [];
         $waste = [];
+        $chain = null;
+        $previousShortfall = null;
+
+        // V136: packaging demands containers; producing containers emits fluid
+        // byproducts that get packaged too (Plastic → HOR). Iterate the whole
+        // pool → classify → net → chain loop until the shortfall stabilizes.
+        for ($pass = 0; $pass < static::MAX_CHAIN_PASSES; $pass++) {
+            $pool = collect([$leftovers, $chain['leftovers'] ?? []])->sumByKey();
+
+            [$recycled, $packaged, $waste] = static::classify($pool, $autoPackage);
+            [$recycled, $shortfall] = static::netContainers($recycled, $packaged);
+
+            if (static::stable($shortfall, $previousShortfall)) {
+                break;
+            }
+
+            $previousShortfall = $shortfall;
+            $chain = empty($shortfall) ? null : static::containerChain($shortfall);
+        }
+
+        // totalled after the container offset — only flows actually sunk count
+        $points = (float) (collect($recycled)->sum('points') + collect($packaged)->sum('points'));
+
+        return [
+            'points' => $points,
+            'recycled' => $recycled,
+            'packaged' => $packaged,
+            'containers' => $chain['rows'] ?? [],
+            'raw_materials' => $chain['raw'] ?? [],
+            'intermediate_materials' => $chain['intermediates'] ?? [],
+            'all_materials' => $chain['all'] ?? [],
+            'waste' => $waste,
+        ];
+    }
+
+    /**
+     * Per-item leftover = produced − consumed. getByproductsUsed is nested
+     * (byproduct → {consumer → qty}); sum the per-consumer amounts to get the
+     * total consumed. A scalar is tolerated too.
+     *
+     * @return array<string, float>
+     */
+    protected static function leftovers(Collection $produced, Collection $used): array
+    {
+        $out = [];
 
         foreach ($produced as $name => $qty) {
-            // getByproductsUsed is nested (byproduct → {consumer → qty}); sum the
-            // per-consumer amounts to get the total consumed. A scalar is tolerated too.
             $consumed = $used->get($name, 0);
             $consumed = is_array($consumed) || $consumed instanceof Collection
                 ? collect($consumed)->sum()
                 : (float) $consumed;
 
             $leftover = (float) $qty - (float) $consumed;
+
+            if ($leftover > 1e-9) {
+                $out[$name] = $leftover;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Route each leftover flow: sinkable solid → recycled (V66); fluid/gas →
+     * packaged when the toggle is on (V67); everything else → waste.
+     *
+     * @param  iterable<string, float>  $pool  leftover qty/min per item
+     * @return array{0: array<string, array{qty: float, points: float}>, 1: list<array<string, mixed>>, 2: array<string, float>}
+     */
+    protected static function classify(iterable $pool, bool $autoPackage): array
+    {
+        $recycled = [];
+        $packaged = [];
+        $waste = [];
+
+        foreach ($pool as $name => $leftover) {
+            $leftover = (float) $leftover;
 
             if ($leftover <= 1e-9) {
                 continue;
@@ -89,33 +165,26 @@ class RecyclingCalc
             $waste[$name] = $leftover;
         }
 
-        // V135/B68: packaging consumes empty containers the plan may not supply —
-        // net the demand against leftover container byproduct, produce the rest.
-        [$recycled, $containers] = static::resolveContainers($recycled, $packaged);
-
-        // recompute: the container offset removes sunk container flows
-        $points = (float) (collect($recycled)->sum('points') + collect($packaged)->sum('points'));
-
-        return compact('points', 'recycled', 'packaged', 'containers', 'waste');
+        return [$recycled, $packaged, $waste];
     }
 
     /**
-     * Supply the packaging steps' empty-container demand (V135): leftover container
-     * byproduct (already in $recycled) feeds the Packager before the sink; any
-     * shortfall becomes a production row via the container's base recipe.
+     * Net the packaging steps' empty-container demand (V135): leftover container
+     * byproduct (already in $recycled) feeds the Packager before the sink; the
+     * remaining demand is returned as the shortfall to produce (V136).
      *
      * @param  array<string, array{qty: float, points: float}>  $recycled
      * @param  list<array<string, mixed>>  $packaged
-     * @return array{0: array<string, array{qty: float, points: float}>, 1: list<array<string, mixed>>}
+     * @return array{0: array<string, array{qty: float, points: float}>, 1: array<string, float>}
      */
-    protected static function resolveContainers(array $recycled, array $packaged): array
+    protected static function netContainers(array $recycled, array $packaged): array
     {
         $demand = collect($packaged)
             ->filter(fn ($row) => ! empty($row['container']) && (float) ($row['container_qty'] ?? 0) > 0)
             ->groupBy('container')
-            ->map(fn ($rows) => $rows->sum('container_qty'));
+            ->map(fn ($rows) => (float) $rows->sum('container_qty'));
 
-        $containers = [];
+        $shortfall = [];
 
         foreach ($demand as $name => $qty) {
             if (isset($recycled[$name])) {
@@ -132,45 +201,116 @@ class RecyclingCalc
                     : collect($recycled)->except($name)->all();
             }
 
-            if ($qty > 1e-9 && ($row = static::produceContainer($name, $qty))) {
-                $containers[] = $row;
+            if ($qty > 1e-9) {
+                $shortfall[$name] = $qty;
             }
         }
 
-        return [$recycled, $containers];
+        return [$recycled, $shortfall];
     }
 
     /**
-     * A production row for a container shortfall (V135): the container's base
-     * recipe (Empty Canister ← Plastic, Empty Fluid Tank ← Aluminum Ingot) sized
-     * to the demand — same shape family as the packaged rows so it folds into
-     * the build summary / parts / power (V87). Null when no recipe exists.
+     * Shortfall maps are equal within CHAIN_EPSILON → the fixpoint is reached.
      *
-     * @return array<string, mixed>|null
+     * @param  array<string, float>  $current
+     * @param  array<string, float>|null  $previous
      */
-    protected static function produceContainer(string $name, float $qty): ?array
+    protected static function stable(array $current, ?array $previous): bool
     {
-        $recipe = optional(Ingredient::ofName($name))->baseRecipe();
-
-        if (! $recipe || (float) $recipe->base_per_min <= 0) {
-            return null;
+        if (is_null($previous)) {
+            return empty($current);
         }
 
+        $keys = array_unique(array_merge(array_keys($current), array_keys($previous)));
+
+        foreach ($keys as $key) {
+            if (abs(($current[$key] ?? 0) - ($previous[$key] ?? 0)) > static::CHAIN_EPSILON) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * The full production chain for the container shortfall (V136): a nested
+     * plan (Multiplexer of one ProductionCalculator per container) so recipe
+     * choices, favorites, and internal byproduct reuse all apply. Returns the
+     * per-product production rows (dependency order), the chain's own leftover
+     * byproducts (they feed back into packaging), and its material totals for
+     * the plan-payload merge.
+     *
+     * @param  array<string, float>  $shortfall  container → qty/min to produce
+     * @return array{rows: list<array<string, mixed>>, leftovers: array<string, float>, raw: array<string, float>, intermediates: array<string, float>, all: array<string, float>}
+     */
+    protected static function containerChain(array $shortfall): array
+    {
+        $multiplexer = new Multiplexer;
+
+        foreach ($shortfall as $name => $qty) {
+            $multiplexer->add(ProductionCalculator::make(
+                product: i($name),
+                qty: $qty,
+                choices: collect(request('choices'))->map(fn ($recipeName) => r($recipeName)),
+            ));
+        }
+
+        $multiplexer->recalculateUsingByproductsUntilStable();
+
+        $results = $multiplexer->getResults();
+        $nonRaw = isset($results[1]) ? $results->skip(1) : $results;
+
+        $rows = [];
+
+        foreach ($nonRaw as $tier) {
+            foreach ($tier as $product => $material) {
+                foreach ($material->production as $production) {
+                    if ((float) ($production['qty'] ?? 0) > 1e-9 && ! empty($production['recipe'])) {
+                        $rows[] = static::chainRow($product, $production);
+                    }
+                }
+            }
+        }
+
+        $raw = $multiplexer->getRawMaterials();
+        $all = $multiplexer->getAllMaterials();
+
+        return [
+            'rows' => $rows,
+            'leftovers' => static::leftovers(collect($multiplexer->getByproducts()), collect($multiplexer->getByproductsUsed())),
+            'raw' => $raw->all(),
+            // "intermediates" for the plan merge = every chain product incl. the
+            // container roots (they're intermediates from the plan's view)
+            'intermediates' => collect($all)->except($raw->keys()->all())->all(),
+            'all' => $all->all(),
+        ];
+    }
+
+    /**
+     * A production row for one chain step (V136) — same shape family as the
+     * packaged rows so it folds into the build summary / parts / power (V87)
+     * and renders as a `produce` step.
+     *
+     * @param  array<string, mixed>  $production  a groupAndSortResults production row
+     * @return array<string, mixed>
+     */
+    protected static function chainRow(string $product, array $production): array
+    {
+        $recipe = $production['recipe'];
+        $qty = (float) $production['qty'];
         $buildings = $qty / (float) $recipe->base_per_min;
         $basePower = (float) (optional(optional($recipe->building)->variant('mk1'))->base_power ?? 0);
 
         return [
-            'product' => $name,
+            'product' => $product,
             'qty' => $qty,
             'buildings' => $buildings,
             'power' => $buildings * $basePower,
             'building' => optional($recipe->building)->name,
+            'recipe' => $recipe->description ?: null,
             'build_cost' => static::packagerBuildCost($recipe, $buildings),
-            'inputs' => $recipe->ingredients
-                ->map(fn ($ingredient) => [
-                    'item' => $ingredient->name,
-                    'qty' => $buildings * (float) $ingredient->pivot->base_qty,
-                ])
+            'inputs' => collect($production['ingredients'] ?? [])
+                ->map(fn ($rate, $name) => ['item' => $name, 'qty' => (float) $rate])
                 ->values()
                 ->all(),
         ];

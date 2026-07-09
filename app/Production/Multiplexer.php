@@ -38,20 +38,24 @@ class Multiplexer
         $recycling = RecyclingCalc::calc($this->getByproducts(), $this->getByproductsUsed(), request()->boolean('auto_package_recycle'));
         $recyclingBelt = (float) request('belt_speed', 780);
 
+        // V136: the container chain's materials fold into the plan totals
+        $rawMaterials = collect([$this->getRawMaterials(), $recycling['raw_materials'] ?? []])->sumByKey();
+
         return json_decode(json_encode([
             'results' => $this->getResults(),
             'byproducts_used' => $this->getByproductsUsed(),
-            'raw_materials' => $this->getRawMaterials(),
-            'intermediate_materials' => $this->getIntermediateMaterials(),
-            'all_materials' => $this->getAllMaterials(),
+            'raw_materials' => $rawMaterials,
+            'intermediate_materials' => collect([$this->getIntermediateMaterials(), $recycling['intermediate_materials'] ?? []])->sumByKey(),
+            'all_materials' => collect([$this->getAllMaterials(), $recycling['all_materials'] ?? []])->sumByKey(),
             'final' => $this->getFinals(),
             'recipe' => $this->getRecipes(),
             'overrides' => $this->getOverrides(),
             'byproducts' => $this->getByproducts(),
             // V93: merge the package steps' 4-clock overviews so they render with controls
             'overviews' => $this->getOverviews()->merge(RecyclingSteps::overviews($recycling, $recyclingBelt)),
-            // V76: extract-mode raws → extractor building rows (summary/parts/power)
-            'extractors' => ExtractorSummary::build($this->getRawMaterials(), request('raw_sources', [])),
+            // V76: extract-mode raws → extractor building rows (summary/parts/power);
+            // V136: chain raws included so extractor counts cover them
+            'extractors' => ExtractorSummary::build(collect($rawMaterials), request('raw_sources', [])),
             'recycling' => $recycling,
             // V88: recycling rendered as full build steps (packaging + sink, with diagrams)
             'recycling_steps' => RecyclingSteps::build($recycling, $recyclingBelt),

@@ -93,7 +93,7 @@ class RecyclingSteps
         foreach (array_merge($recycling['packaged'] ?? [], $recycling['containers'] ?? []) as $row) {
             $product = $row['product'];
             $qty = (float) ($row['qty'] ?? 0);
-            $recipe = optional(Ingredient::ofName($product))->baseRecipe();
+            $recipe = static::rowRecipe($row);
 
             if (! $recipe || $qty <= 0) {
                 continue;
@@ -192,7 +192,7 @@ class RecyclingSteps
     {
         $product = $row['product'];
         $qty = (float) ($row['qty'] ?? 0);
-        $recipe = optional(Ingredient::ofName($product))->baseRecipe();
+        $recipe = static::rowRecipe($row);
 
         [$footprint, $numBuildings, $power] = static::stepDetail(
             $recipe, $product, $qty, $beltSpeed,
@@ -215,6 +215,20 @@ class RecyclingSteps
             'inputs' => $inputs,
             'output' => ['item' => $product, 'qty' => round($qty, 4)],
         ];
+    }
+
+    /**
+     * The recipe backing a recycling row: the chain-chosen recipe when the row
+     * carries one (V136 — favorites/choices may pick an alt), else the
+     * product's base recipe (packaged rows: the Package recipe).
+     */
+    protected static function rowRecipe(array $row): ?object
+    {
+        if (! empty($row['recipe'])) {
+            return r($row['recipe']);
+        }
+
+        return optional(Ingredient::ofName($row['product']))->baseRecipe();
     }
 
     /**

@@ -317,12 +317,16 @@ export default {
             };
         },
 
-        // V135: adapt a backend `produce` (container production) descriptor —
-        // output destinations = the packaging steps consuming this container,
-        // resolved through recycleStepMap
+        // V135/V136: adapt a backend `produce` (container-chain) descriptor —
+        // output destinations = the recycling steps consuming this product
+        // (package steps AND downstream produce steps, e.g. Plastic → Empty
+        // Canister), resolved through recycleStepMap
         producePayload(step) {
             const consumers = this.recycleSteps.filter(
-                (s) => s.type === 'package' && (s.inputs || []).some((i) => i.item === step.name)
+                (s) =>
+                    s !== step &&
+                    (s.type === 'package' || s.type === 'produce') &&
+                    (s.inputs || []).some((i) => i.item === step.name)
             );
 
             return {

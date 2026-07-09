@@ -78,44 +78,60 @@ class RecyclingStepsTest extends TestCase
     }
 
     #[Test]
-    public function container_production_renders_as_a_produce_step_before_the_packager(): void
+    public function container_chain_renders_as_produce_steps_before_the_packager(): void
     {
-        // B68/V135: the packaging step's Empty Canister input must be supplied —
-        // a 'produce' step (Constructor, real footprint) builds the shortfall.
+        // B68/B69/V135/V136: the packaging steps' Empty Canister input is built
+        // by the full chain — produce steps for Plastic AND Empty Canister
+        // (dependency order), each with a real footprint; never sink inputs.
         $recycling = RecyclingCalc::calc(['Water' => 60], [], true);
         $steps = RecyclingSteps::build($recycling, 780);
 
-        $produce = collect($steps)->firstWhere('type', 'produce');
+        // ordering: chain produce steps → package steps → sink
+        $this->assertSame(
+            ['produce', 'produce', 'package', 'package', 'sink'],
+            collect($steps)->pluck('type')->all()
+        );
 
-        $this->assertNotNull($produce, 'expected a container production step');
-        $this->assertSame('Empty Canister', $produce['name']);
-        $this->assertSame('Constructor', $produce['building']);
-        $this->assertEqualsWithDelta(60.0, $produce['output']['qty'], 0.001);
-        $this->assertArrayNotHasKey('to_sink', $produce['output']);
-        $this->assertContains('Plastic', collect($produce['inputs'])->pluck('item')->all());
-        $this->assertArrayHasKey('foundations', $produce['footprint']);
+        $byName = collect($steps)->keyBy('name');
 
-        // ordering: produce → package → sink; canisters feed the Packager, not the sink
-        $this->assertSame(['produce', 'package', 'sink'], collect($steps)->pluck('type')->all());
+        $canister = $byName['Empty Canister'];
+        $this->assertSame('Constructor', $canister['building']);
+        $this->assertEqualsWithDelta(80.0, $canister['output']['qty'], 0.01);
+        $this->assertArrayNotHasKey('to_sink', $canister['output']);
+        $this->assertContains('Plastic', collect($canister['inputs'])->pluck('item')->all());
+        $this->assertArrayHasKey('foundations', $canister['footprint']);
+
+        $plastic = $byName['Plastic'];
+        $this->assertSame('produce', $plastic['type']);
+        $this->assertEqualsWithDelta(40.0, $plastic['output']['qty'], 0.01);
+        $this->assertContains('Crude Oil', collect($plastic['inputs'])->pluck('item')->all());
+
+        // Plastic renders before its consumer (Empty Canister)
+        $types = collect($steps)->pluck('name')->all();
+        $this->assertLessThan(array_search('Empty Canister', $types), array_search('Plastic', $types));
+
         $sink = collect($steps)->firstWhere('type', 'sink');
-        $this->assertNotContains('Empty Canister', collect($sink['inputs'])->pluck('item')->all());
+        $sinkItems = collect($sink['inputs'])->pluck('item')->all();
+        $this->assertNotContains('Empty Canister', $sinkItems);
+        $this->assertNotContains('Plastic', $sinkItems);
     }
 
     #[Test]
-    public function container_produce_step_carries_a_four_clock_overview(): void
+    public function chain_produce_steps_carry_four_clock_overviews(): void
     {
-        // V135: produce steps get the same 4-clock overview set as package steps
+        // V135/V136: every chain produce step gets the 4-clock overview set
         // (V93 key convention) so the frontend renders real controls.
         $recycling = RecyclingCalc::calc(['Water' => 60], [], true);
         $overviews = RecyclingSteps::overviews($recycling, 780);
 
-        $recipe = i('Empty Canister')->baseRecipe();
-        $key = 'Empty Canister|'.($recipe->description ?? 'Empty Canister');
+        $canisterKey = 'Empty Canister|'.(i('Empty Canister')->baseRecipe()->description ?? 'Empty Canister');
+        $plasticKey = 'Plastic|'.(i('Plastic')->baseRecipe()->description ?? 'Plastic');
 
-        $this->assertArrayHasKey($key, $overviews);
+        $this->assertArrayHasKey($canisterKey, $overviews);
+        $this->assertArrayHasKey($plasticKey, $overviews);
 
         foreach (['c100', 'c150', 'c200', 'c250'] as $clock) {
-            $this->assertSame('Constructor', $overviews[$key]['overviews'][$clock]['building']);
+            $this->assertSame('Constructor', $overviews[$canisterKey]['overviews'][$clock]['building']);
         }
     }
 

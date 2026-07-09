@@ -216,11 +216,22 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
         expect(wrapper.findAll('[data-test="recycle-step"]')).toHaveLength(0);
     });
 
-    it('renders a container produce step as a ProductionStep feeding the Packager (V135)', () => {
+    it('renders container-chain produce steps as ProductionSteps feeding downstream (V135/V136)', () => {
         const wrapper = mountSteps({
             production: {
                 ...makeProduction(),
                 recycling_steps: [
+                    {
+                        type: 'produce',
+                        name: 'Plastic',
+                        building: 'Refinery',
+                        num_buildings: 1.5,
+                        power: 45,
+                        footprint: {},
+                        recipe: null,
+                        inputs: [{ item: 'Crude Oil', qty: 45 }],
+                        output: { item: 'Plastic', qty: 30 },
+                    },
                     {
                         type: 'produce',
                         name: 'Empty Canister',
@@ -259,17 +270,25 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
             },
         });
 
-        // the produce step is a real ProductionStep, not a RecycleStep
+        // both chain steps are real ProductionSteps, not RecycleSteps
+        expect(wrapper.find('.stub-step[data-name="Plastic"]').exists()).toBe(true);
         expect(wrapper.find('.stub-step[data-name="Empty Canister"]').exists()).toBe(true);
 
-        // it is reachable in the map so the Packager's canister input links to it
-        expect(wrapper.vm.recycleStepMap['Empty Canister']).toBe('R.A');
-        expect(wrapper.vm.packageDestinationMap['Empty Canister']).toBe('R.A');
+        // both are reachable in the maps so downstream inputs link back to them
+        expect(wrapper.vm.recycleStepMap['Plastic']).toBe('R.A');
+        expect(wrapper.vm.recycleStepMap['Empty Canister']).toBe('R.B');
+        expect(wrapper.vm.packageDestinationMap['Empty Canister']).toBe('R.B');
 
-        // its output destination is the consuming package step, never the sink
-        const payload = wrapper.vm.producePayload(wrapper.vm.recycleSteps[0]);
-        expect(payload.production.ingredients).toEqual({ Plastic: 30 });
-        expect(payload.material.outputs).toEqual({ 'Packaged Water': 60 });
+        // V136: Plastic's destination is the downstream produce step (Empty
+        // Canister), never itself and never the sink
+        const plastic = wrapper.vm.producePayload(wrapper.vm.recycleSteps[0]);
+        expect(plastic.production.ingredients).toEqual({ 'Crude Oil': 45 });
+        expect(plastic.material.outputs).toEqual({ 'Empty Canister': 30 });
+
+        // the canister's destination is the consuming package step
+        const canister = wrapper.vm.producePayload(wrapper.vm.recycleSteps[1]);
+        expect(canister.production.ingredients).toEqual({ Plastic: 30 });
+        expect(canister.material.outputs).toEqual({ 'Packaged Water': 60 });
     });
 });
 

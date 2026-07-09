@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Production\ProductionCalculator;
 use App\Production\RecyclingCalc;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -69,10 +70,11 @@ class RecyclingCalcTest extends TestCase
     {
         // V67 ON: leftover Water → Package recipe (Packager) → Packaged Water (sinkable)
         // → sunk. 60 Water → 1 Packager → 60 Packaged Water (130 pts) + 60 Empty Canister.
+        // V136: the container chain's HOR byproduct is packaged too (second row).
         $result = RecyclingCalc::calc(['Water' => 60], [], true);
 
-        $this->assertCount(1, $result['packaged']);
-        $row = $result['packaged'][0];
+        $this->assertCount(2, $result['packaged']);
+        $row = collect($result['packaged'])->firstWhere('product', 'Packaged Water');
 
         $this->assertSame('Water', $row['fluid']);
         // V94: the fluid input rate (the leftover) is carried explicitly, distinct from
@@ -86,7 +88,8 @@ class RecyclingCalcTest extends TestCase
         $this->assertEqualsWithDelta(60.0, $row['container_qty'], 0.001);
         $this->assertEqualsWithDelta(7800.0, $row['points'], 0.001); // 60 × 130
 
-        $this->assertEqualsWithDelta(7800.0, $result['points'], 0.001);
+        // V136: total includes the chain's packaged HOR — 60×130 + 20×180 = 11400
+        $this->assertEqualsWithDelta(11400.0, $result['points'], 0.01);
         $this->assertEmpty($result['waste']);
 
         // V87: the packaged row carries the Packager build cost (mk1 recipe × buildings)
@@ -133,36 +136,51 @@ class RecyclingCalcTest extends TestCase
     #[Test]
     public function total_points_aggregate_across_flows(): void
     {
-        // V66: total = Σ recycled flows. Concrete (360) + packaged Water (7800) = 8160.
+        // V66: total = Σ recycled flows. Concrete (360) + packaged Water incl.
+        // chain HOR (11400, V136) = 11760.
         $result = RecyclingCalc::calc(['Concrete' => 30, 'Water' => 60], [], true);
 
-        $this->assertEqualsWithDelta(8160.0, $result['points'], 0.001);
+        $this->assertEqualsWithDelta(11760.0, $result['points'], 0.01);
     }
 
     #[Test]
-    public function packaging_container_demand_spawns_a_container_production_row(): void
+    public function packaging_container_demand_spawns_the_full_production_chain(): void
     {
-        // B68/V135: packaging consumes Empty Canisters the plan never produced —
-        // the calc must add a container production row via the container's base
-        // recipe (Constructor: 30 Plastic → 60 Empty Canister, 4 MW).
+        // B69/V136: container demand recurses the full chain with byproduct
+        // feedback. Water 60 → 60 canisters; Plastic (C/2) emits HOR (C/4) which
+        // packages into C/4 more canister demand: C = 60/(1−¼) = 80. Plastic 40,
+        // Crude Oil 60, packaged HOR 20.
         $result = RecyclingCalc::calc(['Water' => 60], [], true);
 
-        $this->assertCount(1, $result['containers']);
-        $row = $result['containers'][0];
+        $rows = collect($result['containers'])->keyBy('product');
 
-        $this->assertSame('Empty Canister', $row['product']);
-        $this->assertEqualsWithDelta(60.0, $row['qty'], 0.001);
-        $this->assertEqualsWithDelta(1.0, $row['buildings'], 0.001);
-        $this->assertSame('Constructor', $row['building']);
-        $this->assertEqualsWithDelta(4.0, $row['power'], 0.001); // Constructor mk1 base_power
+        $canister = $rows['Empty Canister'];
+        $this->assertEqualsWithDelta(80.0, $canister['qty'], 0.01);
+        $this->assertSame('Constructor', $canister['building']);
+        $this->assertEqualsWithDelta(80 / 60, $canister['buildings'], 0.001);
+        $this->assertNotEmpty($canister['build_cost']);
 
-        $plastic = collect($row['inputs'])->firstWhere('item', 'Plastic');
-        $this->assertNotNull($plastic, 'container production must surface its recipe inputs');
-        $this->assertEqualsWithDelta(30.0, $plastic['qty'], 0.001);
+        $plasticInput = collect($canister['inputs'])->firstWhere('item', 'Plastic');
+        $this->assertEqualsWithDelta(40.0, $plasticInput['qty'], 0.01);
 
-        // V87 pattern: the row carries the building's build cost so it folds
-        // into the build summary / parts list
-        $this->assertNotEmpty($row['build_cost']);
+        // the chain recurses: Plastic is produced too, from Crude Oil
+        $plastic = $rows['Plastic'];
+        $this->assertEqualsWithDelta(40.0, $plastic['qty'], 0.01);
+        $crudeInput = collect($plastic['inputs'])->firstWhere('item', 'Crude Oil');
+        $this->assertEqualsWithDelta(60.0, $crudeInput['qty'], 0.01);
+
+        // chain materials surface for the plan-materials merge (V136)
+        $this->assertEqualsWithDelta(60.0, $result['raw_materials']['Crude Oil'], 0.01);
+        $this->assertEqualsWithDelta(40.0, $result['all_materials']['Plastic'], 0.01);
+        $this->assertEqualsWithDelta(40.0, $result['intermediate_materials']['Plastic'], 0.01);
+
+        // chain HOR byproduct is packaged and sunk
+        $hor = collect($result['packaged'])->firstWhere('product', 'Packaged Heavy Oil Residue');
+        $this->assertEqualsWithDelta(20.0, $hor['qty'], 0.01);
+
+        // conservation: canisters produced = Σ packaged container demand
+        $demand = collect($result['packaged'])->sum('container_qty');
+        $this->assertEqualsWithDelta($demand, $canister['qty'], 0.01);
     }
 
     #[Test]
@@ -184,12 +202,41 @@ class RecyclingCalcTest extends TestCase
     #[Test]
     public function container_shortfall_after_offset_is_produced(): void
     {
-        // V135: 20 leftover − 60 demand → all 20 feed packaging (none sunk),
-        // remaining 40 come from a production row.
+        // V135/V136: 20 leftover feed packaging first (none sunk); the produced
+        // shortfall grows with the chain's own HOR feedback:
+        // S = (60 − 20) / (1 − ¼) = 53.3̅.
         $result = RecyclingCalc::calc(['Water' => 60, 'Empty Canister' => 20], [], true);
 
         $this->assertArrayNotHasKey('Empty Canister', $result['recycled']);
-        $this->assertCount(1, $result['containers']);
-        $this->assertEqualsWithDelta(40.0, $result['containers'][0]['qty'], 0.001);
+
+        $canister = collect($result['containers'])->firstWhere('product', 'Empty Canister');
+        $this->assertEqualsWithDelta(160 / 3, $canister['qty'], 0.01);
+    }
+
+    #[Test]
+    public function payload_merges_the_container_chain_into_plan_materials(): void
+    {
+        // V136: chain raws/intermediates fold into the plan payload materials.
+        // Plastic 60 plan: 90 Crude, 30 HOR leftover → chain C = 30/(1−¼) = 40,
+        // chain Plastic 20, chain Crude 30 → raw total 120, Plastic total 80.
+        request()->merge(['auto_package_recycle' => true]);
+
+        $payload = ProductionCalculator::make(product: 'Plastic', qty: 60, recipe: 'Plastic')->toPayload();
+
+        $this->assertEqualsWithDelta(120.0, $payload['raw_materials']['Crude Oil'], 0.01);
+        $this->assertEqualsWithDelta(80.0, $payload['all_materials']['Plastic'], 0.01);
+
+        $canister = collect($payload['recycling']['containers'])->firstWhere('product', 'Empty Canister');
+        $this->assertEqualsWithDelta(40.0, $canister['qty'], 0.01);
+    }
+
+    #[Test]
+    public function toggle_off_payload_has_no_chain_and_unchanged_materials(): void
+    {
+        // V136 canary: auto_package_recycle OFF ⇒ no containers, no material drift.
+        $payload = ProductionCalculator::make(product: 'Plastic', qty: 60, recipe: 'Plastic')->toPayload();
+
+        $this->assertSame([], $payload['recycling']['containers']);
+        $this->assertEqualsWithDelta(90.0, $payload['raw_materials']['Crude Oil'], 0.01);
     }
 }
