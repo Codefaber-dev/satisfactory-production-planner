@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### 📐 Interactive Build Diagrams
+### ♻️ Recycling, Fully Planned
 
-- Every buildable step now opens a full-screen, pan-and-zoom build diagram styled like an engineering drawing — foundation grid, dimension markers, belt manifolds and color-coded pipe runs, and a title block with the step's complete stats. Jump between step diagrams, follow inputs to their producing steps, and change max clock without leaving the modal.
+- Package & Sink Fluids now builds everything it needs inside your plan. Packaging steps and their whole supply chain — Empty Canisters, the Plastic to make them, right down to Crude Oil — appear as real production steps with recipe pickers, clock controls, and build diagrams, merged with the rest of your factory.
 
-## v1.3.1 - Build Diagrams Update
+## v1.3.2 - Recycling Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -31,6 +31,18 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.3.2
+
+- ♻️ **Recycling Joins the Plan** — Everything **Package & Sink Fluids** builds is now part of the plan itself. Packaging steps (Packager → Packaged form) render as normal production steps with recipe pickers, Max Clock and somersloop controls, build diagrams, and Quick Nav entries — no more locked, stripped-down recycling rows.
+- 📦 **Containers Made In-Plan** — Packaging fluids needs Empty Canisters or Fluid Tanks, and the planner now produces them inside your plan with the **full supply chain down to raw resources** — including the feedback loop where making Plastic for canisters yields more Heavy Oil Residue that also gets packaged. Chain raw materials appear as Level 0 steps with the usual Import/Extract/Convert source picker, and extractors, parts, and power all count them.
+- 🔗 **One Factory, No Double-Counting** — If your plan already makes something the recycling chain needs (say, Plastic), the two merge into a single production step with the combined quantity — recipe choices apply to the whole thing.
+- 🗑️ **Leaner Recycling Section** — The Recycling group at the bottom now shows just the AWESOME Sink, with each input linked back to the step that produces it. Sinkable leftovers still offset container demand before anything new is built.
+- 🪲 Bug fix: packaging steps no longer demand Empty Canisters out of thin air — container inputs are supplied by leftovers or produced in-plan, and the chain's own raw materials are fully accounted for in the parts list and power totals.
+- 🪲 Bug fix: destination lists no longer show phantom **0 per min** entries (with a broken link) for byproducts that are already fully covered elsewhere in the plan.
+- 🪲 Bug fix: the **AWESOME Sink** destination link now jumps to the sink step and highlights it, like every other step link.
+
+---
 
 ### v1.3.1
 
