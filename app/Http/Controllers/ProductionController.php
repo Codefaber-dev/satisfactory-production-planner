@@ -98,8 +98,8 @@ class ProductionController extends Controller
 
         // V70/B46: key from whitelisted inputs only — the md5(request()->all())
         // term minted a new never-evicted entry per distinct/irrelevant param.
-        // v2: payload shape carries recycling container-chain merges (V136)
-        $cacheKey = 'multi_production_v2_'
+        // v3: recycling production folded into results (V137)
+        $cacheKey = 'multi_production_v3_'
             .md5(collect(compact('products', 'yields', 'recipes', 'variant', 'choices', 'even', 'speedLimit', 'belt_speed', 'imports'))->toJson())
             .ProductionCalculator::requestCacheSegment();
 

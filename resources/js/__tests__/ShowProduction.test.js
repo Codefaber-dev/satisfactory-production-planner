@@ -305,10 +305,12 @@ describe('Show — T110: auto_package_recycle plan param (V67)', () => {
     });
 });
 
-describe('Show — T125: recycled Packager folds into the build (V87)', () => {
+describe('Show — T184: recycling production arrives via results, not recycling rows (V137)', () => {
     beforeEach(() => vi.clearAllMocks());
 
     function withPackaged() {
+        // V137: the recycling block carries no building data — packaging + chain
+        // buildings/power/build cost arrive through the results-derived overviews
         return makeWrapper({
             production: {
                 ...minimalProduction,
@@ -318,15 +320,12 @@ describe('Show — T125: recycled Packager folds into the build (V87)', () => {
                     packaged: [
                         {
                             fluid: 'Water',
+                            fluid_qty: 60,
                             product: 'Packaged Water',
                             qty: 60,
                             buildings: 1,
                             power: 10,
-                            container: 'Empty Canister',
-                            container_qty: 60,
                             points: 7800,
-                            building: 'Packager',
-                            build_cost: { 'Steel Beam': 20, Rubber: 10, Plastic: 10 },
                         },
                     ],
                     waste: {},
@@ -335,22 +334,13 @@ describe('Show — T125: recycled Packager folds into the build (V87)', () => {
         });
     }
 
-    it('appends a Packager building-detail row', () => {
+    it('adds no building-detail row from the recycling packaged rows', () => {
         const rows = withPackaged().vm.production__building_details;
-        const pkg = rows.find((r) => r.variant_name === 'Packager');
-        expect(pkg).toBeTruthy();
-        expect(pkg.num_buildings).toBe(1);
-        expect(pkg.power_usage).toBe(10);
-        expect(pkg.build_cost['Steel Beam']).toBe(20);
+        expect(rows.find((r) => r.variant_name === 'Packager')).toBeUndefined();
     });
 
-    it('folds Packager power into the plan total power', () => {
-        expect(withPackaged().vm.production__total_power).toBe(10);
-    });
-
-    it('folds Packager build cost into total_build_cost', () => {
-        const summary = withPackaged().vm.production__building_summary;
-        expect(summary.total_build_cost['Steel Beam']).toBe(20);
+    it('adds no power from the recycling packaged rows', () => {
+        expect(withPackaged().vm.production__total_power).toBe(0);
     });
 });
 

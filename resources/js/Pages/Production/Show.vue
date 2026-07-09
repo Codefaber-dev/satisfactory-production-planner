@@ -438,23 +438,9 @@ export default {
             });
 
             // V76: extract-mode raws contribute their extractors (summary/parts/power)
-            // V87: auto-package Packager steps fold into the build (summary/parts/power)
-            // V135: container production rows (Empty Canister/Fluid Tank) fold in too
-            const recycleDetails = [
-                ...(this.production.recycling?.packaged || []),
-                ...(this.production.recycling?.containers || []),
-            ].map((p) => ({
-                product: p.product,
-                variant_name: p.building || 'Packager',
-                num_buildings: p.buildings,
-                exact_buildings: p.buildings,
-                power_usage: p.power,
-                build_cost: p.build_cost || {},
-                clock_speed: 100,
-                footprint: { power_shards: 0, somersloops: 0 },
-            }));
-
-            // V106: the AWESOME Sink folds in too — power + build cost, like the Packager rows
+            // V137: packaging + container-chain production are normal plan steps now —
+            // their buildings/power/build cost arrive via recipeDetails (overviews);
+            // only the AWESOME Sink still folds in from its step descriptor (V106)
             const sinkDetails = (this.production.recycling_steps || [])
                 .filter((s) => s.type === 'sink')
                 .map((s) => ({
@@ -468,7 +454,7 @@ export default {
                     footprint: { power_shards: 0, somersloops: 0 },
                 }));
 
-            return [...recipeDetails, ...(this.production.extractors || []), ...recycleDetails, ...sinkDetails];
+            return [...recipeDetails, ...(this.production.extractors || []), ...sinkDetails];
         },
 
         production__building_summary() {

@@ -44,13 +44,17 @@ class ProductionCalculator
 
     protected $variant;
 
+    // V137: root-step output destination override — null for a requested output
+    // ('final'); the AWESOME Sink name for an injected recycling calc.
+    protected $dest = null;
+
     // derived params
     protected Step $steps;
 
     protected $raw_available;
 
     public static function make(
-        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = 'mk1', $choices = [], $byproducts = []
+        $product, $qty, $recipe = null, $overrides = [], $favorites = null, $imports = [], $variant = 'mk1', $choices = [], $byproducts = [], $dest = null
     ): static {
 
         // V70/B46: make() returns the LIVE calculator object (callers use its
@@ -69,6 +73,11 @@ class ProductionCalculator
             ->setChoices($choices)
             ->setByproducts($byproducts)
             ->setUsedByproducts([]);
+
+        // V137: an injected recycling calc's root step reports its output
+        // destination (the AWESOME Sink) instead of 'final' — it is not a
+        // requested output, and the frontend links the dest to the sink step.
+        $production->dest = $dest;
 
         $production->raw_available = ($raw = request('raw')) ? static::parseRaw($raw) : [];
 
@@ -166,7 +175,8 @@ class ProductionCalculator
         // older code (pre-V70 rememberForever'd the live calculator object
         // under the unversioned prefix) can never be read back here. Bump the
         // version whenever the cached shape changes.
-        $cacheKey = 'production_calc_v4_'
+        // v5: recycling production folded into results (V137)
+        $cacheKey = 'production_calc_v5_'
             .md5(collect(compact('product', 'qty', 'recipe', 'overrides', 'imports', 'variant', 'choices', 'byproducts'))->put('favorites', $favoritesKey)->toJson())
             .static::requestCacheSegment();
 
@@ -205,34 +215,39 @@ class ProductionCalculator
      */
     public function toPayload(): array
     {
-        // V66/V67: AWESOME Sink recycling (points/min + auto-packaged fluids).
-        // Request params consumed here (auto_package_recycle, belt_speed,
-        // raw_sources) are all in CACHE_REQUEST_KEYS, so caching the full
-        // payload stays correct (V70).
-        $recycling = RecyclingCalc::calc($this->getByproducts(), $this->getByproductsUsed(), request()->boolean('auto_package_recycle'));
-        $recyclingBelt = (float) request('belt_speed', 780);
+        // V66/V67/V137: AWESOME Sink recycling. Request params consumed here
+        // (auto_package_recycle, belt_speed, raw_sources) are all in
+        // CACHE_REQUEST_KEYS, so caching the full payload stays correct (V70).
+        //
+        // V137: recycling production (Packager steps + container chain) is
+        // injected into the plan itself via an internal Multiplexer wrap —
+        // packaging renders as normal steps inside `results`, overlapping
+        // production merges, chain raws surface at Level 0. `final`/`recipe`/
+        // `overrides` stay this calc's own single tree (injected calcs are not
+        // requested outputs). With no recycling injection the wrap is inert:
+        // every getter below reduces to this calc's own values.
+        $multiplexer = new Multiplexer;
+        $multiplexer->add($this);
 
-        // V136: the container chain's materials fold into the plan totals
-        $rawMaterials = collect([$this->getRawMaterials(), $recycling['raw_materials'] ?? []])->sumByKey();
+        $recycling = RecyclingCalc::inject($multiplexer, request()->boolean('auto_package_recycle'));
 
         return json_decode(json_encode([
-            'results' => $this->getResults(),
-            'byproducts_used' => $this->getByproductsUsed(),
-            'raw_materials' => $rawMaterials,
-            'intermediate_materials' => collect([$this->getIntermediateMaterials(), $recycling['intermediate_materials'] ?? []])->sumByKey(),
-            'all_materials' => collect([$this->getAllMaterials(), $recycling['all_materials'] ?? []])->sumByKey(),
+            'results' => $multiplexer->getResults(),
+            'byproducts_used' => $multiplexer->getByproductsUsed(),
+            'raw_materials' => $multiplexer->getRawMaterials(),
+            'intermediate_materials' => $multiplexer->getIntermediateMaterials(),
+            'all_materials' => $multiplexer->getAllMaterials(),
             'final' => $this->getSteps()->toArray(),
             'recipe' => $this->getSteps()->getRecipe(),
             'overrides' => $this->getSteps()->getOverrides(),
-            'byproducts' => $this->getByproducts(),
-            // V93: merge the package steps' 4-clock overviews so they render with controls
-            'overviews' => $this->getOverviews()->merge(RecyclingSteps::overviews($recycling, $recyclingBelt)),
+            'byproducts' => $multiplexer->getByproducts(),
+            'overviews' => $multiplexer->getOverviews(),
             // V76: extract-mode raws → extractor building rows (summary/parts/power);
-            // V136: chain raws included so extractor counts cover them
-            'extractors' => ExtractorSummary::build(collect($rawMaterials), request('raw_sources', [])),
+            // V137: injected-chain raws are inside getRawMaterials already
+            'extractors' => ExtractorSummary::build(collect($multiplexer->getRawMaterials()), request('raw_sources', [])),
             'recycling' => $recycling,
-            // V88: recycling rendered as full build steps (packaging + sink, with diagrams)
-            'recycling_steps' => RecyclingSteps::build($recycling, $recyclingBelt),
+            // V137: sink-only — packaging + chain steps live in `results`
+            'recycling_steps' => RecyclingSteps::build($recycling, (float) request('belt_speed', 780)),
         ]), true);
     }
 
@@ -349,6 +364,7 @@ class ProductionCalculator
                 qty: $this->qty,
                 globals: $this->makeGlobals([], [], $injectedOverrides, $injectedImports),
                 recipe: $this->recipe,
+                parent: $this->dest,
             );
 
             return;
@@ -367,6 +383,7 @@ class ProductionCalculator
                 qty: $this->qty,
                 globals: $globals,
                 recipe: $this->recipe,
+                parent: $this->dest,
             );
 
             $external = $globals->getExternalDemand()->all();

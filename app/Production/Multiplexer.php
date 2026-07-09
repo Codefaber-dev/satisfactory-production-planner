@@ -8,9 +8,19 @@ class Multiplexer
 {
     protected Collection $calcs;
 
+    /**
+     * V137: recycling-injected calcs (one per auto-packaged form). They take part
+     * in results/materials/byproducts/overviews — so packaging + container-chain
+     * production render as normal plan steps, merged with overlapping plan
+     * production — but are NOT requested outputs: excluded from finals, recipes,
+     * and overrides.
+     */
+    protected Collection $injected;
+
     public function __construct()
     {
         $this->calcs = collect();
+        $this->injected = collect();
     }
 
     public function add(ProductionCalculator $calc): void
@@ -18,9 +28,29 @@ class Multiplexer
         $this->calcs->push($calc);
     }
 
+    /**
+     * Replace the injected recycling calcs (V137). Called by RecyclingCalc's
+     * fixpoint loop as packaging demand is re-sized.
+     *
+     * @param  iterable<ProductionCalculator>  $calcs
+     */
+    public function setInjected(iterable $calcs): void
+    {
+        $this->injected = collect($calcs);
+    }
+
+    /**
+     * All participating calcs — requested outputs first, injected recycling
+     * calcs after (they consume the leftover byproducts the plan emits).
+     */
+    protected function allCalcs(): Collection
+    {
+        return $this->calcs->concat($this->injected);
+    }
+
     public function getResults()
     {
-        $results = $this->calcs->map(fn ($calc) => $calc->getRawResults())->collapse();
+        $results = $this->allCalcs()->map(fn ($calc) => $calc->getRawResults())->collapse();
 
         return ProductionCalculator::groupAndSortResults($results);
     }
@@ -28,37 +58,36 @@ class Multiplexer
     /**
      * Plain-array Inertia payload for a multi plan — mirrors
      * ProductionCalculator::toPayload (V70: json round-trip, no objects;
-     * V66/V76/V88: recycling + extractor keys). Request params consumed here
+     * V66/V76: recycling + extractor keys). Request params consumed here
      * are whitelisted in CACHE_REQUEST_KEYS, so caching the payload is safe.
+     *
+     * V137: recycling production is injected into the plan itself (packaging +
+     * container chain render as normal steps inside `results`); recycling_steps
+     * carries only the terminal AWESOME Sink step.
      *
      * @return array<string, mixed>
      */
     public function toPayload(): array
     {
-        $recycling = RecyclingCalc::calc($this->getByproducts(), $this->getByproductsUsed(), request()->boolean('auto_package_recycle'));
-        $recyclingBelt = (float) request('belt_speed', 780);
-
-        // V136: the container chain's materials fold into the plan totals
-        $rawMaterials = collect([$this->getRawMaterials(), $recycling['raw_materials'] ?? []])->sumByKey();
+        $recycling = RecyclingCalc::inject($this, request()->boolean('auto_package_recycle'));
 
         return json_decode(json_encode([
             'results' => $this->getResults(),
             'byproducts_used' => $this->getByproductsUsed(),
-            'raw_materials' => $rawMaterials,
-            'intermediate_materials' => collect([$this->getIntermediateMaterials(), $recycling['intermediate_materials'] ?? []])->sumByKey(),
-            'all_materials' => collect([$this->getAllMaterials(), $recycling['all_materials'] ?? []])->sumByKey(),
+            'raw_materials' => $this->getRawMaterials(),
+            'intermediate_materials' => $this->getIntermediateMaterials(),
+            'all_materials' => $this->getAllMaterials(),
             'final' => $this->getFinals(),
             'recipe' => $this->getRecipes(),
             'overrides' => $this->getOverrides(),
             'byproducts' => $this->getByproducts(),
-            // V93: merge the package steps' 4-clock overviews so they render with controls
-            'overviews' => $this->getOverviews()->merge(RecyclingSteps::overviews($recycling, $recyclingBelt)),
+            'overviews' => $this->getOverviews(),
             // V76: extract-mode raws → extractor building rows (summary/parts/power);
-            // V136: chain raws included so extractor counts cover them
-            'extractors' => ExtractorSummary::build(collect($rawMaterials), request('raw_sources', [])),
+            // V137: injected-chain raws are inside getRawMaterials already
+            'extractors' => ExtractorSummary::build(collect($this->getRawMaterials()), request('raw_sources', [])),
             'recycling' => $recycling,
-            // V88: recycling rendered as full build steps (packaging + sink, with diagrams)
-            'recycling_steps' => RecyclingSteps::build($recycling, $recyclingBelt),
+            // V137: sink-only — packaging + chain steps live in `results`
+            'recycling_steps' => RecyclingSteps::build($recycling, (float) request('belt_speed', 780)),
         ]), true);
     }
 
@@ -66,7 +95,7 @@ class Multiplexer
     {
         $used_byproducts = [];
 
-        $this->calcs->each(function ($calc) use (&$used_byproducts) {
+        $this->allCalcs()->each(function ($calc) use (&$used_byproducts) {
             $calc->recalculateUsingByproducts($this->getByproducts(), $used_byproducts);
             $used_byproducts = $calc->getUsedByproducts();
         });
@@ -174,20 +203,24 @@ class Multiplexer
 
     public function getByproducts()
     {
-        return $this->calcs->map(fn ($calc) => $calc->getByproducts())->sumByKey();
+        return $this->allCalcs()->map(fn ($calc) => $calc->getByproducts())->sumByKey();
     }
 
     public function getByproductsUsed()
     {
-        return $this->calcs->map(fn ($calc) => $calc->getByproductsUsed())->sumByKey();
+        return $this->allCalcs()->map(fn ($calc) => $calc->getByproductsUsed())->sumByKey();
     }
 
     public function getOverviews()
     {
+        // imported products render no step, so their overviews are dead weight —
+        // reject them here to match ProductionCalculator::getOverviews (V137
+        // unified the single + multi payload paths through this class).
         return $this->getResults()->map(function ($tier) {
-            return $tier->map(function ($product) {
-                return $product->production->filter(fn ($row) => isset($row['overview']))->pluck('overviews');
-            })->collapse()->filter();
+            return $tier->reject(fn ($product) => $product->imported)
+                ->map(function ($product) {
+                    return $product->production->filter(fn ($row) => isset($row['overview']))->pluck('overviews');
+                })->collapse()->filter();
         })->collapse()
             ->map(fn ($overview) => [$overview['c100']['product'].'|'.$overview['c100']['recipe'] => [
                 'clock' => 'c100',

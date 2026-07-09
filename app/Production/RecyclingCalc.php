@@ -9,83 +9,167 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * AWESOME Sink recycling calc (V66/V67). Given a plan's byproduct flows
- * (produced vs used), compute the recycled points/min and any auto-package
- * Packager steps.
+ * AWESOME Sink recycling calc (V66/V67/V137). Given a plan's byproduct flows
+ * (produced vs used), compute the recycled points/min and the auto-package
+ * demand.
  *
  *  - leftover = produced − used (per item, > 0)
  *  - sinkable solid leftover (V65) → recycled directly: points = leftover × sink_points
  *  - fluid/gas leftover → recycled only when the auto-package toggle is on AND a
- *    Package recipe with a sinkable packaged form exists (V67): packaged → sunk,
- *    surfacing the Packager building/power + empty-container input
- *  - container demand from packaging (V135/V136): leftover container byproduct
- *    feeds the Packager before the sink; any shortfall is produced via a **full
- *    nested production chain** (V136) — container ← Plastic ← Crude Oil etc. —
- *    whose own fluid byproducts (Plastic → HOR) feed back into packaging,
- *    iterated to a fixed point
+ *    Package recipe with a sinkable packaged form exists (V67): packaged → sunk
  *  - everything else → waste
  *
- * Total points/min = Σ recycled flows × sink_points.
+ * V137: the packaging production itself — Packager steps, container chain down
+ * to raw, byproduct feedback — is NOT modeled here as synthetic rows. Instead
+ * inject() adds one real ProductionCalculator per packaged form to the plan's
+ * Multiplexer; byproduct convergence consumes the leftover fluid, nets leftover
+ * containers, and recurses the chain, all rendering as normal plan steps. The
+ * outer fixpoint re-sizes the injected calcs until leftovers stabilize
+ * (ε 1e-4, cap 20 — geometric feedback per V136).
  *
- * @phpstan-type PackagedRow array{fluid: string, product: string, qty: float, buildings: float, power: float, container: ?string, container_qty: float, points: float}
- * @phpstan-type ChainRow array{product: string, qty: float, buildings: float, power: float, building: ?string, recipe: ?string, build_cost: array<string, int>, inputs: list<array{item: string, qty: float}>}
+ * Total points/min = Σ solid recycled + Σ injected packaged output × sink_points.
+ *
+ * @phpstan-type PackagedRow array{fluid: string, fluid_qty: float, product: string, qty: float, buildings: float, power: float, recipe: ?string, points: float}
  */
 class RecyclingCalc
 {
     /**
-     * Container-chain fixpoint iteration bounds (V136): the packaging↔chain
-     * feedback is geometric (each round's extra fluid is a fraction of the
-     * last), so demand converges fast; the cap only guards pathological data.
+     * Packaging↔chain fixpoint iteration bounds (V136/V137): the feedback is
+     * geometric (each round's extra fluid is a fraction of the last), so demand
+     * converges fast; the cap only guards pathological data.
      */
     protected const MAX_CHAIN_PASSES = 20;
 
     protected const CHAIN_EPSILON = 1e-4;
 
     /**
-     * @param  Collection|array<string, float>  $byproducts  produced byproduct qty/min
-     * @param  Collection|array<string, float>  $byproductsUsed  byproduct qty/min consumed elsewhere
-     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, containers: list<array<string, mixed>>, raw_materials: array<string, float>, intermediate_materials: array<string, float>, all_materials: array<string, float>, waste: array<string, float>}
+     * Plan-level entry (V137): classify the plan's leftovers, inject one plan
+     * calc per packaged form into the Multiplexer, and iterate to a fixpoint —
+     * chain byproducts (Plastic → HOR) grow packaging demand, injected calcs
+     * consume leftover fluids/containers, until the sized targets stabilize.
+     *
+     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, waste: array<string, float>}
      */
-    public static function calc($byproducts, $byproductsUsed = [], bool $autoPackage = false): array
+    public static function inject(Multiplexer $multiplexer, bool $autoPackage = false): array
     {
-        $leftovers = static::leftovers(collect($byproducts), collect($byproductsUsed));
-
         $recycled = [];
         $packaged = [];
         $waste = [];
-        $chain = null;
-        $previousShortfall = null;
+        $previousTargets = null;
 
-        // V136: packaging demands containers; producing containers emits fluid
-        // byproducts that get packaged too (Plastic → HOR). Iterate the whole
-        // pool → classify → net → chain loop until the shortfall stabilizes.
         for ($pass = 0; $pass < static::MAX_CHAIN_PASSES; $pass++) {
-            $pool = collect([$leftovers, $chain['leftovers'] ?? []])->sumByKey();
+            $pool = static::sizingPool($multiplexer, $packaged);
 
             [$recycled, $packaged, $waste] = static::classify($pool, $autoPackage);
-            [$recycled, $shortfall] = static::netContainers($recycled, $packaged);
 
-            if (static::stable($shortfall, $previousShortfall)) {
+            $targets = collect($packaged)->mapWithKeys(fn ($row) => [$row['product'] => (float) $row['qty']])->all();
+
+            if (static::stable($targets, $previousTargets)) {
                 break;
             }
 
-            $previousShortfall = $shortfall;
-            $chain = empty($shortfall) ? null : static::containerChain($shortfall);
+            $previousTargets = $targets;
+
+            $multiplexer->setInjected(static::injectedCalcs($packaged));
+            $multiplexer->recalculateUsingByproductsUntilStable();
         }
 
-        // totalled after the container offset — only flows actually sunk count
         $points = (float) (collect($recycled)->sum('points') + collect($packaged)->sum('points'));
 
         return [
             'points' => $points,
             'recycled' => $recycled,
             'packaged' => $packaged,
-            'containers' => $chain['rows'] ?? [],
-            'raw_materials' => $chain['raw'] ?? [],
-            'intermediate_materials' => $chain['intermediates'] ?? [],
-            'all_materials' => $chain['all'] ?? [],
             'waste' => $waste,
         ];
+    }
+
+    /**
+     * Pure single-pass classification (unit-testable without a plan): route the
+     * given byproduct leftovers into recycled / packaged / waste. No injection,
+     * no container netting — plan-level behavior lives in inject().
+     *
+     * @param  Collection|array<string, float>  $byproducts  produced byproduct qty/min
+     * @param  Collection|array<string, float>  $byproductsUsed  byproduct qty/min consumed elsewhere
+     * @return array{points: float, recycled: array<string, array{qty: float, points: float}>, packaged: list<array<string, mixed>>, waste: array<string, float>}
+     */
+    public static function calc($byproducts, $byproductsUsed = [], bool $autoPackage = false): array
+    {
+        $leftovers = static::leftovers(collect($byproducts), collect($byproductsUsed));
+
+        [$recycled, $packaged, $waste] = static::classify($leftovers, $autoPackage);
+
+        $points = (float) (collect($recycled)->sum('points') + collect($packaged)->sum('points'));
+
+        return [
+            'points' => $points,
+            'recycled' => $recycled,
+            'packaged' => $packaged,
+            'waste' => $waste,
+        ];
+    }
+
+    /**
+     * The leftover pool the packaging targets are sized against (V137):
+     * produced − used across ALL calcs (injected included), except each
+     * injected packager's own draw on its fluid — sizing measures the leftover
+     * BEFORE packaging consumes it, else a met target collapses to zero on the
+     * next pass. Excluding the recorded draw (not adding back the sized one)
+     * stays exact under partial consumption. Container draws are NOT excluded:
+     * a canister fed to the Packager must shrink the recycled-canister row.
+     *
+     * @param  list<array<string, mixed>>  $currentPackaged
+     * @return array<string, float>
+     */
+    protected static function sizingPool(Multiplexer $multiplexer, array $currentPackaged): array
+    {
+        $used = collect($multiplexer->getByproductsUsed())
+            ->map(fn ($consumers) => is_array($consumers) || $consumers instanceof Collection ? collect($consumers) : $consumers);
+
+        foreach ($currentPackaged as $row) {
+            $consumers = $used->get($row['fluid']);
+
+            if ($consumers instanceof Collection) {
+                $used->put($row['fluid'], $consumers->except($row['product']));
+            }
+        }
+
+        return static::leftovers(collect($multiplexer->getByproducts()), $used);
+    }
+
+    /**
+     * One real plan calc per packaged form (V137): Packaged X at the sized rate
+     * via its Package recipe. Request recipe choices apply, so the chain honors
+     * user picks (alt Plastic, etc.); byproduct convergence then makes it
+     * consume the plan's leftover fluid instead of producing fresh.
+     *
+     * @param  list<array<string, mixed>>  $packaged
+     * @return list<ProductionCalculator>
+     */
+    protected static function injectedCalcs(array $packaged): array
+    {
+        return collect($packaged)
+            ->filter(fn ($row) => (float) $row['qty'] > 1e-9)
+            ->map(function ($row) {
+                // the Package recipe model — a base recipe's description is null,
+                // so resolve it from the fluid rather than trusting the row string
+                $recipe = static::packageRecipe(i($row['fluid']));
+
+                if (! $recipe) {
+                    return null;
+                }
+
+                return ProductionCalculator::make(
+                    product: i($row['product']),
+                    qty: $row['qty'],
+                    recipe: $recipe,
+                    choices: collect(request('choices'))->map(fn ($recipeName) => r($recipeName)),
+                    dest: BuildingEnum::AWESOME_SINK->value,
+                );
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**
@@ -143,8 +227,7 @@ class RecyclingCalc
                 continue;
             }
 
-            // sinkable solid → recycle directly (V66); points totalled after the
-            // container offset (V135)
+            // sinkable solid → recycle directly (V66)
             if ($ingredient->isSinkable()) {
                 $recycled[$name] = ['qty' => $leftover, 'points' => $leftover * (int) $ingredient->sink_points];
 
@@ -169,48 +252,7 @@ class RecyclingCalc
     }
 
     /**
-     * Net the packaging steps' empty-container demand (V135): leftover container
-     * byproduct (already in $recycled) feeds the Packager before the sink; the
-     * remaining demand is returned as the shortfall to produce (V136).
-     *
-     * @param  array<string, array{qty: float, points: float}>  $recycled
-     * @param  list<array<string, mixed>>  $packaged
-     * @return array{0: array<string, array{qty: float, points: float}>, 1: array<string, float>}
-     */
-    protected static function netContainers(array $recycled, array $packaged): array
-    {
-        $demand = collect($packaged)
-            ->filter(fn ($row) => ! empty($row['container']) && (float) ($row['container_qty'] ?? 0) > 0)
-            ->groupBy('container')
-            ->map(fn ($rows) => (float) $rows->sum('container_qty'));
-
-        $shortfall = [];
-
-        foreach ($demand as $name => $qty) {
-            if (isset($recycled[$name])) {
-                $available = (float) $recycled[$name]['qty'];
-                $used = min($available, $qty);
-                $remaining = $available - $used;
-                $qty -= $used;
-
-                $recycled = $remaining > 1e-9
-                    ? array_replace($recycled, [$name => [
-                        'qty' => $remaining,
-                        'points' => $remaining * (int) optional(Ingredient::ofName($name))->sink_points,
-                    ]])
-                    : collect($recycled)->except($name)->all();
-            }
-
-            if ($qty > 1e-9) {
-                $shortfall[$name] = $qty;
-            }
-        }
-
-        return [$recycled, $shortfall];
-    }
-
-    /**
-     * Shortfall maps are equal within CHAIN_EPSILON → the fixpoint is reached.
+     * Targets maps are equal within CHAIN_EPSILON → the fixpoint is reached.
      *
      * @param  array<string, float>  $current
      * @param  array<string, float>|null  $previous
@@ -233,92 +275,10 @@ class RecyclingCalc
     }
 
     /**
-     * The full production chain for the container shortfall (V136): a nested
-     * plan (Multiplexer of one ProductionCalculator per container) so recipe
-     * choices, favorites, and internal byproduct reuse all apply. Returns the
-     * per-product production rows (dependency order), the chain's own leftover
-     * byproducts (they feed back into packaging), and its material totals for
-     * the plan-payload merge.
-     *
-     * @param  array<string, float>  $shortfall  container → qty/min to produce
-     * @return array{rows: list<array<string, mixed>>, leftovers: array<string, float>, raw: array<string, float>, intermediates: array<string, float>, all: array<string, float>}
-     */
-    protected static function containerChain(array $shortfall): array
-    {
-        $multiplexer = new Multiplexer;
-
-        foreach ($shortfall as $name => $qty) {
-            $multiplexer->add(ProductionCalculator::make(
-                product: i($name),
-                qty: $qty,
-                choices: collect(request('choices'))->map(fn ($recipeName) => r($recipeName)),
-            ));
-        }
-
-        $multiplexer->recalculateUsingByproductsUntilStable();
-
-        $results = $multiplexer->getResults();
-        $nonRaw = isset($results[1]) ? $results->skip(1) : $results;
-
-        $rows = [];
-
-        foreach ($nonRaw as $tier) {
-            foreach ($tier as $product => $material) {
-                foreach ($material->production as $production) {
-                    if ((float) ($production['qty'] ?? 0) > 1e-9 && ! empty($production['recipe'])) {
-                        $rows[] = static::chainRow($product, $production);
-                    }
-                }
-            }
-        }
-
-        $raw = $multiplexer->getRawMaterials();
-        $all = $multiplexer->getAllMaterials();
-
-        return [
-            'rows' => $rows,
-            'leftovers' => static::leftovers(collect($multiplexer->getByproducts()), collect($multiplexer->getByproductsUsed())),
-            'raw' => $raw->all(),
-            // "intermediates" for the plan merge = every chain product incl. the
-            // container roots (they're intermediates from the plan's view)
-            'intermediates' => collect($all)->except($raw->keys()->all())->all(),
-            'all' => $all->all(),
-        ];
-    }
-
-    /**
-     * A production row for one chain step (V136) — same shape family as the
-     * packaged rows so it folds into the build summary / parts / power (V87)
-     * and renders as a `produce` step.
-     *
-     * @param  array<string, mixed>  $production  a groupAndSortResults production row
-     * @return array<string, mixed>
-     */
-    protected static function chainRow(string $product, array $production): array
-    {
-        $recipe = $production['recipe'];
-        $qty = (float) $production['qty'];
-        $buildings = $qty / (float) $recipe->base_per_min;
-        $basePower = (float) (optional(optional($recipe->building)->variant('mk1'))->base_power ?? 0);
-
-        return [
-            'product' => $product,
-            'qty' => $qty,
-            'buildings' => $buildings,
-            'power' => $buildings * $basePower,
-            'building' => optional($recipe->building)->name,
-            'recipe' => $recipe->description ?: null,
-            'build_cost' => static::packagerBuildCost($recipe, $buildings),
-            'inputs' => collect($production['ingredients'] ?? [])
-                ->map(fn ($rate, $name) => ['item' => $name, 'qty' => (float) $rate])
-                ->values()
-                ->all(),
-        ];
-    }
-
-    /**
      * Route a fluid/gas leftover through its Package recipe → Packaged form (V67).
      * Returns null when there is no Package recipe with a sinkable packaged form.
+     * The row sizes the injected plan calc (V137); buildings/power stay for the
+     * ProductionSummary line — the real step numbers come from the plan itself.
      *
      * @return array<string, mixed>|null
      */
@@ -340,49 +300,19 @@ class RecyclingCalc
         $buildings = $qty / $fluidPerMin;
         $packagedQty = $buildings * (float) $recipe->base_per_min;
 
-        // the other input is the empty container (Empty Canister / Empty Fluid Tank)
-        $container = $recipe->ingredients->first(fn ($i) => $i->name !== $fluid->name);
-        $containerQty = $container ? $buildings * (float) $container->pivot->base_qty : 0.0;
-
         $basePower = (float) (optional(optional($recipe->building)->variant('mk1'))->base_power ?? 0);
 
         return [
             'fluid' => $fluid->name,
-            // V94: the fluid input rate (= the leftover), so the packaging step never
+            // V94: the fluid input rate (= the leftover), so packaging never
             // reuses the packaged output qty for the input (B53)
             'fluid_qty' => $qty,
             'product' => $recipe->product->name,
             'qty' => $packagedQty,
             'buildings' => $buildings,
             'power' => $buildings * $basePower,
-            'container' => optional($container)->name,
-            'container_qty' => $containerQty,
             'points' => $packagedQty * (int) $recipe->product->sink_points,
-            // V87: fold the Packager into the build (building summary / parts / power)
-            'building' => optional($recipe->building)->name,
-            'build_cost' => static::packagerBuildCost($recipe, $buildings),
         ];
-    }
-
-    /**
-     * Build-cost materials for the auto-package Packager step (V87), scaled by the
-     * (possibly fractional) building count — read from the Packager mk1 variant recipe.
-     *
-     * @return array<string, int>
-     */
-    protected static function packagerBuildCost(Recipe $recipe, float $buildings): array
-    {
-        $variant = optional($recipe->building)->variant('mk1');
-
-        if (! $variant) {
-            return [];
-        }
-
-        return $variant->recipe
-            ->mapWithKeys(fn ($ingredient) => [
-                $ingredient->name => (int) ceil($ingredient->pivot->qty * $buildings),
-            ])
-            ->all();
     }
 
     /**
