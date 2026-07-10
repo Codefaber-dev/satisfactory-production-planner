@@ -137,7 +137,7 @@ class ProductionCachePayloadTest extends TestCase
     {
         $favoritesKey = Favorites::all()->pluck('id')->sort()->values()->all();
 
-        return 'production_calc_v2_'
+        return 'production_calc_v5_'
             .md5(collect(compact('product', 'qty'))
                 ->put('recipe', null)
                 ->put('overrides', [])

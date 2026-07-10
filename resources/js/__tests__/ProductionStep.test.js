@@ -323,6 +323,27 @@ describe('ProductionStep — recycled byproduct indicator (V66)', () => {
     });
 });
 
+describe('ProductionStep — destination links (V138 / B70)', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    it('links a destination only when it is mapped in levelStepMap', () => {
+        const wrapper = mountWith({
+            levelStepMap: { Rubber: '1.D' },
+            material: { outputs: { Rubber: 90, 'Heavy Oil Residue': 30 } },
+        });
+
+        // mapped dest → identifier link
+        const link = wrapper.find('a[href="#1.D"]');
+        expect(link.exists()).toBe(true);
+        expect(link.text()).toContain('Rubber (1.D)');
+
+        // unmapped dest → plain text, never "(undefined)"
+        expect(wrapper.text()).toContain('Heavy Oil Residue');
+        expect(wrapper.text()).not.toContain('undefined');
+        expect(wrapper.findAll('a').filter((a) => a.text().includes('Heavy Oil Residue'))).toHaveLength(0);
+    });
+});
+
 describe('ProductionStep — QuickNav registration', () => {
     beforeEach(() => vi.clearAllMocks());
 

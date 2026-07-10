@@ -17,6 +17,34 @@ class BuildingDetailsTest extends TestCase
         $this->artisan('db:seed', ['--env' => 'testing']);
     }
 
+    /**
+     * V129/B67: the in-game grid puts the odd half-meter of an odd-length
+     * building BELOW the row — top offset takes the floor, bottom the ceil
+     * (they were swapped). row_spacing_offset stays anchored to the top gap.
+     */
+    #[Test]
+    public function odd_length_building_offsets_put_the_extra_meter_below(): void
+    {
+        $recipe = r('Copper Ingot'); // Smelter, building length 9 (odd)
+        $footprint = BuildingDetails::calc($recipe, $recipe->base_per_min, 780)->first()['footprint'];
+
+        $this->assertLessThan($footprint['bottom_offset'], $footprint['top_offset']);
+        $this->assertSame(11.0, (float) $footprint['top_offset']);
+        $this->assertSame(12.0, (float) $footprint['bottom_offset']);
+
+        // gaps + building fill the slab exactly (single row)
+        $this->assertEquals(
+            $footprint['length_foundations'] * 8,
+            $footprint['top_offset'] + $footprint['building_length'] + $footprint['bottom_offset']
+        );
+
+        // the spacing marker anchors to the top gap
+        $this->assertEquals(
+            $footprint['top_offset'] + $footprint['building_length'],
+            $footprint['row_spacing_offset']
+        );
+    }
+
     #[Test]
     public function normal_path_energy_formula_holds(): void
     {

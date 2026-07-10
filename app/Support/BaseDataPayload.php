@@ -35,7 +35,14 @@ class BaseDataPayload
     public static function recipes(): array
     {
         return Cache::remember(static::RECIPES_KEY, static::TTL, function () {
-            $grouped = Recipe::all()
+            $all = Recipe::all();
+
+            // V127/B66: warm the efficiency-flag caches in memory before
+            // serialization — otherwise each recipe's two appends run their
+            // own query, each hydrating a full eager-loaded Recipe.
+            Recipe::warmEfficiencyFlagCaches($all);
+
+            $grouped = $all
                 ->each(fn (Recipe $recipe) => $recipe->makeHidden('favorite'))
                 ->groupBy(fn (Recipe $recipe) => $recipe->product->name);
 

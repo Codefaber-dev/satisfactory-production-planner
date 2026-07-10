@@ -138,7 +138,10 @@ trait ParsesSteps
                             'imported' => $recipes->max('imported'),
                             'overridden' => $recipes->max('overridden'),
                             'total' => $recipes->sum('qty'),
-                            'outputs' => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->toArray(),
+                            // V138: only positive flows — a byproduct-fully-covered
+                            // consumer (qty-0 step) must not appear as a ghost
+                            // 0/min destination on its suppliers (B70)
+                            'outputs' => $recipes->pluck('outputs')->groupBy('dest')->map->sum('qty')->filter(fn ($qty) => $qty > 0)->toArray(),
                             'byproduct_outputs' => $recipes->pluck('outputs')->groupBy('dest')->map->sum('byproduct_qty')->filter()->toArray(),
                             'production' => $recipes
                                 ->groupBy(fn ($row) => $row['name'].'.'.$row['description'])

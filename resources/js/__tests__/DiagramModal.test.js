@@ -201,35 +201,48 @@ describe('DiagramModal — composition + theming (V115)', () => {
         expect(panel.props('footprint')).toEqual(baseFootprint());
     });
 
-    it('renders in place (no body teleport) with blueprint panel styling (V120)', () => {
+    it('renders in place (no body teleport) as a blueprint engineering-drawing sheet (V128)', () => {
         const wrapper = mountModal();
 
         // in-place render: the overlay is inside the component tree, not document.body
         expect(wrapper.find('[data-diagram-modal]').exists()).toBe(true);
 
-        const panel = wrapper.find('[data-blueprint-panel]');
-        expect(panel.exists()).toBe(true);
-        expect(panel.classes()).toContain('bg-blue-950');
-        expect(panel.classes()).toContain('text-blue-100');
+        const sheet = wrapper.find('[data-drawing-sheet]');
+        expect(sheet.exists()).toBe(true);
+        expect(sheet.classes()).toContain('bg-blue-950');
+        expect(sheet.classes()).toContain('text-blue-100');
     });
 
-    it('renders its diagram in blueprint mode; the inline diagram stays default (V120)', async () => {
+    it('renders its diagram in blueprint mode (V120/V128)', () => {
         const modal = mountModal();
         expect(modal.findComponent(DiagramSvg).props('blueprint')).toBe(true);
-
-        const inline = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
-        expect(inline.findComponent(DiagramSvg).props('blueprint')).toBe(false);
     });
 
-    it('lets the svg fill the stage; the inline svg keeps its height cap (V121)', () => {
+    it('renders the footprint stats as title-block compartments with a live scale cell (V128)', async () => {
+        const wrapper = mountModal();
+
+        expect(wrapper.find('[data-title-block]').exists()).toBe(true);
+        expect(wrapper.findAll('[data-title-block-cell]').length).toBeGreaterThan(5);
+
+        const scale = wrapper.find('[data-scale-cell]');
+        expect(scale.exists()).toBe(true);
+        expect(scale.text()).toMatch(/1 m = [\d.]+ px/);
+
+        // zooming in shrinks the view window ⇒ more pixels per meter
+        const before = Number(scale.text().match(/= ([\d.]+) px/)[1]);
+        await wrapper.find('[data-zoom-in]').trigger('click');
+        const after = Number(
+            wrapper
+                .find('[data-scale-cell]')
+                .text()
+                .match(/= ([\d.]+) px/)[1]
+        );
+        expect(after).toBeGreaterThan(before);
+    });
+
+    it('lets the svg fill the stage (V121)', () => {
         const modalSvg = mountModal().findComponent(DiagramSvg).find('svg');
         expect(modalSvg.classes()).toContain('h-full');
-
-        const inlineSvg = mount(BuildDiagram, { props: { footprint: baseFootprint() } })
-            .findComponent(DiagramSvg)
-            .find('svg');
-        expect(inlineSvg.classes()).toContain('h-auto');
-        expect(inlineSvg.classes()).toContain('max-h-96');
     });
 
     it('fits the view window to the measured stage aspect, centered on the diagram (V121)', async () => {
@@ -247,5 +260,31 @@ describe('DiagramModal — composition + theming (V115)', () => {
         await wrapper.find('[data-zoom-in]').trigger('click');
         const [, , w, h] = modalViewBox(wrapper).split(' ').map(Number);
         expect(h / w).toBeCloseTo(1, 5);
+    });
+
+    it('fit view derives from the content extent, not the slab, when bands overflow (V124)', () => {
+        // single row of 4 buildings 18×20 m: 4 staggered input bands need 15 m
+        // above the row but top_offset is 10 → extent extends 5 m past the slab
+        const wrapper = mountModal({
+            props: {
+                footprint: {
+                    ...baseFootprint(),
+                    rows: 1,
+                    buildings_per_row: 4,
+                    num_buildings: 4,
+                    building_width: 18,
+                    building_length: 20,
+                    length_foundations: 5,
+                    width_foundations: 13,
+                    row_spacing: 0,
+                    top_offset: 10,
+                    bottom_offset: 10,
+                    left_offset: 16,
+                },
+                materials: { inputs: ['A', 'B', 'C', 'D'], outputs: ['O'] },
+            },
+        });
+
+        expect(modalViewBox(wrapper)).toBe('0 -5 104 45');
     });
 });

@@ -59,12 +59,15 @@
                                     />
                                 </div>
                                 <span class="text-xs lg:whitespace-nowrap">
+                                    <!-- V138: identifier link only when the dest step is mapped -->
                                     <a
+                                        v-if="levelStepMap[mat]"
                                         @click="flashDestination(levelStepMap[mat])"
                                         :href="`#${levelStepMap[mat]}`"
                                         class="text-sky-700"
                                         >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
                                     </a>
+                                    <template v-else>{{ mat }}</template>
                                     <br />
                                     {{ formatQtyWithPercentage(out_qty, qty) }}
                                 </span>
@@ -192,12 +195,15 @@
                                         />
                                     </div>
                                     <span class="text-xs lg:whitespace-nowrap">
+                                        <!-- V138: identifier link only when the dest step is mapped -->
                                         <a
+                                            v-if="levelStepMap[mat]"
                                             @click="flashDestination(levelStepMap[mat])"
                                             :href="`#${levelStepMap[mat]}`"
                                             class="text-sky-700"
                                             >{{ mat }} ({{ levelStepMap[mat] }}) ➡️
                                         </a>
+                                        <template v-else>{{ mat }}</template>
                                         <br />
                                         {{ formatQtyWithPercentage(out_qty, qty) }}
                                     </span>
@@ -356,9 +362,16 @@
         </tr>
         <!-- gate on overview presence: a recipe-bearing raw (V79) can lack an overview
              entry transiently while its source mode changes — don't crash (B49) -->
-        <tr class="block lg:table-row" v-if="recipe && overview" v-show="diagrams">
+        <tr class="block lg:table-row" v-if="recipe && overview">
             <td class="block text-center lg:table-cell" colspan="100">
-                <build-diagram :footprint="footprint" :title="production.name" :materials="diagramMaterials" />
+                <build-diagram
+                    :footprint="footprint"
+                    :title="production.name"
+                    :materials="diagramMaterials"
+                    :details="diagramDetails"
+                    :identifier="production.imported ? '' : identifier"
+                    @update:max-clock="updateClock('c' + $event)"
+                />
             </td>
         </tr>
     </tbody>
@@ -377,7 +390,6 @@ export default {
     components: { CloudImage, BuildDiagram, RecipePicker, RawSourceControl },
     props: {
         choices: {},
-        diagrams: {},
         name: {},
         newImports: {},
         recipes: {},
@@ -444,7 +456,6 @@ export default {
 
         this.Bus.on('flash', ({ dest }) => {
             if (dest === this.identifier) {
-                console.log('flashing now');
                 this.shouldFlash = true;
                 setTimeout(() => {
                     this.shouldFlash = false;
@@ -493,6 +504,37 @@ export default {
             return {
                 inputs: Object.keys(this.production.ingredients || {}),
                 outputs: [this.production.name, ...Object.keys(this.production.byproducts || {})],
+            };
+        },
+
+        // full step details for the diagram modal side panel (V126): overview
+        // numbers as-is (multipliers baked in) + the step's material rates
+        diagramDetails() {
+            const detail = this.overview?.details?.[this.selectedVariantName];
+
+            if (!detail) {
+                return null;
+            }
+
+            return {
+                output: { name: this.production.name || this.name, qty: this.overview.qty },
+                byproducts: this.production.byproducts || {},
+                inputs: this.production.ingredients || {},
+                // header RECIPE cell + MAX CLOCK dropdown (V131)
+                recipe_name: this.production.recipe?.description || 'Default',
+                max_clock_speed: detail.max_clock_speed,
+                building: this.overview.building,
+                // detail.variant is the bare tier ('mk1'); selectedVariantName is
+                // the composite details key ('Smelter (mk1)') — prefer the bare one
+                variant: detail.variant ?? this.selectedVariantName,
+                num_buildings: detail.num_buildings,
+                clock_speed: detail.clock_speed,
+                power_usage: detail.power_usage,
+                energy_per_item: detail.energy_per_item,
+                total_energy: detail.total_energy,
+                build_cost: detail.build_cost || {},
+                slots: detail.slots ?? 0,
+                max_slots: detail.max_slots ?? 0,
             };
         },
 
@@ -638,7 +680,6 @@ export default {
         },
 
         flashDestination(dest) {
-            console.log('emitting flash');
             this.Bus.emit('flash', { dest });
         },
 

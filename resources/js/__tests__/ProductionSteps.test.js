@@ -106,22 +106,14 @@ describe('ProductionSteps — Level 0 raws (V100)', () => {
     });
 });
 
-describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
+describe('ProductionSteps — Recycling steps (T184 / V137)', () => {
+    // V137: packaging + container-chain production render as normal plan steps
+    // inside results — the backend recycling_steps carries ONLY the sink.
     function withSteps() {
         return mountSteps({
             production: {
                 ...makeProduction(),
                 recycling_steps: [
-                    {
-                        type: 'package',
-                        name: 'Packaged Water',
-                        building: 'Packager',
-                        num_buildings: 1,
-                        power: 10,
-                        footprint: {},
-                        inputs: [{ item: 'Water', qty: 60 }],
-                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
-                    },
                     {
                         type: 'sink',
                         name: 'AWESOME Sink',
@@ -137,78 +129,26 @@ describe('ProductionSteps — Recycling steps (T127 / V88)', () => {
         });
     }
 
-    it('renders the packaging step as a ProductionStep and the sink as a RecycleStep (V90/V91)', () => {
+    it('renders only the sink RecycleStep in the Recycling group (V137)', () => {
         const wrapper = withSteps();
         const steps = wrapper.findAll('[data-test="recycle-step"]');
-        expect(steps).toHaveLength(2);
+        expect(steps).toHaveLength(1);
 
-        // V90: auto-package fluid is now a real ProductionStep (recipe locked, not RecycleStep)
-        const pkg = wrapper.find('.stub-step[data-name="Packaged Water"]');
-        expect(pkg.exists()).toBe(true);
-
-        // V91: the terminal AWESOME Sink stays a RecycleStep
+        // the terminal AWESOME Sink is a RecycleStep
         const sink = wrapper.find('.stub-recycle[data-name="AWESOME Sink"]');
         expect(sink.exists()).toBe(true);
+
+        // no ProductionStep is rendered from recycling_steps — packaging/chain
+        // steps arrive as normal results steps instead
+        const stubNames = wrapper.findAll('.stub-step').map((s) => s.attributes('data-name'));
+        expect(stubNames).not.toContain('Packaged Water');
     });
 
-    it('assigns terminal R.* identifiers and a sink identifier', () => {
+    it('assigns the terminal R.* identifier and maps the sink into levelStepMap', () => {
         const wrapper = withSteps();
         expect(wrapper.vm.recycleIdentifier(0)).toBe('R.A');
-        expect(wrapper.vm.sinkIdentifier).toBe('R.B');
-        // the packaging step is reachable in the map so the sink's input links to it
-        expect(wrapper.vm.recycleStepMap['Packaged Water']).toBe('R.A');
-        // V90: the packaging step's output destination resolves to the sink
-        expect(wrapper.vm.packageDestinationMap['AWESOME Sink']).toBe('R.B');
-    });
-
-    it('reuses the backend overview + real recipe inputs in the packaging payload (V90/V93/V94)', () => {
-        const overviews = {
-            'Packaged Water|Packaged Water': {
-                clock: 'c100',
-                selected_variant_name: 'mk1',
-                overviews: { c100: { building: 'Packager' } },
-            },
-        };
-        const wrapper = mountSteps({
-            production: {
-                ...makeProduction(),
-                recycling_steps: [
-                    {
-                        type: 'package',
-                        name: 'Packaged Water',
-                        building: 'Packager',
-                        num_buildings: 1,
-                        power: 10,
-                        footprint: {},
-                        recipe: null,
-                        inputs: [
-                            { item: 'Water', qty: 60 },
-                            { item: 'Empty Canister', qty: 60 },
-                        ],
-                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
-                    },
-                    {
-                        type: 'sink',
-                        name: 'AWESOME Sink',
-                        building: 'AWESOME Sink',
-                        num_buildings: 1,
-                        power: 30,
-                        footprint: {},
-                        inputs: [{ item: 'Packaged Water', qty: 60 }],
-                        output: { points: 7800 },
-                    },
-                ],
-            },
-            overviews,
-        });
-        const payload = wrapper.vm.packagePayload(wrapper.vm.recycleSteps[0]);
-        expect(payload.name).toBe('Packaged Water');
-        // V94: both real recipe inputs flow through (fluid + empty container)
-        expect(payload.production.ingredients).toEqual({ Water: 60, 'Empty Canister': 60 });
-        expect(payload.material.outputs).toEqual({ 'AWESOME Sink': 60 });
-        // V93: reuses the real backend overview map, not a hand-rolled synthetic one
-        expect(payload.overviews).toEqual(overviews);
-        expect(payload.production.recipe.description).toBe(null);
+        // V137: plan steps outputting to the AWESOME Sink link to the sink step
+        expect(wrapper.vm.levelStepMap['AWESOME Sink']).toBe('R.A');
     });
 
     it('renders no Recycling level when there are no recycling steps', () => {
@@ -225,7 +165,7 @@ describe('ProductionSteps — header controls (T157 / V112)', () => {
             .map((b) => b.text())
             .join(' ');
 
-        expect(buttonText).toContain('Toggle Diagrams');
+        expect(buttonText).not.toContain('Toggle Diagrams'); // modal-only diagrams (V134)
         expect(buttonText).not.toContain('Force Even Rows');
         expect(buttonText).not.toContain('Limit Belt Rates');
     });
@@ -322,21 +262,13 @@ describe('ProductionSteps — type-ahead step filter (T156 / V110)', () => {
         expect(isShown(findStep(wrapper, 'Iron Ingot'))).toBe(false);
     });
 
-    it('filters recycle steps on their inputs and output', async () => {
+    it('filters the sink step on its inputs', async () => {
+        // V137: recycling_steps carries only the sink; its inputs still join
+        // the filter options and drive its visibility
         const wrapper = mountSteps({
             production: {
                 ...makeFilterProduction(),
                 recycling_steps: [
-                    {
-                        type: 'package',
-                        name: 'Packaged Water',
-                        building: 'Packager',
-                        num_buildings: 1,
-                        power: 10,
-                        footprint: {},
-                        inputs: [{ item: 'Water', qty: 60 }],
-                        output: { item: 'Packaged Water', qty: 60, to_sink: true },
-                    },
                     {
                         type: 'sink',
                         name: 'AWESOME Sink',
@@ -351,14 +283,12 @@ describe('ProductionSteps — type-ahead step filter (T156 / V110)', () => {
             },
         });
 
-        // recycle-step inputs/outputs join the options
+        // sink inputs join the options
         expect(wrapper.vm.filterOptions).toContain('Packaged Water');
-        expect(wrapper.vm.filterOptions).toContain('Water');
 
-        // Water: only the packaging step (fluid input) matches
-        await setFilter(wrapper, 'Water');
-        expect(isShown(findStep(wrapper, 'Packaged Water'))).toBe(true);
-        expect(isShown(wrapper.find('.stub-recycle[data-name="AWESOME Sink"]'))).toBe(false);
+        // Packaged Water: the sink (input) matches
+        await setFilter(wrapper, 'Packaged Water');
+        expect(isShown(wrapper.find('.stub-recycle[data-name="AWESOME Sink"]'))).toBe(true);
 
         // no recycle step matches → Recycling header hides
         await setFilter(wrapper, 'Iron Ingot');

@@ -70,4 +70,28 @@ describe('RecycleStep — terminal AWESOME Sink step (V91)', () => {
         mountStep(sinkStep, { identifier: 'R.B' });
         expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', { name: 'AWESOME Sink', identifier: 'R.B' });
     });
+
+    it('flashes when a destination link targeting it fires (flash parity with ProductionStep)', async () => {
+        vi.useFakeTimers();
+        mockBus.on.mockClear();
+        const wrapper = mountStep(sinkStep);
+
+        const flashHandler = mockBus.on.mock.calls.find(([event]) => event === 'flash')?.[1];
+        expect(flashHandler).toBeTruthy();
+
+        // non-matching dest → no flash
+        flashHandler({ dest: '1.A' });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('tbody').classes()).not.toContain('bg-slate-300');
+
+        // matching dest → flash on, then off after the timeout
+        flashHandler({ dest: 'R.A' });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('tbody').classes()).toContain('bg-slate-300');
+
+        vi.advanceTimersByTime(1300);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('tbody').classes()).not.toContain('bg-slate-300');
+        vi.useRealTimers();
+    });
 });

@@ -153,9 +153,24 @@
                     </div>
 
                     <div class="flex flex-1 flex-col space-y-8 space-x-0 py-4 md:flex-row md:space-y-0 md:space-x-4">
+                        <!-- V123: summary collapse toggle — xl layout only, mobile tabs untouched -->
+                        <button
+                            rel="toggle-summary"
+                            @click="toggleSummary"
+                            :title="summaryCollapsed ? 'Show Summary' : 'Hide Summary'"
+                            class="hidden self-start rounded-lg border border-gray-500 bg-white p-1 shadow-lg xl:block dark:border-sky-700 dark:bg-slate-900 dark:text-gray-100"
+                        >
+                            <chevron-right-icon v-if="summaryCollapsed" class="h-5 w-5" />
+                            <chevron-left-icon v-else class="h-5 w-5" />
+                        </button>
+
                         <!-- Left Side -->
                         <production-summary
-                            :class="{ 'hidden': selectedTab !== 'productionSummary', 'xl:block': true }"
+                            :class="{
+                                'hidden': selectedTab !== 'productionSummary',
+                                'xl:block': !summaryCollapsed,
+                                'xl:hidden': summaryCollapsed,
+                            }"
                             :building-checks="buildingChecks"
                             :disabled-raw-materials="disabledRawMaterials"
                             @fetch="fetch"
@@ -181,7 +196,6 @@
                         <production-steps
                             :class="{ 'hidden': selectedTab !== 'productionSteps', 'xl:flex': true }"
                             ref="productionSteps"
-                            :diagrams="diagrams"
                             :hide-completed="hideCompleted"
                             :new-imports="newImports"
                             :import-notes="newImportNotes"
@@ -200,7 +214,6 @@
                             @updateRawSource="updateRawSource"
                             :applied-even="!!even"
                             @toggle="toggleProductionCheck"
-                            @toggleDiagrams="toggleDiagrams"
                         />
                     </div>
                 </div>
@@ -211,6 +224,7 @@
 
 <script>
 import { computed } from 'vue';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline';
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
 import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
@@ -226,6 +240,8 @@ export default {
     name: 'ShowNew',
 
     components: {
+        ChevronLeftIcon,
+        ChevronRightIcon,
         ProductionQuickNav,
         ProductionSteps,
         ProductionSummary,
@@ -347,7 +363,8 @@ export default {
             disabledRawMaterials: {},
             newConstraints: [],
             rawUnchanged: true,
-            diagrams: store.getItem('diagrams', true),
+            // V123: summary pane collapse — global UI pref, xl layout only.
+            summaryCollapsed: store.getItem('summaryCollapsed', false),
             newImports: this.imports ? Object.fromEntries((this.imports || '').split(',').map((o) => [o, true])) : {},
             showWarnings: true,
             newChoices: this.choices || {},
@@ -421,19 +438,9 @@ export default {
             });
 
             // V76: extract-mode raws contribute their extractors (summary/parts/power)
-            // V87: auto-package Packager steps fold into the build (summary/parts/power)
-            const recycleDetails = (this.production.recycling?.packaged || []).map((p) => ({
-                product: p.product,
-                variant_name: p.building || 'Packager',
-                num_buildings: p.buildings,
-                exact_buildings: p.buildings,
-                power_usage: p.power,
-                build_cost: p.build_cost || {},
-                clock_speed: 100,
-                footprint: { power_shards: 0, somersloops: 0 },
-            }));
-
-            // V106: the AWESOME Sink folds in too — power + build cost, like the Packager rows
+            // V137: packaging + container-chain production are normal plan steps now —
+            // their buildings/power/build cost arrive via recipeDetails (overviews);
+            // only the AWESOME Sink still folds in from its step descriptor (V106)
             const sinkDetails = (this.production.recycling_steps || [])
                 .filter((s) => s.type === 'sink')
                 .map((s) => ({
@@ -447,7 +454,7 @@ export default {
                     footprint: { power_shards: 0, somersloops: 0 },
                 }));
 
-            return [...recipeDetails, ...(this.production.extractors || []), ...recycleDetails, ...sinkDetails];
+            return [...recipeDetails, ...(this.production.extractors || []), ...sinkDetails];
         },
 
         production__building_summary() {
@@ -626,11 +633,6 @@ export default {
         toggleEvenRows() {
             this.newEven = !this.newEven;
             this.fetch({ preserveScroll: true });
-        },
-
-        toggleDiagrams() {
-            this.diagrams = !this.diagrams;
-            this.savePrefs();
         },
 
         updateYield(name, qty) {
@@ -825,8 +827,9 @@ export default {
             saveDesignerMk(store, mk);
         },
 
-        savePrefs() {
-            store.setItem('diagrams', this.diagrams);
+        toggleSummary() {
+            this.summaryCollapsed = !this.summaryCollapsed;
+            store.setItem('summaryCollapsed', this.summaryCollapsed);
         },
 
         helpRawMaterials() {

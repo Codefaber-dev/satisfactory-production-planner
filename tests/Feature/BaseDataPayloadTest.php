@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Support\BaseDataPayload;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -55,6 +56,54 @@ class BaseDataPayloadTest extends TestCase
         foreach ($cached as $group) {
             foreach ($group as $r) {
                 $this->assertArrayNotHasKey('favorite', $r);
+            }
+        }
+    }
+
+    /**
+     * V127/B66: the cold fill must compute the efficiency appends in memory
+     * from the loaded collection — never two queries per recipe, each dragging
+     * the full $with hydration cascade (3,858 queries on a real dashboard).
+     */
+    #[Test]
+    public function recipes_payload_cold_fill_runs_bounded_queries(): void
+    {
+        DB::enableQueryLog();
+
+        BaseDataPayload::recipes();
+
+        $count = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        $this->assertLessThanOrEqual(
+            10,
+            $count,
+            "Cold recipes-payload fill ran {$count} queries — expected the O(1) bulk-warm path (V127)"
+        );
+    }
+
+    /**
+     * V127: exactly one recipe per product carries each efficiency flag, and
+     * the flagged recipe holds the group minimum (ties broken by lowest id).
+     */
+    #[Test]
+    public function efficiency_flags_mark_exactly_the_per_product_minimum(): void
+    {
+        $payload = BaseDataPayload::recipes();
+
+        $multiRecipeGroups = collect($payload)->filter(fn ($group) => count($group) > 1);
+        $this->assertNotEmpty($multiRecipeGroups, 'Seed data must contain a product with alternate recipes');
+
+        foreach ($payload as $product => $group) {
+            $recipes = collect($group);
+
+            foreach (['energy_efficient' => 'energy', 'resource_efficient' => 'resource'] as $flag => $column) {
+                $flagged = $recipes->filter(fn ($r) => $r[$flag]);
+
+                $this->assertCount(1, $flagged, "{$product}: expected exactly one {$flag} recipe");
+
+                $expected = $recipes->sortBy([[$column, 'asc'], ['id', 'asc']])->first();
+                $this->assertSame($expected['id'], $flagged->first()['id'], "{$product}: {$flag} flag not on the group minimum");
             }
         }
     }

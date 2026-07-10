@@ -38,10 +38,17 @@ const baseFootprint = () => ({
     somersloops: 0,
 });
 
-describe('BuildDiagram — grouped render (V41)', () => {
-    it('shows blueprint tiles labeled monogram x size and blueprint stat rows', () => {
-        const footprint = groupedFootprint(baseFootprint(), 8, 32);
+describe('BuildDiagram — grouped render (V41, modal-only V134)', () => {
+    const openModal = async (footprint) => {
         const wrapper = mount(BuildDiagram, { props: { footprint } });
+        await wrapper.find('[aria-label="Expand diagram"]').trigger('click');
+
+        return wrapper;
+    };
+
+    it('shows blueprint tiles labeled monogram x size and blueprint stat rows', async () => {
+        const footprint = groupedFootprint(baseFootprint(), 8, 32);
+        const wrapper = await openModal(footprint);
 
         expect(wrapper.text()).toContain('Cx8');
         expect(wrapper.text()).toContain('Blueprints');
@@ -51,8 +58,8 @@ describe('BuildDiagram — grouped render (V41)', () => {
         expect(wrapper.text()).not.toContain('Building Rows');
     });
 
-    it('keeps individual-building render for ungrouped footprints', () => {
-        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
+    it('keeps individual-building render for ungrouped footprints', async () => {
+        const wrapper = await openModal(baseFootprint());
 
         expect(wrapper.text()).toContain('Building Rows');
         expect(wrapper.text()).toContain('Buildings Per Row');
