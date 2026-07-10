@@ -58,7 +58,6 @@ describe('Checklist Index — Dimensional Depot column (V150)', () => {
 
         await cell.find('input[type="checkbox"]').setValue(true);
 
-
         expect(store.checklist.find((o) => o.name === 'Test Widget').depot).toBe(true);
         expect(cell.text()).toBe('Yes');
     });

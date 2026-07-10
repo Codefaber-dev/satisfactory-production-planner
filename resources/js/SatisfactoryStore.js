@@ -181,9 +181,7 @@ export const useSatisfactoryStore = defineStore('satisfactory', {
             }
 
             // never zero lists: deleting the last recreates a fresh Default (V151)
-            this.lists = Object.keys(rest).length
-                ? rest
-                : { default: { name: 'Default', rows: this.freshRows() } };
+            this.lists = Object.keys(rest).length ? rest : { default: { name: 'Default', rows: this.freshRows() } };
 
             if (!this.lists[this.activeId]) {
                 this.activeId = Object.keys(this.lists)[0];

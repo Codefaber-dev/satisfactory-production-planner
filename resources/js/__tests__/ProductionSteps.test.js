@@ -358,8 +358,7 @@ describe('ProductionSteps — raw-row check parity (V147, B71)', () => {
 });
 
 describe('ProductionSteps — Toggle Completed owns its state (V153, B74)', () => {
-    const findByName = (wrapper, name) =>
-        wrapper.findAll('.stub-step').find((s) => s.attributes('data-name') === name);
+    const findByName = (wrapper, name) => wrapper.findAll('.stub-step').find((s) => s.attributes('data-name') === name);
     const shown = (node) => !(node.attributes('style') || '').includes('display: none');
     const toggleBtn = (wrapper) => wrapper.findAll('button').find((b) => b.text() === 'Toggle Completed');
 
