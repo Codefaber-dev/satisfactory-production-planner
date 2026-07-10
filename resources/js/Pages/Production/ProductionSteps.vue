@@ -171,6 +171,15 @@ export default {
     name: 'production-steps',
     components: { MasterDiagram, ProductionStep, RecycleStep, StepFilter },
 
+    // step diagram modals prepend a Master Diagram nav entry with this (V141d)
+    provide() {
+        return {
+            openMasterDiagram: () => {
+                this.masterOpen = true;
+            },
+        };
+    },
+
     data() {
         return {
             // V110: selected type-ahead filter item (null = no filter, display-only, not persisted)

@@ -151,6 +151,18 @@
                         {{ navOpen ? 'Steps ▸' : '◂' }}
                     </button>
                     <ul v-if="navOpen" class="min-h-0 w-48 overflow-y-auto text-xs">
+                        <!-- reciprocal master-diagram jump (V141d): opener injected by
+                             ProductionSteps; standalone mounts have none ⇒ no entry -->
+                        <li v-if="openMasterDiagram">
+                            <button
+                                type="button"
+                                class="w-full truncate px-2 py-1 text-left font-bold hover:bg-blue-800"
+                                data-modal-nav-master
+                                @click="goToMasterDiagram"
+                            >
+                                🗺 Master Diagram
+                            </button>
+                        </li>
                         <li v-for="entry in navEntries" :key="entry.identifier">
                             <button
                                 type="button"
@@ -202,6 +214,10 @@ export default {
     // fit/zoom extent must match what actually renders (V124)
     inject: {
         liquidNames: {
+            default: null,
+        },
+        // opens the plan-wide master diagram (provided by ProductionSteps, V141d)
+        openMasterDiagram: {
             default: null,
         },
     },
@@ -310,6 +326,11 @@ export default {
         },
         resetView() {
             this.view = this.fitView();
+        },
+        // jump to the plan-wide master diagram: open it, close this modal (V141d)
+        goToMasterDiagram() {
+            this.openMasterDiagram();
+            this.$emit('close');
         },
         // jump to another step's modal: open the target, close this one (V130)
         navigateTo(entry) {

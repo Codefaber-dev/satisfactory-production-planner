@@ -160,6 +160,22 @@ describe('DiagramModal — step cell + nav panel (V130)', () => {
         await wrapper.find('[data-modal-nav-toggle]').trigger('click');
         expect(wrapper.find('[data-modal-nav-item]').exists()).toBe(true);
     });
+
+    // V141d: nav prepends a Master Diagram jump when the opener is provided
+    it('shows the Master Diagram entry only with an injected opener; click opens + closes', async () => {
+        expect(mountModal().find('[data-modal-nav-master]').exists()).toBe(false);
+
+        const openMasterDiagram = vi.fn();
+        const wrapper = mount(DiagramModal, {
+            props: { footprint: baseFootprint(), identifier: '2.B', title: 'Copper Ingot' },
+            global: { provide: { openMasterDiagram } },
+        });
+
+        await wrapper.find('[data-modal-nav-master]').trigger('click');
+
+        expect(openMasterDiagram).toHaveBeenCalledOnce();
+        expect(wrapper.emitted('close')).toHaveLength(1);
+    });
 });
 
 describe('DiagramStepDetails — material jump links (V130)', () => {

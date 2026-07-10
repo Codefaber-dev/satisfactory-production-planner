@@ -198,7 +198,7 @@
                                     font-size="3.5"
                                     fill="#e0f2fe"
                                 >
-                                    {{ node.id }} {{ node.name }}{{ node.numBuildings ? ` ×${node.numBuildings}` : '' }}
+                                    {{ node.id }} {{ node.name }}
                                 </text>
                             </template>
                             <template v-else>
@@ -233,7 +233,7 @@
                                     font-size="5"
                                     fill="#e0f2fe"
                                 >
-                                    {{ node.name }}{{ node.numBuildings ? ` ×${node.numBuildings}` : '' }}
+                                    {{ node.name }}
                                 </text>
                             </template>
                             <!-- faint dashed bounds, hover-lifted (V141a/b) -->
