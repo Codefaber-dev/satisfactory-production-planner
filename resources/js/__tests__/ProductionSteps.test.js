@@ -295,3 +295,23 @@ describe('ProductionSteps — type-ahead step filter (T156 / V110)', () => {
         expect(isShown(findHeader(wrapper, 'Recycling (AWESOME Sink)'))).toBe(false);
     });
 });
+
+describe('ProductionSteps — master diagram entry (V139)', () => {
+    it('header button opens the master diagram modal; close event removes it', async () => {
+        const wrapper = mountSteps();
+
+        expect(wrapper.findComponent({ name: 'master-diagram' }).exists()).toBe(false);
+
+        await wrapper.find('[data-master-diagram-button]').trigger('click');
+
+        const master = wrapper.findComponent({ name: 'master-diagram' });
+        expect(master.exists()).toBe(true);
+        // ProductionSteps' own computed shapes flow in as props
+        expect(Object.keys(master.props('rawSteps'))).toEqual(['Iron Ore']);
+        expect(master.props('levels')).toHaveLength(1);
+
+        await master.vm.$emit('close');
+
+        expect(wrapper.findComponent({ name: 'master-diagram' }).exists()).toBe(false);
+    });
+});

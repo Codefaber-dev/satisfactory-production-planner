@@ -9,6 +9,28 @@
             <!-- V112: Force Even Rows + Limit Belt Rates moved to the Plan Settings panel -->
             <!-- V110: type-ahead ingredient filter -->
             <StepFilter :options="filterOptions" v-model="filterItem" />
+            <!-- V139: whole-plan master diagram -->
+            <button
+                type="button"
+                class="btn btn-emerald btn-sm"
+                data-master-diagram-button
+                title="Master diagram — all steps interconnected"
+                @click="masterOpen = true"
+            >
+                🗺 Master Diagram
+            </button>
+            <MasterDiagram
+                v-if="masterOpen"
+                :raw-steps="rawSteps"
+                :levels="resultsArray"
+                :recycle-steps="recycleSteps"
+                :byproducts-used="production.byproducts_used"
+                :overviews="overviews"
+                :building-multiples="buildingMultiples"
+                :designer-mk="designerMk"
+                :applied-even="appliedEven"
+                @close="masterOpen = false"
+            />
         </div>
         <div class="overflow-x-auto">
         <table class="block w-full p-2 lg:table lg:table-auto lg:p-0">
@@ -140,18 +162,21 @@
     </div>
 </template>
 <script>
+import MasterDiagram from '@/Pages/Production/MasterDiagram';
 import ProductionStep from '@/Pages/Production/ProductionStep';
 import RecycleStep from '@/Pages/Production/RecycleStep';
 import StepFilter from '@/Pages/Production/StepFilter';
 
 export default {
     name: 'production-steps',
-    components: { ProductionStep, RecycleStep, StepFilter },
+    components: { MasterDiagram, ProductionStep, RecycleStep, StepFilter },
 
     data() {
         return {
             // V110: selected type-ahead filter item (null = no filter, display-only, not persisted)
             filterItem: null,
+            // V139: master-diagram modal visibility (local, not persisted)
+            masterOpen: false,
         };
     },
     props: {
