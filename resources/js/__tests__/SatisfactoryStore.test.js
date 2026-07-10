@@ -315,3 +315,52 @@ describe('SatisfactoryStore — saved checklists CRUD (V151)', () => {
         expect(store.checklist[0].name).toBe('Test Widget');
     });
 });
+
+describe('SatisfactoryStore — curated tags for former DB-only items (V152)', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        setActivePinia(createPinia());
+    });
+
+    const ing = (name, extra = {}) => ({
+        name,
+        tier: 1,
+        raw: false,
+        is_liquid: false,
+        is_ficsmas: false,
+        ...extra,
+    });
+
+    it('curated milestone tiers win over the DB seeder tier', () => {
+        const store = useSatisfactoryStore();
+        store.sync([
+            ing('Power Shard', { tier: 6 }),
+            ing('Wood', { tier: 1, raw: true }),
+            ing('Nuke Nobelisk', { tier: 6 }),
+            ing('FICSMAS Gift', { tier: 1, raw: true, is_ficsmas: true }),
+        ]);
+
+        const row = (name) => store.checklist.find((o) => o.name === name);
+
+        expect(row('Power Shard').tier).toBe('1');
+        expect(row('Power Shard').tags).toContain('researched');
+
+        expect(row('Wood').tier).toBe('0');
+        expect(row('Wood').tags).toContain('raw materials');
+
+        expect(row('Nuke Nobelisk').tier).toBe('8');
+        expect(row('Nuke Nobelisk').tags).toEqual(expect.arrayContaining(['nuclear', 'pioneer tech']));
+
+        expect(row('FICSMAS Gift').tier).toBe('0');
+        expect(row('FICSMAS Gift').tags).toContain('ficsmas');
+    });
+
+    it('derived tags still fire for an ingredient unknown to the static file', () => {
+        const store = useSatisfactoryStore();
+        store.sync([ing('Future Widget', { tier: 3, is_ficsmas: true })]);
+
+        const row = store.checklist.find((o) => o.name === 'Future Widget');
+        expect(row.tags).toEqual(['tier 3', 'ficsmas']);
+        expect(row.tier).toBe('3');
+    });
+});
