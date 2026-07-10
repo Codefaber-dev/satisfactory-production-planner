@@ -228,6 +228,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline';
 import AppLayout from '@/Layouts/AppLayout';
 import store from '@/store';
 import { clampSize, effectiveMultiples, loadEnabled, loadSizes, saveEnabled, saveSizes } from '@/blueprintSettings';
+import { checksState, initChecks, toggleCheck } from '@/stepChecks';
 import { computePerfectRatio } from '@/perfectRatio';
 import { DESIGNER_DIMS, loadDesignerMk, saveDesignerMk } from '@/blueprintFootprint';
 import ProductionSummary from '@/Pages/Production/ProductionSummary';
@@ -330,6 +331,8 @@ export default {
     data() {
         const bpSizes = loadSizes(store);
         const bpEnabled = loadEnabled(store, (this.multi ? this.multiFactory : this.factory)?.id);
+        // V145: step-check state loads per factory alongside the blueprint toggles.
+        initChecks(store, (this.multi ? this.multiFactory : this.factory)?.id);
         const outputs = this.multi
             ? this.multi.products.map((o, i) => {
                   return {
@@ -355,7 +358,6 @@ export default {
             newFactory: this.multi ? this.multiFactory : this.factory,
             done: true,
             working: false,
-            productionChecks: {},
             buildingChecks: {},
             hideCompleted: true,
             rawMaterials: this.production.raw_materials,
@@ -394,6 +396,12 @@ export default {
     },
 
     computed: {
+        // V143: check state lives in the shared stepChecks store, not local data —
+        // diagram modals and the master diagram bind the same entries.
+        productionChecks() {
+            return checksState.checks;
+        },
+
         allChosenRecipes() {
             // V57: capture every recipe actually in force in the production tree
             // (incl. sub-recipes that match the current default), not just the
@@ -793,9 +801,7 @@ export default {
         },
 
         toggleProductionCheck(material) {
-            if (Object.hasOwn(this.productionChecks, material))
-                this.productionChecks[material] = !this.productionChecks[material];
-            else this.productionChecks[material] = true;
+            toggleCheck(material);
         },
 
         selectNewRecipe({ recipe }) {

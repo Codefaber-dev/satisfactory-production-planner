@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import '../bootstrap';
 import RecycleStep from '../Pages/Production/RecycleStep.vue';
+import { initChecks, isChecked, resetChecks } from '@/stepChecks';
 
 const mockBus = { on: vi.fn(), emit: vi.fn() };
 
@@ -93,5 +94,49 @@ describe('RecycleStep — terminal AWESOME Sink step (V91)', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find('tbody').classes()).not.toContain('bg-slate-300');
         vi.useRealTimers();
+    });
+});
+
+describe('RecycleStep — build-check toggle (V143)', () => {
+    const makeStore = () => {
+        const data = {};
+
+        return {
+            getItem: (key, def = null) => (key in data ? data[key] : def),
+            setItem: (key, value) => {
+                data[key] = JSON.parse(JSON.stringify(value));
+            },
+            _data: data,
+        };
+    };
+
+    beforeEach(() => {
+        resetChecks();
+    });
+
+    it('renders unchecked by default', () => {
+        initChecks(makeStore(), 5);
+        const wrapper = mountStep(sinkStep);
+
+        expect(wrapper.text()).toContain('⬜');
+        expect(wrapper.text()).not.toContain('✅');
+    });
+
+    it('click toggles the shared store at <name>-sink and shows the checkmark', async () => {
+        const store = makeStore();
+        initChecks(store, 5);
+        const wrapper = mountStep(sinkStep);
+
+        const toggle = wrapper.findAll('span.cursor-pointer').find((el) => el.text().includes('⬜'));
+        expect(toggle).toBeTruthy();
+
+        await toggle.trigger('click');
+        expect(isChecked('AWESOME Sink-sink')).toBe(true);
+        expect(wrapper.text()).toContain('✅');
+        expect(store._data['step_checks:5']).toEqual({ 'AWESOME Sink-sink': true });
+
+        await wrapper.find('span.cursor-pointer').trigger('click');
+        expect(isChecked('AWESOME Sink-sink')).toBe(false);
+        expect(wrapper.text()).toContain('⬜');
     });
 });

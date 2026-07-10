@@ -23,7 +23,16 @@
                     <div class="flex w-full">
                         <cloud-image class="mr-2" :public-id="step.name" width="48" crop="scale" :alt="step.name" />
                         <div class="mr-2 flex shrink-0 grow flex-col space-y-2 font-semibold">
-                            <span>{{ step.name }}</span>
+                            <div class="flex items-center justify-between">
+                                <span class="flex-1">{{ step.name }}</span>
+                                <!-- V143: sink steps join the step-check mechanism -->
+                                <span
+                                    class="cursor-pointer rounded bg-emerald-400 p-1 hover:bg-emerald-500"
+                                    @click="toggleCheck(checkKey)"
+                                >
+                                    {{ finished ? '✅' : '⬜' }}
+                                </span>
+                            </div>
                             <span class="font-light">
                                 {{ +(step.num_buildings || 0).toFixed(2) }}× {{ step.building }} [{{
                                     Math.ceil(step.power || 0)
@@ -89,6 +98,7 @@
 </template>
 <script>
 import BuildDiagram from '@/Pages/Production/BuildDiagram';
+import { isChecked, toggleCheck } from '@/stepChecks';
 import CloudImage from '../../Components/CloudImage.vue';
 
 export default {
@@ -121,7 +131,20 @@ export default {
         // map of material name → producing-step identifier (for input links)
         stepMap: { type: Object, default: () => ({}) },
     },
+    methods: {
+        toggleCheck,
+    },
     computed: {
+        // V143: sink check key — '-sink' suffix, mirroring '<name>-<recipe>' on
+        // production steps without colliding with a same-named recipe step
+        checkKey() {
+            return `${this.step.name}-sink`;
+        },
+
+        finished() {
+            return isChecked(this.checkKey);
+        },
+
         // sink equivalents of the modal step-details payload (V126)
         sinkDetails() {
             return {
