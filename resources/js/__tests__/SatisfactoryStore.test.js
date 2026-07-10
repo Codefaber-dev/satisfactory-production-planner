@@ -180,3 +180,138 @@ describe('SatisfactoryStore — DB ingredient sync (V149)', () => {
         expect(store.checklist.find((o) => o.name === 'Candy Cane').tags).toContain('ficsmas');
     });
 });
+
+describe('SatisfactoryStore — saved checklists CRUD (V151)', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        setActivePinia(createPinia());
+    });
+
+    it('migrates the legacy checklist key into a Default list, preserving user state', () => {
+        const rows = [
+            {
+                name: 'Battery',
+                tags: ['electronics', 'tier 7'],
+                tier: '7',
+                producing: 12,
+                automated: true,
+                storage: false,
+                hidden: false,
+                notes: 'legacy note',
+            },
+        ];
+        localStorage.setItem('checklist', JSON.stringify(rows));
+
+        const store = useSatisfactoryStore();
+
+        expect(store.listSummaries).toHaveLength(1);
+        expect(store.activeName).toBe('Default');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(12);
+        expect(store.checklist.find((o) => o.name === 'Battery').notes).toBe('legacy note');
+        expect(localStorage.getItem('checklist')).toBeNull();
+    });
+
+    it('fresh browser gets a Default list with the full item set', () => {
+        const store = useSatisfactoryStore();
+
+        expect(store.activeName).toBe('Default');
+        expect(store.checklist.length).toBeGreaterThan(0);
+    });
+
+    it('createList starts a fresh full item set and becomes active', () => {
+        const store = useSatisfactoryStore();
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 5 });
+
+        const id = store.createList('Phase 4');
+
+        expect(store.activeId).toBe(id);
+        expect(store.activeName).toBe('Phase 4');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(0);
+        expect(store.listSummaries).toHaveLength(2);
+    });
+
+    it('createList rejects blank names', () => {
+        const store = useSatisfactoryStore();
+
+        expect(store.createList('   ')).toBeNull();
+        expect(store.listSummaries).toHaveLength(1);
+    });
+
+    it('renameList renames; blank rename is a no-op', () => {
+        const store = useSatisfactoryStore();
+        store.renameList(store.activeId, 'Main Base');
+
+        expect(store.activeName).toBe('Main Base');
+
+        store.renameList(store.activeId, '  ');
+        expect(store.activeName).toBe('Main Base');
+    });
+
+    it('deleting the active list switches to a remaining one', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        store.createList('Second');
+
+        store.deleteList(store.activeId);
+
+        expect(store.activeId).toBe(first);
+        expect(store.listSummaries).toHaveLength(1);
+    });
+
+    it('deleting the last list recreates a fresh Default', () => {
+        const store = useSatisfactoryStore();
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 5 });
+
+        store.deleteList(store.activeId);
+
+        expect(store.listSummaries).toHaveLength(1);
+        expect(store.activeName).toBe('Default');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(0);
+    });
+
+    it('isolates row state between lists', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 7 });
+
+        store.createList('Second');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(0);
+
+        const second = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...second, producing: 3 });
+
+        store.selectList(first);
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(7);
+    });
+
+    it('reset touches only the active list', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 7 });
+
+        store.createList('Second');
+        store.resetChecklist();
+
+        store.selectList(first);
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(7);
+    });
+
+    it('sync merges the catalog into every list', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        store.createList('Second');
+
+        store.sync([{ name: 'Test Widget', tier: 2, raw: false, is_liquid: false, is_ficsmas: false }]);
+
+        expect(store.checklist).toHaveLength(1);
+        expect(store.checklist[0].name).toBe('Test Widget');
+
+        store.selectList(first);
+        expect(store.checklist).toHaveLength(1);
+        expect(store.checklist[0].name).toBe('Test Widget');
+    });
+});
