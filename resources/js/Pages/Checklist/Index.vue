@@ -208,6 +208,18 @@ export default {
         CloudImage,
     },
 
+    props: {
+        // DB ingredient set from ChecklistController (V149)
+        ingredients: {
+            type: Array,
+            default: () => [],
+        },
+    },
+
+    mounted() {
+        this.satisfactoryStore.sync(this.ingredients);
+    },
+
     data() {
         return {
             search: '',
