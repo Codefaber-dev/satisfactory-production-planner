@@ -93,6 +93,13 @@
                                     Storage Automated?
                                 </th>
                                 <th
+                                    @click="reSortBy('depot')"
+                                    class="cursor-pointer whitespace-normal px-2 text-center hover:underline"
+                                    data-depot-header
+                                >
+                                    Dimensional Depot
+                                </th>
+                                <th
                                     @click="reSortBy('hidden')"
                                     class="cursor-pointer whitespace-normal px-2 text-center hover:underline"
                                 >
@@ -160,6 +167,20 @@
                                 >
                                     <input type="checkbox" class="w-0 appearance-none" v-model="product.storage" />
                                     {{ product.storage ? 'Yes' : 'No' }}
+                                </label>
+                            </td>
+                            <!-- Dimensional Depot (V150) -->
+                            <td nowrap="nowrap" class="p-2" data-depot-cell>
+                                <label
+                                    :class="[
+                                        product.depot
+                                            ? 'bg-emerald-300 dark:bg-emerald-600'
+                                            : 'bg-rose-300 dark:bg-rose-600',
+                                    ]"
+                                    class="cursor-pointer rounded py-1 pr-2 pl-1"
+                                >
+                                    <input type="checkbox" class="w-0 appearance-none" v-model="product.depot" />
+                                    {{ product.depot ? 'Yes' : 'No' }}
                                 </label>
                             </td>
                             <td nowrap="nowrap" class="p-2">

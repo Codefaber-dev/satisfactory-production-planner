@@ -35,6 +35,8 @@ const freshRow = ({ name, tags }) => ({
     producing: 0,
     automated: false,
     storage: false,
+    // Dimensional Depot upload automated? (V150)
+    depot: false,
     hidden: false,
     notes: '',
 });
@@ -56,6 +58,7 @@ const mergeRows = (catalog, rows) => {
             producing: existing.producing ?? 0,
             automated: !!existing.automated,
             storage: !!existing.storage,
+            depot: !!existing.depot,
             hidden: !!existing.hidden,
             notes: existing.notes ?? '',
         };
