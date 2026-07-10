@@ -160,7 +160,7 @@
                                 data-modal-nav-master
                                 @click="goToMasterDiagram"
                             >
-                                🗺 Master Diagram
+                                🗺 Full Production Diagram
                             </button>
                         </li>
                         <li v-for="entry in navEntries" :key="entry.identifier">

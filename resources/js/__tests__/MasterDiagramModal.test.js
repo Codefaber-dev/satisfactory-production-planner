@@ -258,13 +258,14 @@ describe('MasterDiagram — modal chrome (V128/V114)', () => {
         const wrapper = mountMaster();
 
         expect(wrapper.find('[data-drawing-sheet]').exists()).toBe(true);
-        expect(wrapper.find('h2').text()).toBe('Master Diagram');
+        expect(wrapper.find('h2').text()).toBe('Full Production Diagram');
     });
 
     it('wheel zoom shrinks the viewBox window; Escape closes', async () => {
         const wrapper = mountMaster();
         // the header Heroicons are svgs too — target the stage svg explicitly
-        const widthOf = () => Number(wrapper.find('[aria-label="Master diagram"]').attributes('viewBox').split(' ')[2]);
+        const widthOf = () =>
+            Number(wrapper.find('[aria-label="Full production diagram"]').attributes('viewBox').split(' ')[2]);
         const before = widthOf();
 
         await wrapper.find('.touch-none').trigger('wheel', { deltaY: -100 });

@@ -14,7 +14,7 @@
             <div class="flex flex-wrap items-stretch justify-between border-b-2 border-blue-200/60">
                 <div class="px-4 py-1.5">
                     <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Title</div>
-                    <h2 class="text-lg font-bold uppercase tracking-widest text-blue-50">Master Diagram</h2>
+                    <h2 class="text-lg font-bold uppercase tracking-widest text-blue-50">Full Production Diagram</h2>
                 </div>
                 <div class="flex items-center gap-2 border-l border-blue-200/60 px-3 py-1.5">
                     <button
@@ -45,7 +45,7 @@
                     </button>
                     <button
                         type="button"
-                        aria-label="Close master diagram"
+                        aria-label="Close full production diagram"
                         class="border border-blue-200/60 p-1.5 hover:bg-blue-800"
                         @click="$emit('close')"
                     >
@@ -69,7 +69,7 @@
                         :viewBox="viewBox"
                         preserveAspectRatio="xMidYMid meet"
                         role="img"
-                        aria-label="Master diagram"
+                        aria-label="Full production diagram"
                     >
                         <defs>
                             <marker

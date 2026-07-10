@@ -14,10 +14,10 @@
                 type="button"
                 class="btn btn-emerald btn-sm"
                 data-master-diagram-button
-                title="Master diagram — all steps interconnected"
+                title="Full production diagram — all steps interconnected"
                 @click="masterOpen = true"
             >
-                🗺 Master Diagram
+                🗺 Full Production Diagram
             </button>
             <MasterDiagram
                 v-if="masterOpen"
