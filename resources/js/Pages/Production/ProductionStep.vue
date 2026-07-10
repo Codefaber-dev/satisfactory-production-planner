@@ -24,7 +24,7 @@
                                 </span>
                                 <span
                                     class="cursor-pointer rounded bg-emerald-400 p-1 hover:bg-emerald-500"
-                                    @click="$emit('toggle', name + '-' + (recipe?.description || 'base'))"
+                                    @click="$emit('toggle', checkKey)"
                                 >
                                     {{ finished ? '✅' : '⬜' }}
                                 </span>
@@ -370,6 +370,7 @@
                     :materials="diagramMaterials"
                     :details="diagramDetails"
                     :identifier="production.imported ? '' : identifier"
+                    :check-key="checkKey"
                     @update:max-clock="updateClock('c' + $event)"
                 />
             </td>
@@ -471,6 +472,8 @@ export default {
             this.Bus.emit('RegisterQuickNav', {
                 name: this.name,
                 identifier: this.identifier,
+                // exact check-store key for the nav's ✅ marker (V146)
+                checkKey: this.checkKey,
             });
         }
     },
@@ -496,6 +499,12 @@ export default {
     computed: {
         ingredients() {
             return this.production.ingredients;
+        },
+
+        // V143/V144: the step's entry in the shared check store — same key the
+        // row toggle emits, threaded to the diagram modal's BUILT cell
+        checkKey() {
+            return `${this.name}-${this.recipe?.description || 'base'}`;
         },
 
         // manifold materials for the build diagram: input belts per ingredient,

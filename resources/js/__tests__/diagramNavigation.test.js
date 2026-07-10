@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import BuildDiagram from '../Pages/Production/BuildDiagram.vue';
 import DiagramModal from '../Pages/Production/DiagramModal.vue';
 import DiagramStepDetails from '../Pages/Production/DiagramStepDetails.vue';
 import { diagramRegistry, registerDiagram, resetDiagramRegistry } from '../diagramRegistry';
+import { initChecks, resetChecks, toggleCheck } from '../stepChecks';
 
 const baseFootprint = () => ({
     monogram: 'C',
@@ -72,13 +73,23 @@ describe('diagramRegistry (V130)', () => {
 });
 
 describe('BuildDiagram — registry integration (V130)', () => {
-    it('registers on mount with its identifier and title, unregisters on unmount', () => {
+    it('registers on mount with its identifier, title, and check key, unregisters on unmount', () => {
         const wrapper = mount(BuildDiagram, {
-            props: { footprint: baseFootprint(), identifier: '2.B', title: 'Copper Ingot' },
+            props: {
+                footprint: baseFootprint(),
+                identifier: '2.B',
+                title: 'Copper Ingot',
+                checkKey: 'Copper Ingot-base',
+            },
         });
 
         expect(diagramRegistry).toHaveLength(1);
-        expect(diagramRegistry[0]).toMatchObject({ identifier: '2.B', name: 'Copper Ingot' });
+        // checkKey rides along for nav ✅ markers (V144/V146)
+        expect(diagramRegistry[0]).toMatchObject({
+            identifier: '2.B',
+            name: 'Copper Ingot',
+            checkKey: 'Copper Ingot-base',
+        });
 
         wrapper.unmount();
         expect(diagramRegistry).toHaveLength(0);
@@ -209,5 +220,58 @@ describe('DiagramStepDetails — material jump links (V130)', () => {
 
         expect(wrapper.find('[data-details-output] [data-material-link]').exists()).toBe(false);
         expect(wrapper.find('[data-details-output]').text()).toContain('Copper Ingot');
+    });
+});
+
+describe('Modal nav — ✅ completion markers (V146)', () => {
+    const makeStore = () => {
+        const data = {};
+
+        return {
+            getItem: (key, def = null) => (key in data ? data[key] : def),
+            setItem: (key, value) => {
+                data[key] = JSON.parse(JSON.stringify(value));
+            },
+        };
+    };
+
+    afterEach(() => {
+        resetChecks();
+    });
+
+    it('prefixes ✅ iff the entry’s exact check key is truthy in the store; live-updates on toggle', async () => {
+        initChecks(makeStore(), 4);
+        toggleCheck('Iron Ingot-base');
+
+        registerDiagram({ identifier: '1.A', name: 'Iron Ingot', checkKey: 'Iron Ingot-base', open: () => {} });
+        registerDiagram({ identifier: '3.A', name: 'Iron Plate', checkKey: 'Iron Plate-base', open: () => {} });
+
+        const wrapper = mount(DiagramModal, {
+            props: { footprint: baseFootprint(), identifier: '2.B', title: 'Copper Ingot' },
+        });
+
+        let items = wrapper.findAll('[data-modal-nav-item]');
+        expect(items[0].text()).toContain('✅');
+        expect(items[1].text()).not.toContain('✅');
+
+        // reactive while the panel is open (V146)
+        toggleCheck('Iron Plate-base');
+        await wrapper.vm.$nextTick();
+
+        items = wrapper.findAll('[data-modal-nav-item]');
+        expect(items[1].text()).toContain('✅');
+    });
+
+    it('entries without a check key (legacy/standalone) never show a marker', () => {
+        initChecks(makeStore(), 4);
+        toggleCheck('Iron Ingot-base');
+
+        registerDiagram({ identifier: '1.A', name: 'Iron Ingot', open: () => {} });
+
+        const wrapper = mount(DiagramModal, {
+            props: { footprint: baseFootprint(), identifier: '2.B', title: 'Copper Ingot' },
+        });
+
+        expect(wrapper.find('[data-modal-nav-item]').text()).not.toContain('✅');
     });
 });

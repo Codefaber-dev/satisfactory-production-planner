@@ -10,16 +10,23 @@
         >
             📐 View Diagram
         </button>
-        <diagram-modal
-            v-if="modalOpen"
-            :footprint="footprint"
-            :materials="materials"
-            :title="title"
-            :details="details"
-            :identifier="identifier"
-            @close="modalOpen = false"
-            @update:max-clock="$emit('update:maxClock', $event)"
-        />
+        <!-- V148: teleport the overlay out of the row subtree — a hidden host row
+             (hideCompleted / filter / in-modal BUILT toggle) must not display:none
+             the open modal. Safe: modal palette is fixed blueprint (V128), no
+             dark: classes, so escaping the .dark scope costs nothing (B72). -->
+        <teleport to="body">
+            <diagram-modal
+                v-if="modalOpen"
+                :footprint="footprint"
+                :materials="materials"
+                :title="title"
+                :details="details"
+                :identifier="identifier"
+                :check-key="checkKey"
+                @close="modalOpen = false"
+                @update:max-clock="$emit('update:maxClock', $event)"
+            />
+        </teleport>
     </div>
 </template>
 <script>
@@ -42,6 +49,8 @@ export default {
             this.unregisterDiagram = registerDiagram({
                 identifier: this.identifier,
                 name: this.title,
+                // step-check key so nav panels can render ✅ markers (V144/V146)
+                checkKey: this.checkKey,
                 open: () => {
                     this.modalOpen = true;
                 },
@@ -54,6 +63,11 @@ export default {
     props: {
         // step identifier (e.g. '2.B') for the modal cross-nav registry (V130)
         identifier: {
+            type: String,
+            default: '',
+        },
+        // step-check store key for the modal's BUILT cell (V144); '' ⇒ no cell
+        checkKey: {
             type: String,
             default: '',
         },

@@ -202,6 +202,26 @@ describe('ProductionStep — recipe-bearing raw with absent overview (B49)', () 
         expect(wrapper.vm.overview).not.toBeNull();
         expect(wrapper.findComponent({ name: 'build-diagram' }).exists()).toBe(true);
     });
+
+    it('threads the step check key to the build diagram (V144)', () => {
+        const wrapper = mountRawViaRecipe({
+            overviews: {
+                'Water|Unpackage Water': {
+                    clock: 'c100',
+                    selected_variant_name: 'mk1',
+                    overviews: {
+                        c100: {
+                            building: 'packager',
+                            details: { mk1: { footprint: [], num_buildings: 1, clock_speed: 100, power_usage: 30 } },
+                        },
+                    },
+                },
+            },
+        });
+
+        // same key the row toggle emits: <name>-<recipe description>
+        expect(wrapper.findComponent({ name: 'build-diagram' }).props('checkKey')).toBe('Water-Unpackage Water');
+    });
 });
 
 describe('ProductionStep — raw source controls on the step (V101)', () => {
@@ -352,6 +372,7 @@ describe('ProductionStep — QuickNav registration', () => {
         expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', {
             name: 'Iron Plate',
             identifier: '1.A',
+            checkKey: 'Iron Plate-base',
         });
     });
 
@@ -452,6 +473,10 @@ describe('ProductionStep — synthetic packaging step (V90)', () => {
 
     it('registers in QuickNav under its R.* identifier (V95)', () => {
         mountPackage();
-        expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', { name: 'Packaged Water', identifier: 'R.A' });
+        expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', {
+            name: 'Packaged Water',
+            identifier: 'R.A',
+            checkKey: 'Packaged Water-Packaged Water',
+        });
     });
 });

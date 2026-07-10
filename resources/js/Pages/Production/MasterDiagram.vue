@@ -236,7 +236,8 @@
                                     {{ node.name }}
                                 </text>
                             </template>
-                            <!-- faint dashed bounds, hover-lifted (V141a/b) -->
+                            <!-- faint dashed bounds, hover-lifted (V141a/b);
+                                 checked step ⇒ green border (V144b rev) -->
                             <rect
                                 data-node-bounds
                                 :x="node.x"
@@ -245,8 +246,10 @@
                                 :height="node.h"
                                 fill="#bfdbfe"
                                 :fill-opacity="hovered === node.id ? 0.08 : 0"
-                                stroke="#bfdbfe"
-                                :stroke-opacity="hovered === node.id ? 0.9 : 0.35"
+                                :stroke="isChecked(nodeCheckKey(node)) ? '#4ade80' : '#bfdbfe'"
+                                :stroke-opacity="
+                                    isChecked(nodeCheckKey(node)) || hovered === node.id ? 0.9 : 0.35
+                                "
                                 stroke-width="1"
                                 stroke-dasharray="3 2"
                                 vector-effect="non-scaling-stroke"
@@ -283,6 +286,45 @@
                                     fill="#e0f2fe"
                                 >
                                     ⤢
+                                </text>
+                            </g>
+                            <!-- build-check affordance (V144b): dedicated hit area like the
+                                 open link, so pan/zoom drags can't misfire a toggle; lives
+                                 outside the LOD branches ⇒ present in both zoom states -->
+                            <g
+                                data-check-step
+                                class="cursor-pointer"
+                                role="checkbox"
+                                :aria-checked="isChecked(nodeCheckKey(node)) ? 'true' : 'false'"
+                                :aria-label="`Mark ${node.name} built`"
+                                @click.stop="toggleCheck(nodeCheckKey(node))"
+                                @pointerdown.stop
+                            >
+                                <!-- light box so it reads on the dark node (V144b rev) -->
+                                <rect
+                                    :x="node.x + 1"
+                                    :y="node.y + 1"
+                                    width="8"
+                                    height="8"
+                                    rx="1"
+                                    fill="#e0f2fe"
+                                    fill-opacity="0.95"
+                                    stroke="#bfdbfe"
+                                    stroke-width="1.5"
+                                    vector-effect="non-scaling-stroke"
+                                />
+                                <text
+                                    v-if="isChecked(nodeCheckKey(node))"
+                                    data-check-mark
+                                    :x="node.x + 5"
+                                    :y="node.y + 5"
+                                    text-anchor="middle"
+                                    dominant-baseline="central"
+                                    font-size="7"
+                                    font-weight="bold"
+                                    fill="#16a34a"
+                                >
+                                    ✓
                                 </text>
                             </g>
                         </g>
@@ -351,7 +393,8 @@
                                 data-modal-nav-item
                                 @click="navigateTo(entry)"
                             >
-                                {{ entry.identifier }} {{ entry.name }}
+                                <!-- ✅ iff truthy store value at the entry's exact check key (V146) -->
+                                {{ isChecked(entry.checkKey) ? '✅ ' : '' }}{{ entry.identifier }} {{ entry.name }}
                             </button>
                         </li>
                     </ul>
@@ -365,6 +408,7 @@ import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@h
 import { MANIFOLD_DASHES } from '@/diagramLayout';
 import { diagramRegistry } from '@/diagramRegistry';
 import { MARKER_M, NODE_W, masterLayout } from '@/masterDiagram';
+import { isChecked, toggleCheck } from '@/stepChecks';
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
 
 // same fit-relative zoom window as the step modal (V114)
@@ -492,6 +536,19 @@ export default {
         window.removeEventListener('keydown', this.onKeydown);
     },
     methods: {
+        isChecked,
+        toggleCheck,
+
+        // the node's entry in the shared check store (V143/V144): sink nodes use
+        // the '<name>-sink' key, production nodes the row-toggle key convention
+        nodeCheckKey(node) {
+            if (node.sinkInputs) {
+                return `${node.name}-sink`;
+            }
+
+            return `${node.name}-${node.prod?.recipe?.description || 'base'}`;
+        },
+
         qty(value) {
             return +(value ?? 0).toFixed(2);
         },

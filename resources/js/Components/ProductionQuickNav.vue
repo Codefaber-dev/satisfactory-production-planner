@@ -36,10 +36,11 @@
 <script>
 export default {
     mounted() {
-        this.Bus.on('RegisterQuickNav', ({ name, identifier }) => {
+        this.Bus.on('RegisterQuickNav', ({ name, identifier, checkKey }) => {
             this.links.push({
                 name,
                 identifier,
+                checkKey,
             });
         });
     },
@@ -54,6 +55,15 @@ export default {
         };
     },
     methods: {
+        // ✅ iff the check store holds a TRUTHY value at the link's EXACT key
+        // (V146) — never a name-substring match, never a present-but-false key
+        withChecked(link) {
+            return {
+                ...link,
+                checked: !!this.productionChecks?.[link.checkKey],
+            };
+        },
+
         toggle() {
             this.isCollapsed = !this.isCollapsed;
         },
@@ -76,12 +86,7 @@ export default {
     computed: {
         filteredLinks() {
             if (!this.filter) {
-                return this.links.map((o) => {
-                    return {
-                        ...o,
-                        checked: Object.keys(this.productionChecks).some((oo) => oo.includes(o.name)),
-                    };
-                });
+                return this.links.map((o) => this.withChecked(o));
             }
             return this.links
                 .filter((o) => {
@@ -90,12 +95,7 @@ export default {
                         o.identifier.toLowerCase().includes(this.filter.toLowerCase())
                     );
                 })
-                .map((o) => {
-                    return {
-                        ...o,
-                        checked: Object.keys(this.productionChecks).some((oo) => oo.includes(o.name)),
-                    };
-                });
+                .map((o) => this.withChecked(o));
         },
     },
 };

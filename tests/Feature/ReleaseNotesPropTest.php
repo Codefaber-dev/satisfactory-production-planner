@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -14,6 +15,9 @@ use Tests\TestCase;
  */
 class ReleaseNotesPropTest extends TestCase
 {
+    // /checklist (the fixture page) queries ingredients since V149 (B73)
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();

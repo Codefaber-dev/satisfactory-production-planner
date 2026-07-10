@@ -1,11 +1,11 @@
 # Satisfactory Production Planner
 ## satisfactoryproductionplanner.com
 
-### ♻️ Recycling, Fully Planned
+### ✅ Track Your Build, Plan-Wide
 
-- Package & Sink Fluids now builds everything it needs inside your plan. Packaging steps and their whole supply chain — Empty Canisters, the Plastic to make them, right down to Crude Oil — appear as real production steps with recipe pickers, clock controls, and build diagrams, merged with the rest of your factory.
+- Check off production steps as you build them — from the step row, the build-diagram modal, or the new Full Production Diagram — and your progress follows you everywhere: dimmed rows, checkmarks in Quick Nav and diagram navigation, and green-bordered nodes on the plan-wide diagram. Saved per factory, right in your browser.
 
-## v1.3.2 - Recycling Update
+## v1.4.0 - Build Tracking & Checklist Update
 [Release Notes](#release-notes)
 
 #### By CodeFaber aka [/u/gimcrak](https://www.reddit.com/user/gimcrak)
@@ -31,6 +31,19 @@ I hate spam as much as the next guy. I will never send you spam or give your inf
 ## <a name="release-notes"></a>
 ##  📔 Release Notes
 Greetings Pioneers! Here are the latest changes to the Satisfactory Production Planner.
+
+### v1.4.0
+
+- 🗺️ **Full Production Diagram** — A plan-wide, pan-and-zoom diagram of your whole factory: every step is a node, every material flow a labeled directed edge, laid out by build level from raw resources to final products. A legend toggles each material's edges on and off, zooming in reveals each step's actual building layout, and clicking a node jumps straight into that step's build diagram.
+- ✅ **Build Progress Tracking** — Mark steps **built** from the step row, the diagram modal's new BUILT checkbox, or the checkbox on every Full Production Diagram node. Completed steps dim (and can be hidden entirely), show ✅ in Quick Nav and the diagram Steps panel, and get a green border on the Full Production Diagram. Progress is saved per factory in your browser.
+- 📋 **Checklist, Complete** — The checklist now covers **every item in the game** — the SAM/alien chain, ammo and explosives, power slugs and shards, packaged fluids, and FICSMAS event items — each with a hand-curated milestone tier, and it stays in sync with the planner's game data automatically.
+- 📦 **Dimensional Depot Column** — Track which items you've set up to auto-upload to the Dimensional Depot, right next to Storage Automated — sortable like every other column.
+- 🗂️ **Multiple Checklists** — Create, rename, and delete named checklists and switch between them from the sidebar — one per save file, per phase, or however you play. Your existing checklist carries over automatically.
+- 🪲 Bug fix: raw-material (Level 0) steps now dim, show their checkmark, and hide with the rest of the completed rows.
+- 🪲 Bug fix: an open build diagram no longer vanishes when its step becomes hidden — including when you tick BUILT from inside the diagram itself.
+- 🪲 Bug fix: Quick Nav no longer shows checkmarks for steps you never completed (a name-substring mixup — checking **Iron Ingot** could mark **Iron** too).
+
+---
 
 ### v1.3.2
 

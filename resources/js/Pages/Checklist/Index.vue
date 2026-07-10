@@ -11,7 +11,24 @@
                     <div
                         class="flex w-full flex-col justify-center space-y-4 bg-white p-4 shadow-xl dark:bg-gray-800 sm:rounded-lg"
                     >
-                        <button @click="promptReset" class="btn-sm btn-emerald">Reset Checklist</button>
+                        <!-- saved checklists (V151) -->
+                        <span class="whitespace-nowrap font-semibold"> Saved Checklists </span>
+                        <select
+                            v-model="activeListId"
+                            data-checklist-select
+                            class="w-full rounded p-2 shadow dark:border dark:border-gray-500 dark:bg-gray-800"
+                        >
+                            <option v-for="list in satisfactoryStore.listSummaries" :key="list.id" :value="list.id">
+                                {{ list.name }}
+                            </option>
+                        </select>
+                        <div class="flex space-x-2">
+                            <button type="button" @click="promptCreate" class="btn-sm btn-emerald">New</button>
+                            <button type="button" @click="promptRename" class="btn-sm btn-emerald">Rename</button>
+                            <button type="button" @click="promptDelete" class="btn-sm btn-emerald">Delete</button>
+                        </div>
+
+                        <button type="button" @click="promptReset" class="btn-sm btn-emerald">Reset Checklist</button>
 
                         <span class="whitespace-nowrap font-semibold"> Toggle Hidden </span>
                         <label class="cursor-pointer rounded bg-slate-200 px-2 py-1 dark:bg-slate-700">
@@ -93,6 +110,13 @@
                                     Storage Automated?
                                 </th>
                                 <th
+                                    @click="reSortBy('depot')"
+                                    class="cursor-pointer whitespace-normal px-2 text-center hover:underline"
+                                    data-depot-header
+                                >
+                                    Dimensional Depot
+                                </th>
+                                <th
                                     @click="reSortBy('hidden')"
                                     class="cursor-pointer whitespace-normal px-2 text-center hover:underline"
                                 >
@@ -162,6 +186,20 @@
                                     {{ product.storage ? 'Yes' : 'No' }}
                                 </label>
                             </td>
+                            <!-- Dimensional Depot (V150) -->
+                            <td nowrap="nowrap" class="p-2" data-depot-cell>
+                                <label
+                                    :class="[
+                                        product.depot
+                                            ? 'bg-emerald-300 dark:bg-emerald-600'
+                                            : 'bg-rose-300 dark:bg-rose-600',
+                                    ]"
+                                    class="cursor-pointer rounded py-1 pr-2 pl-1"
+                                >
+                                    <input type="checkbox" class="w-0 appearance-none" v-model="product.depot" />
+                                    {{ product.depot ? 'Yes' : 'No' }}
+                                </label>
+                            </td>
                             <td nowrap="nowrap" class="p-2">
                                 <label
                                     :class="[
@@ -208,6 +246,18 @@ export default {
         CloudImage,
     },
 
+    props: {
+        // DB ingredient set from ChecklistController (V149)
+        ingredients: {
+            type: Array,
+            default: () => [],
+        },
+    },
+
+    mounted() {
+        this.satisfactoryStore.sync(this.ingredients);
+    },
+
     data() {
         return {
             search: '',
@@ -242,6 +292,33 @@ export default {
             this.satisfactoryStore.resetChecklist();
         },
 
+        // saved-checklist CRUD (V151)
+        promptCreate() {
+            const name = prompt('Provide a name for the new checklist');
+
+            if (name?.trim()) {
+                this.satisfactoryStore.createList(name);
+            }
+        },
+
+        promptRename() {
+            const name = prompt('New name for this checklist', this.satisfactoryStore.activeName);
+
+            if (name?.trim()) {
+                this.satisfactoryStore.renameList(this.satisfactoryStore.activeId, name);
+            }
+        },
+
+        promptDelete() {
+            const confirmed = confirm(
+                `Delete checklist "${this.satisfactoryStore.activeName}"? This cannot be undone.`
+            );
+
+            if (confirmed) {
+                this.satisfactoryStore.deleteList(this.satisfactoryStore.activeId);
+            }
+        },
+
         doSort(a, b) {
             const aa = (a === +a ? +a : a) || 0;
             const bb = (b === +b ? +b : b) || 0;
@@ -259,6 +336,16 @@ export default {
 
     computed: {
         ...mapStores(useSatisfactoryStore),
+
+        // v-model bridge for the saved-checklist selector (V151)
+        activeListId: {
+            get() {
+                return this.satisfactoryStore.activeId;
+            },
+            set(id) {
+                this.satisfactoryStore.selectList(id);
+            },
+        },
 
         filteredProducts() {
             return this.satisfactoryStore

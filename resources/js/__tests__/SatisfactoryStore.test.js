@@ -93,3 +93,274 @@ describe('SatisfactoryStore', () => {
         expect(store.checklist[0].producing).toBe(0);
     });
 });
+
+describe('SatisfactoryStore — DB ingredient sync (V149)', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        setActivePinia(createPinia());
+    });
+
+    const ing = (name, extra = {}) => ({
+        name,
+        tier: 5,
+        raw: false,
+        is_liquid: false,
+        is_ficsmas: false,
+        ...extra,
+    });
+
+    it('appends a DB-only item with derived tags and fresh state', () => {
+        const store = useSatisfactoryStore();
+        store.sync([ing('Test Widget'), ing('Test Ore', { tier: 1, raw: true })]);
+
+        const sam = store.checklist.find((o) => o.name === 'Test Widget');
+        expect(sam).toBeTruthy();
+        expect(sam.tags).toEqual(['tier 5']);
+        expect(sam.tier).toBe('5');
+        expect(sam.producing).toBe(0);
+        expect(sam.automated).toBe(false);
+
+        const raw = store.checklist.find((o) => o.name === 'Test Ore');
+        expect(raw.tags).toEqual(['tier 1', 'raw']);
+    });
+
+    it('curated product_list tags win over derived tags on a name match', () => {
+        const store = useSatisfactoryStore();
+        store.sync([ing('Battery', { tier: 3 })]);
+
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        // curated: ['electronics', 'tier 7'] — not the derived ['tier 3']
+        expect(battery.tags).toContain('electronics');
+        expect(battery.tags).toContain('tier 7');
+        expect(battery.tier).toBe('7');
+    });
+
+    it('preserves saved user state by name across a sync', () => {
+        const store = useSatisfactoryStore();
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 42, automated: true, notes: 'north field' });
+
+        store.sync([ing('Battery'), ing('Test Widget')]);
+
+        const after = store.checklist.find((o) => o.name === 'Battery');
+        expect(after.producing).toBe(42);
+        expect(after.automated).toBe(true);
+        expect(after.notes).toBe('north field');
+    });
+
+    it('drops rows no longer in the DB set and resets from the catalog', () => {
+        const store = useSatisfactoryStore();
+        store.sync([ing('Battery'), ing('Test Widget')]);
+
+        expect(store.checklist).toHaveLength(2);
+        expect(store.checklist.find((o) => o.name === 'AI Limiter')).toBeUndefined();
+
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 9 });
+        store.resetChecklist();
+
+        expect(store.checklist).toHaveLength(2);
+        expect(store.checklist.every((o) => o.producing === 0)).toBe(true);
+    });
+
+    it('sync without a prop is a no-op', () => {
+        const store = useSatisfactoryStore();
+        const before = store.checklist.length;
+
+        store.sync(undefined);
+        store.sync([]);
+
+        expect(store.checklist).toHaveLength(before);
+    });
+
+    it('ficsmas flag derives a ficsmas tag on DB-only items', () => {
+        const store = useSatisfactoryStore();
+        store.sync([ing('Candy Cane', { is_ficsmas: true })]);
+
+        expect(store.checklist.find((o) => o.name === 'Candy Cane').tags).toContain('ficsmas');
+    });
+});
+
+describe('SatisfactoryStore — saved checklists CRUD (V151)', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        setActivePinia(createPinia());
+    });
+
+    it('migrates the legacy checklist key into a Default list, preserving user state', () => {
+        const rows = [
+            {
+                name: 'Battery',
+                tags: ['electronics', 'tier 7'],
+                tier: '7',
+                producing: 12,
+                automated: true,
+                storage: false,
+                hidden: false,
+                notes: 'legacy note',
+            },
+        ];
+        localStorage.setItem('checklist', JSON.stringify(rows));
+
+        const store = useSatisfactoryStore();
+
+        expect(store.listSummaries).toHaveLength(1);
+        expect(store.activeName).toBe('Default');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(12);
+        expect(store.checklist.find((o) => o.name === 'Battery').notes).toBe('legacy note');
+        expect(localStorage.getItem('checklist')).toBeNull();
+    });
+
+    it('fresh browser gets a Default list with the full item set', () => {
+        const store = useSatisfactoryStore();
+
+        expect(store.activeName).toBe('Default');
+        expect(store.checklist.length).toBeGreaterThan(0);
+    });
+
+    it('createList starts a fresh full item set and becomes active', () => {
+        const store = useSatisfactoryStore();
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 5 });
+
+        const id = store.createList('Phase 4');
+
+        expect(store.activeId).toBe(id);
+        expect(store.activeName).toBe('Phase 4');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(0);
+        expect(store.listSummaries).toHaveLength(2);
+    });
+
+    it('createList rejects blank names', () => {
+        const store = useSatisfactoryStore();
+
+        expect(store.createList('   ')).toBeNull();
+        expect(store.listSummaries).toHaveLength(1);
+    });
+
+    it('renameList renames; blank rename is a no-op', () => {
+        const store = useSatisfactoryStore();
+        store.renameList(store.activeId, 'Main Base');
+
+        expect(store.activeName).toBe('Main Base');
+
+        store.renameList(store.activeId, '  ');
+        expect(store.activeName).toBe('Main Base');
+    });
+
+    it('deleting the active list switches to a remaining one', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        store.createList('Second');
+
+        store.deleteList(store.activeId);
+
+        expect(store.activeId).toBe(first);
+        expect(store.listSummaries).toHaveLength(1);
+    });
+
+    it('deleting the last list recreates a fresh Default', () => {
+        const store = useSatisfactoryStore();
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 5 });
+
+        store.deleteList(store.activeId);
+
+        expect(store.listSummaries).toHaveLength(1);
+        expect(store.activeName).toBe('Default');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(0);
+    });
+
+    it('isolates row state between lists', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 7 });
+
+        store.createList('Second');
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(0);
+
+        const second = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...second, producing: 3 });
+
+        store.selectList(first);
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(7);
+    });
+
+    it('reset touches only the active list', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        const battery = store.checklist.find((o) => o.name === 'Battery');
+        store.update({ ...battery, producing: 7 });
+
+        store.createList('Second');
+        store.resetChecklist();
+
+        store.selectList(first);
+        expect(store.checklist.find((o) => o.name === 'Battery').producing).toBe(7);
+    });
+
+    it('sync merges the catalog into every list', () => {
+        const store = useSatisfactoryStore();
+        const first = store.activeId;
+        store.createList('Second');
+
+        store.sync([{ name: 'Test Widget', tier: 2, raw: false, is_liquid: false, is_ficsmas: false }]);
+
+        expect(store.checklist).toHaveLength(1);
+        expect(store.checklist[0].name).toBe('Test Widget');
+
+        store.selectList(first);
+        expect(store.checklist).toHaveLength(1);
+        expect(store.checklist[0].name).toBe('Test Widget');
+    });
+});
+
+describe('SatisfactoryStore — curated tags for former DB-only items (V152)', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        setActivePinia(createPinia());
+    });
+
+    const ing = (name, extra = {}) => ({
+        name,
+        tier: 1,
+        raw: false,
+        is_liquid: false,
+        is_ficsmas: false,
+        ...extra,
+    });
+
+    it('curated milestone tiers win over the DB seeder tier', () => {
+        const store = useSatisfactoryStore();
+        store.sync([
+            ing('Power Shard', { tier: 6 }),
+            ing('Wood', { tier: 1, raw: true }),
+            ing('Nuke Nobelisk', { tier: 6 }),
+            ing('FICSMAS Gift', { tier: 1, raw: true, is_ficsmas: true }),
+        ]);
+
+        const row = (name) => store.checklist.find((o) => o.name === name);
+
+        expect(row('Power Shard').tier).toBe('1');
+        expect(row('Power Shard').tags).toContain('researched');
+
+        expect(row('Wood').tier).toBe('0');
+        expect(row('Wood').tags).toContain('raw materials');
+
+        expect(row('Nuke Nobelisk').tier).toBe('8');
+        expect(row('Nuke Nobelisk').tags).toEqual(expect.arrayContaining(['nuclear', 'pioneer tech']));
+
+        expect(row('FICSMAS Gift').tier).toBe('0');
+        expect(row('FICSMAS Gift').tags).toContain('ficsmas');
+    });
+
+    it('derived tags still fire for an ingredient unknown to the static file', () => {
+        const store = useSatisfactoryStore();
+        store.sync([ing('Future Widget', { tier: 3, is_ficsmas: true })]);
+
+        const row = store.checklist.find((o) => o.name === 'Future Widget');
+        expect(row.tags).toEqual(['tier 3', 'ficsmas']);
+        expect(row.tier).toBe('3');
+    });
+});

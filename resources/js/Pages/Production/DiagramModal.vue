@@ -33,6 +33,20 @@
                         <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Recipe</div>
                         <div class="text-lg tracking-widest text-blue-50">{{ details.recipe_name }}</div>
                     </div>
+                    <!-- BUILT check: header compartment right of RECIPE (V144a rev) -->
+                    <div v-if="checkKey" class="border-l border-blue-200/60 px-4 py-1.5" data-built-cell>
+                        <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Built</div>
+                        <label class="flex cursor-pointer items-center gap-2">
+                            <input
+                                type="checkbox"
+                                class="h-5 w-5 cursor-pointer"
+                                data-built-checkbox
+                                :checked="isChecked(checkKey)"
+                                @change="toggleCheck(checkKey)"
+                            />
+                            <span class="text-lg">{{ isChecked(checkKey) ? '✅' : '—' }}</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 border-l border-blue-200/60 px-3 py-1.5">
                     <button
@@ -177,7 +191,8 @@
                                 data-modal-nav-item
                                 @click="navigateTo(entry)"
                             >
-                                {{ entry.identifier }} {{ entry.name }}
+                                <!-- ✅ iff truthy store value at the entry's exact check key (V146) -->
+                                {{ isChecked(entry.checkKey) ? '✅ ' : '' }}{{ entry.identifier }} {{ entry.name }}
                             </button>
                         </li>
                     </ul>
@@ -191,6 +206,7 @@ import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { contentExtent, manifoldLines } from '@/diagramLayout';
 import { diagramRegistry } from '@/diagramRegistry';
+import { isChecked, toggleCheck } from '@/stepChecks';
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
 import DiagramStepDetails from '@/Pages/Production/DiagramStepDetails.vue';
 import FootprintSummary from './FootprintSummary.vue';
@@ -241,6 +257,11 @@ export default {
         },
         // step identifier (e.g. '2.B') — header STEP cell + nav highlight (V130)
         identifier: {
+            type: String,
+            default: '',
+        },
+        // step-check store key — BUILT cell binding (V144); '' ⇒ cell hidden
+        checkKey: {
             type: String,
             default: '',
         },
@@ -301,6 +322,9 @@ export default {
         window.removeEventListener('keydown', this.onKeydown);
     },
     methods: {
+        isChecked,
+        toggleCheck,
+
         onKeydown(event) {
             if (event.key === 'Escape') {
                 this.$emit('close');

@@ -162,8 +162,10 @@ describe('BuildDiagram — modal-only composition (V134)', () => {
 
         await wrapper.find('[aria-label="Expand diagram"]').trigger('click');
 
+        // V148: the modal teleports to body — assert against its own subtree
+        const modal = wrapper.findComponent({ name: 'diagram-modal' });
         expect(wrapper.findComponent(DiagramSvg).exists()).toBe(true);
-        expect(wrapper.text()).toContain('Foundations');
-        expect(wrapper.text()).toContain('Belt Speed');
+        expect(modal.text()).toContain('Foundations');
+        expect(modal.text()).toContain('Belt Speed');
     });
 });
