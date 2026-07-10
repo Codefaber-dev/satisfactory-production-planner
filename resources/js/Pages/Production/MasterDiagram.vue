@@ -211,26 +211,29 @@
                                     :height="node.h"
                                     fill="#172554"
                                 />
+                                <!-- step number + name, never the building monogram (V142) -->
                                 <text
+                                    data-node-box-id
                                     :x="node.x + node.w / 2"
-                                    :y="node.y + node.h / 2 - 6"
+                                    :y="node.y + node.h / 2 - 8"
                                     text-anchor="middle"
                                     dominant-baseline="central"
-                                    font-size="14"
+                                    font-size="10"
                                     fill="#e0f2fe"
                                     fill-opacity="0.9"
                                 >
-                                    {{ node.monogram || node.id }}
+                                    {{ node.id }}
                                 </text>
                                 <text
+                                    data-node-box-name
                                     :x="node.x + node.w / 2"
-                                    :y="node.y + node.h / 2 + 8"
+                                    :y="node.y + node.h / 2 + 6"
                                     text-anchor="middle"
                                     dominant-baseline="central"
-                                    font-size="4.5"
+                                    font-size="5"
                                     fill="#e0f2fe"
                                 >
-                                    {{ node.id }} {{ node.name }}{{ node.numBuildings ? ` ×${node.numBuildings}` : '' }}
+                                    {{ node.name }}{{ node.numBuildings ? ` ×${node.numBuildings}` : '' }}
                                 </text>
                             </template>
                             <!-- faint dashed bounds, hover-lifted (V141a/b) -->

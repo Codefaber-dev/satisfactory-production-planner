@@ -220,6 +220,12 @@ describe('MasterDiagram — semantic zoom (V142)', () => {
         expect(wrapper.findAll('[data-node-box]')).toHaveLength(2);
         expect(wrapper.findComponent(DiagramSvg).exists()).toBe(false);
 
+        // black-box label = step number + name (with count), never the monogram
+        const ingot = wrapper.find('[data-node="1.A"]');
+        expect(ingot.find('[data-node-box-id]').text()).toBe('1.A');
+        expect(ingot.find('[data-node-box-name]').text()).toBe('Iron Ingot ×2');
+        expect(ingot.text()).not.toContain('S');
+
         await zoomIn(wrapper, 5);
 
         // footprint-bearing node switches to its nested buildings svg
