@@ -91,6 +91,7 @@
                     :materials="{ inputs: step.inputs.map((input) => input.item), outputs: [] }"
                     :details="sinkDetails"
                     :identifier="identifier"
+                    :check-key="checkKey"
                 />
             </td>
         </tr>

@@ -17,6 +17,7 @@
             :title="title"
             :details="details"
             :identifier="identifier"
+            :check-key="checkKey"
             @close="modalOpen = false"
             @update:max-clock="$emit('update:maxClock', $event)"
         />
@@ -42,6 +43,8 @@ export default {
             this.unregisterDiagram = registerDiagram({
                 identifier: this.identifier,
                 name: this.title,
+                // step-check key so nav panels can render ✅ markers (V144/V146)
+                checkKey: this.checkKey,
                 open: () => {
                     this.modalOpen = true;
                 },
@@ -54,6 +57,11 @@ export default {
     props: {
         // step identifier (e.g. '2.B') for the modal cross-nav registry (V130)
         identifier: {
+            type: String,
+            default: '',
+        },
+        // step-check store key for the modal's BUILT cell (V144); '' ⇒ no cell
+        checkKey: {
             type: String,
             default: '',
         },

@@ -139,4 +139,11 @@ describe('RecycleStep — build-check toggle (V143)', () => {
         expect(isChecked('AWESOME Sink-sink')).toBe(false);
         expect(wrapper.text()).toContain('⬜');
     });
+
+    it('threads its check key to the build diagram (V144)', () => {
+        initChecks(makeStore(), 5);
+        const wrapper = mountStep(sinkStep);
+
+        expect(wrapper.findComponent({ name: 'build-diagram' }).attributes('check-key')).toBe('AWESOME Sink-sink');
+    });
 });

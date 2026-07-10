@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import BuildDiagram from '../Pages/Production/BuildDiagram.vue';
 import DiagramModal from '../Pages/Production/DiagramModal.vue';
 import DiagramSvg from '../Pages/Production/DiagramSvg.vue';
+import { initChecks, isChecked, resetChecks } from '../stepChecks';
 
 const baseFootprint = () => ({
     monogram: 'C',
@@ -286,5 +287,64 @@ describe('DiagramModal — composition + theming (V115)', () => {
         });
 
         expect(modalViewBox(wrapper)).toBe('0 -5 104 45');
+    });
+});
+
+describe('DiagramModal — BUILT check cell (V144a)', () => {
+    const makeStore = () => {
+        const data = {};
+
+        return {
+            getItem: (key, def = null) => (key in data ? data[key] : def),
+            setItem: (key, value) => {
+                data[key] = JSON.parse(JSON.stringify(value));
+            },
+            _data: data,
+        };
+    };
+
+    beforeEach(() => {
+        resetChecks();
+    });
+
+    it('renders no cell without a check key (standalone mounts)', () => {
+        const wrapper = mountModal();
+
+        expect(wrapper.find('[data-built-cell]').exists()).toBe(false);
+    });
+
+    it('reflects and toggles the shared store entry — same key as the step row', async () => {
+        const store = makeStore();
+        initChecks(store, 3);
+
+        const wrapper = mountModal({
+            props: { footprint: baseFootprint(), checkKey: 'Iron Ingot-base' },
+        });
+        const box = wrapper.find('[data-built-checkbox]');
+
+        expect(box.exists()).toBe(true);
+        expect(box.element.checked).toBe(false);
+
+        await box.setValue(true);
+
+        expect(isChecked('Iron Ingot-base')).toBe(true);
+        expect(store._data['step_checks:3']).toEqual({ 'Iron Ingot-base': true });
+        expect(wrapper.find('[data-built-cell]').text()).toContain('✅');
+
+        await box.setValue(false);
+
+        expect(isChecked('Iron Ingot-base')).toBe(false);
+    });
+
+    it('shows an entry already checked in the store as checked', () => {
+        const store = makeStore();
+        store.setItem('step_checks:3', { 'Iron Ingot-base': true });
+        initChecks(store, 3);
+
+        const wrapper = mountModal({
+            props: { footprint: baseFootprint(), checkKey: 'Iron Ingot-base' },
+        });
+
+        expect(wrapper.find('[data-built-checkbox]').element.checked).toBe(true);
     });
 });

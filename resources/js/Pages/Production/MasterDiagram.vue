@@ -285,6 +285,42 @@
                                     ⤢
                                 </text>
                             </g>
+                            <!-- build-check affordance (V144b): dedicated hit area like the
+                                 open link, so pan/zoom drags can't misfire a toggle; lives
+                                 outside the LOD branches ⇒ present in both zoom states -->
+                            <g
+                                data-check-step
+                                class="cursor-pointer"
+                                role="checkbox"
+                                :aria-checked="isChecked(nodeCheckKey(node)) ? 'true' : 'false'"
+                                :aria-label="`Mark ${node.name} built`"
+                                @click.stop="toggleCheck(nodeCheckKey(node))"
+                                @pointerdown.stop
+                            >
+                                <rect
+                                    :x="node.x + 1"
+                                    :y="node.y + 1"
+                                    width="8"
+                                    height="8"
+                                    rx="1"
+                                    fill="#1e3a8a"
+                                    stroke="#bfdbfe"
+                                    stroke-width="1"
+                                    vector-effect="non-scaling-stroke"
+                                />
+                                <text
+                                    v-if="isChecked(nodeCheckKey(node))"
+                                    data-check-mark
+                                    :x="node.x + 5"
+                                    :y="node.y + 5"
+                                    text-anchor="middle"
+                                    dominant-baseline="central"
+                                    font-size="6"
+                                    fill="#a3e635"
+                                >
+                                    ✓
+                                </text>
+                            </g>
                         </g>
                     </svg>
                 </div>
@@ -365,6 +401,7 @@ import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@h
 import { MANIFOLD_DASHES } from '@/diagramLayout';
 import { diagramRegistry } from '@/diagramRegistry';
 import { MARKER_M, NODE_W, masterLayout } from '@/masterDiagram';
+import { isChecked, toggleCheck } from '@/stepChecks';
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
 
 // same fit-relative zoom window as the step modal (V114)
@@ -492,6 +529,19 @@ export default {
         window.removeEventListener('keydown', this.onKeydown);
     },
     methods: {
+        isChecked,
+        toggleCheck,
+
+        // the node's entry in the shared check store (V143/V144): sink nodes use
+        // the '<name>-sink' key, production nodes the row-toggle key convention
+        nodeCheckKey(node) {
+            if (node.sinkInputs) {
+                return `${node.name}-sink`;
+            }
+
+            return `${node.name}-${node.prod?.recipe?.description || 'base'}`;
+        },
+
         qty(value) {
             return +(value ?? 0).toFixed(2);
         },

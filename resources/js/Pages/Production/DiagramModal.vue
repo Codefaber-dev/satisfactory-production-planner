@@ -107,6 +107,19 @@
                                         <div class="text-[9px] uppercase tracking-widest text-blue-300">Units</div>
                                         <div>Dimensions in meters</div>
                                     </div>
+                                    <!-- V144a: BUILT checkbox — same store entry as the step row -->
+                                    <div v-if="checkKey" class="border-b border-r border-blue-200/40 px-2 py-1" data-built-cell>
+                                        <div class="text-[9px] uppercase tracking-widest text-blue-300">Built</div>
+                                        <label class="flex cursor-pointer items-center gap-1">
+                                            <input
+                                                type="checkbox"
+                                                data-built-checkbox
+                                                :checked="isChecked(checkKey)"
+                                                @change="toggleCheck(checkKey)"
+                                            />
+                                            <span>{{ isChecked(checkKey) ? '✅' : '—' }}</span>
+                                        </label>
+                                    </div>
                                     <div
                                         v-if="details?.max_clock_speed"
                                         class="border-b border-r border-blue-200/40 px-2 py-1"
@@ -191,6 +204,7 @@ import { unref } from 'vue';
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { contentExtent, manifoldLines } from '@/diagramLayout';
 import { diagramRegistry } from '@/diagramRegistry';
+import { isChecked, toggleCheck } from '@/stepChecks';
 import DiagramSvg from '@/Pages/Production/DiagramSvg';
 import DiagramStepDetails from '@/Pages/Production/DiagramStepDetails.vue';
 import FootprintSummary from './FootprintSummary.vue';
@@ -241,6 +255,11 @@ export default {
         },
         // step identifier (e.g. '2.B') — header STEP cell + nav highlight (V130)
         identifier: {
+            type: String,
+            default: '',
+        },
+        // step-check store key — BUILT cell binding (V144); '' ⇒ cell hidden
+        checkKey: {
             type: String,
             default: '',
         },
@@ -301,6 +320,9 @@ export default {
         window.removeEventListener('keydown', this.onKeydown);
     },
     methods: {
+        isChecked,
+        toggleCheck,
+
         onKeydown(event) {
             if (event.key === 'Escape') {
                 this.$emit('close');

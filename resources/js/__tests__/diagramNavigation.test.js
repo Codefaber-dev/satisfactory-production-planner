@@ -72,13 +72,23 @@ describe('diagramRegistry (V130)', () => {
 });
 
 describe('BuildDiagram — registry integration (V130)', () => {
-    it('registers on mount with its identifier and title, unregisters on unmount', () => {
+    it('registers on mount with its identifier, title, and check key, unregisters on unmount', () => {
         const wrapper = mount(BuildDiagram, {
-            props: { footprint: baseFootprint(), identifier: '2.B', title: 'Copper Ingot' },
+            props: {
+                footprint: baseFootprint(),
+                identifier: '2.B',
+                title: 'Copper Ingot',
+                checkKey: 'Copper Ingot-base',
+            },
         });
 
         expect(diagramRegistry).toHaveLength(1);
-        expect(diagramRegistry[0]).toMatchObject({ identifier: '2.B', name: 'Copper Ingot' });
+        // checkKey rides along for nav ✅ markers (V144/V146)
+        expect(diagramRegistry[0]).toMatchObject({
+            identifier: '2.B',
+            name: 'Copper Ingot',
+            checkKey: 'Copper Ingot-base',
+        });
 
         wrapper.unmount();
         expect(diagramRegistry).toHaveLength(0);

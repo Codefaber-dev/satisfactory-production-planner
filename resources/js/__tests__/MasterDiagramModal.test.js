@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { registerDiagram, resetDiagramRegistry } from '../diagramRegistry';
 import MasterDiagram from '../Pages/Production/MasterDiagram.vue';
 import DiagramSvg from '../Pages/Production/DiagramSvg.vue';
+import { initChecks, isChecked, resetChecks } from '../stepChecks';
 
 const footprint = () => ({
     monogram: 'S',
@@ -276,5 +277,80 @@ describe('MasterDiagram — modal chrome (V128/V114)', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted('close')).toBeTruthy();
+    });
+});
+
+describe('MasterDiagram — build-check affordance (V144b)', () => {
+    const makeStore = () => {
+        const data = {};
+
+        return {
+            getItem: (key, def = null) => (key in data ? data[key] : def),
+            setItem: (key, value) => {
+                data[key] = JSON.parse(JSON.stringify(value));
+            },
+            _data: data,
+        };
+    };
+
+    afterEach(() => {
+        resetChecks();
+    });
+
+    it('every node renders a check affordance; click toggles the store without closing the master', async () => {
+        initChecks(makeStore(), 7);
+        const wrapper = mountMaster();
+
+        expect(wrapper.find('[data-node="0.A"] [data-check-step]').exists()).toBe(true);
+
+        const check = wrapper.find('[data-node="1.A"] [data-check-step]');
+        expect(check.exists()).toBe(true);
+        expect(check.attributes('aria-checked')).toBe('false');
+
+        await check.trigger('click');
+
+        // production node key = row-toggle convention '<name>-<recipe description>'
+        expect(isChecked('Iron Ingot-Iron Ingot')).toBe(true);
+        expect(wrapper.emitted('close')).toBeFalsy();
+        expect(wrapper.find('[data-node="1.A"] [data-check-step]').attributes('aria-checked')).toBe('true');
+        expect(wrapper.find('[data-node="1.A"] [data-check-mark]').exists()).toBe(true);
+
+        // raw node untouched
+        expect(isChecked('Iron Ore-base')).toBe(false);
+    });
+
+    it('sink nodes toggle the <name>-sink key', async () => {
+        initChecks(makeStore(), 7);
+        const wrapper = mountMaster({
+            recycleSteps: [
+                {
+                    name: 'AWESOME Sink',
+                    building: 'AWESOME Sink',
+                    num_buildings: 1,
+                    power: 30,
+                    inputs: [{ item: 'Iron Ingot', qty: 30 }],
+                    output: { points: 60 },
+                },
+            ],
+        });
+
+        await wrapper.find('[data-node="R.A"] [data-check-step]').trigger('click');
+
+        expect(isChecked('AWESOME Sink-sink')).toBe(true);
+        expect(wrapper.emitted('close')).toBeFalsy();
+    });
+
+    it('stays present in the zoomed-in detailed state (both V142 LOD states)', async () => {
+        initChecks(makeStore(), 7);
+        const wrapper = mountMaster();
+
+        await zoomIn(wrapper, 5);
+
+        // detailed state active (nested svg mounted) and the affordance survives
+        expect(wrapper.find('[data-node="1.A"]').findComponent(DiagramSvg).exists()).toBe(true);
+        expect(wrapper.find('[data-node="1.A"] [data-check-step]').exists()).toBe(true);
+
+        await wrapper.find('[data-node="1.A"] [data-check-step]').trigger('click');
+        expect(isChecked('Iron Ingot-Iron Ingot')).toBe(true);
     });
 });
