@@ -320,11 +320,19 @@ describe('ProductionSteps — raw-row check parity (V147, B71)', () => {
     const findIronOre = (wrapper) =>
         wrapper.findAll('.stub-step').find((s) => s.attributes('data-name') === 'Iron Ore');
 
-    it('passes :finished and dims a checked raw row', () => {
+    // V153: hideCompleted is component-owned (default true) — flip it via the button
+    const showCompleted = async (wrapper) => {
+        await wrapper
+            .findAll('button')
+            .find((b) => b.text() === 'Toggle Completed')
+            .trigger('click');
+    };
+
+    it('passes :finished and dims a checked raw row', async () => {
         const wrapper = mountSteps({
-            hideCompleted: false,
             productionChecks: { 'Iron Ore-base': true },
         });
+        await showCompleted(wrapper);
         const ironOre = findIronOre(wrapper);
 
         expect(ironOre.classes()).toContain('opacity-25');
@@ -334,7 +342,6 @@ describe('ProductionSteps — raw-row check parity (V147, B71)', () => {
 
     it('hideCompleted hides a checked raw row', () => {
         const wrapper = mountSteps({
-            hideCompleted: true,
             productionChecks: { 'Iron Ore-base': true },
         });
 
@@ -342,10 +349,29 @@ describe('ProductionSteps — raw-row check parity (V147, B71)', () => {
     });
 
     it('leaves an unchecked raw row visible and undimmed under hideCompleted', () => {
-        const wrapper = mountSteps({ hideCompleted: true, productionChecks: {} });
+        const wrapper = mountSteps({ productionChecks: {} });
         const ironOre = findIronOre(wrapper);
 
         expect(ironOre.attributes('style') || '').not.toContain('display: none');
         expect(ironOre.classes()).toContain('opacity-100');
+    });
+});
+
+describe('ProductionSteps — Toggle Completed owns its state (V153, B74)', () => {
+    const findByName = (wrapper, name) =>
+        wrapper.findAll('.stub-step').find((s) => s.attributes('data-name') === name);
+    const shown = (node) => !(node.attributes('style') || '').includes('display: none');
+    const toggleBtn = (wrapper) => wrapper.findAll('button').find((b) => b.text() === 'Toggle Completed');
+
+    it('hides completed rows by default and the button reveals / re-hides them', async () => {
+        const wrapper = mountSteps({ productionChecks: { 'Iron Ingot-base': true } });
+
+        expect(shown(findByName(wrapper, 'Iron Ingot'))).toBe(false);
+
+        await toggleBtn(wrapper).trigger('click');
+        expect(shown(findByName(wrapper, 'Iron Ingot'))).toBe(true);
+
+        await toggleBtn(wrapper).trigger('click');
+        expect(shown(findByName(wrapper, 'Iron Ingot'))).toBe(false);
     });
 });

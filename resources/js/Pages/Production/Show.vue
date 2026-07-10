@@ -196,7 +196,6 @@
                         <production-steps
                             :class="{ 'hidden': selectedTab !== 'productionSteps', 'xl:flex': true }"
                             ref="productionSteps"
-                            :hide-completed="hideCompleted"
                             :new-imports="newImports"
                             :import-notes="newImportNotes"
                             :recycling="production.recycling"
@@ -359,7 +358,6 @@ export default {
             done: true,
             working: false,
             buildingChecks: {},
-            hideCompleted: true,
             rawMaterials: this.production.raw_materials,
             intermediateMaterials: {},
             disabledRawMaterials: {},

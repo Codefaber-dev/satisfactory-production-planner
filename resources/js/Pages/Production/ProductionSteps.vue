@@ -196,10 +196,12 @@ export default {
             filterItem: null,
             // V139: master-diagram modal visibility (local, not persisted)
             masterOpen: false,
+            // V153: owned here, NOT a prop — the Toggle Completed button flips it
+            // (assigning to a prop is silently dropped by Vue, B74)
+            hideCompleted: true,
         };
     },
     props: {
-        hideCompleted: {},
         newImports: {},
         newProduct: {},
         newRecipe: {},
