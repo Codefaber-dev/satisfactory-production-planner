@@ -1,6 +1,6 @@
 <template>
     <svg
-        class="block w-full"
+        :class="nested ? null : 'block w-full'"
         :viewBox="viewBox"
         preserveAspectRatio="xMidYMid meet"
         role="img"
@@ -374,6 +374,13 @@ export default {
         },
         // engineering-blueprint color set — used by the diagram modal (V120)
         blueprint: {
+            type: Boolean,
+            default: false,
+        },
+        // nested <svg> placement inside another svg (master diagram, V142):
+        // drop the block/w-full classes so the fallthrough x/y/width/height
+        // attrs govern the box instead of CSS
+        nested: {
             type: Boolean,
             default: false,
         },
