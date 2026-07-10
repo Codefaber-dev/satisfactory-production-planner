@@ -315,3 +315,37 @@ describe('ProductionSteps — master diagram entry (V139)', () => {
         expect(wrapper.findComponent({ name: 'master-diagram' }).exists()).toBe(false);
     });
 });
+
+describe('ProductionSteps — raw-row check parity (V147, B71)', () => {
+    const findIronOre = (wrapper) =>
+        wrapper.findAll('.stub-step').find((s) => s.attributes('data-name') === 'Iron Ore');
+
+    it('passes :finished and dims a checked raw row', () => {
+        const wrapper = mountSteps({
+            hideCompleted: false,
+            productionChecks: { 'Iron Ore-base': true },
+        });
+        const ironOre = findIronOre(wrapper);
+
+        expect(ironOre.classes()).toContain('opacity-25');
+        expect(ironOre.attributes('finished')).toBe('true');
+        expect(ironOre.attributes('style') || '').not.toContain('display: none');
+    });
+
+    it('hideCompleted hides a checked raw row', () => {
+        const wrapper = mountSteps({
+            hideCompleted: true,
+            productionChecks: { 'Iron Ore-base': true },
+        });
+
+        expect(findIronOre(wrapper).attributes('style')).toContain('display: none');
+    });
+
+    it('leaves an unchecked raw row visible and undimmed under hideCompleted', () => {
+        const wrapper = mountSteps({ hideCompleted: true, productionChecks: {} });
+        const ironOre = findIronOre(wrapper);
+
+        expect(ironOre.attributes('style') || '').not.toContain('display: none');
+        expect(ironOre.classes()).toContain('opacity-100');
+    });
+});

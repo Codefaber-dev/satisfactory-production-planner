@@ -39,32 +39,34 @@ const baseFootprint = () => ({
 });
 
 describe('BuildDiagram — grouped render (V41, modal-only V134)', () => {
+    // V148: the modal teleports to body, so query the modal component's own
+    // subtree — the mount wrapper's DOM holds only the trigger button
     const openModal = async (footprint) => {
         const wrapper = mount(BuildDiagram, { props: { footprint } });
         await wrapper.find('[aria-label="Expand diagram"]').trigger('click');
 
-        return wrapper;
+        return wrapper.findComponent({ name: 'diagram-modal' });
     };
 
     it('shows blueprint tiles labeled monogram x size and blueprint stat rows', async () => {
         const footprint = groupedFootprint(baseFootprint(), 8, 32);
-        const wrapper = await openModal(footprint);
+        const modal = await openModal(footprint);
 
-        expect(wrapper.text()).toContain('Cx8');
-        expect(wrapper.text()).toContain('Blueprints');
-        expect(wrapper.text()).toContain('2 (8 ea)'.replace(/\s+/g, ' ').trim().split(' ')[0]);
-        expect(wrapper.text()).toContain('Blueprint Rows');
-        expect(wrapper.text()).toContain('Blueprints Per Row');
-        expect(wrapper.text()).not.toContain('Building Rows');
+        expect(modal.text()).toContain('Cx8');
+        expect(modal.text()).toContain('Blueprints');
+        expect(modal.text()).toContain('2 (8 ea)'.replace(/\s+/g, ' ').trim().split(' ')[0]);
+        expect(modal.text()).toContain('Blueprint Rows');
+        expect(modal.text()).toContain('Blueprints Per Row');
+        expect(modal.text()).not.toContain('Building Rows');
     });
 
     it('keeps individual-building render for ungrouped footprints', async () => {
-        const wrapper = await openModal(baseFootprint());
+        const modal = await openModal(baseFootprint());
 
-        expect(wrapper.text()).toContain('Building Rows');
-        expect(wrapper.text()).toContain('Buildings Per Row');
-        expect(wrapper.text()).not.toContain('Blueprints');
-        expect(wrapper.text()).not.toContain('Cx');
+        expect(modal.text()).toContain('Building Rows');
+        expect(modal.text()).toContain('Buildings Per Row');
+        expect(modal.text()).not.toContain('Blueprints');
+        expect(modal.text()).not.toContain('Cx');
     });
 });
 

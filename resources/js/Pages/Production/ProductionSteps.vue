@@ -61,10 +61,20 @@
                     <th class="block bg-blue-200 py-2 text-2xl dark:bg-slate-800 lg:table-cell" colspan="100">Level 0</th>
                 </tr>
                 <template v-for="(material, name) in rawSteps">
+                    <!-- V147: raw rows honor check state exactly like leveled rows -->
                     <ProductionStep
                         v-for="prod in material.production"
-                        v-show="stepMatchesFilter(prod, name)"
+                        v-show="
+                            (!hideCompleted || !productionChecks[name + '-' + (prod.recipe?.description || 'base')]) &&
+                            stepMatchesFilter(prod, name)
+                        "
                         :key="name + '-raw-' + (prod.recipe?.description || 'leaf')"
+                        :class="[
+                            productionChecks[name + '-' + (prod.recipe?.description || 'base')]
+                                ? 'opacity-25'
+                                : 'opacity-100',
+                        ]"
+                        :finished="productionChecks[name + '-' + (prod.recipe?.description || 'base')]"
                         :level-index="0"
                         :level-step-map="levelStepMap"
                         :step-index="rawStepIndex(name)"

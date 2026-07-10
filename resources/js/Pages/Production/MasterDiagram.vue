@@ -236,7 +236,8 @@
                                     {{ node.name }}
                                 </text>
                             </template>
-                            <!-- faint dashed bounds, hover-lifted (V141a/b) -->
+                            <!-- faint dashed bounds, hover-lifted (V141a/b);
+                                 checked step ⇒ green border (V144b rev) -->
                             <rect
                                 data-node-bounds
                                 :x="node.x"
@@ -245,8 +246,10 @@
                                 :height="node.h"
                                 fill="#bfdbfe"
                                 :fill-opacity="hovered === node.id ? 0.08 : 0"
-                                stroke="#bfdbfe"
-                                :stroke-opacity="hovered === node.id ? 0.9 : 0.35"
+                                :stroke="isChecked(nodeCheckKey(node)) ? '#4ade80' : '#bfdbfe'"
+                                :stroke-opacity="
+                                    isChecked(nodeCheckKey(node)) || hovered === node.id ? 0.9 : 0.35
+                                "
                                 stroke-width="1"
                                 stroke-dasharray="3 2"
                                 vector-effect="non-scaling-stroke"
@@ -297,15 +300,17 @@
                                 @click.stop="toggleCheck(nodeCheckKey(node))"
                                 @pointerdown.stop
                             >
+                                <!-- light box so it reads on the dark node (V144b rev) -->
                                 <rect
                                     :x="node.x + 1"
                                     :y="node.y + 1"
                                     width="8"
                                     height="8"
                                     rx="1"
-                                    fill="#1e3a8a"
+                                    fill="#e0f2fe"
+                                    fill-opacity="0.95"
                                     stroke="#bfdbfe"
-                                    stroke-width="1"
+                                    stroke-width="1.5"
                                     vector-effect="non-scaling-stroke"
                                 />
                                 <text
@@ -315,8 +320,9 @@
                                     :y="node.y + 5"
                                     text-anchor="middle"
                                     dominant-baseline="central"
-                                    font-size="6"
-                                    fill="#a3e635"
+                                    font-size="7"
+                                    font-weight="bold"
+                                    fill="#16a34a"
                                 >
                                     ✓
                                 </text>

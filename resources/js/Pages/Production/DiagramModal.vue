@@ -33,6 +33,20 @@
                         <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Recipe</div>
                         <div class="text-lg tracking-widest text-blue-50">{{ details.recipe_name }}</div>
                     </div>
+                    <!-- BUILT check: header compartment right of RECIPE (V144a rev) -->
+                    <div v-if="checkKey" class="border-l border-blue-200/60 px-4 py-1.5" data-built-cell>
+                        <div class="text-[9px] uppercase tracking-[0.25em] text-blue-300">Built</div>
+                        <label class="flex cursor-pointer items-center gap-2">
+                            <input
+                                type="checkbox"
+                                class="h-5 w-5 cursor-pointer"
+                                data-built-checkbox
+                                :checked="isChecked(checkKey)"
+                                @change="toggleCheck(checkKey)"
+                            />
+                            <span class="text-lg">{{ isChecked(checkKey) ? '✅' : '—' }}</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 border-l border-blue-200/60 px-3 py-1.5">
                     <button
@@ -106,19 +120,6 @@
                                     <div class="border-b border-r border-blue-200/40 px-2 py-1">
                                         <div class="text-[9px] uppercase tracking-widest text-blue-300">Units</div>
                                         <div>Dimensions in meters</div>
-                                    </div>
-                                    <!-- V144a: BUILT checkbox — same store entry as the step row -->
-                                    <div v-if="checkKey" class="border-b border-r border-blue-200/40 px-2 py-1" data-built-cell>
-                                        <div class="text-[9px] uppercase tracking-widest text-blue-300">Built</div>
-                                        <label class="flex cursor-pointer items-center gap-1">
-                                            <input
-                                                type="checkbox"
-                                                data-built-checkbox
-                                                :checked="isChecked(checkKey)"
-                                                @change="toggleCheck(checkKey)"
-                                            />
-                                            <span>{{ isChecked(checkKey) ? '✅' : '—' }}</span>
-                                        </label>
                                     </div>
                                     <div
                                         v-if="details?.max_clock_speed"

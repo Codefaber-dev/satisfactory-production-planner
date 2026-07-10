@@ -388,3 +388,42 @@ describe('MasterDiagram — nav ✅ markers (V146)', () => {
         expect(items[1].text()).toContain('✅');
     });
 });
+
+describe('MasterDiagram — check visuals (V144b rev)', () => {
+    const makeStore = () => {
+        const data = {};
+
+        return {
+            getItem: (key, def = null) => (key in data ? data[key] : def),
+            setItem: (key, value) => {
+                data[key] = value;
+            },
+        };
+    };
+
+    afterEach(() => {
+        resetChecks();
+    });
+
+    it('affordance box is light-on-dark; checking a node turns its bounds green', async () => {
+        initChecks(makeStore(), 7);
+        const wrapper = mountMaster();
+        const node = wrapper.find('[data-node="1.A"]');
+
+        // light box readable on the #172554 black-box node
+        expect(node.find('[data-check-step] rect').attributes('fill')).toBe('#e0f2fe');
+
+        const bounds = node.find('[data-node-bounds]');
+        expect(bounds.attributes('stroke')).toBe('#bfdbfe');
+        expect(Number(bounds.attributes('stroke-opacity'))).toBeLessThan(0.5);
+
+        await node.find('[data-check-step]').trigger('click');
+
+        const after = wrapper.find('[data-node="1.A"] [data-node-bounds]');
+        expect(after.attributes('stroke')).toBe('#4ade80');
+        expect(Number(after.attributes('stroke-opacity'))).toBeCloseTo(0.9);
+
+        // unchecked sibling keeps the default border
+        expect(wrapper.find('[data-node="0.A"] [data-node-bounds]').attributes('stroke')).toBe('#bfdbfe');
+    });
+});

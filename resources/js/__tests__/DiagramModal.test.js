@@ -348,3 +348,53 @@ describe('DiagramModal — BUILT check cell (V144a)', () => {
         expect(wrapper.find('[data-built-checkbox]').element.checked).toBe(true);
     });
 });
+
+describe('BuildDiagram — teleported modal (V148, B72)', () => {
+    it('mounts the overlay under document.body so a hidden host row cannot hide it', async () => {
+        const wrapper = mount(BuildDiagram, { props: { footprint: baseFootprint() } });
+
+        await wrapper.find('[aria-label="Expand diagram"]').trigger('click');
+
+        const overlay = document.body.querySelector('[data-diagram-modal]');
+        expect(overlay).toBeTruthy();
+        expect(overlay.parentElement).toBe(document.body);
+
+        wrapper.unmount();
+        expect(document.body.querySelector('[data-diagram-modal]')).toBeNull();
+    });
+});
+
+describe('DiagramModal — BUILT cell placement (V144a rev)', () => {
+    beforeEach(() => {
+        resetChecks();
+    });
+
+    it('renders in the header strip (right of recipe), not the bottom stats block', () => {
+        const wrapper = mountModal({
+            props: {
+                footprint: baseFootprint(),
+                checkKey: 'Iron Ingot-base',
+                details: {
+                    recipe_name: 'Iron Ingot Alt',
+                    output: { name: 'Iron Ingot', qty: 30 },
+                    byproducts: {},
+                    inputs: {},
+                    building: 'Smelter',
+                    num_buildings: 1,
+                    clock_speed: 100,
+                    power_usage: 4,
+                    build_cost: {},
+                    slots: 0,
+                    max_slots: 0,
+                },
+            },
+        });
+
+        const headerCell = wrapper.find('.border-b-2 [data-built-cell]');
+        expect(headerCell.exists()).toBe(true);
+        // compartment right of the RECIPE cell
+        expect(headerCell.element.previousElementSibling?.hasAttribute('data-recipe-cell')).toBe(true);
+        // old stats-row placement gone
+        expect(wrapper.find('.max-h-80 [data-built-cell]').exists()).toBe(false);
+    });
+});
