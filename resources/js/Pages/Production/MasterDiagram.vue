@@ -387,7 +387,8 @@
                                 data-modal-nav-item
                                 @click="navigateTo(entry)"
                             >
-                                {{ entry.identifier }} {{ entry.name }}
+                                <!-- ✅ iff truthy store value at the entry's exact check key (V146) -->
+                                {{ isChecked(entry.checkKey) ? '✅ ' : '' }}{{ entry.identifier }} {{ entry.name }}
                             </button>
                         </li>
                     </ul>

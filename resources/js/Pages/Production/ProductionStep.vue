@@ -472,6 +472,8 @@ export default {
             this.Bus.emit('RegisterQuickNav', {
                 name: this.name,
                 identifier: this.identifier,
+                // exact check-store key for the nav's ✅ marker (V146)
+                checkKey: this.checkKey,
             });
         }
     },

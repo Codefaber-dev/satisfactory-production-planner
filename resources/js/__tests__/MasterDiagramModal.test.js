@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { registerDiagram, resetDiagramRegistry } from '../diagramRegistry';
 import MasterDiagram from '../Pages/Production/MasterDiagram.vue';
 import DiagramSvg from '../Pages/Production/DiagramSvg.vue';
-import { initChecks, isChecked, resetChecks } from '../stepChecks';
+import { initChecks, isChecked, resetChecks, toggleCheck } from '../stepChecks';
 
 const footprint = () => ({
     monogram: 'S',
@@ -352,5 +352,39 @@ describe('MasterDiagram — build-check affordance (V144b)', () => {
 
         await wrapper.find('[data-node="1.A"] [data-check-step]').trigger('click');
         expect(isChecked('Iron Ingot-Iron Ingot')).toBe(true);
+    });
+});
+
+describe('MasterDiagram — nav ✅ markers (V146)', () => {
+    afterEach(() => {
+        resetChecks();
+    });
+
+    it('prefixes ✅ iff the entry’s exact check key is truthy', () => {
+        const data = {};
+        initChecks(
+            {
+                getItem: (key, def = null) => (key in data ? data[key] : def),
+                setItem: (key, value) => {
+                    data[key] = value;
+                },
+            },
+            2
+        );
+        toggleCheck('Iron Ingot-Iron Ingot');
+
+        registerDiagram({
+            identifier: '1.A',
+            name: 'Iron Ingot',
+            checkKey: 'Iron Ingot-Iron Ingot',
+            open: vi.fn(),
+        });
+        registerDiagram({ identifier: '0.A', name: 'Iron Ore', checkKey: 'Iron Ore-base', open: vi.fn() });
+
+        const wrapper = mountMaster();
+        const items = wrapper.findAll('[data-modal-nav-item]');
+
+        expect(items[0].text()).not.toContain('✅');
+        expect(items[1].text()).toContain('✅');
     });
 });

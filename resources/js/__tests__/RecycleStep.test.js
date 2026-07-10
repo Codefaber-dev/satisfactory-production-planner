@@ -69,7 +69,11 @@ describe('RecycleStep — terminal AWESOME Sink step (V91)', () => {
     it('registers in QuickNav under its R.* identifier (V95)', () => {
         mockBus.emit.mockClear();
         mountStep(sinkStep, { identifier: 'R.B' });
-        expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', { name: 'AWESOME Sink', identifier: 'R.B' });
+        expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', {
+            name: 'AWESOME Sink',
+            identifier: 'R.B',
+            checkKey: 'AWESOME Sink-sink',
+        });
     });
 
     it('flashes when a destination link targeting it fires (flash parity with ProductionStep)', async () => {

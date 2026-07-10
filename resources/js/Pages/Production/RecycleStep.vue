@@ -113,7 +113,11 @@ export default {
     },
     mounted() {
         // V95: the terminal sink step appears in QuickNav under its R.* identifier
-        this.Bus.emit('RegisterQuickNav', { name: this.step.name, identifier: this.identifier });
+        this.Bus.emit('RegisterQuickNav', {
+            name: this.step.name,
+            identifier: this.identifier,
+            checkKey: this.checkKey,
+        });
 
         // flash parity with ProductionStep: highlight when a destination link
         // targeting this step is clicked

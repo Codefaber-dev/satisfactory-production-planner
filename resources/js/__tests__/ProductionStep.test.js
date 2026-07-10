@@ -372,6 +372,7 @@ describe('ProductionStep — QuickNav registration', () => {
         expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', {
             name: 'Iron Plate',
             identifier: '1.A',
+            checkKey: 'Iron Plate-base',
         });
     });
 
@@ -472,6 +473,10 @@ describe('ProductionStep — synthetic packaging step (V90)', () => {
 
     it('registers in QuickNav under its R.* identifier (V95)', () => {
         mountPackage();
-        expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', { name: 'Packaged Water', identifier: 'R.A' });
+        expect(mockBus.emit).toHaveBeenCalledWith('RegisterQuickNav', {
+            name: 'Packaged Water',
+            identifier: 'R.A',
+            checkKey: 'Packaged Water-Packaged Water',
+        });
     });
 });
